@@ -34,7 +34,7 @@
 - [ ] `apps/astro-blog` へ `npm create astro@latest`（framework: blog, template: minimal）
 - [ ] `astro.config.mjs` の `site`, `output` を `"https://{preview_domain}"`, `"static"` に設定
 - [ ] `.gitignore` に `apps/astro-blog/src/content/**` を追加
-- [ ] `pnpm --filter astro-blog dev` で起動確認
+- [ ] `pnpm --prefix apps/astro-blog dev` で起動確認
 
 ---
 
