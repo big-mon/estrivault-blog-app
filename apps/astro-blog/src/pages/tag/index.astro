@@ -1,0 +1,39 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
+import { getCollection } from "astro:content";
+
+// 全記事からタグ一覧を生成
+const posts = await getCollection("blog");
+const tagsSet = new Set<string>();
+posts.forEach(post => {
+  post.data.tags?.forEach(tag => tagsSet.add(tag));
+});
+const tags = Array.from(tagsSet).sort();
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <BaseHead title={`${SITE_TITLE} - タグ`} description={SITE_DESCRIPTION} />
+    <style>
+      main { width: 960px; margin: auto; }
+      ul { list-style: none; padding: 0; }
+      ul li { margin: 0.5rem 0; }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <h1>タグ一覧</h1>
+      <ul>
+        {tags.map(tag => (
+          <li><a href={`/tag/${tag}/`}>{tag}</a></li>
+        ))}
+      </ul>
+    </main>
+    <Footer />
+  </body>
+</html>
