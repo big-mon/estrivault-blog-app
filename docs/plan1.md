@@ -31,10 +31,10 @@
 
 ### M1 ─ プロジェクト初期化
 
-- [ ] `apps/astro-blog` へ `npm create astro@latest`（framework: blog, template: minimal）
-- [ ] `astro.config.mjs` の `site`, `output` を `"https://{preview_domain}"`, `"static"` に設定
-- [ ] `.gitignore` に `apps/astro-blog/src/content/**` を追加
-- [ ] `pnpm --prefix apps/astro-blog dev` で起動確認
+- [x] `apps/astro-blog` へ `npm create astro@latest`（framework: blog, template: minimal）
+- [x] `astro.config.mjs` の `site`, `output` を `"https://{preview_domain}"`, `"static"` に設定
+- [x] `.gitignore` に `apps/astro-blog/src/content/**` を追加
+- [x] `pnpm --prefix apps/astro-blog dev` で起動確認
 
 ---
 
