@@ -178,7 +178,7 @@
           run: pnpm i
 
         - name: Build Astro blog
-          run: pnpm --filter astro-blog build
+          run: pnpm --prefix apps/astro-blog run build
 
         - name: Upload artifact
           uses: actions/upload-pages-artifact@v3
