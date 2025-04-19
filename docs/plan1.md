@@ -186,7 +186,7 @@
             path: apps/astro-blog/dist
   ```
 
-- [ ] Cloudflare Pages または GitHub Pages に接続
+- [ ] Cloudflare Pages または GitHub Pages または Vercel に接続
 - [ ] PR ごとに Preview URL を発行・検証可能にする
 
 ---
