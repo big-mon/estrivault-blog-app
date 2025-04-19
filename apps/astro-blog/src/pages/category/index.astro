@@ -7,17 +7,30 @@ import { getCollection } from "astro:content";
 
 // 全記事からカテゴリー一覧を生成
 const posts = await getCollection("blog");
-const categories = Array.from(new Set(posts.map((post) => post.data.category))).sort();
+const categories = Array.from(
+  new Set(posts.map((post) => post.data.category))
+).sort();
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
-    <BaseHead title={`${SITE_TITLE} - カテゴリー`} description={SITE_DESCRIPTION} />
+    <BaseHead
+      title={`${SITE_TITLE} - カテゴリー`}
+      description={SITE_DESCRIPTION}
+    />
     <style>
-      main { width: 960px; margin: auto; }
-      ul { list-style: none; padding: 0; }
-      ul li { margin: 0.5rem 0; }
+      main {
+        width: 960px;
+        margin: auto;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      ul li {
+        margin: 0.5rem 0;
+      }
     </style>
   </head>
   <body>
@@ -25,9 +38,13 @@ const categories = Array.from(new Set(posts.map((post) => post.data.category))).
     <main>
       <h1>カテゴリー一覧</h1>
       <ul>
-        {categories.map((cat) => (
-          <li><a href={`/category/${cat}/`}>{cat}</a></li>
-        ))}
+        {
+          categories.map((cat) => (
+            <li>
+              <a href={`/category/${cat}`}>{cat}</a>
+            </li>
+          ))
+        }
       </ul>
     </main>
     <Footer />

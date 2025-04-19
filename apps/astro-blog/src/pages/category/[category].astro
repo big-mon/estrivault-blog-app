@@ -9,7 +9,9 @@ import FormattedDate from "../../components/FormattedDate.astro";
 // 動的にカテゴリーページを生成
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
-  const categories = Array.from(new Set(posts.map((post) => post.data.category)));
+  const categories = Array.from(
+    new Set(posts.map((post) => post.data.category))
+  );
   return categories.map((category) => ({ params: { category } }));
 }
 
@@ -20,35 +22,54 @@ const posts = (await getCollection("blog"))
   .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
-    <BaseHead title={`${SITE_TITLE} - ${category}`} description={SITE_DESCRIPTION} />
+    <BaseHead
+      title={`${SITE_TITLE} - ${category}`}
+      description={SITE_DESCRIPTION}
+    />
     <style>
-      main { width: 960px; margin: auto; }
-      ul { display: flex; flex-wrap: wrap; gap: 2rem; list-style: none; margin: 0; padding: 0; }
-      ul li { width: calc(50% - 1rem); }
-      ul li * { margin: 0; }
+      main {
+        width: 960px;
+        margin: auto;
+      }
+      ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      ul li {
+        width: calc(50% - 1rem);
+      }
+      ul li * {
+        margin: 0;
+      }
     </style>
   </head>
   <body>
     <Header />
     <main>
       <h1>カテゴリ: {category}</h1>
-      {posts.length === 0 ? (
-        <p>該当する記事がありません。</p>
-      ) : (
-        <ul>
-          {posts.map((post) => (
-            <li>
-              <a href={`/post/${post.slug}/`}>
-                <h2>{post.data.title}</h2>
-              </a>
-              <FormattedDate date={post.data.publishedAt} />
-            </li>
-          ))}
-        </ul>
-      )}
+      {
+        posts.length === 0 ? (
+          <p>該当する記事がありません。</p>
+        ) : (
+          <ul>
+            {posts.map((post) => (
+              <li>
+                <a href={`/post/${post.data.slug}`}>
+                  <h2>{post.data.title}</h2>
+                </a>
+                <FormattedDate date={post.data.publishedAt} />
+              </li>
+            ))}
+          </ul>
+        )
+      }
     </main>
     <Footer />
   </body>
