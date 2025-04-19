@@ -1,0 +1,6 @@
+apps/astro-blog/src/content/**
+
+# その他
+.env*
+.DS_Store
+node_modules
