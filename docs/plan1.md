@@ -1,6 +1,6 @@
 # Astro ブログ開発 — 初期フェーズ計画書
 
-**対象リポジトリ**: `blog-template/apps/astro-blog`
+**対象リポジトリ**: `estrivault-blog-app/apps/astro-blog`
 **目的**: Markdown 記事を高速配信する静的ブログを Astro のみで構築し、テンプレート公開の下地を作る。
 
 ---
