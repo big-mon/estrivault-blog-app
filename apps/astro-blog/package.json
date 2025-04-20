@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "dotenv -e ../../.env -- astro dev",
     "predev": "pnpm --filter @estrivault/remark-cloudinary-images run build",
     "build": "astro build",
     "prebuild": "pnpm --filter @estrivault/remark-cloudinary-images run build",
