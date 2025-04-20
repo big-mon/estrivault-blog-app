@@ -7,6 +7,7 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
     root: './',
     vite: {
+        server: { fs: { allow: ['..'] } },
         resolve: { preserveSymlinks: true },
     },
     site: 'https://{preview_domain}',

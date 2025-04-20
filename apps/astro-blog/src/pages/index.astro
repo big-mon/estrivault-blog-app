@@ -5,6 +5,7 @@ import Footer from "../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import { getCollection } from "astro:content";
 import FormattedDate from "../components/FormattedDate.astro";
+import CldImage from "../components/CldImage.astro";
 
 const posts = (await getCollection("blog"))
   .filter((post) => !post.data.draft)
@@ -51,11 +52,11 @@ const posts = (await getCollection("blog"))
             <li>
               <a href={`/post/${post.data.slug}`}>
                 {post.data.coverImage && (
-                  <img
-                    src={post.data.coverImage}
+                  <CldImage
+                    publicId={post.data.coverImage}
                     alt={post.data.title}
-                    width="720"
-                    height="360"
+                    width={720}
+                    height={360}
                   />
                 )}
                 <h4 class="title">{post.data.title}</h4>

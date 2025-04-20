@@ -1,0 +1,13 @@
+---
+import { buildUrl } from '../../../../packages/cloudinary-utils/index.ts';
+const {
+  publicId,
+  alt = "",
+  width = 800,
+  height = 450,
+  class: className = "",
+} = Astro.props;
+const src = buildUrl(publicId, { w: width, h: height });
+---
+
+<img src={src} alt={alt} width={width} height={height} class={className} loading="lazy" />
