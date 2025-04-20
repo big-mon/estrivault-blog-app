@@ -1,25 +1,17 @@
 # estrivault-blog-app
 
-## セットアップ・依存関係の解決
-
-本リポジトリは pnpm workspace を利用しています。新しい依存パッケージを追加した場合や、パッケージ間の参照エラーが発生した場合は、必ず以下を実行してください。
+## 🛠 開発手順
 
 ```bash
-pnpm install
+git clone https://github.com/big-mon/estrivault-blog-app.git
+cd estrivault-blog-app
+
+npm install -g pnpm   # pnpm未導入の場合のみ
+pnpm install          # 依存パッケージのインストール
+pnpm dev              # 開発サーバ起動（http://localhost:5173）
 ```
 
-## パッケージのビルド
-
-TypeScript で記述されたパッケージ（例: `@estrivault/cloudinary-utils`）を利用する場合、利用前にビルドが必要です。
-
-```bash
-pnpm --filter @estrivault/cloudinary-utils run build
-```
-
-## ブログの起動
-
-ルートディレクトリで以下のコマンドを実行し、`apps/astro-blog` の開発サーバを起動します:
-
-```bash
-pnpm run dev:astro-blog
-```
+- Node.js >= 18（Vite と SvelteKit 推奨バージョンに合わせて）
+- pnpm 利用前提（npm や yarn では未サポート or 不安定）
+- モノレポ構成（apps/svelte-blog にアプリがある）
+- pnpm dev が apps/svelte-blog をフィルタして起動する設定済み
