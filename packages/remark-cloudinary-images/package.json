@@ -15,13 +15,17 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --dts --format esm,cjs",
-    "dev": "tsup src/index.ts --dts --watch"
+    "prebuild": "pnpm --filter @estrivault/cloudinary-utils build",
+    "build": "tsc --build --force && tsup"
   },
   "peerDependencies": {
     "unist-util-visit": "^5.0.0"
   },
+  "dependencies": {
+    "@estrivault/cloudinary-utils": "workspace:*"
+  },
   "devDependencies": {
+    "@types/mdast": "^4.0.4",
     "@types/node": "^22.14.1",
     "tsup": "^8.0.0",
     "typescript": "^5.4.0"
