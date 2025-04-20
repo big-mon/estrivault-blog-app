@@ -1,0 +1,35 @@
+{
+    "name": "@estrivault/remark-cloudinary-images",
+    "version": "0.1.0",
+    "type": "module",
+    "description": "Remark plugin that swaps Cloudinary public IDs for <CldImage>",
+    "keywords": ["remark", "cloudinary", "mdx", "plugin"],
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "module": "dist/index.esm.js",
+    "exports": {
+      ".": {
+        "import": "./dist/index.esm.js",
+        "require": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "files": ["dist"],
+    "scripts": {
+      "build": "tsup src/index.ts --dts --format esm,cjs",
+      "dev": "tsup src/index.ts --dts --watch"
+    },
+    "peerDependencies": {
+      "unist-util-visit": "^5.0.0"
+    },
+    "devDependencies": {
+      "tsup": "^8.0.0",
+      "typescript": "^5.4.0"
+    },
+    "license": "MIT",
+    "repository": {
+  "type": "git",
+  "url": "https://github.com/your-name/estrivault-blog-app.git",
+  "directory": "packages/remark-cloudinary-images"
+}
+  }
