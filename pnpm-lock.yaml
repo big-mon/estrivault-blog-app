@@ -27,6 +27,9 @@ importers:
       '@astrojs/sitemap':
         specifier: ^3.3.0
         version: 3.3.0
+      '@estrivault/cloudinary-utils':
+        specifier: workspace:*
+        version: link:../../packages/cloudinary-utils
       '@estrivault/remark-cloudinary-images':
         specifier: workspace:*
         version: link:../../packages/remark-cloudinary-images
