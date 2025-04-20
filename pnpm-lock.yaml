@@ -39,13 +39,23 @@ importers:
       '@cloudinary/url-gen':
         specifier: ^1.21.0
         version: 1.21.0
+    devDependencies:
+      tsup:
+        specifier: ^8.0.0
+        version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)
 
   packages/remark-cloudinary-images:
     dependencies:
+      '@estrivault/cloudinary-utils':
+        specifier: workspace:*
+        version: link:../cloudinary-utils
       unist-util-visit:
         specifier: ^5.0.0
         version: 5.0.0
     devDependencies:
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
       '@types/node':
         specifier: ^22.14.1
         version: 22.14.1
