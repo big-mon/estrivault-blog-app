@@ -17,10 +17,7 @@ function buildUrl(cloudName: string, publicId: string, options: { w?: number; h?
   return `https://res.cloudinary.com/${cloudName}/image/upload/${transform}/${publicId}`;
 }
 
-function buildSrcSet(publicId: string) {
-  const cloudName = process.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
-  if (!cloudName) throw new Error("Missing PUBLIC_CLOUDINARY_CLOUD_NAME");
-
+function buildSrcSet(cloudName: string, publicId: string) {
   return widths
     .map((w) => {
       const h = aspectRatio && mode === "fill" ? Math.round(w / aspectRatio) : undefined;
@@ -31,10 +28,10 @@ function buildSrcSet(publicId: string) {
 }
 
 export default function remarkCloudinaryImages() {
-  const cloudName = process.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
-  if (!cloudName) throw new Error("Missing PUBLIC_CLOUDINARY_CLOUD_NAME");
-
   return (tree) => {
+    const cloudName = process.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
+    if (!cloudName) throw new Error("Missing PUBLIC_CLOUDINARY_CLOUD_NAME");
+
     visit(tree, "image", (node, i, parent) => {
       const url = node.url ?? "";
       const alt = node.alt ?? "";
@@ -43,10 +40,12 @@ export default function remarkCloudinaryImages() {
       if (isExternal) return;
 
       const fallbackWidth = Math.max(...widths);
-      const fallbackHeight = aspectRatio && mode === "fill" ? Math.round(fallbackWidth / aspectRatio) : undefined;
+      const fallbackHeight = aspectRatio && mode === "fill"
+        ? Math.round(fallbackWidth / aspectRatio)
+        : undefined;
 
       const src = buildUrl(cloudName, url, { w: fallbackWidth, h: fallbackHeight, mode });
-      const srcset = buildSrcSet(url);
+      const srcset = buildSrcSet(cloudName, url);
 
       const replacement = {
         type: "html",
@@ -62,6 +61,7 @@ export default function remarkCloudinaryImages() {
           />
         `.trim(),
       };
+      console.log("✅ Replaced:", replacement.value);
 
       parent.children[i] = replacement;
     });
