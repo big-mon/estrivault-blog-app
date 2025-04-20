@@ -1,5 +1,5 @@
 ---
-import { buildUrl } from '../../../../packages/cloudinary-utils/index.ts';
+import { buildUrl } from "../../../../packages/cloudinary-utils/index.ts";
 const {
   publicId,
   alt = "",
@@ -7,7 +7,20 @@ const {
   height = 450,
   class: className = "",
 } = Astro.props;
-const src = buildUrl(publicId, { w: width, h: height });
+
+// cloudNameを環境変数から取得してbuildUrlに渡す
+const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
+if (!cloudName) {
+  throw new Error("Missing Cloudinary cloud name in environment");
+}
+const src = buildUrl(cloudName, publicId, { w: width, h: height });
 ---
 
-<img src={src} alt={alt} width={width} height={height} class={className} loading="lazy" />
+<img
+  src={src}
+  alt={alt}
+  width={width}
+  height={height}
+  class={className}
+  loading="lazy"
+/>
