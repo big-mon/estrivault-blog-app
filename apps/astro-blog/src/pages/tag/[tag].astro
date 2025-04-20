@@ -5,50 +5,79 @@ import Footer from "../../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
 import FormattedDate from "../../components/FormattedDate.astro";
 import { getCollection } from "astro:content";
+import CldImage from "../../components/CldImage.astro";
 
 // 動的タグページ生成
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
-  const tags = Array.from(new Set(posts.flatMap(post => post.data.tags || [])));
-  return tags.map(tag => ({ params: { tag } }));
+  const tags = Array.from(
+    new Set(posts.flatMap((post) => post.data.tags || []))
+  );
+  return tags.map((tag) => ({ params: { tag } }));
 }
 
 const { tag } = Astro.params;
 const posts = (await getCollection("blog"))
-  .filter(post => !post.data.draft)
-  .filter(post => post.data.tags?.includes(tag))
+  .filter((post) => !post.data.draft)
+  .filter((post) => post.data.tags?.includes(tag))
   .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
     <BaseHead title={`${SITE_TITLE} - ${tag}`} description={SITE_DESCRIPTION} />
     <style>
-      main { width: 960px; margin: auto; }
-      ul { display: flex; flex-wrap: wrap; gap: 2rem; list-style: none; margin: 0; padding: 0; }
-      ul li { width: calc(50% - 1rem); }
-      ul li * { margin: 0; }
+      main {
+        width: 960px;
+        margin: auto;
+      }
+      ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      ul li {
+        width: calc(50% - 1rem);
+      }
+      ul li * {
+        margin: 0;
+      }
     </style>
   </head>
   <body>
     <Header />
     <main>
       <h1>タグ: {tag}</h1>
-      {posts.length === 0 ? (
-        <p>該当する記事がありません。</p>
-      ) : (
-        <ul>
-          {posts.map(post => (
-            <li>
-              <a href={`/post/${post.data.slug}/`}>
-                <h2>{post.data.title}</h2>
-              </a>
-              <FormattedDate date={post.data.publishedAt} />
-            </li>
-          ))}
-        </ul>
-      )}
+      {
+        posts.length === 0 ? (
+          <p>該当する記事がありません。</p>
+        ) : (
+          <ul>
+            {posts.map((post) => (
+              <li>
+                <a href={`/post/${post.data.slug}`}>
+                  {post.data.coverImage && (
+                    <CldImage
+                      publicId={post.data.coverImage}
+                      alt={post.data.title}
+                      width={720}
+                      height={360}
+                    />
+                  )}
+                  <h2 class="title">{post.data.title}</h2>
+                  <p class="date">
+                    <FormattedDate date={post.data.publishedAt} />
+                  </p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
     </main>
     <Footer />
   </body>

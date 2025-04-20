@@ -5,6 +5,7 @@ import Footer from "../../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
 import { getCollection } from "astro:content";
 import FormattedDate from "../../components/FormattedDate.astro";
+import CldImage from "../../components/CldImage.astro";
 
 // 動的にカテゴリーページを生成
 export async function getStaticPaths() {
@@ -62,9 +63,19 @@ const posts = (await getCollection("blog"))
             {posts.map((post) => (
               <li>
                 <a href={`/post/${post.data.slug}`}>
-                  <h2>{post.data.title}</h2>
+                  {post.data.coverImage && (
+                    <CldImage
+                      publicId={post.data.coverImage}
+                      alt={post.data.title}
+                      width={720}
+                      height={360}
+                    />
+                  )}
+                  <h2 class="title">{post.data.title}</h2>
+                  <p class="date">
+                    <FormattedDate date={post.data.publishedAt} />
+                  </p>
                 </a>
-                <FormattedDate date={post.data.publishedAt} />
               </li>
             ))}
           </ul>
