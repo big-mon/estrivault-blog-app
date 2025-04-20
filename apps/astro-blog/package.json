@@ -1,10 +1,12 @@
 {
-  "name": "astro-blog",
+  "name": "@estrivault/astro-blog",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "predev": "pnpm --filter @estrivault/remark-cloudinary-images run build",
     "build": "astro build",
+    "prebuild": "pnpm --filter @estrivault/remark-cloudinary-images run build",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -12,6 +14,7 @@
     "@astrojs/mdx": "^4.2.4",
     "@astrojs/rss": "^4.0.11",
     "@astrojs/sitemap": "^3.3.0",
-    "astro": "^5.7.4"
+    "astro": "^5.7.4",
+    "@estrivault/remark-cloudinary-images": "workspace:*"
   }
 }

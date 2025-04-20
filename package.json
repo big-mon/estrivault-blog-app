@@ -2,7 +2,7 @@
   "name": "estrivault-blog-app",
   "private": true,
   "scripts": {
-    "dev:astro-blog": "npm --prefix apps/astro-blog run dev"
+    "dev:astro-blog": "pnpm --filter @estrivault/astro-blog dev"
   },
   "dependencies": {
     "@cloudinary/url-gen": "^1.21.0"

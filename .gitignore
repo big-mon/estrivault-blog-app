@@ -5,3 +5,6 @@ apps/astro-blog/src/content/blog/**
 .env*
 .DS_Store
 node_modules
+
+dist/
+**/dist/
