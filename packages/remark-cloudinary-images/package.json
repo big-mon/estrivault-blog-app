@@ -11,7 +11,9 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --dts --format esm,cjs",
     "dev": "tsup src/index.ts --dts --watch"
@@ -20,6 +22,7 @@
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
+    "@types/node": "^22.14.1",
     "tsup": "^8.0.0",
     "typescript": "^5.4.0"
   },
