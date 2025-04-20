@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import tailwindcss from "@tailwindcss/vite";
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import remarkCloudinaryImages from "@estrivault/remark-cloudinary-images";
@@ -10,6 +11,7 @@ export default defineConfig({
         envPrefix: ['PUBLIC_', 'VITE_'],
         server: { fs: { allow: ['..'] } },
         resolve: { preserveSymlinks: true },
+        plugins: [tailwindcss()],
     },
     site: 'https://{preview_domain}',
     output: 'static',

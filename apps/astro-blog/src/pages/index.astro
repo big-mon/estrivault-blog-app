@@ -6,6 +6,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import { getCollection } from "astro:content";
 import FormattedDate from "../components/FormattedDate.astro";
 import CldImage from "../components/CldImage.astro";
+import "../styles/global.css";
 
 const posts = (await getCollection("blog"))
   .filter((post) => !post.data.draft)
@@ -46,6 +47,7 @@ const posts = (await getCollection("blog"))
     <Header />
     <main>
       <h1>{SITE_TITLE}</h1>
+      <div class="text-3xl font-bold underline">Hello world!</div>
       <ul>
         {
           posts.map((post) => (

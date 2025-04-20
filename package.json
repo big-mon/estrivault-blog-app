@@ -2,12 +2,18 @@
   "name": "estrivault-blog-app",
   "private": true,
   "scripts": {
-    "dev:astro-blog": "pnpm --filter @estrivault/astro-blog dev"
+    "dev:astro-blog": "pnpm --filter @estrivault/astro-blog dev",
+    "dev": "pnpm --filter svelte-blog dev"
   },
   "dependencies": {
     "@cloudinary/url-gen": "^1.21.0"
   },
   "devDependencies": {
     "dotenv-cli": "^8.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }
