@@ -1,5 +1,5 @@
 import { Cloudinary } from "@cloudinary/url-gen";
-import { fill } from "@cloudinary/url-gen/actions/resize";
+import { fill, fit } from "@cloudinary/url-gen/actions/resize";
 import { format, quality } from "@cloudinary/url-gen/actions/delivery";
 
 /**
@@ -8,14 +8,21 @@ import { format, quality } from "@cloudinary/url-gen/actions/delivery";
 export function buildUrl(
   cloudName: string,
   publicId: string,
-  opts: { w?: number; h?: number } = {}
+  opts: {
+    w: number;
+    h?: number;
+    mode?: "fill" | "fit";
+  }
 ): string {
-  const { w = 1200, h = 675 } = opts;
   const cld = new Cloudinary({ cloud: { cloudName } });
-  return cld
-    .image(publicId)
-    .resize(fill().width(w).height(h))
-    .delivery(format("auto"))
-    .delivery(quality("auto"))
-    .toURL();
+  const img = cld.image(publicId);
+
+  if (opts.mode === "fit" || !opts.h) {
+    img.resize(fit().width(opts.w));
+  } else {
+    img.resize(fill().width(opts.w).height(opts.h));
+  }
+
+  img.delivery(format("auto")).delivery(quality("auto"));
+  return img.toURL();
 }
