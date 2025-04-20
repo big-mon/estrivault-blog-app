@@ -1,0 +1,17 @@
+{
+  "name": "cloudinary-utils",
+  "version": "0.1.0",
+  "main": "index.ts",
+  "module": "index.ts",
+  "types": "index.ts",
+  "private": true,
+  "dependencies": {
+    "@cloudinary/url-gen": "^1.21.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.ts",
+      "require": "./index.ts"
+    }
+  }
+}

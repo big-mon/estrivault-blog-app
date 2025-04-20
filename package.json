@@ -1,0 +1,7 @@
+{
+    "name": "estrivault-blog-app",
+    "private": true,
+    "dependencies": {
+        "@cloudinary/url-gen": "^1.21.0"
+    }
+}
