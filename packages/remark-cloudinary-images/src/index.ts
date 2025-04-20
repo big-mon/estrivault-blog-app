@@ -1,21 +1,9 @@
 import { visit } from "unist-util-visit";
+import { buildUrl } from "@estrivault/cloudinary-utils";
 
 const widths = [480, 768, 1024, 1200];
 const aspectRatio = 16 / 9; // 必要に応じて別途指定可能
 const mode = "fill"; // or "fit"
-
-function buildUrl(cloudName: string, publicId: string, options: { w?: number; h?: number; mode?: string }) {
-  const { w, h, mode } = options;
-  const transform = [
-    mode === "fit" ? "c_fit" : "c_fill",
-    w ? `w_${w}` : null,
-    h ? `h_${h}` : null,
-    "f_auto",
-    "q_auto",
-  ].filter(Boolean).join(",");
-
-  return `https://res.cloudinary.com/${cloudName}/image/upload/${transform}/${publicId}`;
-}
 
 function buildSrcSet(cloudName: string, publicId: string) {
   return widths
@@ -61,7 +49,6 @@ export default function remarkCloudinaryImages() {
           />
         `.trim(),
       };
-      console.log("✅ Replaced:", replacement.value);
 
       parent.children[i] = replacement;
     });
