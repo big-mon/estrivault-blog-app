@@ -9,7 +9,9 @@
 	const { pathname }: Props = $props();
 </script>
 
-<header class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-	<Title />
-	<ResponsiveMenu {pathname} />
+<header class="w-full border-b border-gray-200 bg-white">
+	<div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+		<Title />
+		<ResponsiveMenu {pathname} />
+	</div>
 </header>
