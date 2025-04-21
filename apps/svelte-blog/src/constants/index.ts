@@ -7,3 +7,6 @@ export const NAVIGATION_LINKS = [
     { label: 'Tech', href: '/category/tech' },
     { label: 'Opinions', href: '/category/opinions' }
 ];
+
+export const SOCIAL_LINK_X = 'big_mon';
+export const SOCIAL_LINK_GITHUB = 'big-mon';
