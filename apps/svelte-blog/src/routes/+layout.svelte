@@ -10,8 +10,6 @@
 
 <Header pathname={$page.url.pathname} />
 
-<div class="">
-	<main>{@render children()}</main>
-</div>
+<main class="mx-auto w-full max-w-6xl px-4 py-8">{@render children()}</main>
 
 <Footer />
