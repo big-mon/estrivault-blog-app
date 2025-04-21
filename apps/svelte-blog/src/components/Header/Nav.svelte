@@ -6,18 +6,21 @@
 	}
 
 	const { pathname }: Props = $props();
+
+	function isActive(href: string) {
+		return pathname === href || pathname.startsWith(href + '/');
+	}
 </script>
 
 <nav aria-label="Main navigation">
-	<ul class="flex gap-4 text-sm font-medium">
+	<ul class="flex flex-col gap-3 text-sm font-medium md:flex-row md:gap-4">
 		{#each NAVIGATION_LINKS as { label, href }}
 			<li>
 				<a
 					{href}
-					class="transition-opacity hover:opacity-80 {pathname.startsWith(href.slice(0, -2))
-						? 'text-blue-600 underline'
-						: 'text-gray-700'}"
-					aria-current={pathname.startsWith(href.slice(0, -2)) ? 'page' : undefined}
+					class="block rounded px-2 py-1 transition-opacity hover:opacity-80
+						{isActive(href) ? 'text-blue-600 underline md:font-semibold md:underline' : 'text-gray-700'}"
+					aria-current={isActive(href) ? 'page' : undefined}
 				>
 					{label}
 				</a>

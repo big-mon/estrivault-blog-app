@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Nav from './Nav.svelte';
 	import Hamburger from '../Icons/Hamburger.svelte';
+	import MobileMenu from './MobileMenu.svelte';
 
 	interface Props {
 		pathname: string;
@@ -22,13 +23,6 @@
 	</button>
 
 	{#if isMenuOpen}
-		<div class="fixed inset-0 z-50 bg-white p-6">
-			<div class="mb-4 flex justify-end">
-				<button class="text-gray-700" onclick={() => (isMenuOpen = false)} aria-label="Close menu">
-					✕
-				</button>
-			</div>
-			<Nav {pathname} />
-		</div>
+		<MobileMenu {pathname} onClose={() => (isMenuOpen = false)} />
 	{/if}
 </div>
