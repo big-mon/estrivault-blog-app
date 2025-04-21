@@ -14,10 +14,10 @@
 			<li>
 				<a
 					{href}
-					class="transition-opacity hover:opacity-80 {pathname === href
+					class="transition-opacity hover:opacity-80 {pathname.startsWith(href.slice(0, -2))
 						? 'text-blue-600 underline'
 						: 'text-gray-700'}"
-					aria-current={pathname === href ? 'page' : undefined}
+					aria-current={pathname.startsWith(href.slice(0, -2)) ? 'page' : undefined}
 				>
 					{label}
 				</a>
