@@ -8,11 +8,19 @@
 	const { pathname }: Props = $props();
 </script>
 
-<nav>
-	<ul>
-		{#each NAVIGATION_LINKS as link}
+<nav aria-label="Main navigation">
+	<ul class="flex gap-4 text-sm font-medium">
+		{#each NAVIGATION_LINKS as { label, href }}
 			<li>
-				<a href={link.href} class={pathname === link.href ? 'active' : ''}>{link.label}</a>
+				<a
+					{href}
+					class="transition-opacity hover:opacity-80 {pathname === href
+						? 'text-blue-600 underline'
+						: 'text-gray-700'}"
+					aria-current={pathname === href ? 'page' : undefined}
+				>
+					{label}
+				</a>
 			</li>
 		{/each}
 	</ul>

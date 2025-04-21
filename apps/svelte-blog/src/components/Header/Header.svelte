@@ -9,8 +9,7 @@
 	const { pathname }: Props = $props();
 </script>
 
-<header>
+<header class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
 	<Title />
 	<div><Nav {pathname} /></div>
-	{pathname}
 </header>
