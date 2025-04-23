@@ -65,7 +65,13 @@ export async function loadFromString(
     if (error instanceof FrontMatterError) {
       throw error;
     }
-    throw new MarkdownParseError(`Markdownの処理中にエラーが発生しました: ${error.message}`);
+    let msg = '';
+    if (error instanceof Error) {
+      msg = error.message;
+    } else {
+      msg = String(error);
+    }
+    throw new MarkdownParseError(`Markdownの処理中にエラーが発生しました: ${msg}`);
   }
 }
 
@@ -109,7 +115,13 @@ export async function loadFromFile(
         error instanceof MarkdownParseError) {
       throw error;
     }
-    throw new Error(`ファイルの処理中にエラーが発生しました: ${error.message}`);
+    let msg = '';
+    if (error instanceof Error) {
+      msg = error.message;
+    } else {
+      msg = String(error);
+    }
+    throw new Error(`ファイルの処理中にエラーが発生しました: ${msg}`);
   }
 }
 
