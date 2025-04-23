@@ -1,51 +1,60 @@
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
-import remarkFrontmatter from 'remark-frontmatter';
+import remarkDirective from 'remark-directive';
 import remarkRehype from 'remark-rehype';
-import rehypeStringify from 'rehype-stringify';
+import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
-import matter from 'gray-matter';
-import { PostMeta, PostHTML, ProcessorOptions } from './types';
+import rehypeStringify from 'rehype-stringify';
+import { Schema } from 'hast-util-sanitize';
+import { ProcessorOptions } from './types';
+import { remarkLinkTransform } from './plugins/link-transform';
+import { remarkImageTransform } from './plugins/image-transform';
+import { remarkYoutubeEmbed } from './plugins/youtube-embed';
+import { remarkTwitterEmbed } from './plugins/twitter-embed';
+import { remarkGithubEmbed } from './plugins/github-embed';
+import { remarkAmazonEmbed } from './plugins/amazon-embed';
 
 /**
- * Markdown→HTML変換パイプライン
- * @param markdown Markdownテキスト
- * @param options 追加オプション
- * @returns HTML・meta情報
+ * Markdownをパースし、HTMLに変換するパイプラインを構築する
+ * @param options 処理オプション
+ * @returns unified処理パイプライン
  */
-export async function markdownToHtmlPipeline(
-  markdown: string,
-  options?: ProcessorOptions
-): Promise<PostHTML> {
-  // Front-matter抽出
-  const { content, data } = matter(markdown);
+export function createProcessor(options: ProcessorOptions = {}) {
+  // 基本パイプライン
+  let processor = unified()
+    .use(remarkParse) // Markdownをパース
+    .use(remarkDirective) // ::directive{} 構文を有効化
+    .use(remarkLinkTransform) // 外部リンクに target="_blank" を追加
+    .use(remarkRehype, { allowDangerousHtml: true }) // rehypeに変換（生HTMLを許可）
+    .use(rehypeRaw) // 生HTMLを処理
+    .use(rehypeStringify); // HTML文字列に変換
 
-  // unifiedパイプライン構築
-  const file = await unified()
-    .use(remarkParse)
-    .use(remarkFrontmatter, ['yaml', 'toml'])
-    .use(remarkRehype)
-    .use(rehypeSanitize, options?.sanitizeSchema)
-    .use(rehypeStringify)
-    .process(content);
+  // 画像変換（Cloudinary対応）
+  if (options.imageBase) {
+    processor = processor.use(remarkImageTransform, { baseUrl: options.imageBase });
+  }
 
-  // meta生成（PostMeta型に合わせて必要な項目を抽出・補完）
-  const meta: PostMeta = {
-    slug: data.slug || '',
-    title: data.title || '',
-    description: data.description || '',
-    date: data.date || '',
-    publishedAt: data.publishedAt || '',
-    category: data.category || '',
-    tags: data.tags || [],
-    coverImage: data.coverImage,
-    draft: data.draft,
-    readingTime: Math.ceil(content.split(/\s+/).length / 400), // 400wpm想定
-  };
+  // 埋め込みプラグイン
+  const embeds = options.embeds || {};
+  if (embeds.youtube) {
+    processor = processor.use(remarkYoutubeEmbed);
+  }
+  if (embeds.twitter) {
+    processor = processor.use(remarkTwitterEmbed);
+  }
+  if (embeds.github) {
+    processor = processor.use(remarkGithubEmbed);
+  }
+  if (embeds.amazon) {
+    processor = processor.use(remarkAmazonEmbed);
+  }
 
-  return {
-    meta,
-    html: String(file),
-  };
+  // HTMLサニタイズ
+  if (options.sanitizeSchema) {
+    processor = processor.use(rehypeSanitize, options.sanitizeSchema);
+  } else {
+    processor = processor.use(rehypeSanitize);
+  }
+
+  return processor;
 }
-

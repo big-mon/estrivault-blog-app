@@ -39,11 +39,34 @@ export interface ProcessorOptions {
   /** Cloudinary変換ベースURL */
   imageBase?: string;
   /** rehype-sanitize schema (カスタムタグ許可用) */
-  sanitizeSchema?: any; // import("hast-util-sanitize").Schema
+  sanitizeSchema?: import("hast-util-sanitize").Schema;
 }
 
 export interface ListOptions {
   page?: number; // ページ番号（1起点）
   perPage?: number; // デフォルト20
   sort?: "date" | "title"; // ソートキー
+  filter?: (post: PostMeta) => boolean; // フィルタ関数
+}
+
+// エラークラス
+export class FileNotFoundError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'FileNotFoundError';
+  }
+}
+
+export class FrontMatterError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'FrontMatterError';
+  }
+}
+
+export class MarkdownParseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'MarkdownParseError';
+  }
 }

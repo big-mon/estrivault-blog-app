@@ -1,80 +1,204 @@
-// content-processor public API エントリポイント
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import { markdownToHtmlPipeline } from './pipeline';
-import { PostMeta, PostHTML, ProcessorOptions, ListOptions } from './types';
-
-/**
- * Markdown文字列を解析してPostHTMLを返す
- */
-export async function loadFromString(
-  markdown: string,
-  options?: ProcessorOptions
-): Promise<PostHTML> {
-  return markdownToHtmlPipeline(markdown, options);
-}
-
-/**
- * ファイルパスからMarkdownを読み込み、PostHTMLを返す
- */
-export async function loadFromFile(
-  filePath: string,
-  options?: ProcessorOptions
-): Promise<PostHTML> {
-  const markdown = await fs.readFile(filePath, 'utf-8');
-  return markdownToHtmlPipeline(markdown, options);
-}
-
-/**
- * ディレクトリ内の全記事のPostMeta配列を返す
- */
-export async function getAllPosts(
-  dir: string,
-  options?: ListOptions & ProcessorOptions
-): Promise<PostMeta[]> {
-  const files = await fs.readdir(dir);
-  const mdFiles = files.filter(f => f.endsWith('.md'));
-  const posts: PostMeta[] = [];
-  for (const file of mdFiles) {
-    const fullPath = path.join(dir, file);
-    try {
-      const { meta } = await loadFromFile(fullPath, options);
-      if (!meta.draft) posts.push(meta);
-    } catch (e) {
-      // 読み込み失敗はスキップ
-    }
-  }
-  // ソート
-  if (options?.sort === 'title') {
-    posts.sort((a, b) => a.title.localeCompare(b.title));
-  } else {
-    posts.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-  }
-  // ページネーション
-  const page = options?.page || 1;
-  const perPage = options?.perPage || 20;
-  return posts.slice((page - 1) * perPage, page * perPage);
-}
-
-/**
- * slug指定で記事を取得
- */
-export async function getPostBySlug(
-  dir: string,
-  slug: string,
-  options?: ProcessorOptions
-): Promise<PostHTML | null> {
-  const filePath = path.join(dir, slug + '.md');
-  try {
-    return await loadFromFile(filePath, options);
-  } catch {
-    return null;
-  }
-}
-
-export {
+import fs from 'fs/promises';
+import path from 'path';
+import matter from 'gray-matter';
+import readingTime from 'reading-time';
+import { glob } from 'glob';
+import { createProcessor } from './pipeline';
+import {
   PostMeta,
   PostHTML,
   ProcessorOptions,
   ListOptions,
-};
+  FileNotFoundError,
+  FrontMatterError,
+  MarkdownParseError
+} from './types';
+
+/**
+ * Markdown文字列を処理してHTMLとメタデータを返す
+ * @param md Markdown文字列
+ * @param opts 処理オプション
+ * @returns HTML文字列とメタデータ
+ */
+export async function loadFromString(
+  md: string,
+  opts: ProcessorOptions = {}
+): Promise<PostHTML> {
+  try {
+    // Front-matterの抽出
+    const { data, content } = matter(md);
+    
+    // 必須フィールドの検証
+    if (!data.title) {
+      throw new FrontMatterError('Front-matterにtitleが含まれていません');
+    }
+    if (!data.date) {
+      throw new FrontMatterError('Front-matterにdateが含まれていません');
+    }
+
+    // 読了時間の計算
+    const stats = readingTime(content);
+    
+    // Markdownの処理
+    const processor = createProcessor(opts);
+    const result = await processor.process(content);
+    
+    // メタデータの構築
+    const meta: PostMeta = {
+      slug: data.slug || '',
+      title: data.title,
+      description: data.description || '',
+      date: data.date,
+      publishedAt: data.publishedAt || data.date,
+      category: data.category || '',
+      tags: data.tags || [],
+      coverImage: data.coverImage || data.thumbnail,
+      draft: data.draft || false,
+      readingTime: Math.ceil(stats.minutes)
+    };
+    
+    return {
+      meta,
+      html: String(result)
+    };
+  } catch (error) {
+    if (error instanceof FrontMatterError) {
+      throw error;
+    }
+    throw new MarkdownParseError(`Markdownの処理中にエラーが発生しました: ${error.message}`);
+  }
+}
+
+/**
+ * Markdownファイルを読み込み、処理してHTMLとメタデータを返す
+ * @param filePath Markdownファイルのパス
+ * @param opts 処理オプション
+ * @returns HTML文字列とメタデータ
+ */
+export async function loadFromFile(
+  filePath: string,
+  opts: ProcessorOptions = {}
+): Promise<PostHTML> {
+  try {
+    // ファイルの存在確認
+    try {
+      await fs.access(filePath);
+    } catch (error) {
+      throw new FileNotFoundError(`ファイルが見つかりません: ${filePath}`);
+    }
+    
+    // ファイル読み込み
+    const content = await fs.readFile(filePath, 'utf-8');
+    
+    // slugの抽出（ファイル名から拡張子を除いたもの）
+    const basename = path.basename(filePath);
+    const slug = basename.replace(/\.[^/.]+$/, '');
+    
+    // 文字列処理関数に委譲
+    const result = await loadFromString(content, opts);
+    
+    // slugが指定されていない場合はファイル名から設定
+    if (!result.meta.slug) {
+      result.meta.slug = slug;
+    }
+    
+    return result;
+  } catch (error) {
+    if (error instanceof FileNotFoundError || 
+        error instanceof FrontMatterError || 
+        error instanceof MarkdownParseError) {
+      throw error;
+    }
+    throw new Error(`ファイルの処理中にエラーが発生しました: ${error.message}`);
+  }
+}
+
+/**
+ * 指定されたパターンに一致するMarkdownファイルからメタデータ一覧を取得
+ * @param globPattern globパターン（単一または配列）
+ * @param opts 一覧取得オプション
+ * @returns メタデータ一覧
+ */
+export async function getAllPosts(
+  globPattern: string | string[],
+  opts: ListOptions = {}
+): Promise<PostMeta[]> {
+  // デフォルト値の設定
+  const { 
+    page = 1, 
+    perPage = 20, 
+    sort = 'date',
+    filter = () => true
+  } = opts;
+  
+  // ファイル一覧の取得
+  const files = await glob(globPattern);
+  
+  // 各ファイルからメタデータを抽出
+  const posts = await Promise.all(
+    files.map(async (file) => {
+      try {
+        const { meta } = await loadFromFile(file);
+        return meta;
+      } catch (error) {
+        console.warn(`ファイルのメタデータ抽出中にエラー: ${file}`, error);
+        return null;
+      }
+    })
+  );
+  
+  // nullを除外し、フィルタを適用
+  const validPosts = posts
+    .filter((post): post is PostMeta => post !== null)
+    .filter(filter);
+  
+  // ソート
+  const sortedPosts = [...validPosts].sort((a, b) => {
+    if (sort === 'date') {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    } else if (sort === 'title') {
+      return a.title.localeCompare(b.title);
+    }
+    return 0;
+  });
+  
+  // ページネーション
+  const startIndex = (page - 1) * perPage;
+  const endIndex = startIndex + perPage;
+  
+  return sortedPosts.slice(startIndex, endIndex);
+}
+
+/**
+ * 指定されたslugに一致するMarkdownファイルを処理してHTMLとメタデータを返す
+ * @param slug ファイル名（拡張子なし）
+ * @param baseDir 基準ディレクトリ
+ * @param opts 処理オプション
+ * @returns HTML文字列とメタデータ
+ */
+export async function getPostBySlug(
+  slug: string,
+  baseDir: string,
+  opts: ProcessorOptions = {}
+): Promise<PostHTML> {
+  // .mdファイルを探す
+  const filePath = path.join(baseDir, `${slug}.md`);
+  
+  try {
+    return await loadFromFile(filePath, opts);
+  } catch (error) {
+    if (error instanceof FileNotFoundError) {
+      // .mdxファイルも試す
+      const mdxPath = path.join(baseDir, `${slug}.mdx`);
+      try {
+        return await loadFromFile(mdxPath, opts);
+      } catch (mdxError) {
+        throw error; // 元のエラーを投げる
+      }
+    }
+    throw error;
+  }
+}
+
+// 型定義のエクスポート
+export * from './types';

@@ -132,6 +132,12 @@ importers:
         specifier: ^8.0.0
         version: 8.4.0(jiti@2.4.2)(postcss@8.5.3)(typescript@5.8.3)
 
+  packages/content-processor:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.14.1
+        version: 22.14.1
+
   packages/remark-cloudinary-images:
     dependencies:
       '@estrivault/cloudinary-utils':
