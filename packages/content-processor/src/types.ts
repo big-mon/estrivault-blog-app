@@ -1,3 +1,49 @@
-// API仕様に基づく型定義予定
+// API仕様書に基づく型定義
 
-export {};
+export interface PostMeta {
+  /** ファイル名 slug （拡張子なし）*/
+  slug: string;
+  /** 記事タイトル */
+  title: string;
+  /** 記事説明 */
+  description: string;
+  /** ISO 8601 日付文字列 */
+  date: string;
+  /** 公開日時（ISO8601）*/
+  publishedAt: string;
+  /** カテゴリ名 */
+  category: string;
+  /** タグ配列 */
+  tags: string[];
+  /** カバー画像URL（OG画像 or サムネURL）*/
+  coverImage?: string;
+  /** 下書きフラグ */
+  draft?: boolean;
+  /** 読了時間（分） */
+  readingTime: number;
+}
+
+export interface PostHTML {
+  meta: PostMeta;
+  html: string; // sanitize済みHTML
+}
+
+export interface ProcessorOptions {
+  /** 埋め込みプラグインを明示的に追加 */
+  embeds?: {
+    youtube?: boolean;
+    twitter?: boolean;
+    github?: boolean;
+    amazon?: boolean;
+  };
+  /** Cloudinary変換ベースURL */
+  imageBase?: string;
+  /** rehype-sanitize schema (カスタムタグ許可用) */
+  sanitizeSchema?: any; // import("hast-util-sanitize").Schema
+}
+
+export interface ListOptions {
+  page?: number; // ページ番号（1起点）
+  perPage?: number; // デフォルト20
+  sort?: "date" | "title"; // ソートキー
+}
