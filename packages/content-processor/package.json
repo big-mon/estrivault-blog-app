@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
-  "types": "dist/types.d.ts",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js"
   },
@@ -12,6 +12,23 @@
     "build": "tsup src/index.ts --dts",
     "test": "vitest"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "reading-time": "^1.5.0",
+    "rehype-raw": "^7.0.0",
+    "rehype-sanitize": "^6.0.0",
+    "rehype-stringify": "^10.0.0",
+    "remark-directive": "^3.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.0.0",
+    "unified": "^11.0.4",
+    "glob": "^10.3.10",
+    "hast-util-sanitize": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.1.0"
+  }
 }
