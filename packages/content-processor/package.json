@@ -1,0 +1,17 @@
+{
+  "name": "@estrivault/content-processor",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/types.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --dts",
+    "test": "vitest"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
