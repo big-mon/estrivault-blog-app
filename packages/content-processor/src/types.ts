@@ -5,14 +5,20 @@ export interface PostMeta {
   slug: string;
   /** 記事タイトル */
   title: string;
+  /** 記事説明 */
+  description: string;
   /** ISO 8601 日付文字列 */
   date: string;
+  /** 公開日時（ISO8601）*/
+  publishedAt: string;
   /** カテゴリ名 */
   category: string;
   /** タグ配列 */
   tags: string[];
-  /** OG画像 or サムネURL（任意）*/
-  thumbnail?: string;
+  /** カバー画像URL（OG画像 or サムネURL）*/
+  coverImage?: string;
+  /** 下書きフラグ */
+  draft?: boolean;
   /** 読了時間（分） */
   readingTime: number;
 }
