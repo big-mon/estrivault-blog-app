@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PostCard from '../components/PostCard/PostCard.svelte';
+	import PostCard from '../../../../components/PostCard/PostCard.svelte';
 
 	const posts = [
 		{

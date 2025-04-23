@@ -1,0 +1,45 @@
+<script lang="ts">
+	import type { Post } from '$lib/types.ts';
+
+	interface Props {
+		post: Post;
+	}
+
+	const { post }: Props = $props();
+</script>
+
+<article
+	class="group relative transform overflow-hidden rounded-xl border border-gray-200
+         bg-white shadow-sm transition-all duration-100 ease-out hover:scale-[1.01] hover:border-gray-300 hover:shadow-md"
+>
+	<!-- サムネイル -->
+	<div class="relative w-full overflow-hidden pt-[56.25%]">
+		<img
+			src={post.thumbnail}
+			alt={post.title}
+			class="absolute inset-0 h-full w-full object-cover"
+		/>
+	</div>
+
+	<!-- 本文 -->
+	<div class="flex flex-col justify-between space-y-3 p-4 font-sans text-gray-800">
+		<div class="space-y-1">
+			<p class="text-xs uppercase tracking-wide text-gray-500">{post.category}</p>
+			<h2 class="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600">
+				{post.title}
+			</h2>
+			<p class="text-sm text-gray-500">{post.date}</p>
+			<p class="line-clamp-3 text-sm text-gray-700">{post.description}</p>
+		</div>
+
+		<ul class="mt-2 flex shrink-0 flex-wrap gap-2 text-xs text-gray-500">
+			{#each post.tags as tag}
+				<li class="rounded bg-gray-100 px-2 py-0.5">{tag}</li>
+			{/each}
+		</ul>
+	</div>
+
+	<a href={`/post/${post.slug}`} class="absolute inset-0 z-10" aria-label={post.title}>
+		<span class="sr-only">{post.title}</span>
+	</a>
+</article>
