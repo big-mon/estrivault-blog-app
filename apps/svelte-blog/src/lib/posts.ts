@@ -36,7 +36,10 @@ export async function getPosts(options?: {
     };
 
     // 記事一覧を取得
-    const allPosts = await getAllPosts(CONTENT_DIR, {
+    const allPosts = await getAllPosts([
+      `${CONTENT_DIR}/*.md`,
+      `${CONTENT_DIR}/*.mdx`
+    ], {
       page,
       perPage,
       sort,
@@ -44,7 +47,7 @@ export async function getPosts(options?: {
     });
 
     // Postインターフェースに変換
-    const posts = allPosts.posts.map((post) => ({
+    const posts = allPosts.map((post) => ({
       ...post,
       // coverImageをthumbnailとしてマッピング
       thumbnail: post.coverImage || ''
@@ -52,10 +55,10 @@ export async function getPosts(options?: {
 
     return {
       posts,
-      total: allPosts.total,
-      page: allPosts.page,
-      perPage: allPosts.perPage,
-      totalPages: allPosts.totalPages
+      total: posts.length,
+      page,
+      perPage,
+      totalPages: Math.ceil(posts.length / perPage)
     };
   } catch (err) {
     console.error('Failed to get posts:', err);
@@ -113,7 +116,10 @@ export async function getPostsByCategory(
     };
 
     // 記事一覧を取得
-    const allPosts = await getAllPosts(CONTENT_DIR, {
+    const allPosts = await getAllPosts([
+      `${CONTENT_DIR}/*.md`,
+      `${CONTENT_DIR}/*.mdx`
+    ], {
       page,
       perPage,
       sort: 'date',
@@ -121,7 +127,7 @@ export async function getPostsByCategory(
     });
 
     // Postインターフェースに変換
-    const posts = allPosts.posts.map((post) => ({
+    const posts = allPosts.map((post) => ({
       ...post,
       // coverImageをthumbnailとしてマッピング
       thumbnail: post.coverImage || ''
@@ -129,10 +135,10 @@ export async function getPostsByCategory(
 
     return {
       posts,
-      total: allPosts.total,
-      page: allPosts.page,
-      perPage: allPosts.perPage,
-      totalPages: allPosts.totalPages
+      total: posts.length,
+      page,
+      perPage,
+      totalPages: Math.ceil(posts.length / perPage)
     };
   } catch (err) {
     console.error(`Failed to get posts for category ${category}:`, err);
