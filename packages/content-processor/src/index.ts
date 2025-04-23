@@ -145,10 +145,22 @@ export async function getAllPosts(
   
   // ファイル一覧の取得
   const files = await glob(globPattern);
-  
+
+  // ファイルのみ抽出（ディレクトリは除外）
+  const validFiles = (await Promise.all(
+    files.map(async (f) => {
+      try {
+        const stat = await fs.stat(f);
+        return stat.isFile() ? f : null;
+      } catch {
+        return null;
+      }
+    })
+  )).filter((f): f is string => !!f);
+
   // 各ファイルからメタデータを抽出
   const posts = await Promise.all(
-    files.map(async (file) => {
+    validFiles.map(async (file) => {
       try {
         const { meta } = await loadFromFile(file);
         return meta;
