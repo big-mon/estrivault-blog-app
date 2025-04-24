@@ -5,7 +5,7 @@
 		{
 			title: '米国株式市場、テック主導で続伸',
 			slug: 'us-market-tech-rally',
-			date: '2025-04-21',
+			publishedAt: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
 			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
@@ -15,7 +15,7 @@
 		{
 			title: '米国株式市場、テック主導で続伸',
 			slug: 'us-market-tech-rally',
-			date: '2025-04-21',
+			publishedAt: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
 			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
@@ -25,7 +25,7 @@
 		{
 			title: '米国株式市場、テック主導で続伸',
 			slug: 'us-market-tech-rally',
-			date: '2025-04-21',
+			publishedAt: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
 			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
@@ -35,7 +35,7 @@
 		{
 			title: '米国株式市場、テック主導で続伸',
 			slug: 'us-market-tech-rally',
-			date: '2025-04-21',
+			publishedAt: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
 			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
@@ -45,7 +45,7 @@
 		{
 			title: '米国株式市場、テック主導で続伸',
 			slug: 'us-market-tech-rally',
-			date: '2025-04-21',
+			publishedAt: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
 			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
@@ -55,7 +55,7 @@
 		{
 			title: '米国株式市場、テック主導で続伸',
 			slug: 'us-market-tech-rally',
-			date: '2025-04-21',
+			publishedAt: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
 			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
@@ -65,7 +65,7 @@
 		{
 			title: '米国株式市場、テック主導で続伸',
 			slug: 'us-market-tech-rally',
-			date: '2025-04-21',
+			publishedAt: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
 			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
@@ -75,7 +75,7 @@
 		{
 			title: '米国株式市場、テック主導で続伸',
 			slug: 'us-market-tech-rally',
-			date: '2025-04-21',
+			publishedAt: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
 			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',

@@ -1,4 +1,4 @@
-import { getPosts } from '$lib/posts';
+import { getPosts } from '$lib';
 import type { PageServerLoad } from './$types';
 import { POSTS_PER_PAGE } from '../constants';
 
@@ -11,7 +11,7 @@ export const load = (async ({ url }) => {
   const { posts, total, totalPages } = await getPosts({
     page,
     perPage,
-    sort: 'date',
+    sort: 'publishedAt',
     includeDrafts: false
   });
 

@@ -21,7 +21,7 @@
 	<!-- 記事ヘッダー -->
 	<header class="mb-8">
 		<div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
-			<span>{formatDate(meta.date)}</span>
+			<span>{formatDate(meta.publishedAt)}</span>
 			<span>•</span>
 			<span>{meta.readingTime} min read</span>
 		</div>
