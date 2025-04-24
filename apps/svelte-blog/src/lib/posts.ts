@@ -48,9 +48,7 @@ export async function getPosts(options?: {
 
     // Postインターフェースに変換
     const posts = allPosts.map((post) => ({
-      ...post,
-      // coverImageをthumbnailとしてマッピング
-      thumbnail: post.coverImage || ''
+      ...post
     }));
 
     return {
@@ -128,9 +126,7 @@ export async function getPostsByCategory(
 
     // Postインターフェースに変換
     const posts = allPosts.map((post) => ({
-      ...post,
-      // coverImageをthumbnailとしてマッピング
-      thumbnail: post.coverImage || ''
+      ...post
     }));
 
     return {
