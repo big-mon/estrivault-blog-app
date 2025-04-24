@@ -32,8 +32,8 @@ export async function loadFromString(
     if (!data.title) {
       throw new FrontMatterError('Front-matterにtitleが含まれていません');
     }
-    if (!data.date) {
-      throw new FrontMatterError('Front-matterにdateが含まれていません');
+    if (!data.publishedAt) {
+      throw new FrontMatterError('Front-matterにpublishedAtが含まれていません');
     }
 
     // 読了時間の計算
@@ -48,7 +48,6 @@ export async function loadFromString(
       slug: data.slug || '',
       title: data.title,
       description: data.description || '',
-      date: data.date,
       publishedAt: data.publishedAt || data.date,
       category: data.category || '',
       tags: data.tags || [],
@@ -139,7 +138,7 @@ export async function getAllPosts(
   const { 
     page = 1, 
     perPage = 20, 
-    sort = 'date',
+    sort = 'publishedAt',
     filter = () => true
   } = opts;
   
@@ -178,8 +177,8 @@ export async function getAllPosts(
   
   // ソート
   const sortedPosts = [...validPosts].sort((a, b) => {
-    if (sort === 'date') {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (sort === 'publishedAt') {
+      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
     } else if (sort === 'title') {
       return a.title.localeCompare(b.title);
     }

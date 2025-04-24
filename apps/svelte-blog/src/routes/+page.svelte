@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PostCard from '../components/PostCard/PostCard.svelte';
-	import type { PageData } from './$types';
 	import Pagination from '../components/Pagination/Pagination.svelte';
+	import type { PageData } from './$types';
 
 	export let data: PageData;
 	const { posts, pagination } = data;

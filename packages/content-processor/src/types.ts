@@ -7,8 +7,6 @@ export interface PostMeta {
   title: string;
   /** 記事説明 */
   description: string;
-  /** ISO 8601 日付文字列 */
-  date: string;
   /** 公開日時（ISO8601）*/
   publishedAt: string;
   /** カテゴリ名 */
@@ -45,7 +43,7 @@ export interface ProcessorOptions {
 export interface ListOptions {
   page?: number; // ページ番号（1起点）
   perPage?: number; // デフォルト20
-  sort?: "date" | "title"; // ソートキー
+  sort?: "publishedAt" | "title"; // ソートキー
   filter?: (post: PostMeta) => boolean; // フィルタ関数
 }
 

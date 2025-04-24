@@ -28,7 +28,7 @@
 			<h2 class="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600">
 				{post.title}
 			</h2>
-			<p class="text-sm text-gray-500">{post.date}</p>
+			<p class="text-sm text-gray-500">{post.publishedAt}</p>
 			<p class="line-clamp-3 text-sm text-gray-700">{post.description}</p>
 		</div>
 

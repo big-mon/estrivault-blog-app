@@ -1,9 +1,9 @@
-import { getPost } from '$lib/posts';
+import { getPost } from '$lib';
 import type { PageServerLoad } from './$types';
 
 export const load = (async ({ params }) => {
   const { slug } = params;
-  
+
   if (!slug) {
     throw new Error('Post not found');
   }
@@ -11,7 +11,7 @@ export const load = (async ({ params }) => {
   try {
     // 記事データを取得
     const post = await getPost(slug);
-    
+
     return {
       post
     };

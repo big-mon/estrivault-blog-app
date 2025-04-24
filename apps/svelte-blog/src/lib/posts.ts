@@ -10,7 +10,7 @@ const CONTENT_DIR = path.resolve(process.cwd(), '../../content/blog');
 export async function getPosts(options?: {
   page?: number;
   perPage?: number;
-  sort?: 'date' | 'title';
+  sort?: 'publishedAt' | 'title';
   includeDrafts?: boolean;
 }): Promise<{
   posts: PostMeta[];
@@ -85,6 +85,7 @@ export async function getPostsByCategory(
   options?: {
     page?: number;
     perPage?: number;
+    sort?: 'publishedAt' | 'title';
     includeDrafts?: boolean;
   }
 ): Promise<{
@@ -120,7 +121,7 @@ export async function getPostsByCategory(
     ], {
       page,
       perPage,
-      sort: 'date',
+      sort: 'publishedAt',
       filter
     });
 
