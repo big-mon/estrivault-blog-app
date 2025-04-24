@@ -1,3 +1,4 @@
+/*
 import { getPost } from '$lib';
 import type { PageServerLoad } from './$types';
 
@@ -20,3 +21,4 @@ export const load = (async ({ params }) => {
     throw new Error('Post not found');
   }
 }) satisfies PageServerLoad;
+*/
