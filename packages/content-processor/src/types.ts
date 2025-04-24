@@ -9,6 +9,8 @@ export interface PostMeta {
   description: string;
   /** 公開日時（ISO8601）*/
   publishedAt: string;
+  /** 更新日時（ISO8601, 任意）*/
+  updatedAt?: string;
   /** カテゴリ名 */
   category: string;
   /** タグ配列 */
