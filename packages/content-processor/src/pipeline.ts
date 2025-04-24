@@ -19,16 +19,13 @@ import { remarkAmazonEmbed } from './plugins/amazon-embed';
  * @param options 処理オプション
  * @returns unified処理パイプライン
  */
-import type { Processor } from 'unified';
-import type { Root } from 'remark-parse/lib';
-
-export function createProcessor(options: ProcessorOptions = {}): Processor<Root, string, string, string, string> {
+export function createProcessor(options: ProcessorOptions = {}) {
   // 基本パイプライン
   let processor = unified()
     .use(remarkParse) // Markdownをパース
     .use(remarkDirective) // ::directive{} 構文を有効化
     .use(remarkLinkTransform) // 外部リンクに target="_blank" を追加
-    .use(remarkRehype, { allowDangerousHtml: true }) // rehypeに変換（生HTMLを許可）
+    .use(remarkRehype({ allowDangerousHtml: true })) // rehypeに変換（生HTMLを許可）
     .use(rehypeRaw) // 生HTMLを処理
     .use(rehypeStringify); // HTML文字列に変換
 
@@ -59,5 +56,5 @@ export function createProcessor(options: ProcessorOptions = {}): Processor<Root,
     processor = processor.use(rehypeSanitize);
   }
 
-  return processor as Processor<Root, string, string, string, string>;
+  return processor;
 }
