@@ -8,7 +8,7 @@
 			date: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
-			thumbnail: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
+			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
 			category: 'Stocks',
 			tags: ['NASDAQ', 'Tech', 'FOMC']
 		},
@@ -18,7 +18,7 @@
 			date: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
-			thumbnail: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
+			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
 			category: 'Stocks',
 			tags: ['NASDAQ', 'Tech', 'FOMC']
 		},
@@ -28,7 +28,7 @@
 			date: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
-			thumbnail: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
+			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
 			category: 'Stocks',
 			tags: ['NASDAQ', 'Tech', 'FOMC']
 		},
@@ -38,7 +38,7 @@
 			date: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
-			thumbnail: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
+			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
 			category: 'Stocks',
 			tags: ['NASDAQ', 'Tech', 'FOMC']
 		},
@@ -48,7 +48,7 @@
 			date: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
-			thumbnail: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
+			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
 			category: 'Stocks',
 			tags: ['NASDAQ', 'Tech', 'FOMC']
 		},
@@ -58,7 +58,7 @@
 			date: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
-			thumbnail: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
+			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
 			category: 'Stocks',
 			tags: ['NASDAQ', 'Tech', 'FOMC']
 		},
@@ -68,7 +68,7 @@
 			date: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
-			thumbnail: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
+			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
 			category: 'Stocks',
 			tags: ['NASDAQ', 'Tech', 'FOMC']
 		},
@@ -78,7 +78,7 @@
 			date: '2025-04-21',
 			description:
 				'主要テック企業の好決算を受けてS&P500とNasdaqが上昇。FOMCを前に投資家心理も改善。',
-			thumbnail: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
+			coverImage: 'https://res.cloudinary.com/damonge/image/upload/Hero/kotohira-konpirasan',
 			category: 'Stocks',
 			tags: ['NASDAQ', 'Tech', 'FOMC']
 		}

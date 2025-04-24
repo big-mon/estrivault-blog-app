@@ -15,7 +15,7 @@
 	<!-- サムネイル -->
 	<div class="relative w-full overflow-hidden pt-[56.25%]">
 		<img
-			src={post.thumbnail}
+			src={post.coverImage}
 			alt={post.title}
 			class="absolute inset-0 h-full w-full object-cover"
 		/>

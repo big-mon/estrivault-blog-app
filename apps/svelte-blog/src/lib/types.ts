@@ -3,7 +3,7 @@ export interface Post {
     slug: string;
     date: string;
     description: string;
-    thumbnail: string;
+    coverImage?: string;
     category: string;
     tags: string[];
 }
