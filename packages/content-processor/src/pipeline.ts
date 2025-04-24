@@ -19,7 +19,10 @@ import { remarkAmazonEmbed } from './plugins/amazon-embed';
  * @param options 処理オプション
  * @returns unified処理パイプライン
  */
-export function createProcessor(options: ProcessorOptions = {}) {
+import type { Processor } from 'unified';
+import type { Root } from 'remark-parse/lib';
+
+export function createProcessor(options: ProcessorOptions = {}): Processor<Root, string, string, string, string> {
   // 基本パイプライン
   let processor = unified()
     .use(remarkParse) // Markdownをパース
@@ -56,5 +59,5 @@ export function createProcessor(options: ProcessorOptions = {}) {
     processor = processor.use(rehypeSanitize);
   }
 
-  return processor;
+  return processor as Processor<Root, string, string, string, string>;
 }
