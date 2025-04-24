@@ -9,6 +9,8 @@ export interface PostMeta {
   description: string;
   /** 公開日時（ISO8601）*/
   publishedAt: string;
+  /** 更新日時（ISO8601, 任意）*/
+  updatedAt?: string;
   /** カテゴリ名 */
   category: string;
   /** タグ配列 */
@@ -17,8 +19,8 @@ export interface PostMeta {
   coverImage?: string;
   /** 下書きフラグ */
   draft?: boolean;
-  /** 読了時間（分） */
-  readingTime: number;
+  /** 読了時間（分, 任意）*/
+  readingTime?: number;
 }
 
 export interface PostHTML {
