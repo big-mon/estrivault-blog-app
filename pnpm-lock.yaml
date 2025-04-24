@@ -107,6 +107,9 @@ importers:
       tsup:
         specifier: ^8.0.0
         version: 8.4.0(jiti@2.4.2)(postcss@8.5.3)(typescript@5.8.3)
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
 
   packages/content-processor:
     dependencies:
@@ -143,6 +146,9 @@ importers:
       unified:
         specifier: ^11.0.4
         version: 11.0.5
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
       '@types/node':
         specifier: ^20.11.0
