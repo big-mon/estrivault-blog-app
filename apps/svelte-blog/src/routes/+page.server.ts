@@ -1,10 +1,11 @@
 import { getPosts } from '$lib/posts';
 import type { PageServerLoad } from './$types';
+import { POSTS_PER_PAGE } from '../constants';
 
 export const load = (async ({ url }) => {
   // クエリパラメータからページ番号を取得（デフォルトは1）
   const page = parseInt(url.searchParams.get('page') || '1', 10);
-  const perPage = 9; // 1ページあたりの記事数
+  const perPage = POSTS_PER_PAGE; // 1ページあたりの記事数
 
   // 記事一覧を取得
   const { posts, total, totalPages } = await getPosts({

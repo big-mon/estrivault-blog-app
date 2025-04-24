@@ -10,3 +10,5 @@ export const NAVIGATION_LINKS = [
 
 export const SOCIAL_LINK_X = 'big_mon';
 export const SOCIAL_LINK_GITHUB = 'big-mon';
+
+export const POSTS_PER_PAGE = 9;

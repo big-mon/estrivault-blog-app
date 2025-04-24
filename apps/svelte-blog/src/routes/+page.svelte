@@ -15,10 +15,6 @@
 
 {#if pagination.totalPages > 1}
 	<div class="mt-12">
-		<Pagination
-			currentPage={pagination.page}
-			totalPages={pagination.totalPages}
-			baseUrl="/"
-		/>
+		<Pagination currentPage={pagination.page} totalPages={pagination.totalPages} baseUrl="/" />
 	</div>
 {/if}
