@@ -8,7 +8,14 @@ cd estrivault-blog-app
 
 npm install -g pnpm   # pnpm未導入の場合のみ
 pnpm install          # 依存パッケージのインストール
-pnpm build            # 依存パッケージ群をビルド（初回/依存追加時/パッケージ更新時は必須）
+pnpm run build:all   # 全パッケージ・アプリを一括ビルド（モノレポ標準）
+
+# 補足: 個別ビルドが必要な場合は下記コマンドも利用可能です
+# pnpm --filter @estrivault/cloudinary-utils build
+# pnpm --filter @estrivault/content-processor build
+# pnpm --filter @estrivault/remark-cloudinary-images build
+# pnpm --filter svelte-blog build
+
 ```
 
 ## 🔄 継続開発時・普段の開発

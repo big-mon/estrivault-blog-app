@@ -2,7 +2,8 @@
   "name": "estrivault-blog-app",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter svelte-blog dev"
+    "dev": "pnpm --filter svelte-blog dev",
+    "build:all": "pnpm -r build"
   },
   "dependencies": {
     "@cloudinary/url-gen": "^1.21.0"
