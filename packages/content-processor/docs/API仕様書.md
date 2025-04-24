@@ -14,14 +14,18 @@ export interface PostMeta {
   slug: string;
   /** 記事タイトル */
   title: string;
-  /** ISO 8601 日付文字列 */
-  date: string;
+  /** 公開日時（ISO 8601 文字列）*/
+  publishedAt: string;
+  /** 更新日時（ISO 8601 文字列, 任意）*/
+  updatedAt?: string;
   /** カテゴリ名 */
   category: string;
   /** タグ配列 */
   tags: string[];
-  /** OG 画像 or サムネ URL（任意）*/
-  thumbnail?: string;
+  /** カバー画像URL（OG画像 or サムネURL, 任意）*/
+  coverImage?: string;
+  /** 下書きフラグ（任意）*/
+  draft?: boolean;
   /** 読了時間（分） */
   readingTime: number;
 }
@@ -63,7 +67,7 @@ export interface ProcessorOptions {
 export interface ListOptions {
   page?: number; // ページ番号（1 起点）
   perPage?: number; // デフォルト 20
-  sort?: "date" | "title"; // ソートキー
+  sort?: "publishedAt" | "title"; // ソートキー
 }
 ```
 
@@ -101,7 +105,7 @@ console.log(res.html);
 | エラークラス         | 発生条件                                         |
 | -------------------- | ------------------------------------------------ |
 | `FileNotFoundError`  | `loadFromFile` の対象が存在しない                |
-| `FrontMatterError`   | 必須項目（title,date）が欠落 or フォーマット不正 |
+| `FrontMatterError`   | 必須項目（title, publishedAt）が欠落 or フォーマット不正 |
 | `MarkdownParseError` | unified パイプライン処理失敗                     |
 
 ---
