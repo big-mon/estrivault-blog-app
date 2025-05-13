@@ -1,10 +1,10 @@
 ---
 title: サンプル記事
 description: サンプル記事の説明
-slug: about
+slug: sample5
 publishedAt: 2025-01-01T07:00:00
 coverImage: /illust/r9o8w7svb6vjvk9gfjjh
-category: Travel
+category: Opinions
 tags: ["日記"]
 ---
 
