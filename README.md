@@ -1,5 +1,7 @@
 # estrivault-blog-app
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/big-mon/estrivault-blog-app)
+
 ## 🛠 初回セットアップ手順（初めてクローンした場合）
 
 ```bash
@@ -28,4 +30,4 @@ pnpm dev              # 開発サーバ起動（http://localhost:5173）
 - pnpm 利用前提（npm や yarn では未サポート or 不安定）
 - モノレポ構成（apps/svelte-blog にアプリがある）
 - pnpm dev が apps/svelte-blog をフィルタして起動する設定済み
-- 依存パッケージや各種ユーティリティ（例: cloudinary-utils）はdist生成が必要なため、初回や依存追加・アップデート時はpnpm buildを忘れずに実行してください
+- 依存パッケージや各種ユーティリティ（例: cloudinary-utils）は dist 生成が必要なため、初回や依存追加・アップデート時は pnpm build を忘れずに実行してください
