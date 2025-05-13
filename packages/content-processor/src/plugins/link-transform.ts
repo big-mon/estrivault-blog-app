@@ -1,6 +1,7 @@
 import { visit } from 'unist-util-visit';
-import type { Plugin } from 'unified';
-import type { Link } from 'mdast';
+import type { Plugin, Transformer } from 'unified';
+import type { Root, Link } from 'mdast';
+import type { VFile } from 'vfile';
 
 interface LinkTransformOptions {
   /** 内部リンク判定関数 */
@@ -10,24 +11,33 @@ interface LinkTransformOptions {
 /**
  * 外部リンクに target="_blank" rel="noopener noreferrer" を自動付与するremarkプラグイン
  */
-export const remarkLinkTransform: Plugin<[LinkTransformOptions?], any> = (options = {}) => {
-  const internalPredicate = options.internalPredicate || 
-    ((url: string) => url.startsWith('/') || url.startsWith('#'));
+export const remarkLinkTransform: Plugin<[LinkTransformOptions?], Root, Root> = (
+  options: LinkTransformOptions = {}
+) => {
+  const internalPredicate =
+    options.internalPredicate || ((url: string) => url.startsWith('/') || url.startsWith('#'));
 
-  return (tree) => {
+  const transformer: Transformer<Root, Root> = (tree: Root, file?: VFile) => {
     visit(tree, 'link', (node: Link) => {
       const url = node.url;
-      
-      // 内部リンクでない場合、属性を追加
-      if (!internalPredicate(url)) {
-        node.data = node.data || {};
-        node.data.hProperties = node.data.hProperties || {};
-        
-        Object.assign(node.data.hProperties, {
+
+      // urlが存在し、かつ外部リンクである場合
+      if (url && !internalPredicate(url)) {
+        if (!node.data) {
+          node.data = {};
+        }
+        // hPropertiesを安全に扱う
+        const hProperties = (node.data.hProperties || {}) as Record<string, unknown>;
+
+        node.data.hProperties = {
+          ...hProperties, // 既存のプロパティを維持
           target: '_blank',
-          rel: 'noopener noreferrer'
-        });
+          rel: 'noopener noreferrer',
+        };
       }
     });
+    return tree; // 処理後のツリーを返す
   };
+
+  return transformer;
 };

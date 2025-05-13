@@ -1,6 +1,6 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
-import type { Image } from 'mdast';
+import type { Root, Image } from 'mdast';
 
 interface ImageTransformOptions {
   /** Cloudinary変換ベースURL */
@@ -14,14 +14,14 @@ interface ImageTransformOptions {
 /**
  * 相対画像パスをCloudinary CDN URLに変換するremarkプラグイン
  */
-export const remarkImageTransform: Plugin<[ImageTransformOptions?], any> = (options = {}) => {
+export const remarkImageTransform: Plugin<[ImageTransformOptions?], Root, Root> = (options = {}) => {
   const { baseUrl, width = 800, quality = 80 } = options;
   
   if (!baseUrl) {
-    return (tree) => tree; // baseUrlが指定されていない場合は何もしない
+    return (tree: Root) => tree; // baseUrlが指定されていない場合は何もしない
   }
 
-  return (tree) => {
+  return (tree: Root) => {
     visit(tree, 'image', (node: Image) => {
       const url = node.url;
       

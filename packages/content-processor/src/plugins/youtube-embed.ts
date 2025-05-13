@@ -1,12 +1,12 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
-import type { Paragraph } from 'mdast';
+import type { Root, Paragraph } from 'mdast';
 
 /**
  * ::youtube{id="..."} ディレクティブをHTML要素に変換するremarkプラグイン
  */
-export const remarkYoutubeEmbed: Plugin = () => {
-  return (tree) => {
+export const remarkYoutubeEmbed: Plugin<[], Root, Root> = () => {
+  return (tree: Root) => {
     visit(tree, 'containerDirective', (node: any) => {
       if (node.name !== 'youtube') return;
 

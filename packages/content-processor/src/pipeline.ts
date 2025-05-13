@@ -5,7 +5,6 @@ import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeStringify from 'rehype-stringify';
-import { Schema } from 'hast-util-sanitize';
 import { ProcessorOptions } from './types';
 import { remarkLinkTransform } from './plugins/link-transform';
 import { remarkImageTransform } from './plugins/image-transform';
@@ -25,29 +24,14 @@ export function createProcessor(options: ProcessorOptions = {}) {
     .use(remarkParse) // Markdownをパース
     .use(remarkDirective) // ::directive{} 構文を有効化
     .use(remarkLinkTransform) // 外部リンクに target="_blank" を追加
-    .use(remarkRehype({ allowDangerousHtml: true })) // rehypeに変換（生HTMLを許可）
+    .use(remarkImageTransform, { baseUrl: options.imageBase }) // 画像変換（Cloudinary対応）
+    .use(remarkYoutubeEmbed) // YouTube埋め込み
+    .use(remarkTwitterEmbed) // Twitter埋め込み
+    .use(remarkGithubEmbed) // GitHub埋め込み
+    .use(remarkAmazonEmbed) // Amazon埋め込み
+    .use(remarkRehype) // rehypeに変換（生HTMLを許可）
     .use(rehypeRaw) // 生HTMLを処理
     .use(rehypeStringify); // HTML文字列に変換
-
-  // 画像変換（Cloudinary対応）
-  if (options.imageBase) {
-    processor = processor.use(remarkImageTransform, { baseUrl: options.imageBase });
-  }
-
-  // 埋め込みプラグイン
-  const embeds = options.embeds || {};
-  if (embeds.youtube) {
-    processor = processor.use(remarkYoutubeEmbed);
-  }
-  if (embeds.twitter) {
-    processor = processor.use(remarkTwitterEmbed);
-  }
-  if (embeds.github) {
-    processor = processor.use(remarkGithubEmbed);
-  }
-  if (embeds.amazon) {
-    processor = processor.use(remarkAmazonEmbed);
-  }
 
   // HTMLサニタイズ
   if (options.sanitizeSchema) {

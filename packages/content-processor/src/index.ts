@@ -27,7 +27,7 @@ export async function loadFromString(
   try {
     // Front-matterの抽出
     const { data, content } = matter(md);
-    
+
     // 必須フィールドの検証
     if (!data.title) {
       throw new FrontMatterError('Front-matterにtitleが含まれていません');
@@ -38,25 +38,25 @@ export async function loadFromString(
 
     // 読了時間の計算
     const stats = readingTime(content);
-    
+
     // Markdownの処理
     const processor = createProcessor(opts);
     const result = await processor.process(content);
-    
+
     // メタデータの構築
     const meta: PostMeta = {
       slug: data.slug || '',
       title: data.title,
       description: data.description || '',
       publishedAt: data.publishedAt,
-      updatedAt: data.updatedAt,
+      updatedAt: data.updatedAt || data.publishedAt,
       category: data.category || '',
       tags: data.tags || [],
-      coverImage: data.coverImage || data.thumbnail,
+      coverImage: data.coverImage,
       draft: data.draft || false,
       readingTime: Math.ceil(stats.minutes)
     };
-    
+
     return {
       meta,
       html: String(result)
@@ -92,26 +92,26 @@ export async function loadFromFile(
     } catch (error) {
       throw new FileNotFoundError(`ファイルが見つかりません: ${filePath}`);
     }
-    
+
     // ファイル読み込み
     const content = await fs.readFile(filePath, 'utf-8');
-    
+
     // slugの抽出（ファイル名から拡張子を除いたもの）
     const basename = path.basename(filePath);
     const slug = basename.replace(/\.[^/.]+$/, '');
-    
+
     // 文字列処理関数に委譲
     const result = await loadFromString(content, opts);
-    
+
     // slugが指定されていない場合はファイル名から設定
     if (!result.meta.slug) {
       result.meta.slug = slug;
     }
-    
+
     return result;
   } catch (error) {
-    if (error instanceof FileNotFoundError || 
-        error instanceof FrontMatterError || 
+    if (error instanceof FileNotFoundError ||
+        error instanceof FrontMatterError ||
         error instanceof MarkdownParseError) {
       throw error;
     }
@@ -136,13 +136,13 @@ export async function getAllPosts(
   opts: ListOptions = {}
 ): Promise<PostMeta[]> {
   // デフォルト値の設定
-  const { 
-    page = 1, 
-    perPage = 20, 
+  const {
+    page = 1,
+    perPage = 20,
     sort = 'publishedAt',
     filter = () => true
   } = opts;
-  
+
   // ファイル一覧の取得
   const files = await glob(globPattern);
 
@@ -170,12 +170,12 @@ export async function getAllPosts(
       }
     })
   );
-  
+
   // nullを除外し、フィルタを適用
   const validPosts = posts
     .filter((post): post is PostMeta => post !== null)
     .filter(filter);
-  
+
   // ソート
   const sortedPosts = [...validPosts].sort((a, b) => {
     if (sort === 'publishedAt') {
@@ -185,11 +185,11 @@ export async function getAllPosts(
     }
     return 0;
   });
-  
+
   // ページネーション
   const startIndex = (page - 1) * perPage;
   const endIndex = startIndex + perPage;
-  
+
   return sortedPosts.slice(startIndex, endIndex);
 }
 
@@ -207,7 +207,7 @@ export async function getPostBySlug(
 ): Promise<PostHTML> {
   // .mdファイルを探す
   const filePath = path.join(baseDir, `${slug}.md`);
-  
+
   try {
     return await loadFromFile(filePath, opts);
   } catch (error) {

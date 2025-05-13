@@ -122,6 +122,9 @@ importers:
       hast-util-sanitize:
         specifier: ^5.0.1
         version: 5.0.2
+      mdast:
+        specifier: ^3.0.0
+        version: 3.0.0
       reading-time:
         specifier: ^1.5.0
         version: 1.5.0
@@ -149,7 +152,13 @@ importers:
       unist-util-visit:
         specifier: ^5.0.0
         version: 5.0.0
+      vfile:
+        specifier: ^6.0.1
+        version: 6.0.3
     devDependencies:
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
       '@types/node':
         specifier: ^20.11.0
         version: 20.17.30
@@ -1825,6 +1834,10 @@ packages:
 
   mdast-util-to-string@4.0.0:
     resolution: {integrity: sha512-0H44vDimn51F0YwvxSJSm0eCDOJTRlmN0R1yBh4HLj9wiV1Dn0QoXGbvFAWj2hSItVTlCmBF1hqKlIyUBVFLPg==}
+
+  mdast@3.0.0:
+    resolution: {integrity: sha512-xySmf8g4fPKMeC07jXGz971EkLbWAJ83s4US2Tj9lEdnZ142UP5grN73H1Xd3HzrdbU5o9GYYP/y8F9ZSwLE9g==}
+    deprecated: '`mdast` was renamed to `remark`'
 
   merge-stream@2.0.0:
     resolution: {integrity: sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==}
@@ -4363,6 +4376,8 @@ snapshots:
   mdast-util-to-string@4.0.0:
     dependencies:
       '@types/mdast': 4.0.4
+
+  mdast@3.0.0: {}
 
   merge-stream@2.0.0: {}
 
