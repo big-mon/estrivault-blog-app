@@ -1,5 +1,4 @@
 content/blog/**
-apps/astro-blog/src/content/blog/**
 
 # その他
 .env*
