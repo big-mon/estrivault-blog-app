@@ -1,5 +1,3 @@
-content/blog/**
-
 # その他
 .env*
 .DS_Store
