@@ -25,6 +25,7 @@ export function createProcessor(options: ProcessorOptions = {}) {
     .use(remarkParse) // Markdownをパース
     .use(remarkDirective) // ::directive{} 構文を有効化
     .use(remarkLinkTransform) // 外部リンクに target="_blank" を追加
+    .use(remarkYoutubeEmbed)
     .use(remarkRehype) // rehypeに変換（生HTMLを許可）
     .use(rehypeRaw) // 生HTMLを処理
     .use(rehypeStringify); // HTML文字列に変換
@@ -36,9 +37,6 @@ export function createProcessor(options: ProcessorOptions = {}) {
 
   // 埋め込みプラグイン
   const embeds = options.embeds || {};
-  if (embeds.youtube) {
-    processor = processor.use(remarkYoutubeEmbed);
-  }
   if (embeds.twitter) {
     //processor = processor.use(remarkTwitterEmbed);
   }
