@@ -42,7 +42,19 @@ export interface ProcessorOptions {
   sanitizeSchema?: import("hast-util-sanitize").Schema;
 }
 
-export interface ListOptions {
+export interface ProcessorOptions {
+  /** 埋め込みプラグインを明示的に追加 */
+  embeds?: {
+    youtube?: boolean;
+    twitter?: boolean;
+    github?: boolean;
+    amazon?: boolean;
+  };
+  /** Cloudinaryクラウド名 */
+  cloudinaryCloudName?: string;
+}
+
+export interface ListOptions extends ProcessorOptions {
   page?: number; // ページ番号（1起点）
   perPage?: number; // デフォルト20
   sort?: "publishedAt" | "title"; // ソートキー

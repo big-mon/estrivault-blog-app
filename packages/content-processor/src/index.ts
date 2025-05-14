@@ -53,7 +53,7 @@ export async function loadFromString(
       updatedAt: data.updatedAt || data.publishedAt,
       category: data.category || '',
       tags: data.tags || [],
-      coverImage: resolveCoverImage(data.coverImage),
+      coverImage: resolveCoverImage(data.coverImage, opts.cloudinaryCloudName),
       draft: data.draft || false,
       readingTime: Math.ceil(stats.minutes)
     };
@@ -163,7 +163,7 @@ export async function getAllPosts(
   const posts = await Promise.all(
     validFiles.map(async (file) => {
       try {
-        const { meta } = await loadFromFile(file, { imageBase: 'https://res.cloudinary.com/damonge/image/upload' });
+        const { meta } = await loadFromFile(file, opts);
         return meta;
       } catch (error) {
         console.warn(`ファイルのメタデータ抽出中にエラー: ${file}`, error);
@@ -225,12 +225,12 @@ export async function getPostBySlug(
   }
 }
 
-function resolveCoverImage(coverImage?: string): string | undefined {
-  if (!coverImage) return coverImage;
+function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''): string {
+  if (!coverImage) return '';
   if (coverImage.startsWith('http') || coverImage.startsWith('data:')) return coverImage;
   // 先頭スラッシュ除去・拡張子除去
   let publicId = coverImage.replace(/^\//, '').replace(/\.[^/.]+$/, '');
-  return buildUrl('', publicId, { w: 800 });
+  return buildUrl(cloudinaryCloudName, publicId, { w: 800 });
 }
 
 // 型定義のエクスポート
