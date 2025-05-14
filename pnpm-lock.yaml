@@ -104,6 +104,9 @@ importers:
         specifier: ^1.21.0
         version: 1.21.0
     devDependencies:
+      '@types/node':
+        specifier: ^22.14.1
+        version: 22.14.1
       tsup:
         specifier: ^8.0.0
         version: 8.4.0(jiti@2.4.2)(postcss@8.5.3)(typescript@5.8.3)
@@ -113,6 +116,9 @@ importers:
 
   packages/content-processor:
     dependencies:
+      '@estrivault/cloudinary-utils':
+        specifier: workspace:*
+        version: link:../cloudinary-utils
       glob:
         specifier: ^10.3.10
         version: 10.4.5

@@ -6,7 +6,7 @@ import { format, quality } from "@cloudinary/url-gen/actions/delivery";
  * Cloudinary 画像 URL を生成
  */
 export function buildUrl(
-  cloudName: string,
+  cloudName: string = "",
   publicId: string,
   opts: {
     w: number;
@@ -14,7 +14,8 @@ export function buildUrl(
     mode?: "fill" | "fit";
   }
 ): string {
-  const cld = new Cloudinary({ cloud: { cloudName } });
+  const resolvedCloudName = cloudName === "" ? process.env.PUBLIC_CLOUDINARY_CLOUD_NAME : cloudName;
+  const cld = new Cloudinary({ cloud: { cloudName: resolvedCloudName } });
   const img = cld.image(publicId);
 
   if (opts.mode === "fit" || !opts.h) {

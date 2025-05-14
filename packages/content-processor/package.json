@@ -31,7 +31,8 @@
     "remark-rehype": "^11.0.0",
     "unified": "^11.0.4",
     "unist-util-visit": "^5.0.0",
-    "vfile": "^6.0.1"
+    "vfile": "^6.0.1",
+    "@estrivault/cloudinary-utils": "workspace:*"
   },
   "devDependencies": {
     "@types/mdast": "^4.0.4",
