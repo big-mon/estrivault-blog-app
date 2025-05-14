@@ -225,6 +225,12 @@ export async function getPostBySlug(
   }
 }
 
+/**
+ * 画像のURLをCloudinaryのURLに変換する
+ * @param coverImage 画像のURLまたは相対パス
+ * @param cloudinaryCloudName Cloudinaryクラウド名
+ * @returns CloudinaryのURL
+ */
 function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''): string {
   if (!coverImage) return '';
   if (coverImage.startsWith('http') || coverImage.startsWith('data:')) return coverImage;
