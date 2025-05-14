@@ -1,5 +1,6 @@
 import { getAllPosts, getPostBySlug, type PostMeta, type PostHTML } from '@estrivault/content-processor';
 import path from 'path';
+import { PUBLIC_CLOUDINARY_CLOUD_NAME as cloudNameFromEnv } from '$env/static/public';
 
 // コンテンツディレクトリのパス
 const CONTENT_DIR = path.resolve(process.cwd(), '../../content/blog');
@@ -43,7 +44,8 @@ export async function getPosts(options?: {
       page,
       perPage,
       sort,
-      filter
+      filter,
+      cloudinaryCloudName: cloudNameFromEnv
     });
 
     // Postインターフェースに変換
