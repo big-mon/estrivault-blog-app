@@ -3,7 +3,8 @@ import path from 'path';
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
 import { glob } from 'glob';
-import { createProcessor } from './pipeline/pipeline';
+import { createPipeline } from './pipeline';
+import type { Processor } from 'unified';
 import { buildUrl } from '@estrivault/cloudinary-utils';
 import { getBaseNameWithoutExtension, resolvePath } from './utils/path-utils';
 import {
@@ -44,7 +45,7 @@ export async function loadFromString(
     const stats = readingTime(content);
 
     // Markdownの処理
-    const processor = createProcessor(opts);
+    const processor = createPipeline(opts) as Processor;
     const result = await processor.process(content);
 
     // メタデータの構築
