@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "prebuild": "pnpm --filter @estrivault/cloudinary-utils build",
-    "build": "tsc --build --force && tsup"
+    "build": "tsup"
   },
   "peerDependencies": {
     "unist-util-visit": "^5.0.0"

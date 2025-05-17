@@ -14,7 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --dts --format esm",
+    "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
