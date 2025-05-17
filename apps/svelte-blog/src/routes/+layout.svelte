@@ -2,14 +2,14 @@
 	import '../app.css';
 	import { fade, fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import Header from '$components/Header/Header.svelte';
 	import Footer from '$components/Footer/Footer.svelte';
 
 	let { children } = $props();
-	
+
 	// 現在のパスを取得
-	let currentPath = $derived($page.url.pathname);
+	const currentPath = page.url.pathname;
 </script>
 
 <svelte:head>
