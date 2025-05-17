@@ -1,4 +1,3 @@
-import { unified, type Processor } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkDirective from 'remark-directive';
 import remarkRehype from 'remark-rehype';
@@ -11,20 +10,18 @@ import type { PipelineProcessor } from '../types';
  * コアなMarkdownパーサーを設定する
  */
 export const createCoreProcessor: PipelineProcessor = (processor) => {
-  // @ts-ignore - unified の型定義が厳しすぎるため
   return processor
     .use(remarkParse) // Markdownをパース
     .use(remarkDirective) // ::directive{} 構文を有効化
-    .use(remarkRehype) // rehypeに変換（生HTMLを許可）
-    .use(rehypeRaw) // 生HTMLを処理
-    .use(rehypeStringify); // HTML文字列に変換
+    .use(remarkRehype, { allowDangerousHtml: true }) // MarkdownをHTMLに変換
+    .use(rehypeRaw) // HTMLをパースして再構築
+    .use(rehypeStringify); // HTMLを文字列にシリアライズ
 };
 
 /**
  * HTMLサニタイズを設定する
  */
 export const createSanitizeProcessor: PipelineProcessor = (processor, options) => {
-  // @ts-ignore - unified の型定義が厳しすぎるため
   return options?.sanitizeSchema
     ? processor.use(rehypeSanitize, options.sanitizeSchema)
     : processor.use(rehypeSanitize);

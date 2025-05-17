@@ -36,7 +36,6 @@ export function createPipeline(
   const processors = [...DEFAULT_PROCESSORS, ...customProcessors];
 
   // パイプラインを構築
-  // @ts-ignore - unified の型定義が厳しすぎるため
   return processors.reduce(
     (processor, processorFn) => processorFn(processor, options),
     unified()

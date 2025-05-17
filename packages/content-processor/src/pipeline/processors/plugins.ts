@@ -5,13 +5,11 @@ import { remarkYoutubeEmbed } from '../../plugins/youtube-embed';
 import { remarkTwitterEmbed } from '../../plugins/twitter-embed';
 import { remarkGithubEmbed } from '../../plugins/github-embed';
 import { remarkAmazonEmbed } from '../../plugins/amazon-embed';
-import type { Processor } from 'unified';
 
 /**
  * リンク変換プラグインを設定する
  */
 export const createLinkTransformProcessor: PipelineProcessor = (processor) => {
-  // @ts-ignore - unified の型定義が厳しすぎるため
   return processor.use(remarkLinkTransform);
 };
 
@@ -19,7 +17,6 @@ export const createLinkTransformProcessor: PipelineProcessor = (processor) => {
  * 画像変換プラグインを設定する
  */
 export const createImageTransformProcessor: PipelineProcessor = (processor, options) => {
-  // @ts-ignore - unified の型定義が厳しすぎるため
   return processor.use(remarkImageTransform, { baseUrl: options?.imageBase });
 };
 
@@ -27,17 +24,13 @@ export const createImageTransformProcessor: PipelineProcessor = (processor, opti
  * 埋め込みプラグインを設定する
  */
 export const createEmbedProcessors: PipelineProcessor = (processor, options) => {
-  // @ts-ignore - unified の型定義が厳しすぎるため
   if (options?.embeds?.youtube) {
-    // @ts-ignore - unified の型定義が厳しすぎるため
     processor = processor.use(remarkYoutubeEmbed);
   }
   if (options?.embeds?.twitter) {
-    // @ts-ignore - unified の型定義が厳しすぎるため
     processor = processor.use(remarkTwitterEmbed);
   }
   if (options?.embeds?.github) {
-    // @ts-ignore - unified の型定義が厳しすぎるため
     processor = processor.use(remarkGithubEmbed);
   }
   if (options?.embeds?.amazon) {

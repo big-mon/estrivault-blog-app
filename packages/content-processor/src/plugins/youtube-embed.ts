@@ -1,6 +1,6 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
-import type { Root, Paragraph } from 'mdast';
+import type { Root } from 'mdast';
 
 /**
  * ::youtube{id="..."} ディレクティブをHTML要素に変換するremarkプラグイン
