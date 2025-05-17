@@ -20,9 +20,9 @@
 	};
 </script>
 
-<a href={`/post/${post.slug}`} aria-label={post.title}>
+<a href={`/post/${post.slug}`} class="block h-full" aria-label={post.title}>
 	<article
-		class="group relative transform overflow-hidden rounded-xl border border-gray-200
+		class="group relative flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-200
          bg-white shadow-sm transition-all duration-100 ease-out hover:scale-[1.01] hover:border-gray-300 hover:shadow-md"
 	>
 		<header>
@@ -52,8 +52,8 @@
 			</div>
 		</header>
 
-		<section class="line-clamp-2 px-4 text-sm text-gray-700">
-			{post.description}
+		<section class="flex-1 px-4 text-sm text-gray-700">
+			<p class="line-clamp-2">{post.description}</p>
 		</section>
 
 		<footer class="p-4">
