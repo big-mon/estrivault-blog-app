@@ -1,6 +1,6 @@
 // コア型のエクスポート
 export type { PostMeta, PostHTML } from './core/post';
-export type { ProcessorOptions, ListOptions, EmbedOptions } from './core/options';
+export type { ProcessorOptions, ListOptions } from './core/options';
 
 // エラークラスのエクスポート
 export {

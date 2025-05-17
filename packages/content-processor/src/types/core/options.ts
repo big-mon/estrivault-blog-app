@@ -42,4 +42,6 @@ export interface ListOptions extends ProcessorOptions {
   filter?: (post: PostMeta) => boolean;
   /** ベースディレクトリ（デフォルト: カレントディレクトリ） */
   baseDir?: string;
+  /** 下書きを含めるかどうか */
+  includeDrafts?: boolean;
 }
