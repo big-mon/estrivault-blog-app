@@ -1,3 +1,6 @@
+# テストカバレッジ
+coverage/
+
 # その他
 .env*
 .DS_Store
