@@ -51,9 +51,10 @@ describe('pipeline', () => {
 
     const result = await processor.process(markdown);
     const html = String(result);
-
-    expect(html).toContain('youtube-embed');
-    expect(html).toContain('dQw4w9WgXcQ');
+    
+    // 正規表現を使って動的なスタイルを許容
+    const expectedPattern = /<div class="youtube-embed"[^>]*>\s*<iframe[^>]*src="https:\/\/www\.youtube\.com\/embed\/dQw4w9WgXcQ"[^>]*>[\s\S]*<\/div>/;
+    expect(html).toMatch(expectedPattern);
   });
 
   it('画像変換オプションを指定した場合に正しく処理される', async () => {

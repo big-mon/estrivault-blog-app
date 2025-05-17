@@ -59,6 +59,8 @@ export interface ListOptions extends ProcessorOptions {
   perPage?: number; // デフォルト20
   sort?: "publishedAt" | "title"; // ソートキー
   filter?: (post: PostMeta) => boolean; // フィルタ関数
+  /** ベースディレクトリ（デフォルト: カレントディレクトリ） */
+  baseDir?: string;
 }
 
 // エラークラス

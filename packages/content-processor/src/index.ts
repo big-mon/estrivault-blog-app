@@ -5,6 +5,7 @@ import readingTime from 'reading-time';
 import { glob } from 'glob';
 import { createProcessor } from './pipeline';
 import { buildUrl } from '@estrivault/cloudinary-utils';
+import { getBaseNameWithoutExtension, resolvePath } from './utils/path-utils';
 import {
   PostMeta,
   PostHTML,
@@ -33,8 +34,10 @@ export async function loadFromString(
     if (!data.title) {
       throw new FrontMatterError('Front-matterにtitleが含まれていません');
     }
+    
+    // publishedAt がなければ現在時刻を設定
     if (!data.publishedAt) {
-      throw new FrontMatterError('Front-matterにpublishedAtが含まれていません');
+      data.publishedAt = new Date().toISOString();
     }
 
     // 読了時間の計算
@@ -94,12 +97,11 @@ export async function loadFromFile(
       throw new FileNotFoundError(`ファイルが見つかりません: ${filePath}`);
     }
 
-    // ファイル読み込み
+    // ファイルの読み込み
     const content = await fs.readFile(filePath, 'utf-8');
 
-    // slugの抽出（ファイル名から拡張子を除いたもの）
-    const basename = path.basename(filePath);
-    const slug = basename.replace(/\.[^/.]+$/, '');
+    // ファイルパスからスラッグを生成
+    const slug = getBaseNameWithoutExtension(filePath);
 
     // 文字列処理関数に委譲
     const result = await loadFromString(content, opts);
@@ -141,11 +143,16 @@ export async function getAllPosts(
     page = 1,
     perPage = 20,
     sort = 'publishedAt',
-    filter = () => true
+    filter = () => true,
+    baseDir = process.cwd()
   } = opts;
 
   // ファイル一覧の取得
-  const files = await glob(globPattern);
+  const files = await glob(globPattern, { 
+    cwd: baseDir,
+    absolute: true,
+    nodir: true
+  });
 
   // ファイルのみ抽出（ディレクトリは除外）
   const validFiles = (await Promise.all(
@@ -207,14 +214,14 @@ export async function getPostBySlug(
   opts: ProcessorOptions = {}
 ): Promise<PostHTML> {
   // .mdファイルを探す
-  const filePath = path.join(baseDir, `${slug}.md`);
+  const filePath = resolvePath(baseDir, `${slug}.md`);
 
   try {
     return await loadFromFile(filePath, opts);
   } catch (error) {
     if (error instanceof FileNotFoundError) {
       // .mdxファイルも試す
-      const mdxPath = path.join(baseDir, `${slug}.mdx`);
+      const mdxPath = resolvePath(baseDir, `${slug}.mdx`);
       try {
         return await loadFromFile(mdxPath, opts);
       } catch (mdxError) {

@@ -23,16 +23,15 @@ export const remarkLinkTransform: Plugin<[LinkTransformOptions?], Root, Root> = 
 
       // urlが存在し、かつ外部リンクである場合
       if (url && !internalPredicate(url)) {
-        if (!node.data) {
-          node.data = {};
-        }
-        // hPropertiesを安全に扱う
-        const hProperties = (node.data.hProperties || {}) as Record<string, unknown>;
-
+        // 既存のプロパティを取得
+        const existingProps = node.data?.hProperties || {};
+        
+        // 新しいプロパティをマージ
+        node.data = node.data || {};
         node.data.hProperties = {
-          ...hProperties, // 既存のプロパティを維持
+          ...existingProps,
           target: '_blank',
-          rel: 'noopener noreferrer',
+          rel: 'noopener noreferrer'
         };
       }
     });

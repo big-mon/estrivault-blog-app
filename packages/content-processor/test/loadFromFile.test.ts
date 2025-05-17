@@ -45,20 +45,20 @@ describe('loadFromFile', () => {
     });
     
     // YouTube埋め込みの検証
-    expect(result.html).toContain('youtube-embed');
-    expect(result.html).toContain('dQw4w9WgXcQ');
+    const youtubePattern = /<div class="youtube-embed"[^>]*>\s*<iframe[^>]*src="https:\/\/www\.youtube\.com\/embed\/dQw4w9WgXcQ"[^>]*>[\s\S]*<\/div>/;
+    expect(result.html).toMatch(youtubePattern);
     
     // Twitter埋め込みの検証
-    expect(result.html).toContain('twitter-embed');
-    expect(result.html).toContain('1234567890');
+    const twitterPattern = /<div class="twitter-embed"[^>]*>\s*<blockquote[^>]*>\s*<a[^>]*>https:\/\/twitter\.com\/user\/status\/1234567890<\/a>\s*<\/blockquote>\s*<\/div>/;
+    expect(result.html).toMatch(twitterPattern);
     
     // GitHub埋め込みの検証
-    expect(result.html).toContain('github-embed');
-    expect(result.html).toContain('big-mon/estrivault-blog-app');
+    const githubPattern = /<div class="github-embed"[^>]*>\s*<a[^>]*href="https:\/\/github\.com\/big-mon\/estrivault-blog-app"[^>]*>big-mon\/estrivault-blog-app<\/a>\s*<\/div>/;
+    expect(result.html).toMatch(githubPattern);
     
     // Amazon埋め込みの検証
-    expect(result.html).toContain('amazon-embed');
-    expect(result.html).toContain('B01234567');
+    const amazonPattern = /<div class="amazon-embed"[^>]*>\s*<a[^>]*href="https:\/\/www\.amazon\.co\.jp\/dp\/B01234567"[^>]*>商品名<\/a>\s*<\/div>/;
+    expect(result.html).toMatch(amazonPattern);
   });
 
   it('画像変換オプションを指定した場合に正しく処理する', async () => {

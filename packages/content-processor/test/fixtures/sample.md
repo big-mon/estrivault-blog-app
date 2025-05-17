@@ -1,20 +1,18 @@
 ---
 title: サンプル記事
 description: これはテスト用のサンプル記事です
-date: 2025-04-23
+slug: sample
 publishedAt: 2025-04-23T10:00:00Z
-category: テスト
-tags:
-  - サンプル
-  - テスト
 coverImage: /images/sample.jpg
+category: テスト
+tags: ["サンプル", "テスト"]
 ---
 
 # サンプル記事
 
 これはテスト用のサンプル記事です。
 
-## 見出し2
+## 見出し 2
 
 通常の**太字**や*斜体*のテキストも含まれています。
 
