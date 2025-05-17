@@ -1,51 +1,57 @@
 <script lang="ts">
-	import PostCard from '$components/PostCard/PostCard.svelte';
-	import type { PageData } from '../../../$types';
-	import type { PostMeta } from '@estrivault/content-processor';
+  import { browser } from '$app/environment';
+  import { afterNavigate } from '$app/navigation';
+  import PostCard from '$components/PostCard/PostCard.svelte';
+  import type { PageData } from '../../../$types';
+  import type { PostMeta } from '@estrivault/content-processor';
 
-	const { data } = $props<{ data: PageData }>();
+  const { data } = $props<{ data: PageData }>();
 
-	// 型アサーションを使用してデータを取得
-	type PageDataType = {
-		posts: PostMeta[];
-		category: string;
-		pagination: {
-			page: number;
-			perPage: number;
-			total: number;
-			totalPages: number;
-		};
-	};
+  type PageDataType = {
+    posts: PostMeta[];
+    category: string;
+    pagination: {
+      page: number;
+      perPage: number;
+      total: number;
+      totalPages: number;
+    };
+  };
 
-	const pageData = $state<PageDataType>({
-		posts: [],
-		category: '',
-		pagination: {
-			page: 1,
-			perPage: 10,
-			total: 0,
-			totalPages: 1
-		}
-	});
+  const pageData = $state<PageDataType>({
+    posts: [],
+    category: '',
+    pagination: {
+      page: 1,
+      perPage: 10,
+      total: 0,
+      totalPages: 1
+    }
+  });
 
-	// 初期データを設定
-	$effect(() => {
-		const newData = data as unknown as PageDataType;
-		pageData.posts = newData.posts;
-		pageData.category = newData.category;
-		pageData.pagination = newData.pagination;
-	});
+  // データを更新する共通関数
+  const updateData = () => {
+    const newData = data as unknown as PageDataType;
+    pageData.posts = newData.posts;
+    pageData.category = newData.category;
+    pageData.pagination = newData.pagination;
+  };
 
-	// URLパラメータが変更されたらデータを更新
-	$effect(() => {
-		const currentPath = window.location.pathname;
-		if (currentPath.includes('/category/')) {
-			const newData = data as unknown as PageDataType;
-			pageData.posts = newData.posts;
-			pageData.category = newData.category;
-			pageData.pagination = newData.pagination;
-		}
-	});
+  // 初期データを設定
+  $effect(() => {
+    if (browser) {
+      updateData();
+    }
+  });
+
+  // ナビゲーション後にデータを更新
+  if (browser) {
+    afterNavigate(({ to }) => {
+      if (to?.url.pathname.includes('/category/')) {
+        updateData();
+      }
+    });
+  }
 </script>
 
 <svelte:head>
