@@ -13,8 +13,10 @@
 		return new Intl.DateTimeFormat('ja-JP', {
 			year: 'numeric',
 			month: '2-digit',
-			day: '2-digit',
-		}).format(date).replace(/\//g, '-');
+			day: '2-digit'
+		})
+			.format(date)
+			.replace(/\//g, '-');
 	};
 </script>
 
@@ -34,11 +36,15 @@
 
 		<div class="flex flex-col justify-between p-4 font-sans text-gray-800">
 			<div class="space-y-1">
-				<p class="text-xs uppercase tracking-wide text-gray-500">{post.category}</p>
+				<div class="flex items-center justify-between">
+					<p class="text-xs uppercase tracking-wide text-gray-500">{post.category}</p>
+					<time datetime={post.publishedAt} class="text-xs text-gray-500"
+						>{formatDate(post.publishedAt)}</time
+					>
+				</div>
 				<h2 class="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600">
 					{post.title}
 				</h2>
-				<time datetime={post.publishedAt} class="text-sm text-gray-500">{formatDate(post.publishedAt)}</time>
 			</div>
 		</div>
 	</header>
