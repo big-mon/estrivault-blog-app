@@ -5,13 +5,13 @@ import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeStringify from 'rehype-stringify';
-import { ProcessorOptions } from './types';
-import { remarkLinkTransform } from './plugins/link-transform';
-import { remarkImageTransform } from './plugins/image-transform';
-import { remarkYoutubeEmbed } from './plugins/youtube-embed';
-import { remarkTwitterEmbed } from './plugins/twitter-embed';
-import { remarkGithubEmbed } from './plugins/github-embed';
-import { remarkAmazonEmbed } from './plugins/amazon-embed';
+import { ProcessorOptions } from '../types';
+import { remarkLinkTransform } from '../plugins/link-transform';
+import { remarkImageTransform } from '../plugins/image-transform';
+import { remarkYoutubeEmbed } from '../plugins/youtube-embed';
+import { remarkTwitterEmbed } from '../plugins/twitter-embed';
+import { remarkGithubEmbed } from '../plugins/github-embed';
+import { remarkAmazonEmbed } from '../plugins/amazon-embed';
 
 /**
  * Markdownをパースし、HTMLに変換するパイプラインを構築する

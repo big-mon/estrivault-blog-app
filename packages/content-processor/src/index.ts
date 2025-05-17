@@ -3,7 +3,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
 import { glob } from 'glob';
-import { createProcessor } from './pipeline';
+import { createProcessor } from './pipeline/pipeline';
 import { buildUrl } from '@estrivault/cloudinary-utils';
 import { getBaseNameWithoutExtension, resolvePath } from './utils/path-utils';
 import {
@@ -34,7 +34,7 @@ export async function loadFromString(
     if (!data.title) {
       throw new FrontMatterError('Front-matterにtitleが含まれていません');
     }
-    
+
     // publishedAt がなければ現在時刻を設定
     if (!data.publishedAt) {
       data.publishedAt = new Date().toISOString();
@@ -148,7 +148,7 @@ export async function getAllPosts(
   } = opts;
 
   // ファイル一覧の取得
-  const files = await glob(globPattern, { 
+  const files = await glob(globPattern, {
     cwd: baseDir,
     absolute: true,
     nodir: true
