@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PostCard from '../../../../components/PostCard/PostCard.svelte';
+	import PostCard from '$components/PostCard/PostCard.svelte';
 	import type { PageData } from '../../../$types';
 	import type { PostMeta } from '@estrivault/content-processor';
 

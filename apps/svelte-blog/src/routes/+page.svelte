@@ -1,6 +1,6 @@
 <script lang="ts">
-	import PostCard from '../components/PostCard/PostCard.svelte';
-	import Pagination from '../components/Pagination/Pagination.svelte';
+	import PostCard from '$components/PostCard/PostCard.svelte';
+	import Pagination from '$components/Pagination/Pagination.svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
