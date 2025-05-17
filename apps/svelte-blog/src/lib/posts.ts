@@ -1,4 +1,4 @@
-import { getAllPosts, getPostBySlug, type PostMeta, type PostHTML } from '@estrivault/content-processor';
+import { getAllPosts, type PostMeta } from '@estrivault/content-processor';
 import path from 'path';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME as cloudNameFromEnv } from '$env/static/public';
 
@@ -13,6 +13,7 @@ export async function getPosts(options?: {
   perPage?: number;
   sort?: 'publishedAt' | 'title';
   includeDrafts?: boolean;
+  category?: string;
 }): Promise<{
   posts: PostMeta[];
   total: number;
@@ -31,6 +32,10 @@ export async function getPosts(options?: {
     const filter = (post: PostMeta) => {
       // 下書きを除外（includeDraftsがtrueの場合は含める）
       if (!includeDrafts && post.draft) {
+        return false;
+      }
+      // カテゴリーが指定されている場合はフィルタリング（大文字小文字を区別しない）
+      if (options?.category && post.category?.toLowerCase() !== options.category.toLowerCase()) {
         return false;
       }
       return true;
