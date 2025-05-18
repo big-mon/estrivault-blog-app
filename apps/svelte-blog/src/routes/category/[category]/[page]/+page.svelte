@@ -2,6 +2,7 @@
   import { browser } from '$app/environment';
   import { afterNavigate } from '$app/navigation';
   import PostCard from '$components/PostCard/PostCard.svelte';
+  import Pagination from '$components/Pagination/Pagination.svelte';
   import type { PageData } from '../../../$types';
   import type { PostMeta } from '@estrivault/content-processor';
 
@@ -62,21 +63,37 @@
   />
 </svelte:head>
 
-<div class="container mx-auto px-4 py-8">
+<main class="container mx-auto px-4 py-8">
   <div class="mb-8 text-center">
     <h1 class="mb-2 text-3xl font-bold">{pageData.category.toUpperCase()}</h1>
-    <p class="text-gray-600">全{pageData.posts.length}件の記事</p>
+    <p class="text-gray-600">
+      全{pageData.pagination.total}件の記事（{pageData.pagination.page} / {pageData.pagination
+        .totalPages}ページ）
+    </p>
   </div>
 
   {#if pageData.posts.length > 0}
-    <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      {#each pageData.posts as post}
-        <PostCard {post} />
-      {/each}
+    <div class="mb-8">
+      <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {#each pageData.posts as post}
+          <PostCard {post} />
+        {/each}
+      </div>
+
+      {#if pageData.pagination.totalPages > 1}
+        <div class="mt-12">
+          <Pagination
+            currentPage={pageData.pagination.page}
+            totalPages={pageData.pagination.totalPages}
+            baseUrl={`/category/${pageData.category}`}
+            maxVisible={5}
+          />
+        </div>
+      {/if}
     </div>
   {:else}
-    <div class="py-12 text-center">
-      <p class="text-gray-600">このカテゴリーにはまだ記事がありません。</p>
+    <div class="rounded-lg bg-gray-50 p-8 text-center">
+      <p class="text-gray-500">このカテゴリーにはまだ記事がありません。</p>
     </div>
   {/if}
-</div>
+</main>

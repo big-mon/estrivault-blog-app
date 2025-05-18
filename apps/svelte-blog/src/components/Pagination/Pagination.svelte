@@ -18,7 +18,7 @@
     if (page === 1) {
       return baseUrl;
     }
-    return `${baseUrl}?page=${page}`;
+    return `${baseUrl}/${page}`;
   }
 
   // 表示するページ番号の配列を生成
