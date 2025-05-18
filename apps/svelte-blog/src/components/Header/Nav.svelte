@@ -1,14 +1,24 @@
 <script lang="ts">
 	import { NAVIGATION_LINKS } from '../../constants/index';
+	import { goto } from '$app/navigation';
 
 	interface Props {
 		pathname: string;
+		onNavigate?: (href: string) => Promise<void>;
 	}
 
-	const { pathname }: Props = $props();
+	const { pathname, onNavigate }: Props = $props();
 
 	function isActive(href: string) {
 		return pathname === href || pathname.startsWith(href + '/');
+	}
+
+	async function handleClick(event: MouseEvent, href: string) {
+		event.preventDefault();
+		if (onNavigate) {
+			await onNavigate(href);
+		}
+		await goto(href);
 	}
 </script>
 
@@ -18,6 +28,7 @@
 			<li>
 				<a
 					{href}
+					onclick={(event) => handleClick(event, href)}
 					class="block rounded-md px-2 py-2 transition hover:bg-gray-100 {isActive(href)
 						? 'font-semibold text-blue-600'
 						: 'text-gray-800'}"

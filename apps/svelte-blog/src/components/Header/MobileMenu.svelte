@@ -3,10 +3,15 @@
 	import Title from './Title.svelte';
 	import GitHub from '../Icons/GitHub.svelte';
 	import X from '../Icons/X.svelte';
-	import { fly, fade } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 
 	export let pathname: string;
 	export let onClose: () => void;
+
+	async function handleNavigate() {
+		onClose();
+		await new Promise((resolve) => setTimeout(resolve, 250));
+	}
 </script>
 
 <!-- オーバーレイ（背景タップで閉じる） -->
@@ -25,7 +30,7 @@
 		</div>
 
 		<!-- ナビゲーション -->
-		<Nav {pathname} />
+		<Nav {pathname} onNavigate={handleNavigate} />
 
 		<!-- フッターアイコン -->
 		<div class="mt-8 flex justify-center gap-6">
