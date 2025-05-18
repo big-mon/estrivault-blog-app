@@ -1,23 +1,22 @@
 <script lang="ts">
-	import Title from './Title.svelte';
-	import ResponsiveMenu from './ResponsiveMenu.svelte';
+  import Title from './Title.svelte';
+  import ResponsiveMenu from './ResponsiveMenu.svelte';
 
-	interface Props {
-		pathname: string;
-	}
+  interface Props {
+    pathname: string;
+  }
 
-	const { pathname }: Props = $props();
+  const { pathname }: Props = $props();
 </script>
 
-<div class="py-4">
-	<header
-		class="mx-auto w-full max-w-6xl rounded-xl bg-white/70
-         px-4 shadow-md backdrop-blur supports-[backdrop-filter]:bg-white/60
-         sm:px-6 lg:px-8"
-	>
-		<div class="flex items-center justify-between py-2">
-			<Title />
-			<ResponsiveMenu {pathname} />
-		</div>
-	</header>
-</div>
+<header class="sticky top-0 z-50 w-full px-4 py-3">
+  <div
+    class="mx-auto max-w-6xl rounded-xl bg-white
+         px-4 py-3 shadow-md sm:px-6 lg:px-8"
+  >
+    <div class="flex items-center justify-between">
+      <div><Title /></div>
+      <ResponsiveMenu {pathname} />
+    </div>
+  </div>
+</header>

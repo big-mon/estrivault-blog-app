@@ -5,12 +5,12 @@
  */
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
-  
+
   // 日本語フォーマット
   return new Intl.DateTimeFormat('ja-JP', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   }).format(date);
 }
 
@@ -23,14 +23,14 @@ export function getRelativeTimeString(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
   const diffInMs = now.getTime() - date.getTime();
-  
+
   const diffInSecs = Math.floor(diffInMs / 1000);
   const diffInMins = Math.floor(diffInSecs / 60);
   const diffInHours = Math.floor(diffInMins / 60);
   const diffInDays = Math.floor(diffInHours / 24);
   const diffInMonths = Math.floor(diffInDays / 30);
   const diffInYears = Math.floor(diffInDays / 365);
-  
+
   if (diffInSecs < 60) {
     return '数秒前';
   } else if (diffInMins < 60) {

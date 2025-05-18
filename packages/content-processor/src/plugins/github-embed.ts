@@ -22,7 +22,7 @@ export const remarkGithubEmbed: Plugin = () => {
       data.hName = 'div';
       data.hProperties = {
         className: ['github-embed'],
-        style: 'margin: 1.5rem 0;'
+        style: 'margin: 1.5rem 0;',
       };
 
       let embedUrl = '';
@@ -53,30 +53,36 @@ export const remarkGithubEmbed: Plugin = () => {
       }
 
       // iframeを子要素として追加
-      node.children = [{
-        type: 'paragraph',
-        data: {
-          hName: 'div',
-          hProperties: {
-            className: ['github-card']
-          }
-        },
-        children: [{
+      node.children = [
+        {
           type: 'paragraph',
           data: {
-            hName: 'a',
+            hName: 'div',
             hProperties: {
-              href: embedUrl,
-              target: '_blank',
-              rel: 'noopener noreferrer'
-            }
+              className: ['github-card'],
+            },
           },
-          children: [{
-            type: 'text',
-            value: `GitHub: ${owner}/${repo}${id ? ` #${id}` : ''}`
-          }]
-        }]
-      }];
+          children: [
+            {
+              type: 'paragraph',
+              data: {
+                hName: 'a',
+                hProperties: {
+                  href: embedUrl,
+                  target: '_blank',
+                  rel: 'noopener noreferrer',
+                },
+              },
+              children: [
+                {
+                  type: 'text',
+                  value: `GitHub: ${owner}/${repo}${id ? ` #${id}` : ''}`,
+                },
+              ],
+            },
+          ],
+        },
+      ];
     });
   };
 };

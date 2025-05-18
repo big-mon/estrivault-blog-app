@@ -2,10 +2,10 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: ['src/index.ts'],
-  format: ['esm'],  // ESM のみをサポート
-  dts: true,        // 型定義を生成
-  clean: true,      // ビルド前に出力ディレクトリをクリーンアップ
-  bundle: true,     // バンドルを有効化
+  format: ['esm'], // ESM のみをサポート
+  dts: true, // 型定義を生成
+  clean: true, // ビルド前に出力ディレクトリをクリーンアップ
+  bundle: true, // バンドルを有効化
   // 外部ライブラリを指定（peerDependenciesや使用するライブラリ）
   external: [
     'unist-util-visit',
@@ -22,6 +22,6 @@ export default defineConfig({
     'hast-util-sanitize',
     'mdast',
     'remark-directive',
-    '@estrivault/cloudinary-utils'
-  ]
+    '@estrivault/cloudinary-utils',
+  ],
 });

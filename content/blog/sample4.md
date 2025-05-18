@@ -5,7 +5,7 @@ slug: sample4
 publishedAt: 2025-01-01T07:00:00
 coverImage: /illust/r9o8w7svb6vjvk9gfjjh
 category: Tech
-tags: ["日記"]
+tags: ["日記", "TailwindCSS"]
 ---
 
 # Heading

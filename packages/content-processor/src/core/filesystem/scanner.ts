@@ -26,14 +26,14 @@ export class FileScanner {
       cwd = process.cwd(),
       absolute = true,
       ignore = ['**/node_modules/**'],
-      nodir = true
+      nodir = true,
     } = options;
 
     const files = await glob(patterns, {
       cwd,
       absolute,
       ignore,
-      nodir
+      nodir,
     });
 
     return files;
@@ -45,10 +45,7 @@ export class FileScanner {
    * @param recursive 再帰的に検索するかどうか
    * @returns 見つかったMarkdownファイルのパスの配列
    */
-  async findMarkdownFiles(
-    dirPath: string,
-    recursive: boolean = true
-  ): Promise<string[]> {
+  async findMarkdownFiles(dirPath: string, recursive: boolean = true): Promise<string[]> {
     const pattern = recursive ? '**/*.md' : '*.md';
     return this.findFiles(pattern, { cwd: dirPath });
   }
@@ -67,7 +64,7 @@ export class FileScanner {
     const results = await Promise.all(
       files.map(async (file) => ({
         path: file,
-        match: await filterFn(file)
+        match: await filterFn(file),
       }))
     );
     return results.filter((r) => r.match).map((r) => r.path);

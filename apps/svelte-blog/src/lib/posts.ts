@@ -1,4 +1,4 @@
-import { getAllPosts, getPostBySlug, type PostMeta, type PostHTML } from '@estrivault/content-processor';
+import { getAllPosts, type PostMeta } from '@estrivault/content-processor';
 import path from 'path';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME as cloudNameFromEnv } from '$env/static/public';
 
@@ -13,6 +13,7 @@ export async function getPosts(options?: {
   perPage?: number;
   sort?: 'publishedAt' | 'title';
   includeDrafts?: boolean;
+  category?: string;
 }): Promise<{
   posts: PostMeta[];
   total: number;
@@ -33,24 +34,25 @@ export async function getPosts(options?: {
       if (!includeDrafts && post.draft) {
         return false;
       }
+      // カテゴリーが指定されている場合はフィルタリング（大文字小文字を区別しない）
+      if (options?.category && post.category?.toLowerCase() !== options.category.toLowerCase()) {
+        return false;
+      }
       return true;
     };
 
     // 記事一覧を取得
-    const allPosts = await getAllPosts([
-      `${CONTENT_DIR}/*.md`,
-      `${CONTENT_DIR}/*.mdx`
-    ], {
+    const allPosts = await getAllPosts([`${CONTENT_DIR}/*.md`, `${CONTENT_DIR}/*.mdx`], {
       page,
       perPage,
       sort,
       filter,
-      cloudinaryCloudName: cloudNameFromEnv
+      cloudinaryCloudName: cloudNameFromEnv,
     });
 
     // Postインターフェースに変換
     const posts = allPosts.map((post) => ({
-      ...post
+      ...post,
     }));
 
     return {
@@ -58,7 +60,7 @@ export async function getPosts(options?: {
       total: posts.length,
       page,
       perPage,
-      totalPages: Math.ceil(posts.length / perPage)
+      totalPages: Math.ceil(posts.length / perPage),
     };
   } catch (err) {
     console.error('Failed to get posts:', err);

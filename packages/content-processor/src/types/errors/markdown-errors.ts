@@ -5,21 +5,14 @@ import { ErrorCodes } from './error-codes';
  * Front-matterの形式が不正な場合のエラー
  */
 export class FrontMatterError extends AppError {
-  constructor(
-    message: string,
-    options: { cause?: Error; context?: Record<string, unknown> } = {}
-  ) {
-    super(
-      `Front-matterの形式が不正です: ${message}`,
-      ErrorCodes.VALIDATION_ERROR,
-      {
-        ...options,
-        context: {
-          ...options.context,
-          validationTarget: 'frontMatter'
-        }
-      }
-    );
+  constructor(message: string, options: { cause?: Error; context?: Record<string, unknown> } = {}) {
+    super(`Front-matterの形式が不正です: ${message}`, ErrorCodes.VALIDATION_ERROR, {
+      ...options,
+      context: {
+        ...options.context,
+        validationTarget: 'frontMatter',
+      },
+    });
   }
 }
 
@@ -27,10 +20,7 @@ export class FrontMatterError extends AppError {
  * マークダウンのパースに失敗した場合のエラー
  */
 export class MarkdownParseError extends AppError {
-  constructor(
-    message: string,
-    options: { cause?: Error; context?: Record<string, unknown> } = {}
-  ) {
+  constructor(message: string, options: { cause?: Error; context?: Record<string, unknown> } = {}) {
     super(
       `マークダウンのパースに失敗しました: ${message}`,
       ErrorCodes.MARKDOWN_PARSE_ERROR,
@@ -43,10 +33,7 @@ export class MarkdownParseError extends AppError {
  * マークダウンのレンダリングに失敗した場合のエラー
  */
 export class MarkdownRenderError extends AppError {
-  constructor(
-    message: string,
-    options: { cause?: Error; context?: Record<string, unknown> } = {}
-  ) {
+  constructor(message: string, options: { cause?: Error; context?: Record<string, unknown> } = {}) {
     super(
       `マークダウンのレンダリングに失敗しました: ${message}`,
       ErrorCodes.MARKDOWN_RENDER_ERROR,

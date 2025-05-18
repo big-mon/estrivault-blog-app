@@ -1,10 +1,7 @@
 import { unified, type Processor } from 'unified';
 import type { ProcessorOptions } from '../../types';
 import type { PipelineProcessor } from '../types';
-import {
-  createCoreProcessor,
-  createSanitizeProcessor,
-} from '../processors/core';
+import { createCoreProcessor, createSanitizeProcessor } from '../processors/core';
 import {
   createLinkTransformProcessor,
   createImageTransformProcessor,

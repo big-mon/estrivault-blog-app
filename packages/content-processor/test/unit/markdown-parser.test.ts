@@ -7,8 +7,8 @@ vi.mock('unified', () => {
   const mockProcess = vi.fn().mockResolvedValue({ value: '<p>Test content</p>' });
   return {
     unified: vi.fn().mockReturnValue({
-      process: mockProcess
-    })
+      process: mockProcess,
+    }),
   };
 });
 
@@ -17,7 +17,7 @@ vi.mock('gray-matter', () => ({
   default: vi.fn().mockImplementation((content: string) => ({
     data: { title: 'Test Title' },
     content: 'Test content',
-  }))
+  })),
 }));
 
 vi.mock('reading-time', () => ({
@@ -26,7 +26,7 @@ vi.mock('reading-time', () => ({
     minutes: 2.5,
     words: 500,
     time: 150000,
-  })
+  }),
 }));
 
 describe('MarkdownParser', () => {
@@ -60,9 +60,9 @@ Test content`;
           tags: [],
           coverImage: '',
           draft: false,
-          readingTime: 3
+          readingTime: 3,
         },
-        html: '<p>Test content</p>'
+        html: '<p>Test content</p>',
       });
     });
 
@@ -77,18 +77,16 @@ Test content`;
         orig: Buffer.from(''),
         language: '',
         matter: '',
-        stringify: () => ''
+        stringify: () => '',
       }));
 
-      await expect(parser.parse('Test content')).rejects.toThrow(
-        FrontMatterError
-      );
+      await expect(parser.parse('Test content')).rejects.toThrow(FrontMatterError);
     });
 
     it('publishedAtが指定されていない場合は現在日時が設定されること', async () => {
       const now = new Date().toISOString();
       const matter = await import('gray-matter');
-      
+
       // テスト用のモックデータを設定
       vi.mocked(matter.default).mockImplementationOnce(() => ({
         data: { title: 'Test' },
@@ -98,23 +96,24 @@ Test content`;
         orig: Buffer.from(''),
         language: '',
         matter: '',
-        stringify: () => ''
+        stringify: () => '',
       }));
-      
+
       const result = await parser.parse('---\ntitle: Test\n---\nContent');
-      
-      expect(new Date(result.meta.publishedAt).getTime())
-        .toBeGreaterThanOrEqual(new Date(now).getTime() - 1000); // 1秒以内の許容誤差
+
+      expect(new Date(result.meta.publishedAt).getTime()).toBeGreaterThanOrEqual(
+        new Date(now).getTime() - 1000
+      ); // 1秒以内の許容誤差
     });
 
     it('CloudinaryのURLが正しく解決されること', async () => {
       const matter = await import('gray-matter');
-      
+
       // テスト用のモックデータを設定
       vi.mocked(matter.default).mockImplementationOnce(() => ({
-        data: { 
+        data: {
           title: 'Test',
-          coverImage: '/images/test.jpg' 
+          coverImage: '/images/test.jpg',
         },
         content: 'Content',
         excerpt: '',
@@ -122,12 +121,12 @@ Test content`;
         orig: Buffer.from(''),
         language: '',
         matter: '',
-        stringify: () => ''
+        stringify: () => '',
       }));
-      
+
       const options = { cloudinaryCloudName: 'test-cloud' };
       const result = await parser.parse('dummy', options);
-      
+
       expect(result.meta.coverImage).toBe(
         'https://res.cloudinary.com/test-cloud/image/upload/w_800/images/test'
       );
@@ -135,12 +134,12 @@ Test content`;
 
     it('外部URLの場合はそのまま返されること', async () => {
       const matter = await import('gray-matter');
-      
+
       // テスト用のモックデータを設定
       vi.mocked(matter.default).mockImplementationOnce(() => ({
-        data: { 
+        data: {
           title: 'Test',
-          coverImage: 'https://example.com/image.jpg' 
+          coverImage: 'https://example.com/image.jpg',
         },
         content: 'Content',
         excerpt: '',
@@ -148,9 +147,9 @@ Test content`;
         orig: Buffer.from(''),
         language: '',
         matter: '',
-        stringify: () => ''
+        stringify: () => '',
       }));
-      
+
       const result = await parser.parse('dummy');
       expect(result.meta.coverImage).toBe('https://example.com/image.jpg');
     });

@@ -9,17 +9,13 @@ export class PluginLoadError extends AppError {
     pluginName: string,
     options: { cause?: Error; context?: Record<string, unknown> } = {}
   ) {
-    super(
-      `プラグインの読み込みに失敗しました: ${pluginName}`,
-      ErrorCodes.PLUGIN_LOAD_ERROR,
-      {
-        ...options,
-        context: {
-          pluginName,
-          ...options.context
-        }
-      }
-    );
+    super(`プラグインの読み込みに失敗しました: ${pluginName}`, ErrorCodes.PLUGIN_LOAD_ERROR, {
+      ...options,
+      context: {
+        pluginName,
+        ...options.context,
+      },
+    });
   }
 }
 
@@ -39,8 +35,8 @@ export class PluginExecutionError extends AppError {
         ...options,
         context: {
           pluginName,
-          ...options.context
-        }
+          ...options.context,
+        },
       }
     );
   }
@@ -63,8 +59,8 @@ export class PluginValidationError extends AppError {
         context: {
           pluginName,
           validationTarget: 'plugin',
-          ...options.context
-        }
+          ...options.context,
+        },
       }
     );
   }

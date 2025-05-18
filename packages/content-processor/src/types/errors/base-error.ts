@@ -60,7 +60,7 @@ export class AppError extends Error {
       message: this.message,
       ...(this.cause && { cause: this.cause.message }),
       ...(this.context && { context: this.context }),
-      stack: this.stack
+      stack: this.stack,
     };
   }
 }
