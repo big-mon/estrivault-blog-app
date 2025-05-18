@@ -15,9 +15,6 @@
 
   // ページリンクの生成
   function getPageUrl(page: number): string {
-    if (page === 1) {
-      return baseUrl;
-    }
     return `${baseUrl}/${page}`;
   }
 
