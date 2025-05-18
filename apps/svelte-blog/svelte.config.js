@@ -8,6 +8,7 @@ const config = {
     alias: {
       $components: './src/components',
       $lib: './src/lib',
+      $constants: './src/constants',
     },
   },
 };
