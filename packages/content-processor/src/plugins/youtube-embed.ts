@@ -23,7 +23,8 @@ export const remarkYoutubeEmbed: Plugin<[], Root, Root> = () => {
       data.hName = 'div';
       data.hProperties = {
         className: 'youtube-embed',
-        style: 'position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 1rem 0;'
+        style:
+          'position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 1rem 0;',
       };
 
       // iframeのHTMLを直接生成して設定
@@ -38,7 +39,6 @@ export const remarkYoutubeEmbed: Plugin<[], Root, Root> = () => {
           style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
         ></iframe>
       `;
-
 
       // ノードのタイプをHTMLに変更
       node.type = 'html';

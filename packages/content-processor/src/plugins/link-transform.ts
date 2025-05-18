@@ -25,13 +25,13 @@ export const remarkLinkTransform: Plugin<[LinkTransformOptions?], Root, Root> = 
       if (url && !internalPredicate(url)) {
         // 既存のプロパティを取得
         const existingProps = node.data?.hProperties || {};
-        
+
         // 新しいプロパティをマージ
         node.data = node.data || {};
         node.data.hProperties = {
           ...existingProps,
           target: '_blank',
-          rel: 'noopener noreferrer'
+          rel: 'noopener noreferrer',
         };
       }
     });

@@ -4,12 +4,13 @@ import { resolve } from 'path';
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'node',  // Node.js 環境でテストを実行
-    include: ['**/*.test.ts'],  // テストファイルのパターン
+    environment: 'node', // Node.js 環境でテストを実行
+    include: ['**/*.test.ts'], // テストファイルのパターン
     coverage: {
-      provider: 'v8',  // カバレッジプロバイダー
-      reporter: ['text', 'json', 'html'],  // カバレッジレポートの形式
-      exclude: [  // カバレッジから除外するファイル
+      provider: 'v8', // カバレッジプロバイダー
+      reporter: ['text', 'json', 'html'], // カバレッジレポートの形式
+      exclude: [
+        // カバレッジから除外するファイル
         '**/*.test.ts',
         '**/test/**',
         '**/__mocks__/**',

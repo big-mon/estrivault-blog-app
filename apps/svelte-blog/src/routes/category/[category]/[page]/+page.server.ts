@@ -8,7 +8,7 @@ export const load = (async ({ params }) => {
   const { posts } = await getPosts({
     sort: 'publishedAt',
     includeDrafts: false,
-    category
+    category,
   });
 
   return {
@@ -17,8 +17,8 @@ export const load = (async ({ params }) => {
       page: 1,
       perPage: posts.length,
       total: posts.length,
-      totalPages: 1
+      totalPages: 1,
     },
-    category
+    category,
   };
 }) satisfies PageServerLoad;

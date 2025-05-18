@@ -22,33 +22,39 @@ export const remarkTwitterEmbed: Plugin = () => {
       data.hName = 'div';
       data.hProperties = {
         className: ['twitter-embed'],
-        style: 'display: flex; justify-content: center; margin: 1.5rem 0;'
+        style: 'display: flex; justify-content: center; margin: 1.5rem 0;',
       };
 
       // Twitter埋め込みコードを子要素として追加
-      node.children = [{
-        type: 'paragraph',
-        data: {
-          hName: 'blockquote',
-          hProperties: {
-            className: ['twitter-tweet'],
-            'data-dnt': 'true'
-          }
-        },
-        children: [{
+      node.children = [
+        {
           type: 'paragraph',
           data: {
-            hName: 'a',
+            hName: 'blockquote',
             hProperties: {
-              href: `https://twitter.com/user/status/${id}`
-            }
+              className: ['twitter-tweet'],
+              'data-dnt': 'true',
+            },
           },
-          children: [{
-            type: 'text',
-            value: 'Loading tweet...'
-          }]
-        }]
-      }];
+          children: [
+            {
+              type: 'paragraph',
+              data: {
+                hName: 'a',
+                hProperties: {
+                  href: `https://twitter.com/user/status/${id}`,
+                },
+              },
+              children: [
+                {
+                  type: 'text',
+                  value: 'Loading tweet...',
+                },
+              ],
+            },
+          ],
+        },
+      ];
 
       // Twitter埋め込みスクリプトを追加
       node.children.push({
@@ -58,10 +64,10 @@ export const remarkTwitterEmbed: Plugin = () => {
           hProperties: {
             async: true,
             src: 'https://platform.twitter.com/widgets.js',
-            charset: 'utf-8'
-          }
+            charset: 'utf-8',
+          },
         },
-        children: []
+        children: [],
       });
     });
   };

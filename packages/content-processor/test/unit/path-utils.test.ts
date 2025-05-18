@@ -5,7 +5,7 @@ import {
   resolvePath,
   getBaseNameWithoutExtension,
   generateSlugFromPath,
-  getDirname
+  getDirname,
 } from '../../src/utils/path-utils';
 
 /**
@@ -26,9 +26,8 @@ describe('path-utils', () => {
     // 絶対パスがそのまま返されること（変更されないこと）
     it('絶対パスがそのまま返されること', () => {
       // プラットフォームに応じた絶対パスを生成
-      const absolutePath = process.platform === 'win32'
-        ? 'C:\\absolute\\path\\test.md'
-        : '/absolute/path/test.md';
+      const absolutePath =
+        process.platform === 'win32' ? 'C:\\absolute\\path\\test.md' : '/absolute/path/test.md';
       const result = resolvePath('/base/dir', absolutePath);
       expect(result).toBe(absolutePath);
     });
@@ -101,13 +100,12 @@ describe('path-utils', () => {
   describe('getDirname', () => {
     it('import.meta から正しくディレクトリパスを取得できること', () => {
       // プラットフォームに依存しないファイルURLを準備
-      const mockFileUrl = process.platform === 'win32'
-        ? 'file:///C:/path/to/module.ts'
-        : 'file:///path/to/module.ts';
+      const mockFileUrl =
+        process.platform === 'win32' ? 'file:///C:/path/to/module.ts' : 'file:///path/to/module.ts';
 
       // import.meta オブジェクトのモックを作成
       const mockMeta = {
-        url: mockFileUrl
+        url: mockFileUrl,
       } as unknown as ImportMeta;
 
       // 期待される結果を計算

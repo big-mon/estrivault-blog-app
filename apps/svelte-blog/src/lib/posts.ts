@@ -42,20 +42,17 @@ export async function getPosts(options?: {
     };
 
     // 記事一覧を取得
-    const allPosts = await getAllPosts([
-      `${CONTENT_DIR}/*.md`,
-      `${CONTENT_DIR}/*.mdx`
-    ], {
+    const allPosts = await getAllPosts([`${CONTENT_DIR}/*.md`, `${CONTENT_DIR}/*.mdx`], {
       page,
       perPage,
       sort,
       filter,
-      cloudinaryCloudName: cloudNameFromEnv
+      cloudinaryCloudName: cloudNameFromEnv,
     });
 
     // Postインターフェースに変換
     const posts = allPosts.map((post) => ({
-      ...post
+      ...post,
     }));
 
     return {
@@ -63,7 +60,7 @@ export async function getPosts(options?: {
       total: posts.length,
       page,
       perPage,
-      totalPages: Math.ceil(posts.length / perPage)
+      totalPages: Math.ceil(posts.length / perPage),
     };
   } catch (err) {
     console.error('Failed to get posts:', err);

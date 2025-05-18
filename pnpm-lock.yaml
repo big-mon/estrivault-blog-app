@@ -15,6 +15,15 @@ importers:
       dotenv-cli:
         specifier: ^8.0.0
         version: 8.0.0
+      prettier:
+        specifier: ^3.5.3
+        version: 3.5.3
+      prettier-plugin-svelte:
+        specifier: ^3.4.0
+        version: 3.4.0(prettier@3.5.3)(svelte@5.30.2)
+      prettier-plugin-tailwindcss:
+        specifier: ^0.6.11
+        version: 0.6.11(prettier-plugin-svelte@3.4.0(prettier@3.5.3)(svelte@5.30.2))(prettier@3.5.3)
 
   apps/svelte-blog:
     dependencies:

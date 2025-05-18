@@ -30,12 +30,9 @@ const processor = new ContentProcessor({
 });
 
 // マークダウンファイルを処理
-const result = await processor.processFile(
-  path.join(__dirname, 'example.md'),
-  {
-    // 処理オプション
-  }
-);
+const result = await processor.processFile(path.join(__dirname, 'example.md'), {
+  // 処理オプション
+});
 
 console.log(result.html); // 変換されたHTML
 console.log(result.meta); // メタデータ

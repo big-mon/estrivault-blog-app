@@ -1,5 +1,9 @@
 {
-    "cSpell.words": [
-        "estrivault"
-    ]
+  "cSpell.words": ["estrivault"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.detectIndentation": false,
+  "[svelte]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

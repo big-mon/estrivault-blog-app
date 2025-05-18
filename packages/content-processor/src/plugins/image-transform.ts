@@ -14,7 +14,9 @@ interface ImageTransformOptions {
 /**
  * 相対画像パスをCloudinary CDN URLに変換するremarkプラグイン
  */
-export const remarkImageTransform: Plugin<[ImageTransformOptions?], Root, Root> = (options = {}) => {
+export const remarkImageTransform: Plugin<[ImageTransformOptions?], Root, Root> = (
+  options = {}
+) => {
   const { baseUrl, width = 800, quality = 80 } = options;
 
   if (!baseUrl) {

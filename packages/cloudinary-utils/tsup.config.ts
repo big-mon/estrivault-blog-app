@@ -10,5 +10,5 @@ export default defineConfig({
   outDir: 'dist',
   minify: true,
   treeshake: true,
-  external: ['@cloudinary/url-gen']
+  external: ['@cloudinary/url-gen'],
 });

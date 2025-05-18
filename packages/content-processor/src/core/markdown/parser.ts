@@ -17,10 +17,7 @@ export class MarkdownParser {
    * @param options 処理オプション
    * @returns 処理済みのHTMLとメタデータ
    */
-  async parse(
-    content: string,
-    options: ProcessorOptions = {}
-  ): Promise<PostHTML> {
+  async parse(content: string, options: ProcessorOptions = {}): Promise<PostHTML> {
     try {
       // Front-matterの抽出
       const { data, content: markdownContent } = matter(content);
@@ -40,7 +37,7 @@ export class MarkdownParser {
 
       return {
         meta,
-        html: String(result.value)
+        html: String(result.value),
       };
     } catch (error) {
       if (error instanceof FrontMatterError) {
@@ -89,7 +86,7 @@ export class MarkdownParser {
       tags: data.tags || [],
       coverImage: this.resolveCoverImage(data.coverImage, options.cloudinaryCloudName),
       draft: data.draft || false,
-      readingTime: Math.ceil(stats.minutes)
+      readingTime: Math.ceil(stats.minutes),
     };
   }
 

@@ -13,7 +13,7 @@ import {
   ListOptions,
   FileNotFoundError,
   FrontMatterError,
-  MarkdownParseError
+  MarkdownParseError,
 } from './types';
 
 /**
@@ -22,10 +22,7 @@ import {
  * @param opts 処理オプション
  * @returns HTML文字列とメタデータ
  */
-export async function loadFromString(
-  md: string,
-  opts: ProcessorOptions = {}
-): Promise<PostHTML> {
+export async function loadFromString(md: string, opts: ProcessorOptions = {}): Promise<PostHTML> {
   try {
     // Front-matterの抽出
     const { data, content } = matter(md);
@@ -58,12 +55,12 @@ export async function loadFromString(
       tags: data.tags || [],
       coverImage: resolveCoverImage(data.coverImage, opts.cloudinaryCloudName),
       draft: data.draft || false,
-      readingTime: Math.ceil(stats.minutes)
+      readingTime: Math.ceil(stats.minutes),
     };
 
     return {
       meta,
-      html: String(result)
+      html: String(result),
     };
   } catch (error) {
     if (error instanceof FrontMatterError) {
@@ -113,9 +110,11 @@ export async function loadFromFile(
 
     return result;
   } catch (error) {
-    if (error instanceof FileNotFoundError ||
-        error instanceof FrontMatterError ||
-        error instanceof MarkdownParseError) {
+    if (
+      error instanceof FileNotFoundError ||
+      error instanceof FrontMatterError ||
+      error instanceof MarkdownParseError
+    ) {
       throw error;
     }
     let msg = '';
@@ -144,27 +143,29 @@ export async function getAllPosts(
     perPage = 20,
     sort = 'publishedAt',
     filter = () => true,
-    baseDir = process.cwd()
+    baseDir = process.cwd(),
   } = opts;
 
   // ファイル一覧の取得
   const files = await glob(globPattern, {
     cwd: baseDir,
     absolute: true,
-    nodir: true
+    nodir: true,
   });
 
   // ファイルのみ抽出（ディレクトリは除外）
-  const validFiles = (await Promise.all(
-    files.map(async (f) => {
-      try {
-        const stat = await fs.stat(f);
-        return stat.isFile() ? f : null;
-      } catch {
-        return null;
-      }
-    })
-  )).filter((f): f is string => !!f);
+  const validFiles = (
+    await Promise.all(
+      files.map(async (f) => {
+        try {
+          const stat = await fs.stat(f);
+          return stat.isFile() ? f : null;
+        } catch {
+          return null;
+        }
+      })
+    )
+  ).filter((f): f is string => !!f);
 
   // 各ファイルからメタデータを抽出
   const posts = await Promise.all(
@@ -180,9 +181,7 @@ export async function getAllPosts(
   );
 
   // nullを除外し、フィルタを適用
-  const validPosts = posts
-    .filter((post): post is PostMeta => post !== null)
-    .filter(filter);
+  const validPosts = posts.filter((post): post is PostMeta => post !== null).filter(filter);
 
   // ソート
   const sortedPosts = [...validPosts].sort((a, b) => {

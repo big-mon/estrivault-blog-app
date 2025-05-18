@@ -25,7 +25,7 @@ export interface ProcessorOptions {
   /** Cloudinary変換ベースURL */
   imageBase?: string;
   /** rehype-sanitize schema (カスタムタグ許可用) */
-  sanitizeSchema?: import("hast-util-sanitize").Schema;
+  sanitizeSchema?: import('hast-util-sanitize').Schema;
 }
 
 /**
@@ -37,7 +37,7 @@ export interface ListOptions extends ProcessorOptions {
   /** 1ページあたりの表示件数（デフォルト20） */
   perPage?: number;
   /** ソートキー */
-  sort?: "publishedAt" | "title";
+  sort?: 'publishedAt' | 'title';
   /** フィルタ関数 */
   filter?: (post: PostMeta) => boolean;
   /** ベースディレクトリ（デフォルト: カレントディレクトリ） */

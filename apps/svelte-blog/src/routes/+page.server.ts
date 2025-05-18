@@ -12,7 +12,7 @@ export const load = (async () => {
     page,
     perPage,
     sort: 'publishedAt',
-    includeDrafts: false
+    includeDrafts: false,
   });
 
   return {
@@ -21,7 +21,7 @@ export const load = (async () => {
       page,
       perPage,
       total,
-      totalPages
-    }
+      totalPages,
+    },
   };
 }) satisfies PageServerLoad;
