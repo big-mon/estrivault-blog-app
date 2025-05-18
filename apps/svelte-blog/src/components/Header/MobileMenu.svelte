@@ -10,7 +10,8 @@
 
 	async function handleNavigate() {
 		onClose();
-		await new Promise((resolve) => setTimeout(resolve, 250));
+		// 画面遷移するまでスライドを閉じる待機時間
+		await new Promise((resolve) => setTimeout(resolve, 100));
 	}
 </script>
 
