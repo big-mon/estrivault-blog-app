@@ -2,6 +2,8 @@
   /**
    * ページネーションコンポーネント
    */
+  import ChevronLeft from '$components/Icons/ChevronLeft.svelte';
+  import ChevronRight from '$components/Icons/ChevronRight.svelte';
 
   // Props
   interface Props {
@@ -46,45 +48,23 @@
     <!-- 前のページへのリンク -->
     {#if currentPage > 1}
       <li>
-        <a
-          href={getPageUrl(currentPage - 1)}
-          class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-          aria-label="前のページ"
-        >
-          <span class="sr-only">前のページ</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+          <a
+            href={getPageUrl(currentPage - 1)}
+            class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
+            aria-label="前のページ"
           >
-            <path
-              fill-rule="evenodd"
-              d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-              clip-rule="evenodd"
-            />
-          </svg>
+            <span class="sr-only">前のページ</span>
+            <ChevronLeft size="5" />
         </a>
       </li>
     {:else}
       <li>
-        <span
-          class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400"
-          aria-disabled="true"
-        >
-          <span class="sr-only">前のページ</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+          <span
+            class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400"
+            aria-disabled="true"
           >
-            <path
-              fill-rule="evenodd"
-              d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-              clip-rule="evenodd"
-            />
-          </svg>
+            <span class="sr-only">前のページ</span>
+            <ChevronLeft size="5" classNames="text-gray-400"/>
         </span>
       </li>
     {/if}
@@ -150,45 +130,23 @@
     <!-- 次のページへのリンク -->
     {#if currentPage < totalPages}
       <li>
-        <a
-          href={getPageUrl(currentPage + 1)}
-          class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-          aria-label="次のページ"
-        >
-          <span class="sr-only">次のページ</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+          <a
+            href={getPageUrl(currentPage + 1)}
+            class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
+            aria-label="次のページ"
           >
-            <path
-              fill-rule="evenodd"
-              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-              clip-rule="evenodd"
-            />
-          </svg>
+            <span class="sr-only">次のページ</span>
+            <ChevronRight size="5" />
         </a>
       </li>
     {:else}
       <li>
-        <span
-          class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400"
-          aria-disabled="true"
-        >
-          <span class="sr-only">次のページ</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+          <span
+            class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400"
+            aria-disabled="true"
           >
-            <path
-              fill-rule="evenodd"
-              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-              clip-rule="evenodd"
-            />
-          </svg>
+            <span class="sr-only">次のページ</span>
+            <ChevronRight size="5" classNames="text-gray-400"/>
         </span>
       </li>
     {/if}
