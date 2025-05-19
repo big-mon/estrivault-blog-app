@@ -146,7 +146,7 @@ export async function getAllPosts(
     baseDir = process.cwd(),
   } = opts;
 
-  // ファイル一覧の取得
+  // ファイル一覧の取得（サブディレクトリも再帰的に検索）
   const files = await glob(globPattern, {
     cwd: baseDir,
     absolute: true,

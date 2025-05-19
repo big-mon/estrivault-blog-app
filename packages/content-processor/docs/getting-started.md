@@ -24,7 +24,7 @@ const processor = new ContentProcessor({
   },
   plugins: [
     // 使用するプラグイン
-  ]
+  ],
 });
 ```
 
@@ -37,12 +37,9 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ファイルを処理
-const result = await processor.processFile(
-  path.join(__dirname, 'example.md'),
-  {
-    // 処理オプション
-  }
-);
+const result = await processor.processFile(path.join(__dirname, 'example.md'), {
+  // 処理オプション
+});
 
 console.log('HTML:', result.html);
 console.log('メタデータ:', result.meta);
@@ -54,7 +51,7 @@ console.log('メタデータ:', result.meta);
 const markdownContent = `
 ---
 title: サンプル記事
-date: 2023-01-01
+publishedAt: 2023-01-01
 ---
 
 # 見出し1
@@ -69,20 +66,20 @@ const result = await processor.processContent(markdownContent);
 
 ### ContentProcessor オプション
 
-| オプション | 型 | デフォルト値 | 説明 |
-|----------|----|------------|------|
-| `markdown` | `MarkdownOptions` | `{}` | マークダウン解析オプション |
-| `plugins` | `Plugin[]` | `[]` | 使用するプラグインの配列 |
-| `cache` | `boolean` | `true` | キャッシュを有効にするか |
+| オプション | 型                | デフォルト値 | 説明                       |
+| ---------- | ----------------- | ------------ | -------------------------- |
+| `markdown` | `MarkdownOptions` | `{}`         | マークダウン解析オプション |
+| `plugins`  | `Plugin[]`        | `[]`         | 使用するプラグインの配列   |
+| `cache`    | `boolean`         | `true`       | キャッシュを有効にするか   |
 
 ### 処理オプション
 
 `processFile` と `processContent` メソッドで使用可能なオプション:
 
-| オプション | 型 | デフォルト値 | 説明 |
-|----------|----|------------|------|
-| `skipCache` | `boolean` | `false` | キャッシュをスキップするか |
-| `meta` | `Record<string, any>` | `{}` | 追加のメタデータ |
+| オプション  | 型                    | デフォルト値 | 説明                       |
+| ----------- | --------------------- | ------------ | -------------------------- |
+| `skipCache` | `boolean`             | `false`      | キャッシュをスキップするか |
+| `meta`      | `Record<string, any>` | `{}`         | 追加のメタデータ           |
 
 ## 次のステップ
 

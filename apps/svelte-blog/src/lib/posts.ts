@@ -41,8 +41,8 @@ export async function getPosts(options?: {
       return true;
     };
 
-    // 記事一覧を取得
-    const allPosts = await getAllPosts([`${CONTENT_DIR}/*.md`, `${CONTENT_DIR}/*.mdx`], {
+    // 記事一覧を取得（サブディレクトリも再帰的に検索）
+    const allPosts = await getAllPosts([`${CONTENT_DIR}/**/*.md`, `${CONTENT_DIR}/**/*.mdx`], {
       page,
       perPage,
       sort,
