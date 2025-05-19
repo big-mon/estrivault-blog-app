@@ -1,4 +1,4 @@
-import { getAllPosts, type PostMeta } from '@estrivault/content-processor';
+import { getAllPosts, getPostBySlug as getPostContent, type PostMeta, type PostHTML } from '@estrivault/content-processor';
 import path from 'path';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME as cloudNameFromEnv } from '$env/static/public';
 
@@ -65,5 +65,28 @@ export async function getPosts(options?: {
   } catch (err) {
     console.error('Failed to get posts:', err);
     throw new Error('Failed to get posts');
+  }
+}
+
+/**
+ * スラッグに基づいて個別の記事を取得
+ * @param slug 記事のスラッグ
+ * @returns 記事のメタデータとHTMLコンテンツ
+ */
+export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
+  try {
+    // 記事のHTMLコンテンツを取得（baseDir とオプションを分けて渡す）
+    const post = await getPostContent(slug, CONTENT_DIR, {
+      cloudinaryCloudName: cloudNameFromEnv,
+    });
+
+    if (!post) {
+      return null;
+    }
+
+    return post;
+  } catch (err) {
+    console.error('記事の取得中にエラーが発生しました:', err);
+    throw new Error('記事の取得中にエラーが発生しました');
   }
 }
