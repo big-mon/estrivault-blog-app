@@ -7,7 +7,7 @@
 </script>
 
 {#if !post}
-  <div class="container mx-auto px-4 py-8">
+  <div class="container mx-auto">
     <div class="text-center">
       <h1 class="text-2xl font-bold text-gray-800">記事が見つかりません</h1>
       <p class="mt-4 text-gray-600">お探しの記事は存在しないか、削除された可能性があります。</p>
@@ -15,6 +15,8 @@
     </div>
   </div>
 {:else}
-  <Header meta={post.meta} />
-  <PostBody {post} />
+  <article class="container mx-auto">
+    <Header meta={post.meta} />
+    <PostBody {post} />
+  </article>
 {/if}
