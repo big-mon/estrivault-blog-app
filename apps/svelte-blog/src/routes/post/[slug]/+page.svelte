@@ -1,15 +1,9 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { onMount } from 'svelte';
   import Header from '$components/Post/Header.svelte';
-  import Post from '$components/Post/Post.svelte';
+  import PostBody from '$components/Post/PostBody.svelte';
 
   const post = page.data.post;
-
-  // マウント時にスクロールをトップに戻す
-  onMount(() => {
-    window.scrollTo(0, 0);
-  });
 </script>
 
 {#if !post}
@@ -22,5 +16,5 @@
   </div>
 {:else}
   <Header meta={post.meta} />
-  <Post {post} />
+  <PostBody {post} />
 {/if}
