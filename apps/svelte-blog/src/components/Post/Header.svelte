@@ -4,17 +4,17 @@
   export let meta: PostMeta;
 </script>
 
-<header class="mb-12">
-  <div class="container mx-auto">
-    <div class="flex flex-col items-center gap-8 lg:flex-row lg:gap-12">
+<header class="py-12 bg-white">
+  <div class="container px-4 mx-auto">
+    <div class="flex flex-col items-start gap-8 lg:flex-row">
       <!-- 画像を左側に配置（モバイルでは上部） -->
       {#if meta.coverImage}
-        <div class="w-full lg:w-1/2">
-          <div class="overflow-hidden rounded-lg shadow-lg">
+        <div class="w-full mb-8 lg:mb-0 lg:w-1/2">
+          <div class="overflow-hidden border border-gray-200 rounded-lg">
             <img
               src={meta.coverImage}
               alt={meta.title}
-              class="h-auto w-full object-cover transition-transform duration-300 hover:scale-105"
+              class="w-full h-auto"
             />
           </div>
         </div>
@@ -22,32 +22,32 @@
 
       <!-- テキストコンテンツを右側に配置（モバイルでは下部） -->
       <div class="w-full lg:w-1/2">
-        <!-- カテゴリタグ -->
+        <!-- カテゴリ -->
         {#if meta.category}
-          <span
-            class="mb-3 inline-block rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700"
-          >
-            {meta.category}
-          </span>
+          <div class="mb-4">
+            <span class="text-sm font-medium text-gray-600">
+              {meta.category}
+            </span>
+          </div>
         {/if}
 
         <!-- タイトル -->
-        <h1 class="mb-4 text-3xl font-bold leading-tight text-gray-900 md:text-4xl">
+        <h1 class="mb-6 text-3xl font-bold leading-tight text-gray-900 md:text-4xl lg:text-5xl">
           {meta.title}
         </h1>
 
         <!-- 公開日 -->
         {#if meta.publishedAt}
-          <div class="mb-4 flex items-center text-sm text-gray-500">
-            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex items-center mb-6 text-sm text-gray-500">
+            <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.5"
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <time datetime={new Date(meta.publishedAt).toISOString()}>
+            <time datetime={new Date(meta.publishedAt).toISOString()} class="leading-relaxed">
               {new Date(meta.publishedAt).toLocaleDateString('ja-JP', {
                 year: 'numeric',
                 month: 'long',
@@ -60,11 +60,9 @@
 
         <!-- タグ -->
         {#if meta.tags && meta.tags.length > 0}
-          <div class="mb-6 flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-2 mb-6">
             {#each meta.tags as tag}
-              <span
-                class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800"
-              >
+              <span class="px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded">
                 {tag}
               </span>
             {/each}
@@ -73,7 +71,7 @@
 
         <!-- リード文（もしあれば） -->
         {#if meta.description}
-          <p class="text-lg leading-relaxed text-gray-600">
+          <p class="text-gray-700 leading-relaxed">
             {meta.description}
           </p>
         {/if}
