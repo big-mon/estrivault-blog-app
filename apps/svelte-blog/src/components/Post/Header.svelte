@@ -4,30 +4,29 @@
   export let meta: PostMeta;
 </script>
 
-<header class="py-12 bg-white">
-  <div class="container px-4 mx-auto">
+<header class="bg-white py-12">
+  <div class="container mx-auto px-4">
     <div class="flex flex-col items-start gap-8 lg:flex-row">
-      <!-- 画像を左側に配置（モバイルでは上部） -->
+      <!-- 画像を左側に配置 -->
       {#if meta.coverImage}
-        <div class="w-full mb-8 lg:mb-0 lg:w-1/2">
-          <div class="overflow-hidden border border-gray-200 rounded-lg">
-            <img
-              src={meta.coverImage}
-              alt={meta.title}
-              class="w-full h-auto"
-            />
+        <div class="mb-8 w-full lg:mb-0 lg:w-1/2">
+          <div class="overflow-hidden rounded-lg border border-gray-200">
+            <img src={meta.coverImage} alt={meta.title} class="h-auto w-full" />
           </div>
         </div>
       {/if}
 
-      <!-- テキストコンテンツを右側に配置（モバイルでは下部） -->
+      <!-- テキストコンテンツを右側に配置 -->
       <div class="w-full lg:w-1/2">
         <!-- カテゴリ -->
         {#if meta.category}
           <div class="mb-4">
-            <span class="text-sm font-medium text-gray-600">
+            <a
+              href={`/category/${encodeURIComponent(meta.category.toLowerCase())}/1`}
+              class="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+            >
               {meta.category}
-            </span>
+            </a>
           </div>
         {/if}
 
@@ -38,8 +37,8 @@
 
         <!-- 公開日 -->
         {#if meta.publishedAt}
-          <div class="flex items-center mb-6 text-sm text-gray-500">
-            <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="mb-6 flex items-center text-sm text-gray-500">
+            <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -53,25 +52,28 @@
                 month: 'long',
                 day: 'numeric',
               })}
-              {meta.updatedAt ? '（更新）' : ''}
+              {meta.updatedAt ? '(更新)' : ''}
             </time>
           </div>
         {/if}
 
         <!-- タグ -->
         {#if meta.tags && meta.tags.length > 0}
-          <div class="flex flex-wrap gap-2 mb-6">
+          <div class="mb-6 flex flex-wrap gap-2">
             {#each meta.tags as tag}
-              <span class="px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded">
+              <a
+                href={`/tag/${encodeURIComponent(tag.toLowerCase())}/1`}
+                class="rounded bg-gray-100 px-2 py-1 text-xs text-gray-600 transition-colors hover:bg-gray-200"
+              >
                 {tag}
-              </span>
+              </a>
             {/each}
           </div>
         {/if}
 
-        <!-- リード文（もしあれば） -->
+        <!-- リード文 -->
         {#if meta.description}
-          <p class="text-gray-700 leading-relaxed">
+          <p class="leading-relaxed text-gray-700">
             {meta.description}
           </p>
         {/if}
