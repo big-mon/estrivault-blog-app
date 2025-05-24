@@ -240,46 +240,32 @@ export async function getPostBySlug(
     throw new FileNotFoundError(`Slug not found: ${normalizedSlug}`);
   }
 
-  // ファイルを検索して読み込む
-  const pattern = `**/${normalizedSlug}.{md,mdx}`;
-  console.log(`[getPostBySlug] Searching files with pattern: ${pattern}`);
-
-  const files = await glob(pattern, {
-    cwd: baseDir,
+  // content/blog 配下のすべてのマークダウンファイルを検索
+  const allMarkdownFiles = await glob('content/blog/**/*.{md,mdx}', {
+    cwd: process.cwd(),
     absolute: true,
-    nocase: true, // 大文字小文字を区別しない
-    dot: true, // .で始まるファイルも含める
-    matchBase: true // ベース名でのマッチングを有効化
+    nodir: true,
   });
 
-  console.log(`[getPostBySlug] Found files:`, files);
+  console.log(`[getPostBySlug] Found ${allMarkdownFiles.length} markdown files`);
 
-  if (files.length === 0) {
-    // ファイルが見つからない場合、別のパターンで再試行
-    const altPattern = `**/*${normalizedSlug}*.{md,mdx}`;
-    console.log(`[getPostBySlug] Trying alternative pattern: ${altPattern}`);
-
-    const altFiles = await glob(altPattern, {
-      cwd: baseDir,
-      absolute: true,
-      nocase: true,
-      dot: true,
-      matchBase: true
-    });
-
-    console.log(`[getPostBySlug] Found with alternative pattern:`, altFiles);
-
-    if (altFiles.length === 0) {
-      throw new FileNotFoundError(`File not found for slug: ${normalizedSlug}`);
+  // 各ファイルを順番にチェック
+  for (const filePath of allMarkdownFiles) {
+    try {
+      const content = await fs.readFile(filePath, 'utf-8');
+      const { data } = matter(content);
+      
+      if (data.slug === normalizedSlug) {
+        console.log(`[getPostBySlug] Found matching slug in file: ${filePath}`);
+        return await loadFromFile(filePath, { ...opts, baseDir });
+      }
+    } catch (error) {
+      console.warn(`[getPostBySlug] Error processing file ${filePath}:`, error);
+      continue;
     }
-
-    // 代替パターンで見つかった最初のファイルを使用
-    return await loadFromFile(altFiles[0], { ...opts, baseDir });
   }
 
-  // 最初に見つかったファイルを読み込む
-  console.log(`[getPostBySlug] Loading file: ${files[0]}`);
-  return await loadFromFile(files[0], { ...opts, baseDir });
+  throw new FileNotFoundError(`File not found for slug: ${normalizedSlug}`);
 }
 
 /**
