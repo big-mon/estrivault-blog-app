@@ -31,24 +31,33 @@
             </div>
           {/if}
 
-          {#if meta.publishedAt}
+          {#if meta.publishedAt || meta.updatedAt}
             <div class="flex items-center text-sm text-gray-500">
-              <svg class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.5"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              <time datetime={new Date(meta.publishedAt).toISOString()} class="leading-relaxed">
-                {new Date(meta.publishedAt).toLocaleDateString('ja-JP', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-                {meta.updatedAt ? ' (更新)' : ''}
-              </time>
+              {#if meta.updatedAt}
+                <svg class="mr-1 h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <time datetime={new Date(meta.updatedAt).toISOString()} class="leading-relaxed">
+                  {new Date(meta.updatedAt).toISOString().split('T')[0]}
+                </time>
+              {:else}
+                <svg class="mr-1 h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <time datetime={new Date(meta.publishedAt).toISOString()} class="leading-relaxed">
+                  {new Date(meta.publishedAt).toISOString().split('T')[0]}
+                </time>
+              {/if}
             </div>
           {/if}
         </div>
