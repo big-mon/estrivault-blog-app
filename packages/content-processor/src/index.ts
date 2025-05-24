@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import path from 'path';
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
 import { glob } from 'glob';
@@ -97,18 +98,8 @@ export async function loadFromFile(
     // ファイルの読み込み
     const content = await fs.readFile(filePath, 'utf-8');
 
-    // ファイルパスからスラッグを生成
-    const slug = getBaseNameWithoutExtension(filePath);
-
     // 文字列処理関数に委譲
-    const result = await loadFromString(content, opts);
-
-    // slugが指定されていない場合はファイル名から設定
-    if (!result.meta.slug) {
-      result.meta.slug = slug;
-    }
-
-    return result;
+    return await loadFromString(content, opts);
   } catch (error) {
     if (
       error instanceof FileNotFoundError ||
@@ -181,7 +172,9 @@ export async function getAllPosts(
   );
 
   // nullを除外し、フィルタを適用
-  const validPosts = posts.filter((post): post is PostMeta => post !== null).filter(filter);
+  const validPosts = posts
+    .filter((post): post is PostMeta => post !== null)
+    .filter(filter);
 
   // ソート
   const sortedPosts = [...validPosts].sort((a, b) => {
@@ -202,7 +195,7 @@ export async function getAllPosts(
 
 /**
  * 指定されたslugに一致するMarkdownファイルを処理してHTMLとメタデータを返す
- * @param slug ファイル名（拡張子なし）
+ * @param slug 検索するslug
  * @param baseDir 基準ディレクトリ
  * @param opts 処理オプション
  * @returns HTML文字列とメタデータ
@@ -215,24 +208,25 @@ export async function getPostBySlug(
   // スラッグを正規化（先頭のスラッシュを削除）
   const normalizedSlug = slug.startsWith('/') ? slug.slice(1) : slug;
   
-  // ファイルパスを構築
-  const mdPath = resolvePath(baseDir, `${normalizedSlug}.md`);
-  const mdxPath = resolvePath(baseDir, `${normalizedSlug}.mdx`);
-
-  try {
-    // .md ファイルを試す
-    return await loadFromFile(mdPath, opts);
-  } catch (error) {
-    if (error instanceof FileNotFoundError) {
-      // .mdx ファイルを試す
-      try {
-        return await loadFromFile(mdxPath, opts);
-      } catch (mdxError) {
-        throw new FileNotFoundError(`File not found: ${mdPath} or ${mdxPath}`);
-      }
-    }
-    throw error;
+  // すべての記事を取得
+  const allPosts = await getAllPosts('**/*.{md,mdx}', { ...opts, baseDir, perPage: Number.MAX_SAFE_INTEGER });
+  
+  // スラッグに一致する記事を検索
+  const postMeta = allPosts.find(post => post.slug === normalizedSlug);
+  
+  if (!postMeta) {
+    throw new FileNotFoundError(`Slug not found: ${normalizedSlug}`);
   }
+  
+  // ファイルを検索して読み込む
+  const files = await glob(`**/${normalizedSlug}.{md,mdx}`, { cwd: baseDir, absolute: true });
+  
+  if (files.length === 0) {
+    throw new FileNotFoundError(`File not found for slug: ${normalizedSlug}`);
+  }
+  
+  // 最初に見つかったファイルを読み込む
+  return await loadFromFile(files[0], { ...opts, baseDir });
 }
 
 /**

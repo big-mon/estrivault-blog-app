@@ -26,6 +26,8 @@ export interface ProcessorOptions {
   imageBase?: string;
   /** rehype-sanitize schema (カスタムタグ許可用) */
   sanitizeSchema?: import('hast-util-sanitize').Schema;
+  /** ベースディレクトリ */
+  baseDir?: string;
 }
 
 /**
