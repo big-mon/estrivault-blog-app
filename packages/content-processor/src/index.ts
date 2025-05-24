@@ -97,15 +97,12 @@ export async function loadFromFile(
     // ファイルの読み込み
     const content = await fs.readFile(filePath, 'utf-8');
 
-    // ファイルパスからスラッグを生成
-    const slug = getBaseNameWithoutExtension(filePath);
-
     // 文字列処理関数に委譲
     const result = await loadFromString(content, opts);
 
-    // slugが指定されていない場合はファイル名から設定
+    // フロントマターにslugが必須の場合はここでバリデーション
     if (!result.meta.slug) {
-      result.meta.slug = slug;
+      throw new FrontMatterError('Front-matterにslugが指定されていません');
     }
 
     return result;
@@ -117,13 +114,7 @@ export async function loadFromFile(
     ) {
       throw error;
     }
-    let msg = '';
-    if (error instanceof Error) {
-      msg = error.message;
-    } else {
-      msg = String(error);
-    }
-    throw new Error(`ファイルの処理中にエラーが発生しました: ${msg}`);
+    throw new MarkdownParseError(`ファイルの処理中にエラーが発生しました: ${filePath}`);
   }
 }
 
@@ -212,23 +203,23 @@ export async function getPostBySlug(
   baseDir: string,
   opts: ProcessorOptions = {}
 ): Promise<PostHTML> {
-  // .mdファイルを探す
-  const filePath = resolvePath(baseDir, `${slug}.md`);
+  // ディレクトリを再帰的に検索
+  const files = await glob([`${baseDir}/**/*.{md,mdx}`], { nodir: true });
 
-  try {
-    return await loadFromFile(filePath, opts);
-  } catch (error) {
-    if (error instanceof FileNotFoundError) {
-      // .mdxファイルも試す
-      const mdxPath = resolvePath(baseDir, `${slug}.mdx`);
-      try {
-        return await loadFromFile(mdxPath, opts);
-      } catch (mdxError) {
-        throw error; // 元のエラーを投げる
+  for (const file of files) {
+    try {
+      const post = await loadFromFile(file, opts);
+      // ファイルのフロントマターのslugと一致するか確認
+      if (post.meta.slug === slug) {
+        return post;
       }
+    } catch (error) {
+      // エラーが発生した場合は次のファイルを試す
+      continue;
     }
-    throw error;
   }
+
+  throw new FileNotFoundError(`File not found with slug: ${slug}`);
 }
 
 /**
