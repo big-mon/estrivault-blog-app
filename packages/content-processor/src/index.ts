@@ -212,19 +212,23 @@ export async function getPostBySlug(
   baseDir: string,
   opts: ProcessorOptions = {}
 ): Promise<PostHTML> {
-  // .mdファイルを探す
-  const filePath = resolvePath(baseDir, `${slug}.md`);
+  // スラッグを正規化（先頭のスラッシュを削除）
+  const normalizedSlug = slug.startsWith('/') ? slug.slice(1) : slug;
+  
+  // ファイルパスを構築
+  const mdPath = resolvePath(baseDir, `${normalizedSlug}.md`);
+  const mdxPath = resolvePath(baseDir, `${normalizedSlug}.mdx`);
 
   try {
-    return await loadFromFile(filePath, opts);
+    // .md ファイルを試す
+    return await loadFromFile(mdPath, opts);
   } catch (error) {
     if (error instanceof FileNotFoundError) {
-      // .mdxファイルも試す
-      const mdxPath = resolvePath(baseDir, `${slug}.mdx`);
+      // .mdx ファイルを試す
       try {
         return await loadFromFile(mdxPath, opts);
       } catch (mdxError) {
-        throw error; // 元のエラーを投げる
+        throw new FileNotFoundError(`File not found: ${mdPath} or ${mdxPath}`);
       }
     }
     throw error;
