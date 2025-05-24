@@ -87,19 +87,27 @@ export async function loadFromFile(
   filePath: string,
   opts: ProcessorOptions = {}
 ): Promise<PostHTML> {
+  console.log(`[loadFromFile] Loading file: ${filePath}`);
+  
   try {
     // ファイルの存在確認
     try {
       await fs.access(filePath);
+      console.log(`[loadFromFile] File exists: ${filePath}`);
     } catch (error) {
+      console.error(`[loadFromFile] File not found: ${filePath}`, error);
       throw new FileNotFoundError(`ファイルが見つかりません: ${filePath}`);
     }
-
+    
     // ファイルの読み込み
     const content = await fs.readFile(filePath, 'utf-8');
+    console.log(`[loadFromFile] File read successfully: ${filePath} (${content.length} bytes)`);
 
     // 文字列処理関数に委譲
-    return await loadFromString(content, opts);
+    console.log(`[loadFromFile] Processing content with options:`, opts);
+    const result = await loadFromString(content, opts);
+    console.log(`[loadFromFile] Content processed successfully`);
+    return result;
   } catch (error) {
     if (
       error instanceof FileNotFoundError ||
@@ -179,9 +187,7 @@ export async function getAllPosts(
   );
 
   // nullを除外し、フィルタを適用
-  const validPosts = posts
-    .filter((post): post is PostMeta => post !== null)
-    .filter(filter);
+  const validPosts = posts.filter((post): post is PostMeta => post !== null).filter(filter);
 
   // ソート
   const sortedPosts = [...validPosts].sort((a, b) => {
@@ -214,30 +220,65 @@ export async function getPostBySlug(
 ): Promise<PostHTML> {
   // スラッグを正規化（先頭のスラッシュを削除）
   const normalizedSlug = slug.startsWith('/') ? slug.slice(1) : slug;
-  
+
   // すべての記事を取得
-  const allPosts = await getAllPosts('**/*.{md,mdx}', { 
-    ...opts, 
-    baseDir, 
+  const allPosts = await getAllPosts('**/*.{md,mdx}', {
+    ...opts,
+    baseDir,
     perPage: Number.MAX_SAFE_INTEGER,
-    sort: 'publishedAt'  // 明示的にソート順を指定
+    sort: 'publishedAt', // 明示的にソート順を指定
   });
-  
+
+  console.log(`[getPostBySlug] Searching for slug: ${normalizedSlug}`);
+
   // スラッグに一致する記事を検索
-  const postMeta = allPosts.find(post => post.slug === normalizedSlug);
-  
+  const postMeta = allPosts.find((post) => post.slug === normalizedSlug);
+
   if (!postMeta) {
+    console.error(`[getPostBySlug] Slug not found: ${normalizedSlug}`);
+    console.log(`[getPostBySlug] Available slugs:`, allPosts.map((p) => p.slug));
     throw new FileNotFoundError(`Slug not found: ${normalizedSlug}`);
   }
-  
+
   // ファイルを検索して読み込む
-  const files = await glob(`**/${normalizedSlug}.{md,mdx}`, { cwd: baseDir, absolute: true });
-  
+  const pattern = `**/${normalizedSlug}.{md,mdx}`;
+  console.log(`[getPostBySlug] Searching files with pattern: ${pattern}`);
+
+  const files = await glob(pattern, {
+    cwd: baseDir,
+    absolute: true,
+    nocase: true, // 大文字小文字を区別しない
+    dot: true, // .で始まるファイルも含める
+    matchBase: true // ベース名でのマッチングを有効化
+  });
+
+  console.log(`[getPostBySlug] Found files:`, files);
+
   if (files.length === 0) {
-    throw new FileNotFoundError(`File not found for slug: ${normalizedSlug}`);
+    // ファイルが見つからない場合、別のパターンで再試行
+    const altPattern = `**/*${normalizedSlug}*.{md,mdx}`;
+    console.log(`[getPostBySlug] Trying alternative pattern: ${altPattern}`);
+
+    const altFiles = await glob(altPattern, {
+      cwd: baseDir,
+      absolute: true,
+      nocase: true,
+      dot: true,
+      matchBase: true
+    });
+
+    console.log(`[getPostBySlug] Found with alternative pattern:`, altFiles);
+
+    if (altFiles.length === 0) {
+      throw new FileNotFoundError(`File not found for slug: ${normalizedSlug}`);
+    }
+
+    // 代替パターンで見つかった最初のファイルを使用
+    return await loadFromFile(altFiles[0], { ...opts, baseDir });
   }
-  
+
   // 最初に見つかったファイルを読み込む
+  console.log(`[getPostBySlug] Loading file: ${files[0]}`);
   return await loadFromFile(files[0], { ...opts, baseDir });
 }
 
