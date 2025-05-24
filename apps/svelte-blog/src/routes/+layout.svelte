@@ -21,7 +21,7 @@
 
 <Header pathname={page.url.pathname} />
 
-<main class="mx-auto w-full max-w-6xl px-4 py-8">
+<main class="mx-auto w-full max-w-6xl px-4 py-4">
   {@render children()}
 </main>
 
