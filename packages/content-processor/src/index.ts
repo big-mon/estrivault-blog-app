@@ -135,7 +135,14 @@ export async function getAllPosts(
     sort = 'publishedAt',
     filter = () => true,
     baseDir = process.cwd(),
+    ...restOpts
   } = opts;
+
+  // 残りのオプションを処理オプションにマージ
+  const processorOpts: ProcessorOptions = {
+    ...restOpts,
+    baseDir,
+  };
 
   // ファイル一覧の取得（サブディレクトリも再帰的に検索）
   const files = await glob(globPattern, {
@@ -162,7 +169,7 @@ export async function getAllPosts(
   const posts = await Promise.all(
     validFiles.map(async (file) => {
       try {
-        const { meta } = await loadFromFile(file, opts);
+        const { meta } = await loadFromFile(file, processorOpts);
         return meta;
       } catch (error) {
         console.warn(`ファイルのメタデータ抽出中にエラー: ${file}`, error);
@@ -209,7 +216,12 @@ export async function getPostBySlug(
   const normalizedSlug = slug.startsWith('/') ? slug.slice(1) : slug;
   
   // すべての記事を取得
-  const allPosts = await getAllPosts('**/*.{md,mdx}', { ...opts, baseDir, perPage: Number.MAX_SAFE_INTEGER });
+  const allPosts = await getAllPosts('**/*.{md,mdx}', { 
+    ...opts, 
+    baseDir, 
+    perPage: Number.MAX_SAFE_INTEGER,
+    sort: 'publishedAt'  // 明示的にソート順を指定
+  });
   
   // スラッグに一致する記事を検索
   const postMeta = allPosts.find(post => post.slug === normalizedSlug);
