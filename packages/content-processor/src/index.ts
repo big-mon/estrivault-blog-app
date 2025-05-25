@@ -5,7 +5,6 @@ import { glob } from 'glob';
 import { createPipeline } from './pipeline';
 import type { Processor } from 'unified';
 import { buildUrl } from '@estrivault/cloudinary-utils';
-import { getBaseNameWithoutExtension, resolvePath } from './utils/path-utils';
 import {
   PostMeta,
   PostHTML,
