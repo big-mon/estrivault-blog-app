@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
-import { remarkImageTransform, type ImageTransformOptions } from '../plugins/image-transform';
+import { rehypeImageTransform, type ImageTransformOptions } from '../plugins/image-transform';
 import { rehypeLinkTransform } from '../plugins/link-transform';
 import { remarkYoutubeEmbed } from '../plugins/youtube-embed';
 import { remarkTwitterEmbed } from '../plugins/twitter-embed';
@@ -43,9 +43,6 @@ export function createPipeline(options: ProcessorOptions = {}) {
       .use(remarkDirective)
       .use(remarkGfm)
 
-      // 画像変換 (remarkRehypeの前に適用)
-      .use(remarkImageTransform, imageTransformOptions)
-
       // 埋め込みコンテンツ
       .use(remarkYoutubeEmbed)
       .use(remarkTwitterEmbed)
@@ -54,6 +51,14 @@ export function createPipeline(options: ProcessorOptions = {}) {
       // HTML 変換
       .use(remarkRehype, { allowDangerousHtml: true })
       .use(rehypeRaw)
+
+      // 画像変換 (HTML 変換後)
+      .use(rehypeImageTransform, {
+        cloudinaryCloudName: cloudinaryCloudName || '',
+        width: 1200,
+        quality: 80,
+        mode: 'fit'
+      })
 
       // リンク変換
       .use(rehypeLinkTransform)
