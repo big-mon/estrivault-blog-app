@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
 import { glob } from 'glob';
-import { createPipeline } from './pipeline';
+import { createPipeline } from './pipeline/pipeline';
 import type { Processor } from 'unified';
 import { buildUrl } from '@estrivault/cloudinary-utils';
 import {
@@ -235,5 +235,6 @@ function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''
   return buildUrl(cloudinaryCloudName, publicId, { w: 800 });
 }
 
-// 型定義のエクスポート
+// 型定義と関数のエクスポート
 export * from './types';
+export { createPipeline, createProcessor } from './pipeline/pipeline';
