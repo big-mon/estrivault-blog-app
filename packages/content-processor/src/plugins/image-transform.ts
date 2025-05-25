@@ -1,10 +1,11 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
 import type { Root, Image } from 'mdast';
+import { buildUrl } from '@estrivault/cloudinary-utils';
 
-interface ImageTransformOptions {
-  /** Cloudinary変換ベースURL */
-  baseUrl?: string;
+export interface ImageTransformOptions {
+  /** Cloudinaryクラウド名（必須） */
+  cloudinaryCloudName: string;
   /** 画像幅 */
   width?: number;
   /** 画像品質 */
@@ -14,14 +15,8 @@ interface ImageTransformOptions {
 /**
  * 相対画像パスをCloudinary CDN URLに変換するremarkプラグイン
  */
-export const remarkImageTransform: Plugin<[ImageTransformOptions?], Root, Root> = (
-  options = {}
-) => {
-  const { baseUrl, width = 800, quality = 80 } = options;
-
-  if (!baseUrl) {
-    return (tree: Root) => tree; // baseUrlが指定されていない場合は何もしない
-  }
+export const remarkImageTransform: Plugin<[ImageTransformOptions], Root, Root> = (options) => {
+  const { cloudinaryCloudName, width = 800 } = options;
 
   return (tree: Root) => {
     visit(tree, 'image', (node: Image) => {
@@ -29,24 +24,21 @@ export const remarkImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
 
       // 相対パスの場合のみ変換
       if (url && !url.startsWith('http') && !url.startsWith('data:')) {
-        // 拡張子を除いたパス部分を取得
-        let pathSegment = url.replace(/\.[^/.]+$/, '');
+        try {
+          // 拡張子を除いたパス部分を取得
+          let publicId = url.replace(/^\//, '').replace(/\.[^/.]+$/, '');
 
-        // pathSegmentの先頭のスラッシュを除去
-        if (pathSegment.startsWith('/')) {
-          pathSegment = pathSegment.substring(1);
+          // Cloudinary URLを生成
+          node.url = buildUrl(cloudinaryCloudName, publicId, {
+            w: width,
+            mode: 'fit', // アスペクト比を維持
+          });
+        } catch (error) {
+          console.error('Error transforming image URL:', error);
+          // エラーが発生した場合は元のURLを維持
         }
-
-        // baseUrlの末尾のスラッシュを除去 (もしあれば)
-        let cleanedBaseUrl = baseUrl;
-        if (cleanedBaseUrl.endsWith('/')) {
-          cleanedBaseUrl = cleanedBaseUrl.slice(0, -1);
-        }
-
-        // Cloudinary URL形式に変換
-        node.url = `${cleanedBaseUrl}/${pathSegment}?w=${width}&q=${quality}`;
       }
     });
-    return tree; // 変更されたツリーまたは元のツリーを返す
+    return tree;
   };
 };
