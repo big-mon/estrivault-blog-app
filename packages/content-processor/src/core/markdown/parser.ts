@@ -19,8 +19,15 @@ export class MarkdownParser {
    */
   async parse(content: string, options: ProcessorOptions = {}): Promise<PostHTML> {
     try {
-      // Front-matterの抽出
-      const { data, content: markdownContent } = matter(content);
+      // Front-matterの抽出と検証
+      const { data, content: markdownContent } = matter(content.trim(), {
+        // 空のフロントマターを許可しない
+        excerpt: false,
+        // フロントマターの区切り文字を明示的に指定
+        delimiters: ['---', '---'],
+        // 空の値を許可しない
+        empty: false
+      });
 
       // 必須フィールドの検証
       this.validateFrontMatter(data);
@@ -30,7 +37,7 @@ export class MarkdownParser {
 
       // Markdownの処理
       const processor = this.createProcessor(options);
-      const result = await processor.process(markdownContent);
+      const result = await processor.process(markdownContent.trim());
 
       // メタデータの構築
       const meta = this.buildPostMeta(data, stats, options);

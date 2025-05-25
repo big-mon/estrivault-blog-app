@@ -3,7 +3,6 @@ import matter from 'gray-matter';
 import readingTime from 'reading-time';
 import { glob } from 'glob';
 import { createPipeline } from './pipeline/pipeline';
-import type { Processor } from 'unified';
 import { buildUrl } from '@estrivault/cloudinary-utils';
 import {
   PostMeta,
@@ -42,9 +41,9 @@ export async function loadFromString(md: string, opts: ProcessorOptions = {}): P
     // パイプラインの作成
     const pipeline = createPipeline(opts);
 
-    // Markdownの処理
-    const result = await pipeline.process(md);
-    const html = result.toString() as string;
+    // Markdownの処理（フロントマターを除いたコンテンツを処理）
+    const result = await pipeline.process(content);
+    const html = String(result);
 
     // メタデータの構築
     const meta: PostMeta = {
@@ -62,7 +61,7 @@ export async function loadFromString(md: string, opts: ProcessorOptions = {}): P
 
     return {
       meta,
-      html: String(result),
+      html,
     };
   } catch (error) {
     if (error instanceof FrontMatterError) {
