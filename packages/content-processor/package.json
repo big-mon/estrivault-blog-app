@@ -39,6 +39,7 @@
     "vfile": "^6.0.3"
   },
   "devDependencies": {
+    "@types/hast": "^3.0.4",
     "@types/mdast": "^4.0.4",
     "@types/node": "^22.15.18",
     "@vitest/coverage-v8": "^3.1.3",

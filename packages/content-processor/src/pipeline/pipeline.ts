@@ -4,10 +4,9 @@ import remarkDirective from 'remark-directive';
 import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
-import rehypeSanitize from 'rehype-sanitize';
 import rehypeStringify from 'rehype-stringify';
 import { remarkImageTransform, type ImageTransformOptions } from '../plugins/image-transform';
-import { remarkLinkTransform } from '../plugins/link-transform';
+import { rehypeLinkTransform } from '../plugins/link-transform';
 import { remarkYoutubeEmbed } from '../plugins/youtube-embed';
 import { remarkTwitterEmbed } from '../plugins/twitter-embed';
 import { remarkGithubEmbed } from '../plugins/github-embed';
@@ -19,8 +18,6 @@ import type { ProcessorOptions as BaseProcessorOptions } from '../types';
 interface ProcessorOptions extends BaseProcessorOptions {
   /** 画像変換用のCloudinaryクラウド名 */
   cloudinaryCloudName?: string;
-  /** カスタムサニタイズスキーマ */
-  sanitizeSchema?: any;
 }
 
 /**
@@ -29,7 +26,7 @@ interface ProcessorOptions extends BaseProcessorOptions {
  * @returns 構築されたパイプライン
  */
 export function createPipeline(options: ProcessorOptions = {}) {
-  const { cloudinaryCloudName, sanitizeSchema } = options;
+  const { cloudinaryCloudName } = options;
 
   // 画像変換オプション
   const imageTransformOptions: ImageTransformOptions = {
@@ -49,9 +46,6 @@ export function createPipeline(options: ProcessorOptions = {}) {
       // 画像変換 (remarkRehypeの前に適用)
       .use(remarkImageTransform, imageTransformOptions)
 
-      // リンク変換
-      .use(remarkLinkTransform)
-
       // 埋め込みコンテンツ
       .use(remarkYoutubeEmbed)
       .use(remarkTwitterEmbed)
@@ -61,8 +55,8 @@ export function createPipeline(options: ProcessorOptions = {}) {
       .use(remarkRehype, { allowDangerousHtml: true })
       .use(rehypeRaw)
 
-      // サニタイズ
-      .use(rehypeSanitize, sanitizeSchema)
+      // リンク変換
+      .use(rehypeLinkTransform)
 
       // 最終出力
       .use(rehypeStringify)
