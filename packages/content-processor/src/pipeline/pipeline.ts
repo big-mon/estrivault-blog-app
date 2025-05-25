@@ -11,7 +11,17 @@ import { remarkLinkTransform } from '../plugins/link-transform';
 import { remarkYoutubeEmbed } from '../plugins/youtube-embed';
 import { remarkTwitterEmbed } from '../plugins/twitter-embed';
 import { remarkGithubEmbed } from '../plugins/github-embed';
-import type { ProcessorOptions } from '../types';
+import type { ProcessorOptions as BaseProcessorOptions } from '../types';
+
+/**
+ * 拡張されたプロセッサーオプション
+ */
+interface ProcessorOptions extends BaseProcessorOptions {
+  /** 画像変換用のCloudinaryクラウド名 */
+  cloudinaryCloudName?: string;
+  /** カスタムサニタイズスキーマ */
+  sanitizeSchema?: any;
+}
 
 /**
  * パイプラインを構築する

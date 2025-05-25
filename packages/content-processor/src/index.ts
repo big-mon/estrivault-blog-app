@@ -39,9 +39,12 @@ export async function loadFromString(md: string, opts: ProcessorOptions = {}): P
     // 読了時間の計算
     const stats = readingTime(content);
 
+    // パイプラインの作成
+    const pipeline = createPipeline(opts);
+
     // Markdownの処理
-    const processor = createPipeline(opts) as Processor;
-    const result = await processor.process(content);
+    const result = await pipeline.process(md);
+    const html = result.toString() as string;
 
     // メタデータの構築
     const meta: PostMeta = {
