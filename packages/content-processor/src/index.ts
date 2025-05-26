@@ -20,7 +20,7 @@ import {
  * @param opts 処理オプション
  * @returns HTML文字列とメタデータ
  */
-export async function loadFromString(md: string, opts: ProcessorOptions = {}): Promise<PostHTML> {
+async function loadFromString(md: string, opts: ProcessorOptions = {}): Promise<PostHTML> {
   try {
     // Front-matterの抽出
     const { data, content } = matter(md);
@@ -83,10 +83,7 @@ export async function loadFromString(md: string, opts: ProcessorOptions = {}): P
  * @param opts 処理オプション
  * @returns HTML文字列とメタデータ
  */
-export async function loadFromFile(
-  filePath: string,
-  opts: ProcessorOptions = {}
-): Promise<PostHTML> {
+async function loadFromFile(filePath: string, opts: ProcessorOptions = {}): Promise<PostHTML> {
   try {
     // ファイルの存在確認
     try {
