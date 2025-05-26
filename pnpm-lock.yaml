@@ -121,6 +121,9 @@ importers:
       '@estrivault/cloudinary-utils':
         specifier: workspace:*
         version: link:../cloudinary-utils
+      fast-glob:
+        specifier: ^3.3.3
+        version: 3.3.3
       glob:
         specifier: ^11.0.2
         version: 11.0.2
@@ -176,9 +179,6 @@ importers:
       '@types/node':
         specifier: ^22.15.18
         version: 22.15.18
-      fast-glob:
-        specifier: ^3.3.3
-        version: 3.3.3
       tsup:
         specifier: ^8.5.0
         version: 8.5.0(jiti@2.4.2)(postcss@8.5.3)(typescript@5.8.3)
