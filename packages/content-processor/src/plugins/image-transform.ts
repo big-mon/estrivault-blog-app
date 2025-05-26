@@ -1,52 +1,83 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
-import type { Root, Image } from 'mdast';
+import type { Root } from 'hast';
+import { buildUrl, type BuildUrlOptions } from '@estrivault/cloudinary-utils';
 
-interface ImageTransformOptions {
-  /** Cloudinary変換ベースURL */
-  baseUrl?: string;
+export interface ImageTransformOptions {
+  /** Cloudinaryクラウド名（必須） */
+  cloudinaryCloudName: string;
   /** 画像幅 */
   width?: number;
   /** 画像品質 */
   quality?: number;
+  /** 画像のトリミングモード */
+  mode?: 'fit' | 'fill';
 }
 
 /**
- * 相対画像パスをCloudinary CDN URLに変換するremarkプラグイン
+ * 画像パスをCloudinary CDN URLに変換するrehypeプラグイン
  */
-export const remarkImageTransform: Plugin<[ImageTransformOptions?], Root, Root> = (
-  options = {}
-) => {
-  const { baseUrl, width = 800, quality = 80 } = options;
-
-  if (!baseUrl) {
-    return (tree: Root) => tree; // baseUrlが指定されていない場合は何もしない
+export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> = (options) => {
+  if (!options?.cloudinaryCloudName) {
+    throw new Error('cloudinaryCloudName is required in options');
   }
+  const { 
+    cloudinaryCloudName, 
+    width = 1200, 
+    quality = 80,
+    mode = 'fit' 
+  } = options;
 
   return (tree: Root) => {
-    visit(tree, 'image', (node: Image) => {
-      const url = node.url;
+    visit(tree, 'element', (node) => {
+      if (node.tagName !== 'img' || !node.properties) {
+        return;
+      }
 
-      // 相対パスの場合のみ変換
-      if (url && !url.startsWith('http') && !url.startsWith('data:')) {
+      const src = node.properties.src;
+      if (typeof src !== 'string' || !src) {
+        return;
+      }
+
+      // すでに絶対URLまたはデータURLの場合はスキップ
+      if (src.startsWith('http') || src.startsWith('data:')) {
+        return;
+      }
+
+      try {
         // 拡張子を除いたパス部分を取得
-        let pathSegment = url.replace(/\.[^/.]+$/, '');
+        const publicId = src.replace(/^\//, '').split('.')[0];
+        
+        // Cloudinary URLを生成
+        const mode = (node.properties['data-mode'] as string) === 'fill' ? 'fill' as const : 'fit' as const;
+        const buildOptions: BuildUrlOptions = {
+          w: width,
+          ...(quality && { q: quality }),
+          mode,
+        };
+        
+        node.properties.src = buildUrl(cloudinaryCloudName, publicId, buildOptions);
 
-        // pathSegmentの先頭のスラッシュを除去
-        if (pathSegment.startsWith('/')) {
-          pathSegment = pathSegment.substring(1);
+        // レスポンシブ画像用の属性を追加
+        node.properties.loading = 'lazy';
+        node.properties.decoding = 'async';
+        
+        // サイズヒントを追加
+        if (!node.properties.sizes) {
+          node.properties.sizes = '(max-width: 768px) 100vw, 50vw';
         }
-
-        // baseUrlの末尾のスラッシュを除去 (もしあれば)
-        let cleanedBaseUrl = baseUrl;
-        if (cleanedBaseUrl.endsWith('/')) {
-          cleanedBaseUrl = cleanedBaseUrl.slice(0, -1);
-        }
-
-        // Cloudinary URL形式に変換
-        node.url = `${cleanedBaseUrl}/${pathSegment}?w=${width}&q=${quality}`;
+      } catch (error) {
+        console.error('Error transforming image URL:', error);
+        // エラーが発生した場合は元のURLを維持
       }
     });
-    return tree; // 変更されたツリーまたは元のツリーを返す
+
+    return tree;
   };
 };
+
+// 後方互換性のため
+/**
+ * @deprecated 代わりに `rehypeImageTransform` を使用してください
+ */
+export const remarkImageTransform = rehypeImageTransform;
