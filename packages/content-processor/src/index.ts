@@ -236,4 +236,4 @@ function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''
 
 // 型定義と関数のエクスポート
 export * from './types';
-export { createPipeline, createProcessor } from './pipeline/pipeline';
+export { createPipeline } from './pipeline/pipeline';

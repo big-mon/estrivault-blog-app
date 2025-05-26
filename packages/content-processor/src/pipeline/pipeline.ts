@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
-import { rehypeImageTransform, type ImageTransformOptions } from '../plugins/image-transform';
+import { rehypeImageTransform } from '../plugins/image-transform';
 import { rehypeLinkTransform } from '../plugins/link-transform';
 import { remarkYoutubeEmbed } from '../plugins/youtube-embed';
 import { remarkTwitterEmbed } from '../plugins/twitter-embed';
@@ -27,13 +27,6 @@ interface ProcessorOptions extends BaseProcessorOptions {
  */
 export function createPipeline(options: ProcessorOptions = {}) {
   const { cloudinaryCloudName } = options;
-
-  // 画像変換オプション
-  const imageTransformOptions: ImageTransformOptions = {
-    cloudinaryCloudName: cloudinaryCloudName || '',
-    width: 1200,
-    quality: 80,
-  };
 
   // 1つのチェーンで全てのプラグインを適用
   return (
@@ -57,7 +50,7 @@ export function createPipeline(options: ProcessorOptions = {}) {
         cloudinaryCloudName: cloudinaryCloudName || '',
         width: 1200,
         quality: 80,
-        mode: 'fit'
+        mode: 'fit',
       })
 
       // リンク変換
@@ -67,14 +60,3 @@ export function createPipeline(options: ProcessorOptions = {}) {
       .use(rehypeStringify)
   );
 }
-
-/**
- * Markdownをパースし、HTMLに変換するパイプラインを構築する
- * @deprecated 新しい `createPipeline` 関数を使用してください
- * @param options 処理オプション
- * @returns unified処理パイプライン
- */
-/**
- * @deprecated 新しい `createPipeline` 関数を使用してください
- */
-export const createProcessor = createPipeline;
