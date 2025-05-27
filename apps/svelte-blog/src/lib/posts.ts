@@ -44,18 +44,17 @@ export async function getPosts(options?: {
       if (options?.category && post.category?.toLowerCase() !== options.category.toLowerCase()) {
         return false;
       }
-      // タグが指定されている場合はフィルタリング（大文字小文字を区別しない）
-      if (
-        options?.tag &&
-        !post.tags?.some((tag) => tag.toLowerCase() === options.tag?.toLowerCase())
-      ) {
-        return false;
+      // タグが指定されている場合はフィルタリング（大文字小文字を区別せず、前後の空白も無視）
+      if (options?.tag) {
+        const targetTag = normalizeTag(options.tag);
+        return post.tags?.some((tag) => normalizeTag(tag) === targetTag) ?? false;
       }
       return true;
     };
 
     // 記事一覧を取得（サブディレクトリも再帰的に検索）
-    const allPosts = await getAllPosts([`${CONTENT_DIR}/**/*.md`, `${CONTENT_DIR}/**/*.mdx`], {
+    const allPosts = await getAllPosts(['**/*.md', '**/*.mdx'], {
+      cwd: CONTENT_DIR,
       page,
       perPage,
       sort,
@@ -101,5 +100,51 @@ export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
   } catch (err) {
     console.error('記事の取得中にエラーが発生しました:', err);
     throw new Error('記事の取得中にエラーが発生しました');
+  }
+}
+
+/**
+ * タグを正規化する
+ * - 前後の空白を削除
+ * - 大文字小文字を統一（小文字に変換）
+ */
+function normalizeTag(tag: string): string {
+  return tag.trim().toLowerCase();
+}
+
+/**
+ * すべてのユニークなタグを取得
+ */
+export async function getAllTags(): Promise<string[]> {
+  try {
+    // 正しい glob パターンを使用
+    const allPosts = await getAllPosts(['**/*.md', '**/*.mdx'], {
+      cwd: CONTENT_DIR,
+      includeDrafts: false, // ドラフトは含めない
+      sort: 'publishedAt',
+      filter: (post) => {
+        const include = !post.draft;
+        return include;
+      },
+    });
+
+    const tags = new Set<string>();
+
+    allPosts.forEach((post) => {
+      // PostMeta 型に直接 tags プロパティがあると仮定
+      const postWithTags = post as PostMeta & { tags?: string[] };
+      if (postWithTags.tags && Array.isArray(postWithTags.tags)) {
+        postWithTags.tags
+          .map((tag) => normalizeTag(tag))
+          .filter((tag) => tag.length > 0) // 空のタグを除外
+          .forEach((tag) => tags.add(tag));
+      }
+    });
+
+    // アルファベット順にソートして返す
+    return Array.from(tags).sort((a, b) => a.localeCompare(b));
+  } catch (err) {
+    console.error('Failed to get all tags:', err);
+    return [];
   }
 }
