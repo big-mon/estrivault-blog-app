@@ -1,5 +1,4 @@
-// src/loaders/directory-loader.ts
-import { glob } from 'fast-glob';
+import fg from 'fast-glob';
 import type { PostMeta, PostHTML, ProcessorOptions, ListOptions } from '../types';
 import { loadFile } from './file-loader';
 import { FileNotFoundError } from '../types/errors/file-errors';
@@ -52,7 +51,7 @@ export async function loadDirectory(
   } = options;
 
   // ファイルの検索
-  const files = await glob(pattern, {
+  const files = await fg(pattern, {
     cwd,
     ignore,
     onlyFiles: true,
