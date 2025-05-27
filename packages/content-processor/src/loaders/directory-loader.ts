@@ -118,16 +118,26 @@ export async function getAllPosts(
   globPattern: string | string[],
   options: Omit<DirectoryLoaderOptions, 'pattern'> = {}
 ): Promise<PostMeta[]> {
-  // デフォルト値の設定
   const {
+    cwd = process.cwd(),
+    ignore = [
+      '**/node_modules/**',
+      '**/.git/**',
+      '**/.svelte-kit/**',
+      '**/build/**',
+      '**/.vercel/**',
+      '**/.netlify/**',
+    ],
+    recursive = true,
     page = 1,
     perPage = 20,
     sort = 'publishedAt',
     filter = () => true,
-    cwd = process.cwd(),
     includeDrafts = false,
   } = options;
+
   const patterns = Array.isArray(globPattern) ? globPattern : [globPattern];
+
   const posts = await Promise.all(
     patterns.map((pattern) =>
       loadDirectory({
@@ -141,31 +151,30 @@ export async function getAllPosts(
   const allPosts = posts.flat();
 
   // メタデータに変換してからフィルタリング
-  const postMetas = allPosts.map(post => ({
+  const postMetas = allPosts.map((post) => ({
     meta: {
       ...post.meta,
       // 必要に応じて追加のメタデータをマッピング
-    }
+    },
   }));
 
   // ドラフトを除外
-  const publishedPosts = includeDrafts 
-    ? postMetas 
-    : postMetas.filter(post => !post.meta.draft);
+  const publishedPosts = includeDrafts ? postMetas : postMetas.filter((post) => !post.meta?.draft);
 
   // カスタムフィルタを適用
-  const filteredPosts = publishedPosts.filter(post => filter(post.meta));
+  const filteredPosts = publishedPosts.filter((post) => filter(post.meta));
 
   // ソート
-  const sortedPosts = sort === 'title'
-    ? [...filteredPosts].sort((a, b) => a.meta.title.localeCompare(b.meta.title))
-    : sortPostsByDate(filteredPosts, sort === 'publishedAt' ? 'desc' : 'asc');
+  const sortedPosts =
+    sort === 'title'
+      ? [...filteredPosts].sort((a, b) => a.meta.title.localeCompare(b.meta.title))
+      : sortPostsByDate(filteredPosts, sort === 'publishedAt' ? 'desc' : 'asc');
 
   // ページネーション
   const startIndex = (page - 1) * perPage;
   const endIndex = startIndex + perPage;
 
-  return sortedPosts.slice(startIndex, endIndex).map(post => post.meta);
+  return sortedPosts.slice(startIndex, endIndex).map((post) => post.meta);
 }
 
 /**

@@ -40,11 +40,22 @@ function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''
  */
 export async function loadFile(filePath: string, options: LoadFileOptions = {}): Promise<PostHTML> {
   const resolvedPath = resolve(options.cwd || process.cwd(), filePath);
+  let data: Record<string, any> = {};
+  let markdown = '';
 
   try {
-    // ファイルを読み込む
     const content = await readFile(resolvedPath, 'utf-8');
-    const { data, content: markdown } = matter(content);
+    
+    try {
+      const parsed = matter(content);
+      data = parsed.data || {};
+      markdown = parsed.content;
+    } catch (parseError) {
+      throw new MarkdownParseError(`フロントマターのパースに失敗しました: ${resolvedPath}`, { 
+        cause: parseError instanceof Error ? parseError : new Error(String(parseError)),
+        context: { filePath: resolvedPath }
+      });
+    }
 
     // 必須フィールドの検証
     if (!data.title) {
