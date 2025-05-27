@@ -5,7 +5,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
   envDir: process.cwd(),
-  ssr: {
-    noExternal: ['fast-glob'],
+  optimizeDeps: {
+    exclude: ['fast-glob'],
   },
 });
