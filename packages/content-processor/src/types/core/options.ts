@@ -30,8 +30,9 @@ export interface ProcessorOptions {
 
 /**
  * 一覧取得用のオプション
+ * @template T フィルター関数の引数型（デフォルト: PostMeta）
  */
-export interface ListOptions extends ProcessorOptions {
+export interface ListOptions<T = PostMeta> extends ProcessorOptions {
   /** ページ番号（1起点） */
   page?: number;
   /** 1ページあたりの表示件数（デフォルト20） */
@@ -39,7 +40,7 @@ export interface ListOptions extends ProcessorOptions {
   /** ソートキー */
   sort?: 'publishedAt' | 'title';
   /** フィルタ関数 */
-  filter?: (post: PostMeta) => boolean;
+  filter?: (post: T) => boolean;
   /** ベースディレクトリ（デフォルト: カレントディレクトリ） */
   baseDir?: string;
   /** 下書きを含めるかどうか */

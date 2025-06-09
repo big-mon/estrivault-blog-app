@@ -1,13 +1,14 @@
 import { glob } from 'glob';
 import path from 'path';
-import type { PostMeta, PostHTML, ProcessorOptions, ListOptions } from '../types';
+import type { PostMeta, PostHTML, ProcessorOptions } from '../types';
+import type { ListOptions } from '../types/core/options';
 import { loadFile } from './file-loader';
 import { FileNotFoundError } from '../types/errors/file-errors';
 
 /**
  * コンテンツディレクトリのパス
  */
-const CONTENT_DIR = path.resolve(process.cwd(), '../../content/blog');
+const CONTENT_DIR = path.resolve(process.cwd(), 'content/blog');
 
 /**
  * デフォルトのファイルパターン
@@ -23,7 +24,7 @@ export interface DirectoryLoaderResult extends PostHTML {
  * ディレクトリからマークダウンファイルを読み込む
  */
 async function loadDirectory(
-  options: ProcessorOptions & ListOptions = {}
+  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
 ): Promise<DirectoryLoaderResult[]> {
   const { ...processorOptions } = options;
 
@@ -62,15 +63,15 @@ async function loadDirectory(
  */
 export async function getPostBySlug(
   slug: string,
-  options: ProcessorOptions & ListOptions = {}
+  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
 ): Promise<DirectoryLoaderResult> {
   const posts = await loadDirectory({
     ...options,
-    filter: (meta) => meta.slug === slug,
+    filter: (post) => !post.meta.draft && post.meta.slug === slug,
   });
 
-  // スラッグが完全一致する記事を検索
-  const post = posts.find((post) => post.meta.slug === slug);
+  // フィルタリング済みの最初の記事を取得
+  const post = posts[0];
   if (!post) {
     throw new FileNotFoundError(`File not found with slug: ${slug}`);
   }
@@ -81,11 +82,11 @@ export async function getPostBySlug(
  * 公開済みの記事一覧を取得する
  */
 export async function getAllPosts(
-  options: ProcessorOptions & ListOptions = {}
+  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
 ): Promise<PostMeta[]> {
   const posts = await loadDirectory({
     ...options,
-    filter: (meta) => !meta.draft,
+    filter: (post) => !post.meta.draft,
   });
 
   const sortedPosts = sortPostsByDate(posts);
@@ -97,11 +98,11 @@ export async function getAllPosts(
  */
 export async function getPostsByTag(
   tag: string,
-  options: ProcessorOptions & ListOptions = {}
+  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
 ): Promise<PostMeta[]> {
   const posts = await loadDirectory({
     ...options,
-    filter: (meta) => !meta.draft && meta.tags?.includes(tag),
+    filter: (post) => !post.meta.draft && post.meta.tags?.includes(tag),
   });
 
   const sortedPosts = sortPostsByDate(posts);
