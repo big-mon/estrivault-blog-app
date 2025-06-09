@@ -7,8 +7,9 @@ import { FileNotFoundError } from '../types/errors/file-errors';
 
 /**
  * コンテンツディレクトリのパス
+ * プロジェクトルートからの相対パス
  */
-const CONTENT_DIR = path.resolve(process.cwd(), 'content/blog');
+const CONTENT_DIR = path.resolve(process.cwd(), '../../content/blog');
 
 /**
  * デフォルトのファイルパターン

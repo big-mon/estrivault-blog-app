@@ -40,9 +40,9 @@ export async function getPosts(options?: {
       return true;
     };
 
-    // 記事一覧を取得（サブディレクトリも再帰的に検索）
+    // 記事一覧を取得
     const allPosts = await getAllPosts({
-      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
+      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME
     });
 
     // フィルタリングとソートを適用
@@ -63,7 +63,7 @@ export async function getPosts(options?: {
       total: filteredPosts.length, // フィルタリング後の全件数を返す
       page,
       perPage,
-      totalPages: Math.ceil(posts.length / perPage),
+      totalPages: Math.ceil(filteredPosts.length / perPage),
     };
   } catch (err) {
     console.error('Failed to get posts:', err);
@@ -79,7 +79,7 @@ export async function getPosts(options?: {
 export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
   try {
     const post = await getPostBySlugFromProcessor(slug, {
-      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
+      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME
     });
     return post;
   } catch (err) {
