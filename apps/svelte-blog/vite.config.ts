@@ -5,7 +5,13 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
   envDir: process.cwd(),
+  optimizeDeps: {
+    exclude: ['gray-matter', 'glob'],
+  },
   ssr: {
-    noExternal: ['fast-glob'],
+    noExternal: ['gray-matter', 'glob'],
+  },
+  define: {
+    'process.env.NODE_ENV': '"production"',
   },
 });

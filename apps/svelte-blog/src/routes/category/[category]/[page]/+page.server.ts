@@ -8,8 +8,6 @@ export const load = (async ({ params }) => {
 
   // カテゴリーでフィルタリングして全記事を取得
   const { posts: allPosts } = await getPosts({
-    sort: 'publishedAt',
-    includeDrafts: false,
     category,
   });
 

@@ -1,34 +1,20 @@
-// src/loaders/directory-loader.ts
-import { glob } from 'fast-glob';
-import type { PostMeta, PostHTML, ProcessorOptions, ListOptions } from '../types';
+import { glob } from 'glob';
+import path from 'path';
+import type { PostMeta, PostHTML, ProcessorOptions } from '../types';
+import type { ListOptions } from '../types/core/options';
 import { loadFile } from './file-loader';
 import { FileNotFoundError } from '../types/errors/file-errors';
 
-export interface DirectoryLoaderOptions extends ProcessorOptions, ListOptions {
-  /**
-   * 検索対象のディレクトリ
-   * @default process.cwd()
-   */
-  cwd?: string;
+/**
+ * コンテンツディレクトリのパス
+ * プロジェクトルートからの相対パス
+ */
+const CONTENT_DIR = path.resolve(process.cwd(), '../../content/blog');
 
-  /**
-   * ファイルパターン
-   * @default '**\/*.{md,mdx}'
-   */
-  pattern?: string;
-
-  /**
-   * 無視するディレクトリパターン
-   * @default ['node_modules', '.git', 'dist', 'build']
-   */
-  ignore?: string[];
-
-  /**
-   * 再帰的に検索するか
-   * @default true
-   */
-  recursive?: boolean;
-}
+/**
+ * デフォルトのファイルパターン
+ */
+const DEFAULT_PATTERN = '**/*.{md,mdx}';
 
 export interface DirectoryLoaderResult extends PostHTML {
   /** ファイルパス */
@@ -36,72 +22,57 @@ export interface DirectoryLoaderResult extends PostHTML {
 }
 
 /**
- * ディレクトリからマークダウンファイルを検索して読み込む
- * @param options オプション
- * @returns 読み込まれたコンテンツとメタデータの配列
+ * ディレクトリからマークダウンファイルを読み込む
  */
 export async function loadDirectory(
-  options: DirectoryLoaderOptions = {}
+  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
 ): Promise<DirectoryLoaderResult[]> {
-  const {
-    cwd = process.cwd(),
-    pattern = '**/*.{md,mdx}',
-    ignore = ['node_modules', '.git', 'dist', 'build'],
-    recursive = true,
-    ...processorOptions
-  } = options;
+  const { ...processorOptions } = options;
 
-  // ファイルの検索
-  const files = await glob(pattern, {
-    cwd,
-    ignore,
-    onlyFiles: true,
-    absolute: false,
-    caseSensitiveMatch: false,
-    dot: false,
-    unique: true,
-    followSymbolicLinks: false,
-    deep: recursive ? undefined : 1,
-  });
+  // クライアントサイドでは空配列を返す
+  if (typeof window !== 'undefined') {
+    return [];
+  }
 
-  // ファイルの読み込み
-  const results = await Promise.allSettled(
-    files.map(async (file) => {
-      const result = await loadFile(file, { cwd, ...processorOptions });
-      return {
-        ...result,
-        path: file,
-      };
-    })
-  );
+  try {
+    // ファイルの検索
+    const files = await glob(DEFAULT_PATTERN, {
+      cwd: CONTENT_DIR,
+      nodir: true,
+      absolute: true,
+      dot: false,
+      follow: false,
+    });
 
-  // エラーを無視して成功した結果のみを返す
-  return results
-    .filter(
-      (result): result is PromiseFulfilledResult<DirectoryLoaderResult> =>
-        result.status === 'fulfilled'
-    )
-    .map((result) => result.value);
+    // ファイルの読み込み
+    const results = await Promise.all(
+      files.map(async (file) => {
+        const result = await loadFile(file, { ...processorOptions });
+        return { ...result, path: file };
+      })
+    );
+
+    return results;
+  } catch (error) {
+    console.error('Error loading directory:', error);
+    throw error;
+  }
 }
 
 /**
  * スラッグで記事を検索する
- * @param slug 検索するスラッグ
- * @param options オプション
- * @returns 見つかった記事のコンテンツとメタデータ
- * @throws {FileNotFoundError} 記事が見つからない場合
  */
-export async function findPostBySlug(
+export async function getPostBySlug(
   slug: string,
-  options: Omit<DirectoryLoaderOptions, 'pattern'> = {}
+  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
 ): Promise<DirectoryLoaderResult> {
   const posts = await loadDirectory({
     ...options,
-    pattern: '**/*.{md,mdx}',
+    filter: (post) => !post.meta.draft && post.meta.slug === slug,
   });
 
-  // スラッグが完全一致する記事を検索
-  const post = posts.find((post) => post.meta.slug === slug);
+  // フィルタリング済みの最初の記事を取得
+  const post = posts[0];
   if (!post) {
     throw new FileNotFoundError(`File not found with slug: ${slug}`);
   }
@@ -109,90 +80,76 @@ export async function findPostBySlug(
 }
 
 /**
- * 指定されたパターンに一致するMarkdownファイルからメタデータ一覧を取得
- * @param globPattern globパターン（単一または配列）
- * @param options オプション
- * @returns メタデータ一覧
+ * 公開済みの記事一覧を取得する
  */
 export async function getAllPosts(
-  globPattern: string | string[],
-  options: Omit<DirectoryLoaderOptions, 'pattern'> = {}
+  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
 ): Promise<PostMeta[]> {
-  // デフォルト値の設定
-  const {
-    page = 1,
-    perPage = 20,
-    sort = 'publishedAt',
-    filter = () => true,
-    cwd = process.cwd(),
-    includeDrafts = false,
-  } = options;
-  const patterns = Array.isArray(globPattern) ? globPattern : [globPattern];
-  const posts = await Promise.all(
-    patterns.map((pattern) =>
-      loadDirectory({
-        ...options,
-        pattern,
-      })
-    )
-  );
-
-  // 結果をフラット化
-  const allPosts = posts.flat();
-
-  // メタデータに変換してからフィルタリング
-  const postMetas = allPosts.map(post => ({
-    meta: {
-      ...post.meta,
-      // 必要に応じて追加のメタデータをマッピング
-    }
-  }));
-
-  // ドラフトを除外
-  const publishedPosts = includeDrafts 
-    ? postMetas 
-    : postMetas.filter(post => !post.meta.draft);
-
-  // カスタムフィルタを適用
-  const filteredPosts = publishedPosts.filter(post => filter(post.meta));
-
-  // ソート
-  const sortedPosts = sort === 'title'
-    ? [...filteredPosts].sort((a, b) => a.meta.title.localeCompare(b.meta.title))
-    : sortPostsByDate(filteredPosts, sort === 'publishedAt' ? 'desc' : 'asc');
-
-  // ページネーション
-  const startIndex = (page - 1) * perPage;
-  const endIndex = startIndex + perPage;
-
-  return sortedPosts.slice(startIndex, endIndex).map(post => post.meta);
-}
-
-/**
- * 指定されたslugに一致するMarkdownファイルを処理してHTMLとメタデータを返す
- * @param slug ファイル名（拡張子なし）
- * @param baseDir 基準ディレクトリ
- * @param options 処理オプション
- * @returns HTML文字列とメタデータ
- */
-export async function getPostBySlug(
-  slug: string,
-  baseDir: string,
-  options: ProcessorOptions = {}
-): Promise<PostHTML> {
-  return findPostBySlug(slug, {
+  const posts = await loadDirectory({
     ...options,
-    cwd: baseDir,
+    filter: (post) => !post.meta.draft,
   });
+
+  const sortedPosts = sortPostsByDate(posts);
+  return sortedPosts.map((post) => post.meta);
 }
 
 /**
- * ポストを公開日でソートする
- * @param posts ソートするポストの配列
- * @param order ソート順 ('asc' | 'desc')
- * @returns ソートされたポストの配列
+ * タグを正規化する
+ * - 前後の空白を削除
+ * - 大文字小文字を統一（小文字に変換）
  */
-export function sortPostsByDate<T extends { meta: { publishedAt: string } }>(
+export function normalizeTag(tag: string, filePath?: string): string {
+  if (typeof tag !== 'string') {
+    console.error('Invalid tag type:', { tag, type: typeof tag, filePath });
+    throw new Error(`Tag must be a string, got ${typeof tag} in file: ${filePath}`);
+  }
+  return tag.trim().toLowerCase();
+}
+
+/**
+ * タグをURLセーフな形式に変換する
+ * - スペースをハイフンに置換
+ * - 特殊文字を削除
+ */
+export function slugifyTag(tag: string): string {
+  return tag
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '') // 英数字、ハイフン、アンダースコア、スペース以外を削除
+    .trim()
+    .replace(/\s+/g, '-') // スペースをハイフンに置換
+    .replace(/-+/g, '-'); // 連続するハイフンを1つに
+}
+
+/**
+ * タグで記事をフィルタリングする
+ */
+export async function getPostsByTag(
+  tag: string,
+  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
+): Promise<PostMeta[]> {
+  const normalizedTag = normalizeTag(tag);
+  const posts = await loadDirectory({
+    ...options,
+    filter: (post) => {
+      if (post.meta.draft) return false;
+      // タグが文字列の配列であることを確認
+      if (!Array.isArray(post.meta.tags)) return false;
+      return post.meta.tags.some((t) => {
+        // タグが文字列でない場合はスキップ
+        if (typeof t !== 'string') return false;
+        return normalizeTag(t, post.path) === normalizedTag;
+      });
+    },
+  });
+
+  return sortPostsByDate(posts).map((post) => post.meta);
+}
+
+/**
+ * 記事を日付でソートする
+ */
+function sortPostsByDate<T extends { meta: { publishedAt: string } }>(
   posts: T[],
   order: 'asc' | 'desc' = 'desc'
 ): T[] {
@@ -201,14 +158,4 @@ export function sortPostsByDate<T extends { meta: { publishedAt: string } }>(
     const dateB = new Date(b.meta.publishedAt).getTime();
     return order === 'asc' ? dateA - dateB : dateB - dateA;
   });
-}
-
-/**
- * ポストをフィルタリングする
- * @param posts フィルタリングするポストの配列
- * @param predicate フィルタリング関数
- * @returns フィルタリングされたポストの配列
- */
-export function filterPosts<T>(posts: T[], predicate: (post: T) => boolean): T[] {
-  return posts.filter(predicate);
 }

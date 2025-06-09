@@ -18,8 +18,7 @@
   },
   "dependencies": {
     "@estrivault/cloudinary-utils": "workspace:*",
-    "fast-glob": "^3.3.3",
-    "glob": "^11.0.2",
+    "glob": "11.0.2",
     "gray-matter": "^4.0.3",
     "hast-util-sanitize": "^5.0.2",
     "mdast": "^3.0.0",

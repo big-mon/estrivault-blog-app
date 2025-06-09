@@ -40,11 +40,22 @@ function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''
  */
 export async function loadFile(filePath: string, options: LoadFileOptions = {}): Promise<PostHTML> {
   const resolvedPath = resolve(options.cwd || process.cwd(), filePath);
+  let data: Record<string, any> = {};
+  let markdown = '';
 
   try {
-    // ファイルを読み込む
     const content = await readFile(resolvedPath, 'utf-8');
-    const { data, content: markdown } = matter(content);
+    
+    try {
+      const parsed = matter(content);
+      data = parsed.data || {};
+      markdown = parsed.content;
+    } catch (parseError) {
+      throw new MarkdownParseError(`フロントマターのパースに失敗しました: ${resolvedPath}`, { 
+        cause: parseError instanceof Error ? parseError : new Error(String(parseError)),
+        context: { filePath: resolvedPath }
+      });
+    }
 
     // 必須フィールドの検証
     if (!data.title) {
@@ -59,6 +70,14 @@ export async function loadFile(filePath: string, options: LoadFileOptions = {}):
     const result = await pipeline.process(markdown);
     const html = String(result);
 
+    // タグを検証して正規化
+    const tags = Array.isArray(data.tags) 
+      ? data.tags
+          .filter((tag): tag is string => typeof tag === 'string')
+          .map(tag => tag.trim())
+          .filter(tag => tag.length > 0)
+      : [];
+
     // メタデータの構築
     const meta: PostMeta = {
       slug: data.slug || filePath.replace(/\.(md|mdx)$/, ''),
@@ -67,7 +86,7 @@ export async function loadFile(filePath: string, options: LoadFileOptions = {}):
       publishedAt: data.publishedAt || new Date().toISOString(),
       updatedAt: data.updatedAt || data.publishedAt || new Date().toISOString(),
       category: data.category || '',
-      tags: Array.isArray(data.tags) ? data.tags : [],
+      tags,
       coverImage: resolveCoverImage(data.coverImage, options.cloudinaryCloudName),
       draft: data.draft || false,
       readingTime: Math.ceil(stats.minutes),
