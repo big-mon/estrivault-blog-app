@@ -24,7 +24,7 @@ export interface DirectoryLoaderResult extends PostHTML {
 /**
  * ディレクトリからマークダウンファイルを読み込む
  */
-async function loadDirectory(
+export async function loadDirectory(
   options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
 ): Promise<DirectoryLoaderResult[]> {
   const { ...processorOptions } = options;
@@ -95,19 +95,55 @@ export async function getAllPosts(
 }
 
 /**
+ * タグを正規化する
+ * - 前後の空白を削除
+ * - 大文字小文字を統一（小文字に変換）
+ */
+export function normalizeTag(tag: string, filePath?: string): string {
+  if (typeof tag !== 'string') {
+    console.error('Invalid tag type:', { tag, type: typeof tag, filePath });
+    throw new Error(`Tag must be a string, got ${typeof tag} in file: ${filePath}`);
+  }
+  return tag.trim().toLowerCase();
+}
+
+/**
+ * タグをURLセーフな形式に変換する
+ * - スペースをハイフンに置換
+ * - 特殊文字を削除
+ */
+export function slugifyTag(tag: string): string {
+  return tag
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '') // 英数字、ハイフン、アンダースコア、スペース以外を削除
+    .trim()
+    .replace(/\s+/g, '-') // スペースをハイフンに置換
+    .replace(/-+/g, '-'); // 連続するハイフンを1つに
+}
+
+/**
  * タグで記事をフィルタリングする
  */
 export async function getPostsByTag(
   tag: string,
   options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
 ): Promise<PostMeta[]> {
+  const normalizedTag = normalizeTag(tag);
   const posts = await loadDirectory({
     ...options,
-    filter: (post) => !post.meta.draft && post.meta.tags?.includes(tag),
+    filter: (post) => {
+      if (post.meta.draft) return false;
+      // タグが文字列の配列であることを確認
+      if (!Array.isArray(post.meta.tags)) return false;
+      return post.meta.tags.some((t) => {
+        // タグが文字列でない場合はスキップ
+        if (typeof t !== 'string') return false;
+        return normalizeTag(t, post.path) === normalizedTag;
+      });
+    },
   });
 
-  const sortedPosts = sortPostsByDate(posts);
-  return sortedPosts.map((post) => post.meta);
+  return sortPostsByDate(posts).map((post) => post.meta);
 }
 
 /**

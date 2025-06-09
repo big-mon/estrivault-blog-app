@@ -70,6 +70,14 @@ export async function loadFile(filePath: string, options: LoadFileOptions = {}):
     const result = await pipeline.process(markdown);
     const html = String(result);
 
+    // タグを検証して正規化
+    const tags = Array.isArray(data.tags) 
+      ? data.tags
+          .filter((tag): tag is string => typeof tag === 'string')
+          .map(tag => tag.trim())
+          .filter(tag => tag.length > 0)
+      : [];
+
     // メタデータの構築
     const meta: PostMeta = {
       slug: data.slug || filePath.replace(/\.(md|mdx)$/, ''),
@@ -78,7 +86,7 @@ export async function loadFile(filePath: string, options: LoadFileOptions = {}):
       publishedAt: data.publishedAt || new Date().toISOString(),
       updatedAt: data.updatedAt || data.publishedAt || new Date().toISOString(),
       category: data.category || '',
-      tags: Array.isArray(data.tags) ? data.tags : [],
+      tags,
       coverImage: resolveCoverImage(data.coverImage, options.cloudinaryCloudName),
       draft: data.draft || false,
       readingTime: Math.ceil(stats.minutes),

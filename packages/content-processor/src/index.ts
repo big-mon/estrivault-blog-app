@@ -1,4 +1,8 @@
-export * from './loaders/file-loader';
-export * from './loaders/directory-loader';
+// ローダー
+export * from './loaders';
+
+// 型
 export * from './types';
+
+// パイプライン
 export { createPipeline } from './pipeline/pipeline';

@@ -1,8 +1,10 @@
 import {
   getAllPosts,
   getPostBySlug as getPostBySlugFromProcessor,
+  getPostsByTag as getPostsByTagFromProcessor,
   type PostMeta,
   type PostHTML,
+  normalizeTag,
 } from '@estrivault/content-processor';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
 
@@ -42,7 +44,7 @@ export async function getPosts(options?: {
 
     // 記事一覧を取得
     const allPosts = await getAllPosts({
-      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME
+      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
     });
 
     // フィルタリングとソートを適用
@@ -79,7 +81,7 @@ export async function getPosts(options?: {
 export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
   try {
     const post = await getPostBySlugFromProcessor(slug, {
-      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME
+      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
     });
     return post;
   } catch (err) {
@@ -89,37 +91,12 @@ export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
 }
 
 /**
- * タグを正規化する
- * - 前後の空白を削除
- * - 大文字小文字を統一（小文字に変換）
+ * タグに基づいて記事を取得
+ * @param tag タグのスラッグ
+ * @returns タグに一致する記事のメタデータの配列
  */
-function normalizeTag(tag: string): string {
-  return tag.trim().toLowerCase();
-}
-
-/**
- * すべてのユニークなタグを取得
- */
-export async function getAllTags(): Promise<string[]> {
-  try {
-    const allPosts = await getAllPosts({
-      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
-    });
-
-    const tags = new Set<string>();
-
-    allPosts.forEach((post) => {
-      // PostMeta 型に直接 tags プロパティがあると仮定
-      const postWithTags = post as PostMeta & { tags?: string[] };
-      if (postWithTags.tags && Array.isArray(postWithTags.tags)) {
-        postWithTags.tags.map((tag) => normalizeTag(tag)).forEach((tag) => tags.add(tag));
-      }
-    });
-
-    // アルファベット順にソートして返す
-    return Array.from(tags).sort((a, b) => a.localeCompare(b));
-  } catch (err) {
-    console.error('Failed to get all tags:', err);
-    return [];
-  }
+export async function getPostsByTag(tag: string): Promise<PostMeta[]> {
+  return await getPostsByTagFromProcessor(tag, {
+    cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
+  });
 }

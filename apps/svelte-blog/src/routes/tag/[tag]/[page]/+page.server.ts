@@ -1,34 +1,6 @@
-import { getPosts, getAllTags } from '$lib';
+import { getPosts } from '$lib';
 import { POSTS_PER_PAGE } from '$constants';
-import type { PageServerLoad, EntryGenerator } from './$types';
-
-export const entries: EntryGenerator = async () => {
-  const tags = await getAllTags();
-
-  const allEntries = [];
-
-  for (const tag of tags) {
-    // タグごとの記事数を取得
-    const { total } = await getPosts({
-      tag,
-      includeDrafts: false,
-    });
-
-    // ページ数を計算
-    const totalPages = Math.ceil(total / POSTS_PER_PAGE);
-
-    // 各ページのエントリを生成
-    const tagEntries = [];
-    for (let page = 1; page <= totalPages; page++) {
-      const entry = { tag, page: page.toString() };
-      tagEntries.push(entry);
-    }
-
-    allEntries.push(...tagEntries);
-  }
-
-  return allEntries;
-};
+import type { PageServerLoad } from './$types';
 
 export const load = (async ({ params }) => {
   const { tag, page: pageParam } = params;
@@ -36,8 +8,6 @@ export const load = (async ({ params }) => {
 
   // タグでフィルタリングして全記事を取得
   const { posts: allPosts } = await getPosts({
-    sort: 'publishedAt',
-    includeDrafts: false,
     tag,
   });
 
