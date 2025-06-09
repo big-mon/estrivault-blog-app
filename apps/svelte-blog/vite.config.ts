@@ -6,6 +6,12 @@ export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
   envDir: process.cwd(),
   optimizeDeps: {
-    exclude: ['fast-glob'],
+    exclude: ['gray-matter', 'glob'],
+  },
+  ssr: {
+    noExternal: ['gray-matter', 'glob'],
+  },
+  define: {
+    'process.env.NODE_ENV': '"production"',
   },
 });

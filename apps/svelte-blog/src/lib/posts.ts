@@ -1,14 +1,10 @@
 import {
   getAllPosts,
-  getPostBySlug as getPostContent,
+  getPostBySlug as getPostBySlugFromProcessor,
   type PostMeta,
   type PostHTML,
 } from '@estrivault/content-processor';
-import path from 'path';
-import { PUBLIC_CLOUDINARY_CLOUD_NAME as cloudNameFromEnv } from '$env/static/public';
-
-// コンテンツディレクトリのパス
-const CONTENT_DIR = path.resolve(process.cwd(), '../../content/blog');
+import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
 
 /**
  * すべての記事メタデータを取得
@@ -16,8 +12,6 @@ const CONTENT_DIR = path.resolve(process.cwd(), '../../content/blog');
 export async function getPosts(options?: {
   page?: number;
   perPage?: number;
-  sort?: 'publishedAt' | 'title';
-  includeDrafts?: boolean;
   category?: string;
   tag?: string;
 }): Promise<{
@@ -31,15 +25,9 @@ export async function getPosts(options?: {
     // デフォルトオプション
     const page = options?.page || 1;
     const perPage = options?.perPage || 20;
-    const sort = options?.sort || 'publishedAt';
-    const includeDrafts = options?.includeDrafts || false;
 
     // フィルター関数
     const filter = (post: PostMeta) => {
-      // 下書きを除外（includeDraftsがtrueの場合は含める）
-      if (!includeDrafts && post.draft) {
-        return false;
-      }
       // カテゴリーが指定されている場合はフィルタリング（大文字小文字を区別しない）
       if (options?.category && post.category?.toLowerCase() !== options.category.toLowerCase()) {
         return false;
@@ -53,23 +41,26 @@ export async function getPosts(options?: {
     };
 
     // 記事一覧を取得（サブディレクトリも再帰的に検索）
-    const allPosts = await getAllPosts(['**/*.md', '**/*.mdx'], {
-      cwd: CONTENT_DIR,
-      page,
-      perPage,
-      sort,
-      filter,
-      cloudinaryCloudName: cloudNameFromEnv,
+    const allPosts = await getAllPosts({
+      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
     });
 
+    // フィルタリングとソートを適用
+    const filteredPosts = allPosts.filter(filter);
+
+    // ページネーションを適用
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
+    const paginatedPosts = filteredPosts.slice(start, end);
+
     // Postインターフェースに変換
-    const posts = allPosts.map((post) => ({
+    const posts = paginatedPosts.map((post) => ({
       ...post,
     }));
 
     return {
       posts,
-      total: posts.length,
+      total: filteredPosts.length, // フィルタリング後の全件数を返す
       page,
       perPage,
       totalPages: Math.ceil(posts.length / perPage),
@@ -87,19 +78,13 @@ export async function getPosts(options?: {
  */
 export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
   try {
-    // 記事のHTMLコンテンツを取得（baseDir とオプションを分けて渡す）
-    const post = await getPostContent(slug, CONTENT_DIR, {
-      cloudinaryCloudName: cloudNameFromEnv,
+    const post = await getPostBySlugFromProcessor(slug, {
+      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
     });
-
-    if (!post) {
-      return null;
-    }
-
     return post;
   } catch (err) {
     console.error('記事の取得中にエラーが発生しました:', err);
-    throw new Error('記事の取得中にエラーが発生しました');
+    return null;
   }
 }
 
@@ -117,15 +102,8 @@ function normalizeTag(tag: string): string {
  */
 export async function getAllTags(): Promise<string[]> {
   try {
-    // 正しい glob パターンを使用
-    const allPosts = await getAllPosts(['**/*.md', '**/*.mdx'], {
-      cwd: CONTENT_DIR,
-      includeDrafts: false, // ドラフトは含めない
-      sort: 'publishedAt',
-      filter: (post) => {
-        const include = !post.draft;
-        return include;
-      },
+    const allPosts = await getAllPosts({
+      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
     });
 
     const tags = new Set<string>();
@@ -134,10 +112,7 @@ export async function getAllTags(): Promise<string[]> {
       // PostMeta 型に直接 tags プロパティがあると仮定
       const postWithTags = post as PostMeta & { tags?: string[] };
       if (postWithTags.tags && Array.isArray(postWithTags.tags)) {
-        postWithTags.tags
-          .map((tag) => normalizeTag(tag))
-          .filter((tag) => tag.length > 0) // 空のタグを除外
-          .forEach((tag) => tags.add(tag));
+        postWithTags.tags.map((tag) => normalizeTag(tag)).forEach((tag) => tags.add(tag));
       }
     });
 
