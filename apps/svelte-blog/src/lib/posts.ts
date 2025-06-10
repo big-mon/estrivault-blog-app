@@ -2,12 +2,11 @@ import {
   getPosts as getPostsFromProcessor,
   getPostBySlug as getPostBySlugFromProcessor,
   getPostsByTag as getPostsByTagFromProcessor,
-  loadFile,
   type PostMeta,
   type PostHTML,
-  normalizeTag,
 } from '@estrivault/content-processor';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
+import { loadFile } from '@estrivault/content-processor';
 
 /**
  * すべての記事メタデータを取得
@@ -49,23 +48,16 @@ export async function getPosts(options?: {
     });
 
     // DirectoryLoadedItem[] → PostMeta[] へ変換し、フィルタ適用
-    const filteredPosts = allPostsObj.posts
-      .map(item => item.meta)
-      .filter(filter);
+    const filteredPosts = allPostsObj.posts.map((item) => item.meta).filter(filter);
 
     // ページネーションを適用
     const start = (page - 1) * perPage;
     const end = start + perPage;
     const paginatedPosts = filteredPosts.slice(start, end);
 
-    // Postインターフェースに変換
-    const posts = paginatedPosts.map((post) => ({
-      ...post,
-    }));
-
     return {
-      posts,
-      total: filteredPosts.length, // フィルタリング後の全件数を返す
+      posts: filteredPosts, // PostMeta[] 型で返す
+      total: filteredPosts.length,
       page,
       perPage,
       totalPages: Math.ceil(filteredPosts.length / perPage),
