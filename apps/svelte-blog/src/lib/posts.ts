@@ -1,10 +1,9 @@
 import {
-  getAllPosts,
+  getPosts as getPostsFromProcessor,
   getPostBySlug as getPostBySlugFromProcessor,
   getPostsByTag as getPostsByTagFromProcessor,
   type PostMeta,
   type PostHTML,
-  normalizeTag,
 } from '@estrivault/content-processor';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
 
@@ -36,14 +35,14 @@ export async function getPosts(options?: {
       }
       // タグが指定されている場合はフィルタリング（大文字小文字を区別せず、前後の空白も無視）
       if (options?.tag) {
-        const targetTag = normalizeTag(options.tag);
-        return post.tags?.some((tag) => normalizeTag(tag) === targetTag) ?? false;
+        const targetTag = options.tag;
+        return post.tags?.some((tag) => tag === targetTag) ?? false;
       }
       return true;
     };
 
     // 記事一覧を取得
-    const allPosts = await getAllPosts({
+    const allPosts = await getPostsFromProcessor({
       cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
     });
 
