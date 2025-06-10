@@ -9,7 +9,7 @@ export default defineConfig({
     exclude: ['gray-matter', 'glob'],
   },
   ssr: {
-    noExternal: ['gray-matter', 'glob'],
+    noExternal: ['glob'],
   },
   define: {
     'process.env.NODE_ENV': '"production"',
