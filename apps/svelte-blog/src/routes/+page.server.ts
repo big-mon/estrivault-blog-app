@@ -12,6 +12,7 @@ export const load = (async () => {
     page,
     perPage,
   });
+  console.log('posts', posts);
 
   return {
     posts,

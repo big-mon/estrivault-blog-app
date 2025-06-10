@@ -1,12 +1,8 @@
 import path from 'path';
-import { FileNotFoundError } from '../errors';
-import type {
-  DirectoryLoaderResult,
-  DirectoryLoadedItem,
-  ListOptions,
-  ProcessorOptions,
-} from '../types';
-import { loadDirectory } from './load-directory';
+import fs from 'node:fs';
+import matter from 'gray-matter';
+import type { DirectoryLoaderResult, ListOptions, ProcessorOptions } from '../types';
+import type { PostMeta } from '../types/post';
 
 /**
  * プロジェクトルートからの相対パス
@@ -28,15 +24,48 @@ export async function getPosts(
   try {
     const page = options.page || 1;
     const perPage = options.perPage || 20;
-    const allPosts = loadDirectory({
-      ...options,
-      pattern: DEFAULT_PATTERN,
-    }) as DirectoryLoadedItem[];
-    const filteredPosts = allPosts.filter((post) => !post.meta.draft);
+    const baseDir = options.baseDir || path.resolve(process.cwd(), '../../content/blog');
+    const posts: PostMeta[] = [];
+
+    // 再帰的にmdファイルを探索
+    function walk(dir: string) {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          walk(fullPath);
+        } else if (entry.isFile() && /\.(md|mdx)$/.test(entry.name)) {
+          const raw = fs.readFileSync(fullPath, 'utf-8');
+          const { data } = matter(raw);
+          // デバッグ: data内容確認
+          console.log('data:', data);
+          if (data.draft) continue;
+          if (!data.title || !data.slug || !data.publishedAt) continue;
+          const post = {
+            title: data.title,
+            slug: data.slug,
+            description: data.description || '',
+            coverImage: data.coverImage || '',
+            category: data.category || '',
+            tags: Array.isArray(data.tags) ? data.tags : [],
+            publishedAt: data.publishedAt,
+            updatedAt: data.updatedAt,
+            readingTime: data.readingTime,
+          };
+          console.log('pushing post:', post);
+          posts.push(post);
+        }
+      }
+    }
+    walk(baseDir);
+
+    // 並び替え（新しい順）
+    posts.sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
+    const filteredPosts = posts; // 追加のフィルタがあればここで適用
     const paginatedPosts = filteredPosts.slice((page - 1) * perPage, page * perPage);
     return {
       posts: paginatedPosts,
-      total: filteredPosts.length, // フィルタリング後の全件数を返す
+      total: filteredPosts.length,
       page,
       perPage,
       totalPages: Math.ceil(filteredPosts.length / perPage),
@@ -54,28 +83,40 @@ export async function getPosts(
  */
 export async function getPostBySlug(
   slug: string,
-  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
-): Promise<DirectoryLoadedItem | undefined> {
-  // 調査用: slug比較ログ
-  console.log('getPostBySlug called with:', slug);
-
-  // 正しいfilterを適用
-  const posts = loadDirectory({
-    ...options,
-    filter: (post: DirectoryLoadedItem) => !post.meta.draft && post.meta.slug === slug,
-  }) as DirectoryLoadedItem[];
-
-  // フィルタリング済みの最初の記事を取得
-  console.log(
-    'filtered posts:',
-    posts.map((p) => p.meta.slug)
-  );
-  console.log('filtered posts (full object):', posts);
-  const post = posts[0];
-  if (!post) {
-    throw new FileNotFoundError(`File not found with slug: ${slug}`);
+  options: ProcessorOptions & ListOptions = {}
+): Promise<PostMeta | undefined> {
+  const baseDir = options.baseDir || path.resolve(process.cwd(), '../../content/blog');
+  let found: PostMeta | undefined = undefined;
+  function walk(dir: string) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+      } else if (entry.isFile() && /\.(md|mdx)$/.test(entry.name)) {
+        const raw = fs.readFileSync(fullPath, 'utf-8');
+        const { data } = matter(raw);
+        if (data.draft) continue;
+        if (!data.title || !data.slug || !data.publishedAt) continue;
+        if (data.slug === slug) {
+          found = {
+            title: data.title,
+            slug: data.slug,
+            description: data.description || '',
+            coverImage: data.coverImage || '',
+            category: data.category || '',
+            tags: Array.isArray(data.tags) ? data.tags : [],
+            publishedAt: data.publishedAt,
+            updatedAt: data.updatedAt,
+            readingTime: data.readingTime,
+          };
+          return;
+        }
+      }
+    }
   }
-  return post;
+  walk(baseDir);
+  return found;
 }
 
 /**
@@ -85,19 +126,39 @@ export async function getPostBySlug(
  */
 export async function getPostsByTag(
   tag: string,
-  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
-) {
-  try {
-    const allPosts = loadDirectory({
-      ...options,
-      pattern: DEFAULT_PATTERN,
-    }) as DirectoryLoadedItem[];
-    const filteredPosts = allPosts.filter(
-      (post) => !post.meta.draft && Array.isArray(post.meta.tags) && post.meta.tags.includes(tag)
-    );
-    return filteredPosts;
-  } catch (err) {
-    console.error('Failed to get posts by tag:', err);
-    throw new Error('Failed to get posts by tag');
+  options: ProcessorOptions & ListOptions = {}
+): Promise<PostMeta[]> {
+  const baseDir = options.baseDir || path.resolve(process.cwd(), '../../content/blog');
+  const posts: PostMeta[] = [];
+  function walk(dir: string) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+      } else if (entry.isFile() && /\.(md|mdx)$/.test(entry.name)) {
+        const raw = fs.readFileSync(fullPath, 'utf-8');
+        const { data } = matter(raw);
+        if (data.draft) continue;
+        if (!data.title || !data.slug || !data.publishedAt) continue;
+        if (Array.isArray(data.tags) && data.tags.includes(tag)) {
+          posts.push({
+            title: data.title,
+            slug: data.slug,
+            description: data.description || '',
+            coverImage: data.coverImage || '',
+            category: data.category || '',
+            tags: data.tags,
+            publishedAt: data.publishedAt,
+            updatedAt: data.updatedAt,
+            readingTime: data.readingTime,
+          });
+        }
+      }
+    }
   }
+  walk(baseDir);
+  // 新しい順にソート
+  posts.sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
+  return posts;
 }

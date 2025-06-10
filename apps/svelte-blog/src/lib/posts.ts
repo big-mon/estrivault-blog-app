@@ -47,8 +47,8 @@ export async function getPosts(options?: {
       cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
     });
 
-    // DirectoryLoadedItem[] → PostMeta[] へ変換し、フィルタ適用
-    const filteredPosts = allPostsObj.posts.map((item) => item.meta).filter(filter);
+    // PostMeta[] へフィルタ適用
+    const filteredPosts = allPostsObj.posts.filter(filter);
 
     return {
       posts: filteredPosts, // PostMeta[] 型で返す
@@ -93,5 +93,5 @@ export async function getPostsByTag(tag: string): Promise<PostMeta[]> {
   const items = await getPostsByTagFromProcessor(tag, {
     cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
   });
-  return items.map(item => item.meta);
+  return items.map((item) => item.meta);
 }
