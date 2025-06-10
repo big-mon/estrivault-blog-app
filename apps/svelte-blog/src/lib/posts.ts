@@ -2,8 +2,10 @@ import {
   getPosts as getPostsFromProcessor,
   getPostBySlug as getPostBySlugFromProcessor,
   getPostsByTag as getPostsByTagFromProcessor,
+  loadFile,
   type PostMeta,
   type PostHTML,
+  normalizeTag,
 } from '@estrivault/content-processor';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
 
@@ -42,12 +44,14 @@ export async function getPosts(options?: {
     };
 
     // 記事一覧を取得
-    const allPosts = await getPostsFromProcessor({
+    const allPostsObj = await getPostsFromProcessor({
       cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
     });
 
-    // フィルタリングとソートを適用
-    const filteredPosts = allPosts.filter(filter);
+    // DirectoryLoadedItem[] → PostMeta[] へ変換し、フィルタ適用
+    const filteredPosts = allPostsObj.posts
+      .map(item => item.meta)
+      .filter(filter);
 
     // ページネーションを適用
     const start = (page - 1) * perPage;
@@ -79,7 +83,11 @@ export async function getPosts(options?: {
  */
 export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
   try {
-    const post = await getPostBySlugFromProcessor(slug, {
+    const item = await getPostBySlugFromProcessor(slug, {
+      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
+    });
+    if (!item) return null;
+    const post = await loadFile(item.filePath, {
       cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
     });
     return post;
