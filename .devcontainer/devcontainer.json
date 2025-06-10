@@ -1,0 +1,17 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu24.04",
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:latest": {},
+    "ghcr.io/devcontainers-community/npm-features/typescript:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "[json][jsonc][jsonl]": {
+          "editor.defaultFormatter": "vscode.json-language-features",
+          "editor.formatOnSave": true
+        }
+      }
+    }
+  }
+}
