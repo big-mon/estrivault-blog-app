@@ -50,11 +50,6 @@ export async function getPosts(options?: {
     // DirectoryLoadedItem[] → PostMeta[] へ変換し、フィルタ適用
     const filteredPosts = allPostsObj.posts.map((item) => item.meta).filter(filter);
 
-    // ページネーションを適用
-    const start = (page - 1) * perPage;
-    const end = start + perPage;
-    const paginatedPosts = filteredPosts.slice(start, end);
-
     return {
       posts: filteredPosts, // PostMeta[] 型で返す
       total: filteredPosts.length,
@@ -95,7 +90,8 @@ export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
  * @returns タグに一致する記事のメタデータの配列
  */
 export async function getPostsByTag(tag: string): Promise<PostMeta[]> {
-  return await getPostsByTagFromProcessor(tag, {
+  const items = await getPostsByTagFromProcessor(tag, {
     cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
   });
+  return items.map(item => item.meta);
 }
