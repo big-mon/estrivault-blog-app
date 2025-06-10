@@ -23,11 +23,8 @@ export async function getPosts(options: ProcessorOptions & ListOptions<Directory
   try {
     const page = options.page || 1;
     const perPage = options.perPage || 20;
-    const allPosts = await loadDirectory({
-      ...options,
-      pattern: DEFAULT_PATTERN,
-    });
-    const filteredPosts = allPosts.filter((post) => !post.meta.draft);
+    const allPosts = (loadDirectory({ ...options, pattern: DEFAULT_PATTERN } as any) as any[]);
+    const filteredPosts = allPosts.filter((post: any) => !post.meta.draft);
     const paginatedPosts = filteredPosts.slice((page - 1) * perPage, page * perPage);
     return {
       posts: paginatedPosts,
@@ -55,13 +52,10 @@ export async function getPostBySlug(
   console.log('getPostBySlug called with:', slug);
 
   // 正しいfilterを適用
-  const posts = await loadDirectory({
-    ...options,
-    filter: (post) => !post.meta.draft && post.meta.slug === slug,
-  });
+  const posts = (loadDirectory({ ...options, filter: (post: any) => !post.meta.draft && post.meta.slug === slug } as any) as any[]);
 
   // フィルタリング済みの最初の記事を取得
-  console.log('filtered posts:', posts.map(p => p.meta.slug));
+  console.log('filtered posts:', posts.map((p: any) => p.meta.slug));
   console.log('filtered posts (full object):', posts);
   const post = posts[0];
   if (!post) {
@@ -80,12 +74,9 @@ export async function getPostsByTag(
   options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
 ) {
   try {
-    const allPosts = await loadDirectory({
-      ...options,
-      pattern: DEFAULT_PATTERN,
-    });
+    const allPosts = (loadDirectory({ ...options, pattern: DEFAULT_PATTERN } as any) as any[]);
     const filteredPosts = allPosts.filter(
-      (post) => !post.meta.draft && Array.isArray(post.meta.tags) && post.meta.tags.includes(tag)
+      (post: any) => !post.meta.draft && Array.isArray(post.meta.tags) && post.meta.tags.includes(tag)
     );
     return filteredPosts;
   } catch (err) {
