@@ -1,7 +1,12 @@
-import fs from 'fs';
 import path from 'path';
-import matter from 'gray-matter';
-import { FileNotFoundError } from '../errors';
+
+// 独自エラー: FileNotFoundError（このファイル内で完結）
+export class FileNotFoundError extends Error {
+  constructor(message?: string) {
+    super(message || 'File not found');
+    this.name = 'FileNotFoundError';
+  }
+}
 import type { DirectoryLoaderResult, ListOptions, ProcessorOptions } from '../types';
 import { loadDirectory } from './load-directory';
 
@@ -19,11 +24,13 @@ const DEFAULT_PATTERN = '**/*.{md,mdx}';
 /**
  * 記事一覧を取得
  */
-export async function getPosts(options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}) {
+export async function getPosts(
+  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
+) {
   try {
     const page = options.page || 1;
     const perPage = options.perPage || 20;
-    const allPosts = (loadDirectory({ ...options, pattern: DEFAULT_PATTERN } as any) as any[]);
+    const allPosts = loadDirectory({ ...options, pattern: DEFAULT_PATTERN } as any) as any[];
     const filteredPosts = allPosts.filter((post: any) => !post.meta.draft);
     const paginatedPosts = filteredPosts.slice((page - 1) * perPage, page * perPage);
     return {
@@ -52,10 +59,16 @@ export async function getPostBySlug(
   console.log('getPostBySlug called with:', slug);
 
   // 正しいfilterを適用
-  const posts = (loadDirectory({ ...options, filter: (post: any) => !post.meta.draft && post.meta.slug === slug } as any) as any[]);
+  const posts = loadDirectory({
+    ...options,
+    filter: (post: any) => !post.meta.draft && post.meta.slug === slug,
+  } as any) as any[];
 
   // フィルタリング済みの最初の記事を取得
-  console.log('filtered posts:', posts.map((p: any) => p.meta.slug));
+  console.log(
+    'filtered posts:',
+    posts.map((p: any) => p.meta.slug)
+  );
   console.log('filtered posts (full object):', posts);
   const post = posts[0];
   if (!post) {
@@ -74,9 +87,10 @@ export async function getPostsByTag(
   options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
 ) {
   try {
-    const allPosts = (loadDirectory({ ...options, pattern: DEFAULT_PATTERN } as any) as any[]);
+    const allPosts = loadDirectory({ ...options, pattern: DEFAULT_PATTERN } as any) as any[];
     const filteredPosts = allPosts.filter(
-      (post: any) => !post.meta.draft && Array.isArray(post.meta.tags) && post.meta.tags.includes(tag)
+      (post: any) =>
+        !post.meta.draft && Array.isArray(post.meta.tags) && post.meta.tags.includes(tag)
     );
     return filteredPosts;
   } catch (err) {
