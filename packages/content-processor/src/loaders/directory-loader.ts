@@ -5,17 +5,6 @@ import type { DirectoryLoaderResult, ListOptions, ProcessorOptions } from '../ty
 import type { PostMeta } from '../types/post';
 
 /**
- * プロジェクトルートからの相対パス
- */
-const CONTENT_DIR = path.resolve(process.cwd(), '../../content/blog');
-console.log('CONTENT_DIR:', CONTENT_DIR);
-
-/**
- * デフォルトのファイルパターン
- */
-const DEFAULT_PATTERN = '**/*.{md,mdx}';
-
-/**
  * 記事一覧を取得
  */
 export async function getPosts(
@@ -37,8 +26,6 @@ export async function getPosts(
         } else if (entry.isFile() && /\.(md|mdx)$/.test(entry.name)) {
           const raw = fs.readFileSync(fullPath, 'utf-8');
           const { data } = matter(raw);
-          // デバッグ: data内容確認
-          console.log('data:', data);
           if (data.draft) continue;
           if (!data.title || !data.slug || !data.publishedAt) continue;
           const post = {
@@ -52,7 +39,6 @@ export async function getPosts(
             updatedAt: data.updatedAt,
             readingTime: data.readingTime,
           };
-          console.log('pushing post:', post);
           posts.push(post);
         }
       }
