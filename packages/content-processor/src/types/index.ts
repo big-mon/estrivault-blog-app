@@ -4,7 +4,7 @@ export type { ProcessorOptions, ListOptions } from './core/options';
 export type { DirectoryLoaderResult } from './core/loader';
 
 // エラークラスのエクスポート
-export { FileNotFoundError, FrontMatterError, MarkdownParseError } from './errors';
+export { FileNotFoundError, FrontMatterError, MarkdownParseError } from '../errors';
 
 // 型ユーティリティ
 export type { Schema } from 'hast-util-sanitize';

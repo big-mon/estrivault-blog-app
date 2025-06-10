@@ -1,12 +1,5 @@
 import path from 'path';
-
-// 独自エラー: FileNotFoundError（このファイル内で完結）
-export class FileNotFoundError extends Error {
-  constructor(message?: string) {
-    super(message || 'File not found');
-    this.name = 'FileNotFoundError';
-  }
-}
+import { FileNotFoundError } from '../errors';
 import type { DirectoryLoaderResult, ListOptions, ProcessorOptions } from '../types';
 import { loadDirectory } from './load-directory';
 

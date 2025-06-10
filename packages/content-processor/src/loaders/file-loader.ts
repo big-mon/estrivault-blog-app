@@ -6,7 +6,7 @@ import readingTime from 'reading-time';
 import { createPipeline } from '../pipeline/pipeline';
 import { buildUrl } from '@estrivault/cloudinary-utils';
 import type { PostMeta, PostHTML, ProcessorOptions } from '../types';
-import { FrontMatterError, MarkdownParseError } from '../types/errors';
+import { FrontMatterError, MarkdownParseError } from '../errors';
 
 export interface LoadFileOptions extends ProcessorOptions {
   /**
@@ -51,10 +51,9 @@ export async function loadFile(filePath: string, options: LoadFileOptions = {}):
       data = parsed.data || {};
       markdown = parsed.content;
     } catch (parseError) {
-      throw new MarkdownParseError(`フロントマターのパースに失敗しました: ${resolvedPath}`, { 
-        cause: parseError instanceof Error ? parseError : new Error(String(parseError)),
-        context: { filePath: resolvedPath }
-      });
+      throw new MarkdownParseError(
+        `フロントマターのパースに失敗しました: ${resolvedPath} (${parseError instanceof Error ? parseError.message : String(parseError)})`
+      );
     }
 
     // 必須フィールドの検証
