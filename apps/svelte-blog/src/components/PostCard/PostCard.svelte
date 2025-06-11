@@ -1,7 +1,5 @@
 <script lang="ts">
   import type { Post } from '$lib/types.ts';
-  import { buildUrl } from '@estrivault/cloudinary-utils';
-  import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
 
   interface Props {
     post: Post;
@@ -20,9 +18,6 @@
       .format(date)
       .replace(/\//g, '-');
   };
-
-  // Cloudinary画像URL生成
-  const coverImageUrl = buildUrl(PUBLIC_CLOUDINARY_CLOUD_NAME, post.coverImage || '', { w: 600 });
 </script>
 
 <a href={`/post/${post.slug}`} class="block h-full" aria-label={post.title}>
@@ -34,7 +29,7 @@
       <!-- サムネイル -->
       <figure class="relative w-full overflow-hidden pt-[56.25%]">
         <img
-          src={coverImageUrl}
+          src={post.coverImage}
           alt={post.title}
           class="absolute inset-0 h-full w-full object-cover"
         />

@@ -1,9 +1,8 @@
 import path from 'path';
 import fs from 'node:fs';
-import matter from 'gray-matter';
 import type { DirectoryLoaderResult, ListOptions, ProcessorOptions } from '../types';
 import type { PostMeta, PostHTML } from '../types/post';
-import { processMarkdown, loadFile } from './file-loader';
+import { loadFile } from './file-loader';
 
 /**
  * 記事一覧を取得

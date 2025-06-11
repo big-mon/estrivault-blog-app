@@ -45,7 +45,7 @@ export async function loadFile(filePath: string, options: LoadFileOptions = {}):
 
   try {
     const content = await readFile(resolvedPath, 'utf-8');
-    
+
     try {
       const parsed = matter(content);
       data = parsed.data || {};
@@ -70,11 +70,11 @@ export async function loadFile(filePath: string, options: LoadFileOptions = {}):
     const html = String(result);
 
     // タグを検証して正規化
-    const tags = Array.isArray(data.tags) 
+    const tags = Array.isArray(data.tags)
       ? data.tags
           .filter((tag): tag is string => typeof tag === 'string')
-          .map(tag => tag.trim())
-          .filter(tag => tag.length > 0)
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0)
       : [];
 
     // メタデータの構築
@@ -100,57 +100,5 @@ export async function loadFile(filePath: string, options: LoadFileOptions = {}):
     throw new MarkdownParseError(
       `ファイルの処理中にエラーが発生しました (${filePath}): ${message}`
     );
-  }
-}
-
-/**
- * マークダウン文字列を処理する
- * @param content 処理するマークダウン文字列
- * @param options オプション
- * @returns 処理されたHTMLとメタデータ
- * @throws {FrontMatterError} フロントマターの検証エラー
- * @throws {MarkdownParseError} マークダウンの処理エラー
- */
-export async function processMarkdown(
-  content: string,
-  options: ProcessorOptions = {}
-): Promise<PostHTML> {
-  try {
-    const { data, content: markdown } = matter(content);
-
-    // 必須フィールドの検証
-    if (!data.title) {
-      throw new FrontMatterError('Front-matterにtitleが含まれていません');
-    }
-
-    // 読了時間の計算
-    const stats = readingTime(markdown);
-
-    // マークダウンをHTMLに変換
-    const pipeline = createPipeline(options);
-    const result = await pipeline.process(markdown);
-    const html = String(result);
-
-    // メタデータの構築
-    const meta: PostMeta = {
-      slug: data.slug || '',
-      title: data.title,
-      description: data.description || '',
-      publishedAt: data.publishedAt || new Date().toISOString(),
-      updatedAt: data.updatedAt || data.publishedAt || new Date().toISOString(),
-      category: data.category || '',
-      tags: Array.isArray(data.tags) ? data.tags : [],
-      coverImage: resolveCoverImage(data.coverImage, options.cloudinaryCloudName),
-      draft: data.draft || false,
-      readingTime: Math.ceil(stats.minutes),
-    };
-
-    return { meta, html };
-  } catch (error) {
-    if (error instanceof FrontMatterError) {
-      throw error;
-    }
-    const message = error instanceof Error ? error.message : String(error);
-    throw new MarkdownParseError(`マークダウンの処理中にエラーが発生しました: ${message}`);
   }
 }
