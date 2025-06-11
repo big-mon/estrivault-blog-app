@@ -53,7 +53,21 @@ export async function getPosts(options: PostListOptions = {}) {
     // category/tag/filter条件で絞り込み
     let filteredPosts = posts;
     // 絞り込み用正規化関数
-    const normalize = (str: string) => str.trim().toLowerCase();
+    // URLセーフなスラッグ化も含む正規化関数
+    const normalize = (str: string) =>
+      str
+        .trim()
+        .toLowerCase()
+        // 全角英数字→半角
+        .replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
+        // 空白・アンダースコア→ハイフン
+        .replace(/[\s_]+/g, '-')
+        // 英数字・ハイフン以外除去
+        .replace(/[^a-z0-9-]/g, '')
+        // 連続ハイフンを1つに
+        .replace(/-+/g, '-')
+        // 先頭・末尾ハイフン除去
+        .replace(/^-+|-+$/g, '');
 
     if (options.category) {
       filteredPosts = filteredPosts.filter(
