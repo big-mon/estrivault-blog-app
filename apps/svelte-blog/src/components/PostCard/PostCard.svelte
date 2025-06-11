@@ -22,11 +22,7 @@
   };
 
   // Cloudinary画像URL生成
-  const coverImageUrl = buildUrl(
-    PUBLIC_CLOUDINARY_CLOUD_NAME,
-    post.coverImage,
-    { w: 600 }
-  );
+  const coverImageUrl = buildUrl(PUBLIC_CLOUDINARY_CLOUD_NAME, post.coverImage || '', { w: 600 });
 </script>
 
 <a href={`/post/${post.slug}`} class="block h-full" aria-label={post.title}>
