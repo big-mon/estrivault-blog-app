@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import matter from 'gray-matter';
 import type { DirectoryLoaderResult, ListOptions, ProcessorOptions } from '../types';
 import type { PostMeta, PostHTML } from '../types/post';
-import { processMarkdown } from './file-loader';
+import { processMarkdown, loadFile } from './file-loader';
 
 /**
  * 記事一覧を取得
@@ -18,33 +18,25 @@ export async function getPosts(
     const posts: PostMeta[] = [];
 
     // 再帰的にmdファイルを探索
-    function walk(dir: string) {
+    async function walk(dir: string) {
       const entries = fs.readdirSync(dir, { withFileTypes: true });
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
         if (entry.isDirectory()) {
-          walk(fullPath);
+          await walk(fullPath);
         } else if (entry.isFile() && /\.(md|mdx)$/.test(entry.name)) {
-          const raw = fs.readFileSync(fullPath, 'utf-8');
-          const { data } = matter(raw);
-          if (data.draft) continue;
-          if (!data.title || !data.slug || !data.publishedAt) continue;
-          const post = {
-            title: data.title,
-            slug: data.slug,
-            description: data.description || '',
-            coverImage: data.coverImage || '',
-            category: data.category || '',
-            tags: Array.isArray(data.tags) ? data.tags : [],
-            publishedAt: data.publishedAt,
-            updatedAt: data.updatedAt,
-            readingTime: data.readingTime,
-          };
-          posts.push(post);
+          try {
+            const { meta } = await loadFile(fullPath, options);
+            if (meta.draft) continue;
+            posts.push(meta);
+          } catch (e) {
+            // 無効なファイルはスキップ
+            continue;
+          }
         }
       }
     }
-    walk(baseDir);
+    await walk(baseDir);
 
     // 並び替え（新しい順）
     posts.sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
@@ -83,13 +75,14 @@ export async function getPostBySlug(
       if (entry.isDirectory()) {
         await walk(fullPath);
       } else if (entry.isFile() && /\.(md|mdx)$/.test(entry.name)) {
-        const raw = fs.readFileSync(fullPath, 'utf-8');
-        const { data } = matter(raw);
-        if (data.draft) continue;
-        if (!data.title || !data.slug || !data.publishedAt) continue;
-
-        if (data.slug === slug) {
-          posts.push(await processMarkdown(raw, options));
+        try {
+          const post = await loadFile(fullPath, options);
+          if (post.meta.draft) continue;
+          if (post.meta.slug === slug) {
+            posts.push(post);
+          }
+        } catch (e) {
+          continue;
         }
       }
     }
@@ -111,34 +104,26 @@ export async function getPostsByTag(
   const posts: PostMeta[] = [];
 
   // 再帰的にmdファイルを探索
-  function walk(dir: string) {
+  async function walk(dir: string) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) {
-        walk(fullPath);
+        await walk(fullPath);
       } else if (entry.isFile() && /\.(md|mdx)$/.test(entry.name)) {
-        const raw = fs.readFileSync(fullPath, 'utf-8');
-        const { data } = matter(raw);
-        if (data.draft) continue;
-        if (!data.title || !data.slug || !data.publishedAt) continue;
-        if (Array.isArray(data.tags) && data.tags.includes(tag)) {
-          posts.push({
-            title: data.title,
-            slug: data.slug,
-            description: data.description || '',
-            coverImage: data.coverImage || '',
-            category: data.category || '',
-            tags: data.tags,
-            publishedAt: data.publishedAt,
-            updatedAt: data.updatedAt,
-            readingTime: data.readingTime,
-          });
+        try {
+          const { meta } = await loadFile(fullPath, options);
+          if (meta.draft) continue;
+          if (Array.isArray(meta.tags) && meta.tags.includes(tag)) {
+            posts.push(meta);
+          }
+        } catch (e) {
+          continue;
         }
       }
     }
   }
-  walk(baseDir);
+  await walk(baseDir);
   // 新しい順にソート
   posts.sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
   return posts;
