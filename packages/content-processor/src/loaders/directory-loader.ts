@@ -52,11 +52,21 @@ export async function getPosts(options: PostListOptions = {}) {
 
     // category/tag/filter条件で絞り込み
     let filteredPosts = posts;
+    // 絞り込み用正規化関数
+    const normalize = (str: string) => str.trim().toLowerCase();
+
     if (options.category) {
-      filteredPosts = filteredPosts.filter((post) => post.category === options.category);
+      filteredPosts = filteredPosts.filter(
+        (post) => normalize(post.category) === normalize(options.category!)
+      );
     }
     if (options.tag) {
-      filteredPosts = filteredPosts.filter((post) => post.tags.includes(options.tag!));
+      const tags = Array.isArray(options.tag) ? options.tag : [options.tag];
+      filteredPosts = filteredPosts.filter(
+        (post) => tags.some(
+          (tag) => post.tags.some((t) => normalize(t) === normalize(tag))
+        )
+      );
     }
     if (options.filter) {
       filteredPosts = filteredPosts.filter(options.filter);
