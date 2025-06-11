@@ -27,35 +27,16 @@ export async function getPosts(options?: {
     const page = options?.page || 1;
     const perPage = options?.perPage || 20;
 
-    // フィルター関数
-    const filter = (post: PostMeta) => {
-      // カテゴリーが指定されている場合はフィルタリング（大文字小文字を区別しない）
-      if (options?.category && post.category?.toLowerCase() !== options.category.toLowerCase()) {
-        return false;
-      }
-      // タグが指定されている場合はフィルタリング（大文字小文字を区別せず、前後の空白も無視）
-      if (options?.tag) {
-        const targetTag = options.tag;
-        return post.tags?.some((tag) => tag === targetTag) ?? false;
-      }
-      return true;
-    };
-
-    // 記事一覧を取得
+    // content-processor側でフィルタされるため、ここでのfilter処理は不要
     const allPostsObj = await getPostsFromProcessor({
       cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
-    });
-
-    // PostMeta[] へフィルタ適用
-    const filteredPosts = allPostsObj.posts.filter(filter);
-
-    return {
-      posts: filteredPosts, // PostMeta[] 型で返す
-      total: filteredPosts.length,
       page,
       perPage,
-      totalPages: Math.ceil(filteredPosts.length / perPage),
-    };
+      category: options?.category,
+      tag: options?.tag,
+    });
+
+    return allPostsObj;
   } catch (err) {
     console.error('Failed to get posts:', err);
     throw new Error('Failed to get posts');

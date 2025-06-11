@@ -11,9 +11,9 @@
     if (!document.startViewTransition) return;
 
     return new Promise((resolve) => {
-      document.startViewTransition(async () => {
+      document.startViewTransition(() => {
         resolve();
-        await navigation.complete;
+        // navigation.complete を待たずに即アニメーション開始
       });
     });
   });

@@ -1,15 +1,25 @@
 import path from 'path';
 import fs from 'node:fs';
-import type { DirectoryLoaderResult, ListOptions, ProcessorOptions } from '../types';
+import type { ProcessorOptions } from '../types';
 import type { PostMeta, PostHTML } from '../types/post';
 import { loadFile } from './file-loader';
 
 /**
+ * 記事一覧取得用オプション
+ */
+export interface PostListOptions extends ProcessorOptions {
+  page?: number;
+  perPage?: number;
+  category?: string;
+  tag?: string;
+  filter?: (post: PostMeta) => boolean;
+  baseDir?: string;
+}
+
+/**
  * 記事一覧を取得
  */
-export async function getPosts(
-  options: ProcessorOptions & ListOptions<DirectoryLoaderResult> = {}
-) {
+export async function getPosts(options: PostListOptions = {}) {
   try {
     const page = options.page || 1;
     const perPage = options.perPage || 20;
@@ -39,7 +49,41 @@ export async function getPosts(
 
     // 並び替え（新しい順）
     posts.sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
-    const filteredPosts = posts; // 追加のフィルタがあればここで適用
+
+    // category/tag/filter条件で絞り込み
+    let filteredPosts = posts;
+    // 絞り込み用正規化関数
+    // URLセーフなスラッグ化も含む正規化関数
+    const normalize = (str: string) =>
+      str
+        .trim()
+        .toLowerCase()
+        // 全角英数字→半角
+        .replace(/[！-～]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
+        // 空白・アンダースコア→ハイフン
+        .replace(/[\s_]+/g, '-')
+        // 英数字・ハイフン以外除去
+        .replace(/[^a-z0-9-]/g, '')
+        // 連続ハイフンを1つに
+        .replace(/-+/g, '-')
+        // 先頭・末尾ハイフン除去
+        .replace(/^-+|-+$/g, '');
+
+    if (options.category) {
+      filteredPosts = filteredPosts.filter(
+        (post) => normalize(post.category) === normalize(options.category!)
+      );
+    }
+    if (options.tag) {
+      const tags = Array.isArray(options.tag) ? options.tag : [options.tag];
+      filteredPosts = filteredPosts.filter((post) =>
+        tags.some((tag) => post.tags.some((t) => normalize(t) === normalize(tag)))
+      );
+    }
+    if (options.filter) {
+      filteredPosts = filteredPosts.filter(options.filter);
+    }
+
     const paginatedPosts = filteredPosts.slice((page - 1) * perPage, page * perPage);
     return {
       posts: paginatedPosts,
@@ -61,7 +105,7 @@ export async function getPosts(
  */
 export async function getPostBySlug(
   slug: string,
-  options: ProcessorOptions & ListOptions = {}
+  options: PostListOptions = {}
 ): Promise<PostHTML> {
   const baseDir = options.baseDir || path.resolve(process.cwd(), '../../content/blog');
   const posts: PostHTML[] = [];
@@ -97,7 +141,7 @@ export async function getPostBySlug(
  */
 export async function getPostsByTag(
   tag: string,
-  options: ProcessorOptions & ListOptions = {}
+  options: PostListOptions = {}
 ): Promise<PostMeta[]> {
   const baseDir = options.baseDir || path.resolve(process.cwd(), '../../content/blog');
   const posts: PostMeta[] = [];
