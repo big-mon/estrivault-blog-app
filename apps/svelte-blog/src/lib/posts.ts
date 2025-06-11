@@ -1,10 +1,9 @@
 import {
-  getAllPosts,
+  getPosts as getPostsFromProcessor,
   getPostBySlug as getPostBySlugFromProcessor,
   getPostsByTag as getPostsByTagFromProcessor,
   type PostMeta,
   type PostHTML,
-  normalizeTag,
 } from '@estrivault/content-processor';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
 
@@ -36,33 +35,23 @@ export async function getPosts(options?: {
       }
       // タグが指定されている場合はフィルタリング（大文字小文字を区別せず、前後の空白も無視）
       if (options?.tag) {
-        const targetTag = normalizeTag(options.tag);
-        return post.tags?.some((tag) => normalizeTag(tag) === targetTag) ?? false;
+        const targetTag = options.tag;
+        return post.tags?.some((tag) => tag === targetTag) ?? false;
       }
       return true;
     };
 
     // 記事一覧を取得
-    const allPosts = await getAllPosts({
+    const allPostsObj = await getPostsFromProcessor({
       cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
     });
 
-    // フィルタリングとソートを適用
-    const filteredPosts = allPosts.filter(filter);
-
-    // ページネーションを適用
-    const start = (page - 1) * perPage;
-    const end = start + perPage;
-    const paginatedPosts = filteredPosts.slice(start, end);
-
-    // Postインターフェースに変換
-    const posts = paginatedPosts.map((post) => ({
-      ...post,
-    }));
+    // PostMeta[] へフィルタ適用
+    const filteredPosts = allPostsObj.posts.filter(filter);
 
     return {
-      posts,
-      total: filteredPosts.length, // フィルタリング後の全件数を返す
+      posts: filteredPosts, // PostMeta[] 型で返す
+      total: filteredPosts.length,
       page,
       perPage,
       totalPages: Math.ceil(filteredPosts.length / perPage),
@@ -78,16 +67,11 @@ export async function getPosts(options?: {
  * @param slug 記事のスラッグ
  * @returns 記事のメタデータとHTMLコンテンツ
  */
-export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
-  try {
-    const post = await getPostBySlugFromProcessor(slug, {
-      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
-    });
-    return post;
-  } catch (err) {
-    console.error('記事の取得中にエラーが発生しました:', err);
-    return null;
-  }
+export async function getPostBySlug(slug: string): Promise<PostHTML> {
+  const post = await getPostBySlugFromProcessor(slug, {
+    cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
+  });
+  return post;
 }
 
 /**
@@ -96,7 +80,8 @@ export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
  * @returns タグに一致する記事のメタデータの配列
  */
 export async function getPostsByTag(tag: string): Promise<PostMeta[]> {
-  return await getPostsByTagFromProcessor(tag, {
+  const items = await getPostsByTagFromProcessor(tag, {
     cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
   });
+  return items;
 }

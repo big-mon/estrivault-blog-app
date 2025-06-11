@@ -27,6 +27,9 @@ importers:
 
   apps/svelte-blog:
     dependencies:
+      '@estrivault/cloudinary-utils':
+        specifier: workspace:^
+        version: link:../../packages/cloudinary-utils
       '@estrivault/content-processor':
         specifier: workspace:*
         version: link:../../packages/content-processor

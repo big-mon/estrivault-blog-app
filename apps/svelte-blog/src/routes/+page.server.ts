@@ -11,8 +11,6 @@ export const load = (async () => {
   const { posts, total, totalPages } = await getPosts({
     page,
     perPage,
-    sort: 'publishedAt',
-    includeDrafts: false,
   });
 
   return {
