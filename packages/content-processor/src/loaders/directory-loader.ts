@@ -2,7 +2,8 @@ import path from 'path';
 import fs from 'node:fs';
 import matter from 'gray-matter';
 import type { DirectoryLoaderResult, ListOptions, ProcessorOptions } from '../types';
-import type { PostMeta } from '../types/post';
+import type { PostMeta, PostHTML } from '../types/post';
+import { processMarkdown } from './file-loader';
 
 /**
  * 記事一覧を取得
@@ -70,42 +71,31 @@ export async function getPosts(
 export async function getPostBySlug(
   slug: string,
   options: ProcessorOptions & ListOptions = {}
-): Promise<PostMeta> {
+): Promise<PostHTML> {
   const baseDir = options.baseDir || path.resolve(process.cwd(), '../../content/blog');
-  let found: PostMeta | undefined = undefined;
-  function walk(dir: string) {
+  const posts: PostHTML[] = [];
+
+  // 再帰的にmdファイルを探索
+  async function walk(dir: string) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) {
-        walk(fullPath);
+        await walk(fullPath);
       } else if (entry.isFile() && /\.(md|mdx)$/.test(entry.name)) {
         const raw = fs.readFileSync(fullPath, 'utf-8');
         const { data } = matter(raw);
         if (data.draft) continue;
         if (!data.title || !data.slug || !data.publishedAt) continue;
+
         if (data.slug === slug) {
-          found = {
-            title: data.title,
-            slug: data.slug,
-            description: data.description || '',
-            coverImage: data.coverImage || '',
-            category: data.category || '',
-            tags: Array.isArray(data.tags) ? data.tags : [],
-            publishedAt: data.publishedAt,
-            updatedAt: data.updatedAt,
-            readingTime: data.readingTime,
-          };
-          return;
+          posts.push(await processMarkdown(raw, options));
         }
       }
     }
   }
-  walk(baseDir);
-  if (!found) {
-    throw new Error(`記事が見つかりませんでした: slug=${slug}`);
-  }
-  return found;
+  await walk(baseDir);
+  return posts[0];
 }
 
 /**
@@ -119,6 +109,8 @@ export async function getPostsByTag(
 ): Promise<PostMeta[]> {
   const baseDir = options.baseDir || path.resolve(process.cwd(), '../../content/blog');
   const posts: PostMeta[] = [];
+
+  // 再帰的にmdファイルを探索
   function walk(dir: string) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
