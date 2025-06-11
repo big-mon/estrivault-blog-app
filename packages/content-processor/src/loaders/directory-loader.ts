@@ -59,7 +59,7 @@ export async function getPosts(options: PostListOptions = {}) {
         .trim()
         .toLowerCase()
         // 全角英数字→半角
-        .replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
+        .replace(/[！-～]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
         // 空白・アンダースコア→ハイフン
         .replace(/[\s_]+/g, '-')
         // 英数字・ハイフン以外除去
@@ -76,10 +76,8 @@ export async function getPosts(options: PostListOptions = {}) {
     }
     if (options.tag) {
       const tags = Array.isArray(options.tag) ? options.tag : [options.tag];
-      filteredPosts = filteredPosts.filter(
-        (post) => tags.some(
-          (tag) => post.tags.some((t) => normalize(t) === normalize(tag))
-        )
+      filteredPosts = filteredPosts.filter((post) =>
+        tags.some((tag) => post.tags.some((t) => normalize(t) === normalize(tag)))
       );
     }
     if (options.filter) {
