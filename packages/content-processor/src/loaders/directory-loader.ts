@@ -70,7 +70,7 @@ export async function getPosts(
 export async function getPostBySlug(
   slug: string,
   options: ProcessorOptions & ListOptions = {}
-): Promise<PostMeta | undefined> {
+): Promise<PostMeta> {
   const baseDir = options.baseDir || path.resolve(process.cwd(), '../../content/blog');
   let found: PostMeta | undefined = undefined;
   function walk(dir: string) {
@@ -102,6 +102,9 @@ export async function getPostBySlug(
     }
   }
   walk(baseDir);
+  if (!found) {
+    throw new Error(`記事が見つかりませんでした: slug=${slug}`);
+  }
   return found;
 }
 
