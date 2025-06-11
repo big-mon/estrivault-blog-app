@@ -6,7 +6,6 @@ import {
   type PostHTML,
 } from '@estrivault/content-processor';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
-import { loadFile } from '@estrivault/content-processor';
 
 /**
  * すべての記事メタデータを取得
@@ -68,20 +67,11 @@ export async function getPosts(options?: {
  * @param slug 記事のスラッグ
  * @returns 記事のメタデータとHTMLコンテンツ
  */
-export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
-  try {
-    const item = await getPostBySlugFromProcessor(slug, {
-      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
-    });
-    if (!item) return null;
-    const post = await loadFile(item.filePath, {
-      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
-    });
-    return post;
-  } catch (err) {
-    console.error('記事の取得中にエラーが発生しました:', err);
-    return null;
-  }
+export async function getPostBySlug(slug: string): Promise<PostHTML> {
+  const post = await getPostBySlugFromProcessor(slug, {
+    cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
+  });
+  return post;
 }
 
 /**
@@ -93,5 +83,5 @@ export async function getPostsByTag(tag: string): Promise<PostMeta[]> {
   const items = await getPostsByTagFromProcessor(tag, {
     cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
   });
-  return items.map((item) => item.meta);
+  return items;
 }
