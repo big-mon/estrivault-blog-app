@@ -8,8 +8,6 @@ export interface ImageTransformOptions {
   cloudinaryCloudName: string;
   /** 画像幅 */
   width?: number;
-  /** 画像品質 */
-  quality?: number;
   /** 画像のトリミングモード */
   mode?: 'fit' | 'fill';
 }
@@ -24,7 +22,6 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
   const { 
     cloudinaryCloudName, 
     width = 1200, 
-    quality = 80,
     mode = 'fit' 
   } = options;
 
@@ -52,7 +49,6 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
         const mode = (node.properties['data-mode'] as string) === 'fill' ? 'fill' as const : 'fit' as const;
         const buildOptions: BuildUrlOptions = {
           w: width,
-          ...(quality && { q: quality }),
           mode,
         };
         
