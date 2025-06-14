@@ -10,11 +10,11 @@ $color-bg: white;
 // ミックスイン
 @mixin transition($properties...) {
   $transition: ();
-  
+
   @each $property in $properties {
     $transition: append($transition, #{$property} 200ms cubic-bezier(0.4, 0, 0.2, 1), comma);
   }
-  
+
   transition: $transition;
 }
 
@@ -26,8 +26,9 @@ $color-bg: white;
   padding: 1rem;
   border: 1px solid $color-border;
   border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   margin: 1.5rem 0;
 
   // タブレット以上のスタイル
@@ -36,12 +37,18 @@ $color-bg: white;
   }
 
   &__image {
-    grid-column: span 3;
+    // スマホ画面では1列全体を使用し中央配置
+    grid-column: span 1;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0.5rem;
     background-color: $color-bg;
+
+    // タブレット以上では3列分を使用
+    @media (min-width: $breakpoint-md) {
+      grid-column: span 3;
+    }
 
     &__img {
       max-width: 100%;
@@ -51,14 +58,19 @@ $color-bg: white;
     }
   }
 
-
   &__content {
-    grid-column: span 7;
+    // スマホ画面では1列全体を使用
+    grid-column: span 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-  }
+    justify-content: flex-start;
+    gap: 1rem;
 
+    // タブレット以上では7列分を使用
+    @media (min-width: $breakpoint-md) {
+      grid-column: span 7;
+    }
+  }
 
   &__title {
     font: 500 1.125rem/1.75rem sans-serif;
@@ -72,16 +84,16 @@ $color-bg: white;
     }
   }
 
-
   &__cta {
     display: inline-block;
-    margin-top: 1rem;
     padding: 0.5rem 1rem;
     background-color: $color-cta;
     color: $color-text;
     font: 500 0.875rem/1.25rem sans-serif;
     border-radius: 0.375rem;
     text-align: center;
+    text-decoration: none;
+    width: 10rem;
     @include transition(background-color, color, transform);
 
     &:hover {
