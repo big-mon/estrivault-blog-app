@@ -15,20 +15,15 @@ export const rehypeLinkTransform: Plugin<[LinkTransformOptions?], Root, Root> = 
   options: LinkTransformOptions = {}
 ) => {
     const internalPredicate = options.internalPredicate || ((url: string) => {
-        // 空のリンクやフラグメントは内部リンク
-        if (!url || url.startsWith('#')) return true;
-
-        try {
-          // URLとしてパース可能か試みる
-          const parsedUrl = new URL(url, 'https://example.com');
-
-          // 相対パスまたは同じオリジンの場合に内部リンクと判定
-          return !parsedUrl.hostname || parsedUrl.hostname === 'example.com';
-        } catch {
-          // URLパースに失敗した場合は相対パスとみなして内部リンクとする
-          return true;
-        }
-      });
+      // 空のリンクやフラグメントは内部リンク
+      if (!url || url.startsWith('#')) return true;
+      
+      // 相対パス（./ または ../ で始まる）の場合のみ内部リンクと判定
+      if (url.startsWith('./') || url.startsWith('../')) return true;
+      
+      // 絶対パス（/ で始まる）や完全なURLは外部リンクとみなす
+      return false;
+    });
 
   const transformer: Transformer<Root, Root> = (tree: Root, file?: VFile) => {
     visit(tree, 'element', (node) => {
