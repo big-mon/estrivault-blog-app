@@ -56,7 +56,7 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
       };
 
       // Twitterの正しいURL
-      const tweetUrl = `https://x.com/twitter/status/${id}`;
+      const tweetUrl = `https://twitter.com/i/status/${id}`;
 
       // blockquoteの子要素として適切なコンテンツを設定
       node.children = [

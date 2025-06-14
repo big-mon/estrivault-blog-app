@@ -77,7 +77,6 @@
       script.id = 'twitter-wjs';
       script.async = true;
       script.src = 'https://platform.twitter.com/widgets.js';
-      script.charset = 'utf-8';
 
       script.onload = () => {
         console.log('Twitter script loaded');
