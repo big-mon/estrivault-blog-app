@@ -2,7 +2,7 @@
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu24.04",
   "features": {
     "ghcr.io/anthropics/devcontainer-features/claude-code:latest": {},
-    "ghcr.io/devcontainers-community/npm-features/typescript:1": {}
+    "ghcr.io/devcontainers-community/npm-features/typescript:1.1.0": {}
   },
   "customizations": {
     "vscode": {

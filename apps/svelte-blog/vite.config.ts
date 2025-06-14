@@ -3,15 +3,11 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  plugins: [tailwindcss(), sveltekit()],
-  envDir: process.cwd(),
+  plugins: [sveltekit(), tailwindcss()],
   optimizeDeps: {
     exclude: ['gray-matter', 'glob'],
   },
   ssr: {
     noExternal: ['glob'],
-  },
-  define: {
-    'process.env.NODE_ENV': '"production"',
   },
 });
