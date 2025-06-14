@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   // 型アサーションをモジュールスコープで宣言
   declare const window: Window & {
-    twitter?: {
+    twttr?: {
       widgets: {
         load: () => void;
       };
@@ -41,8 +41,8 @@
 
   async function loadTwitterWidgets() {
     // すでに読み込まれている場合は再初期化のみ
-    if (window.twitter) {
-      window.twitter.widgets.load();
+    if (window.twttr?.widgets) {
+      window.twttr.widgets.load();
       return;
     }
 
@@ -50,7 +50,16 @@
       const script = document.createElement('script');
       script.async = true;
       script.src = 'https://platform.twitter.com/widgets.js';
-      script.onload = () => resolve();
+      script.onload = () => {
+        // Twitter ウィジェットが完全に読み込まれるのを待つ
+        const checkTwttr = setInterval(() => {
+          if (window.twttr?.widgets) {
+            clearInterval(checkTwttr);
+            window.twttr.widgets.load();
+            resolve();
+          }
+        }, 100);
+      };
       document.head.appendChild(script);
     });
   }
