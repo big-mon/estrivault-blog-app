@@ -1,7 +1,6 @@
 import path from 'path';
 import fs from 'node:fs';
-import type { PostMeta, PostHTML } from '../types/post';
-import type { ProcessorOptions } from '../types';
+import type { PostMeta, PostHTML, ProcessorOptions } from '../types';
 import { loadFile } from '../loaders/file-loader';
 
 export interface FileWalkOptions extends ProcessorOptions {
@@ -58,7 +57,7 @@ export async function walkMarkdownFilesWithPath(options: FileWalkOptions = {}): 
  */
 export async function findPostBySlug(slug: string, options: FileWalkOptions = {}): Promise<PostHTML | null> {
   const postsWithPath = await walkMarkdownFilesWithPath(options);
-  
+
   for (const { meta, filePath } of postsWithPath) {
     if (meta.slug === slug) {
       try {
@@ -68,6 +67,6 @@ export async function findPostBySlug(slug: string, options: FileWalkOptions = {}
       }
     }
   }
-  
+
   return null;
 }

@@ -5,7 +5,7 @@ export * from './loaders/directory-loader';
 export * from './types';
 
 // パイプライン
-export { createPipeline } from './pipeline/pipeline';
+export { createPipeline } from './pipeline';
 
 // ユーティリティ
 export { normalizeForTagFilter, normalizeForSlug } from './utils/normalize';
