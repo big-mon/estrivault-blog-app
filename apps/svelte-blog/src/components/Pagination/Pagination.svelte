@@ -20,7 +20,10 @@
     if (page === 1) {
       return baseUrl === '/' ? '/' : baseUrl;
     }
-    return `${baseUrl}${page}`;
+    if (baseUrl === '/') {
+      return `/${page}`;
+    }
+    return `${baseUrl}/${page}`;
   }
 
   // 表示するページ番号の配列を生成
