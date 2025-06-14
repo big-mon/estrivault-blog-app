@@ -1,17 +1,19 @@
 <script context="module" lang="ts">
   // 型アサーションをモジュールスコープで宣言
-  declare const window: Window & {
-    twttr?: {
-      widgets: {
-        load(): Promise<void>;
+  declare global {
+    interface Window {
+      twttr?: {
+        widgets: {
+          load(): Promise<void>;
+        };
+        ready?: (callback: () => void) => void;
       };
-      ready?: (callback: () => void) => void;
-    };
-  };
+    }
+  }
 </script>
 
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { page } from '$app/state';
   import Header from '$components/Post/Header.svelte';
   import PostBody from '$components/Post/PostBody.svelte';
@@ -36,6 +38,8 @@
   // Twitter埋め込みがある場合のみスクリプトを読み込み
   onMount(async () => {
     if (data.hasTwitterEmbed) {
+      // DOMが完全に描画されるまで待つ
+      await tick();
       await loadTwitterWidgets();
     }
   });
@@ -43,34 +47,63 @@
   async function loadTwitterWidgets(): Promise<void> {
     return new Promise<void>((resolve) => {
       if (window.twttr) {
-        // 既に読み込まれている場合は、widgets.load()を呼び出す
-        window.twttr.widgets.load().then(() => resolve());
+        // 既に存在する場合は即座に実行
+        console.log('Twitter already loaded, calling widgets.load()');
+        window.twttr.widgets.load().then(() => {
+          console.log('Twitter widgets loaded successfully');
+          resolve();
+        });
         return;
       }
 
-      // スクリプトが存在しない場合は新しく作成
+      // Twitter スクリプトが既に存在するかチェック
+      const existingScript = document.getElementById('twitter-wjs');
+      if (existingScript) {
+        // スクリプトは存在するがtwttrがまだ利用できない場合
+        const checkTwttr = () => {
+          if (window.twttr) {
+            window.twttr.widgets.load().then(() => resolve());
+          } else {
+            setTimeout(checkTwttr, 100);
+          }
+        };
+        checkTwttr();
+        return;
+      }
+
+      // 新しくスクリプトを作成
+      console.log('Loading Twitter script...');
       const script = document.createElement('script');
+      script.id = 'twitter-wjs';
       script.async = true;
       script.src = 'https://platform.twitter.com/widgets.js';
       script.charset = 'utf-8';
-      script.id = 'twitter-wjs';
 
       script.onload = () => {
-        // スクリプト読み込み完了後、twttrが利用可能になるまで待つ
-        if (window.twttr && window.twttr.ready) {
-          window.twttr.ready(() => {
-            window.twttr!.widgets.load().then(() => resolve());
-          });
-        } else {
-          // fallback: 少し待ってからwidgets.load()を呼び出す
-          setTimeout(() => {
-            if (window.twttr) {
-              window.twttr.widgets.load().then(() => resolve());
-            } else {
-              resolve();
-            }
-          }, 100);
-        }
+        console.log('Twitter script loaded');
+        const waitForTwttr = () => {
+          if (window.twttr && window.twttr.widgets) {
+            console.log('Calling widgets.load()');
+            window.twttr.widgets
+              .load()
+              .then(() => {
+                console.log('Widgets loaded successfully');
+                resolve();
+              })
+              .catch((err) => {
+                console.error('Error loading widgets:', err);
+                resolve();
+              });
+          } else {
+            setTimeout(waitForTwttr, 50);
+          }
+        };
+        waitForTwttr();
+      };
+
+      script.onerror = () => {
+        console.error('Failed to load Twitter script');
+        resolve();
       };
 
       document.head.appendChild(script);
