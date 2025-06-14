@@ -10,4 +10,7 @@ export default defineConfig({
   ssr: {
     noExternal: ['glob'],
   },
+  server: {
+    host: true,
+  },
 });
