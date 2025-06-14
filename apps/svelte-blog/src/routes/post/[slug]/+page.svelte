@@ -17,6 +17,7 @@
   import { page } from '$app/state';
   import Header from '$components/Post/Header.svelte';
   import PostBody from '$components/Post/PostBody.svelte';
+  import { SITE_TITLE, SITE_AUTHOR } from '$constants';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
   import './amazon-card.scss';
   import './twitter-embed.scss';
@@ -113,11 +114,23 @@
 </script>
 
 <svelte:head>
+  <title>{post.meta.title} | {SITE_TITLE}</title>
+  <meta name="description" content={post.meta.description || post.meta.description || `${post.meta.title}についての記事です。`} />
+  {#if post.meta.tags && post.meta.tags.length > 0}
+    <meta name="keywords" content={post.meta.tags.join(', ')} />
+  {/if}
+  <meta name="author" content={SITE_AUTHOR} />
   {#if data.metadata}
     <meta name="published" content={new Date(data.metadata.publishedAt).toISOString()} />
     {#if data.metadata.updatedAt}
       <meta name="updated" content={new Date(data.metadata.updatedAt).toISOString()} />
     {/if}
+  {/if}
+  <meta property="og:title" content={post.meta.title} />
+  <meta property="og:description" content={post.meta.description || post.meta.description || `${post.meta.title}についての記事です。`} />
+  <meta property="og:type" content="article" />
+  {#if post.meta.coverImage}
+    <meta property="og:image" content={post.meta.coverImage} />
   {/if}
 </svelte:head>
 
