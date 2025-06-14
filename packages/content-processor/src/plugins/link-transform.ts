@@ -1,7 +1,6 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin, Transformer } from 'unified';
 import type { Root } from 'hast';
-import type { VFile } from 'vfile';
 
 interface LinkTransformOptions {
   /** 内部リンク判定関数 */
@@ -17,15 +16,15 @@ export const rehypeLinkTransform: Plugin<[LinkTransformOptions?], Root, Root> = 
     const internalPredicate = options.internalPredicate || ((url: string) => {
       // 空のリンクやフラグメントは内部リンク
       if (!url || url.startsWith('#')) return true;
-      
+
       // 相対パス（./ または ../ で始まる）の場合のみ内部リンクと判定
       if (url.startsWith('./') || url.startsWith('../')) return true;
-      
+
       // 絶対パス（/ で始まる）や完全なURLは外部リンクとみなす
       return false;
     });
 
-  const transformer: Transformer<Root, Root> = (tree: Root, file?: VFile) => {
+  const transformer: Transformer<Root, Root> = (tree: Root) => {
     visit(tree, 'element', (node) => {
       if (node.tagName !== 'a' || !node.properties) return;
 
