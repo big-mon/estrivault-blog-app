@@ -6,43 +6,41 @@ import type { Root } from 'mdast';
  * ::youtube{id="..."} ディレクティブをHTML要素に変換するremarkプラグイン
  */
 export const remarkYoutubeEmbed: Plugin<[], Root, Root> = () => {
-  return (tree: Root) => {
-    visit(tree, 'containerDirective', (node: any) => {
+  return (tree) => {
+    visit(tree, function (node) {
+      const isTargetType =
+        node.type === 'containerDirective' ||
+        node.type === 'leafDirective' ||
+        node.type === 'textDirective';
+      if (!isTargetType) return;
       if (node.name !== 'youtube') return;
 
       const data = node.data || (node.data = {});
       const attributes = node.attributes || {};
       const id = attributes.id;
 
-      if (!id) {
-        console.warn('YouTube embed directive without id attribute');
+      if (node.type === 'textDirective') {
+        console.error(
+          'Unexpected `:youtube` text directive, use two colons for a leaf directive',
+          node
+        );
         return;
       }
 
-      // HTMLノードに変換
-      data.hName = 'div';
+      if (!id) {
+        console.error('Unexpected missing `id` on `youtube` directive', node);
+        return;
+      }
+
+      data.hName = 'iframe';
       data.hProperties = {
-        className: 'youtube-embed',
-        style:
-          'position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 1rem 0;',
+        src: 'https://www.youtube.com/embed/' + id,
+        width: 200,
+        height: 200,
+        frameBorder: 0,
+        allow: 'picture-in-picture',
+        allowFullScreen: true,
       };
-
-      // iframeのHTMLを直接生成して設定
-      const iframeHtml = `
-        <iframe
-          src="https://www.youtube.com/embed/${id}"
-          width="100%"
-          height="100%"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
-        ></iframe>
-      `;
-
-      // ノードのタイプをHTMLに変更
-      node.type = 'html';
-      node.value = iframeHtml;
     });
   };
 };
