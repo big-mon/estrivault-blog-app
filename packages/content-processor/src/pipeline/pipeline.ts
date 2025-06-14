@@ -51,7 +51,6 @@ export function createPipeline(options: ProcessorOptions = {}) {
       .use(rehypeImageTransform, {
         cloudinaryCloudName: cloudinaryCloudName || '',
         width: 1200,
-        quality: 80,
         mode: 'fit',
       })
 
