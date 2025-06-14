@@ -19,6 +19,7 @@
   import PostBody from '$components/Post/PostBody.svelte';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
   import './amazon-card.scss';
+  import './twitter-embed.scss';
 
   interface PageData {
     post: PostHTML;
@@ -108,6 +109,7 @@
       document.head.appendChild(script);
     });
   }
+
 </script>
 
 <svelte:head>
