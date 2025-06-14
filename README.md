@@ -15,7 +15,6 @@ pnpm run build:all   # 全パッケージ・アプリを一括ビルド（モノ
 # 補足: 個別ビルドが必要な場合は下記コマンドも利用可能です
 # pnpm --filter @estrivault/cloudinary-utils build
 # pnpm --filter @estrivault/content-processor build
-# pnpm --filter @estrivault/remark-cloudinary-images build
 # pnpm --filter svelte-blog build
 
 ```
