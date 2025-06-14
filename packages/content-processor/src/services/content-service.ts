@@ -101,14 +101,21 @@ export class ContentService {
 /**
  * デフォルトのコンテンツサービスインスタンス
  */
-const defaultContentService = new ContentService();
+let defaultContentService: ContentService | null = null;
+
+function getDefaultService(options?: ContentServiceOptions): ContentService {
+  if (!defaultContentService || options) {
+    defaultContentService = new ContentService(options);
+  }
+  return defaultContentService;
+}
 
 // 便利な関数をエクスポート
-export const getPosts = () => defaultContentService.getPosts();
-export const getPostBySlug = (slug: string) => defaultContentService.getPostBySlug(slug);
-export const getPostsByCategory = (category: string, page?: number, limit?: number) => 
-  defaultContentService.getPostsByCategory(category, page, limit);
-export const getPostsByTag = (tag: string, page?: number, limit?: number) => 
-  defaultContentService.getPostsByTag(tag, page, limit);
-export const getCategories = () => defaultContentService.getCategories();
-export const getTags = () => defaultContentService.getTags();
+export const getPosts = (options?: ContentServiceOptions) => getDefaultService(options).getPosts();
+export const getPostBySlug = (slug: string, options?: ContentServiceOptions) => getDefaultService(options).getPostBySlug(slug);
+export const getPostsByCategory = (category: string, page?: number, limit?: number, options?: ContentServiceOptions) => 
+  getDefaultService(options).getPostsByCategory(category, page, limit);
+export const getPostsByTag = (tag: string, page?: number, limit?: number, options?: ContentServiceOptions) => 
+  getDefaultService(options).getPostsByTag(tag, page, limit);
+export const getCategories = (options?: ContentServiceOptions) => getDefaultService(options).getCategories();
+export const getTags = (options?: ContentServiceOptions) => getDefaultService(options).getTags();

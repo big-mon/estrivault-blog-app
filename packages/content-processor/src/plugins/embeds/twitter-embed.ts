@@ -6,19 +6,11 @@ interface TwitterEmbedOptions {
   onTwitterFound?: () => void;
 }
 
-// PostHTML型を拡張
-export interface PostHTMLWithMeta {
-  html: string;
-  hasTwitterEmbed: boolean;
-  // 他の既存のプロパティ...
-}
-
 /**
  * ::twitter{id="..."} ディレクティブをHTML要素に変換するremarkプラグイン
  */
-export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (options = {}) => {
-  return (tree, file) => {
-    let hasTwitterEmbed = false;
+export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = () => {
+  return (tree) => {
     visit(tree, function (node: any) {
       const isTargetType =
         node.type === 'containerDirective' ||
@@ -26,9 +18,6 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
         node.type === 'textDirective';
 
       if (!isTargetType || node.name !== 'twitter') return;
-
-      // Twitter埋め込みが見つかったことを記録
-      hasTwitterEmbed = true;
 
       const data = node.data || (node.data = {});
       const attributes = node.attributes || {};
