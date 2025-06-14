@@ -32,15 +32,26 @@ export const remarkYoutubeEmbed: Plugin<[], Root, Root> = () => {
         return;
       }
 
-      data.hName = 'iframe';
+      // ラッパーdivの設定
+      data.hName = 'div';
       data.hProperties = {
-        src: 'https://www.youtube.com/embed/' + id,
-        width: 200,
-        height: 200,
-        frameBorder: 0,
-        allow: 'picture-in-picture',
-        allowFullScreen: true,
+        className: ['youtube-embed'],
+        style: 'position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 1rem 0;'
       };
+
+      // iframeの設定
+      data.hChildren = [{
+        type: 'element',
+        tagName: 'iframe',
+        properties: {
+          src: 'https://www.youtube.com/embed/' + id,
+          frameBorder: '0',
+          allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+          allowFullScreen: true,
+          style: 'position: absolute; top: 0; left: 0; width: 100%; height: 100%;'
+        },
+        children: []
+      }];
     });
   };
 };
