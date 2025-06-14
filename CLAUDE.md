@@ -58,10 +58,31 @@ pnpm --filter @estrivault/cloudinary-utils build
 pnpm --filter @estrivault/cloudinary-utils dev  # Watch mode for development
 ```
 
+## Project Structure
+
+### Workspace Packages
+- `@estrivault/content-processor@0.1.0` - Core Markdown processing with unified/remark/rehype pipeline
+- `@estrivault/cloudinary-utils@0.1.0` - Image optimization utilities using Cloudinary
+- `svelte-blog` - Main SvelteKit application
+
+### Key Dependencies
+**Content Processing:**
+- unified, remark-parse, remark-directive, remark-gfm for Markdown parsing
+- rehype-raw, rehype-sanitize, rehype-stringify for HTML processing
+- gray-matter for frontmatter parsing
+- reading-time for estimated reading time calculation
+
+**SvelteKit App:**
+- Svelte 5.x with SvelteKit 2.x
+- TailwindCSS 4.x with typography plugin
+- Vite 6.x for build tooling
+- Vitest for unit testing, Playwright for E2E testing
+- TypeScript with strict configuration
+
 ## Important Architecture Details
 
 ### Content Processing Pipeline
-The `@estrivault/content-processor` uses a unified pipeline (`packages/content-processor/src/pipeline/pipeline.ts`) that:
+The `@estrivault/content-processor` uses a unified pipeline (`packages/content-processor/src/pipeline.ts`) that:
 - Parses Markdown with remark-parse, remark-directive, remark-gfm
 - Processes custom embeds (YouTube, Twitter, GitHub, Amazon) via custom remark plugins
 - Converts to HTML with rehype, including image optimization via Cloudinary
