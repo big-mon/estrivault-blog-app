@@ -9,6 +9,8 @@ interface TwitterEmbedOptions {
 // PostHTML型を拡張
 export interface PostHTMLWithMeta {
   html: string;
+  hasTwitterEmbed: boolean;
+  // 他の既存のプロパティ...
 }
 
 /**
@@ -16,6 +18,7 @@ export interface PostHTMLWithMeta {
  */
 export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (options = {}) => {
   return (tree, file) => {
+    let hasTwitterEmbed = false;
     visit(tree, function (node: any) {
       const isTargetType =
         node.type === 'containerDirective' ||
@@ -23,6 +26,9 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
         node.type === 'textDirective';
 
       if (!isTargetType || node.name !== 'twitter') return;
+
+      // Twitter埋め込みが見つかったことを記録
+      hasTwitterEmbed = true;
 
       const data = node.data || (node.data = {});
       const attributes = node.attributes || {};
@@ -49,21 +55,34 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
         'data-width': '550'
       };
 
-      // Twitterの正しいURL（x.comまたはtwitter.com）
-      const tweetUrl = `https://x.com/i/status/${id}`;
+      // Twitterの正しいURL
+      const tweetUrl = `https://x.com/twitter/status/${id}`;
 
-      // blockquoteの子要素として最小限のコンテンツを設定
+      // blockquoteの子要素として適切なコンテンツを設定
       node.children = [
         {
           type: 'paragraph',
           children: [
+            {
+              type: 'text',
+              value: 'Loading tweet...'
+            }
+          ]
+        },
+        {
+          type: 'paragraph',
+          children: [
+            {
+              type: 'text',
+              value: '— '
+            },
             {
               type: 'link',
               url: tweetUrl,
               children: [
                 {
                   type: 'text',
-                  value: `View tweet ${id}`
+                  value: `View on X`
                 }
               ]
             }

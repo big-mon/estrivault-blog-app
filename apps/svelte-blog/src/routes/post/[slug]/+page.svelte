@@ -3,8 +3,9 @@
   declare const window: Window & {
     twttr?: {
       widgets: {
-        load: () => void;
+        load(): Promise<void>;
       };
+      ready?: (callback: () => void) => void;
     };
   };
 </script>
@@ -39,27 +40,39 @@
     }
   });
 
-  async function loadTwitterWidgets() {
-    // すでに読み込まれている場合は再初期化のみ
-    if (window.twttr?.widgets) {
-      window.twttr.widgets.load();
-      return;
-    }
-
+  async function loadTwitterWidgets(): Promise<void> {
     return new Promise<void>((resolve) => {
+      if (window.twttr) {
+        // 既に読み込まれている場合は、widgets.load()を呼び出す
+        window.twttr.widgets.load().then(() => resolve());
+        return;
+      }
+
+      // スクリプトが存在しない場合は新しく作成
       const script = document.createElement('script');
       script.async = true;
       script.src = 'https://platform.twitter.com/widgets.js';
+      script.charset = 'utf-8';
+      script.id = 'twitter-wjs';
+
       script.onload = () => {
-        // Twitter ウィジェットが完全に読み込まれるのを待つ
-        const checkTwttr = setInterval(() => {
-          if (window.twttr?.widgets) {
-            clearInterval(checkTwttr);
-            window.twttr.widgets.load();
-            resolve();
-          }
-        }, 100);
+        // スクリプト読み込み完了後、twttrが利用可能になるまで待つ
+        if (window.twttr && window.twttr.ready) {
+          window.twttr.ready(() => {
+            window.twttr!.widgets.load().then(() => resolve());
+          });
+        } else {
+          // fallback: 少し待ってからwidgets.load()を呼び出す
+          setTimeout(() => {
+            if (window.twttr) {
+              window.twttr.widgets.load().then(() => resolve());
+            } else {
+              resolve();
+            }
+          }, 100);
+        }
       };
+
       document.head.appendChild(script);
     });
   }
