@@ -1,0 +1,29 @@
+/* Twitter埋め込みコンテナのスタイル調整 */
+.prose .twitter-tweet {
+  margin: 2rem auto !important;
+  max-width: 550px !important;
+  border-radius: 12px !important;
+  border: 1px solid #e1e8ed !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24) !important;
+}
+
+/* Twitter iframe のスタイル調整 */
+.prose iframe[id^="twitter-widget"] {
+  border-radius: 12px !important;
+  max-width: 100% !important;
+}
+
+/* Twitter埋め込み周辺の余白調整 */
+.prose .twitter-tweet + p,
+.prose p + .twitter-tweet {
+  margin-top: 2rem !important;
+  margin-bottom: 2rem !important;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .prose .twitter-tweet {
+    margin: 1.5rem auto !important;
+    max-width: 100% !important;
+  }
+}

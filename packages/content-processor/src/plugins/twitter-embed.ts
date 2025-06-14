@@ -52,11 +52,13 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
       data.hProperties = {
         className: ['twitter-tweet'],
         'data-theme': 'light',
-        'data-width': '550'
+        'data-width': '550',
+        'data-dnt': 'true',
+        'data-conversation': 'none'
       };
 
       // Twitterの正しいURL
-      const tweetUrl = `https://x.com/twitter/status/${id}`;
+      const tweetUrl = `https://twitter.com/i/status/${id}`;
 
       // blockquoteの子要素として適切なコンテンツを設定
       node.children = [

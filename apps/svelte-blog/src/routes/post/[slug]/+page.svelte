@@ -19,6 +19,7 @@
   import PostBody from '$components/Post/PostBody.svelte';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
   import './amazon-card.scss';
+  import './twitter-embed.scss';
 
   interface PageData {
     post: PostHTML;
@@ -77,7 +78,6 @@
       script.id = 'twitter-wjs';
       script.async = true;
       script.src = 'https://platform.twitter.com/widgets.js';
-      script.charset = 'utf-8';
 
       script.onload = () => {
         console.log('Twitter script loaded');
@@ -109,6 +109,7 @@
       document.head.appendChild(script);
     });
   }
+
 </script>
 
 <svelte:head>
