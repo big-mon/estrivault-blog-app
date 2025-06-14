@@ -31,11 +31,3 @@ export function normalizeForSlug(str: string): string {
     // 先頭・末尾ハイフン除去
     .replace(/^-+|-+$/g, '');
 }
-
-/**
- * 後方互換性のため残す（非推奨）
- * @deprecated normalizeForTagFilter または normalizeForSlug を使用してください
- */
-export function normalize(str: string): string {
-  return normalizeForTagFilter(str);
-}
