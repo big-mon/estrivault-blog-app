@@ -54,6 +54,4 @@ CIKとはEDGAR上で採番された一意の識別子です。詳しくはEDGAR�
 [gc]: https://www.sec.gov/edgar/browse/?CIK=0001079114
 [ac]: https://www.sec.gov/edgar/browse/?CIK=1165408
 
-```amazon:B075JCTJ4X
-歴史の大局を見渡す ──人類の遺産の創造とその記録
-```
+::amazon{asin="B075JCTJ4X" name="歴史の大局を見渡す ──人類の遺産の創造とその記録"}

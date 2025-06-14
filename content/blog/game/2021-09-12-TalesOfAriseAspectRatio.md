@@ -36,6 +36,4 @@ Universal Unreal Engine Unlockerに関するドキュメントは下記で確認
 
 [https://framedsc.github.io/GeneralGuides/universal_ue4_consoleunlocker.htm](https://framedsc.github.io/GeneralGuides/universal_ue4_consoleunlocker.htm)
 
-```amazon:B09319VMGT
-Tales of ARISE
-```
+::amazon{asin="B09319VMGT" name="Tales of ARISE"}

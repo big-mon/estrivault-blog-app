@@ -21,8 +21,6 @@ A2+はDAC内臓なのでPCとUSB接続するだけで使用できる見た目と
 
 結果としては**問題なく接続に成功**、音楽再生など違和感を感じません。(ピュアオーディオ界隈の方からすれば何かしら違いを感じるかもしれませんが、素人の耳では差が分かりませんでした)
 
-```amazon:B0197AP8NC
-エレコム USBケーブル Type C ( USB C to micro B ) 15W 1.0m USB2.0認証品 最大480Mbps ブラック U2C-CMB10NBK
-```
+::amazon{asin="B0197AP8NC" name="エレコム USBケーブル Type C ( USB C to micro B ) 15W 1.0m USB2.0認証品 最大480Mbps ブラック U2C-CMB10NBK"}
 
 なお、今回の検証で私が使用したのは上記のエレコム製のUSBケーブルです。

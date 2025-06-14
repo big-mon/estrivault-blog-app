@@ -86,6 +86,4 @@ const App = ({ Component, pageProps, router }: AppProps) => {
 export default App;
 ```
 
-```amazon:B07DK8QHGV
-後宮の烏
-```
+::amazon{asin="B07DK8QHGV" name="後宮の烏"}

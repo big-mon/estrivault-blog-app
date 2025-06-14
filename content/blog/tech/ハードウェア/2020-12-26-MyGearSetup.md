@@ -40,9 +40,7 @@ IKEAで購入した竹で加工されたテーブルです。表面が竹なの�
 
 予算に糸目をつけなければオカムラの「[コンテッサ II](https://www.okamura.co.jp/product/seating/contessa_seconda/)」が更に満足度が高いと思います。
 
-```amazon:B00B7C5MNA
-オカムラ サブリナ
-```
+::amazon{asin="B00B7C5MNA" name="オカムラ サブリナ"}
 
 ## PC
 
@@ -70,9 +68,7 @@ Windows派だったので敵情視察としてApple製のPCを購入してみま
 
 メインPCは標準でホコリフィルターが装備されているので効果はあまり実感していませんが、PCを少し浮かせられるためホコリへの対策にもなるようです。
 
-```amazon:B019EN24T8
-サンワダイレクト PC スタンド
-```
+::amazon{asin="B019EN24T8" name="サンワダイレクト PC スタンド"}
 
 ## モニター
 
@@ -86,9 +82,7 @@ Windows派だったので敵情視察としてApple製のPCを購入してみま
 
 購入したときよりもずいぶん価格が下がっており、ちょっとショックです。
 
-```amazon:B07BDRPXHP
-ROG STRIX XG35VQ
-```
+::amazon{asin="B07BDRPXHP" name="ROG STRIX XG35VQ"}
 
 ### サブモニター：Philips「227E7QDSB」
 
@@ -96,9 +90,7 @@ ROG STRIX XG35VQ
 
 ウルトラワイドモニターをメインとしているので必要ないかとも思いましたが、動画を再生していたりTipsの様な参考情報を表示する領域として使用して、メインモニターでより重要な情報を複数のウィンドウで表示するような使い方が気に入っています。
 
-```amazon:B0813TKCQX
-Philips 227E7QDSB
-```
+::amazon{asin="B0813TKCQX" name="Philips 227E7QDSB"}
 
 ### モニターアーム：エルゴトロン
 
@@ -108,9 +100,7 @@ Philips 227E7QDSB
 
 モニターアームがあると机がすっきりとするので、地味に使うと戻れなくなる製品ですね。
 
-```amazon:B0036RDOT8
-エルゴトロン LX デスクマウント
-```
+::amazon{asin="B0036RDOT8" name="エルゴトロン LX デスクマウント"}
 
 ## マウスとキーボード
 
@@ -124,9 +114,7 @@ Razerのワイヤレスマウス「Viper Ultimate」を使用しています。
 
 普段使いと大部分のゲームはこのマウスを使用しています。
 
-```amazon:B07ZD46659
-Razer Viper Ultimate
-```
+::amazon{asin="B07ZD46659" name="Razer Viper Ultimate"}
 
 ### マウス：Logicool G「G600t」
 
@@ -138,9 +126,7 @@ LogicoolのMMO用ゲーミングマウス「G600t」をサブマウスとして�
 
 重量があるので普段使いにはあまりお勧めできませんが、MMOをプレイするうえではかなりのオススメです。Razerでも競合製品が出ているので、そちらも良い選択肢になると思います。
 
-```amazon:B01D45U6LA
-Logicool G G600t
-```
+::amazon{asin="B01D45U6LA" name="Logicool G G600t"}
 
 #### マウスバンジー：Razer「Mouse Bungee V2」
 
@@ -148,9 +134,7 @@ Logicool G G600t
 
 有線マウスはここぞという場面でケーブルの重量を感じて、操作中に違和感を感じたりすることがあります。その違和感がなくなるよう、ケーブルに常にゆとりを持たせる便利グッズですね。MMOマウスに使用していて、正直MMOでは少しくらいケーブルの重さを感じても影響は少ないのですが、もう戻れないですね。
 
-```amazon:B07JG2C552
-Razer Mouse Bungee V2
-```
+::amazon{asin="B07JG2C552" name="Razer Mouse Bungee V2"}
 
 ### キーボード：Razer「Huntsman Tournament Edition」
 
@@ -164,9 +148,7 @@ Razerのテンキーレスなワイヤレスキーボードを使用していま
 
 職場で普段使用しているREALFORCEのキーボードと比べた感想になりますが、REALFORCEの方が満足度が高いです。
 
-```amazon:B07Z8728BK
-Razer Huntsman Tournament Edition
-```
+::amazon{asin="B07Z8728BK" name="Razer Huntsman Tournament Edition"}
 
 #### パームレスト：FILCO
 
@@ -178,9 +160,7 @@ PC作業を仕事としている人たちの間で人気のあるサイドオプ
 
 サイズはLサイズを使用していて、テンキーレスのキーボードに対しては余り気味です。購入した当時のキーボードがテンキー付きだったのでこうなりましたが、見た目の不格好さを除けば幅が余ることで困ることはありません。逆は困るでしょう。
 
-```amazon:B07ZJPF1KZ
-FILCO Genuine ウッドリストレスト
-```
+::amazon{asin="B07ZJPF1KZ" name="FILCO Genuine ウッドリストレスト"}
 
 ### マウスパッド：SteelSeries「QcK HEAVY」
 
@@ -192,9 +172,7 @@ FILCO Genuine ウッドリストレスト
 
 お茶をこぼしたこともあるのですが、変に染みになったり匂いがすることもなく、干したり洗ったりできるメンテナンスのしやすさも良いです。
 
-```amazon:B00WAA2704
-SteelSeries QcK HEAVY
-```
+::amazon{asin="B00WAA2704" name="SteelSeries QcK HEAVY"}
 
 ## オーディオ
 

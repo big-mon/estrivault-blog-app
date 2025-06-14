@@ -9,7 +9,7 @@ interface AmazonAttributes {
 }
 
 /**
- * ::amazon{asin="..."} ディレクティブをHTML要素に変換するremarkプラグイン
+ * ::amazon{asin="..." name="..."} ディレクティブをHTML要素に変換するremarkプラグイン
  * スタイリングは呼び出し元のCSSクラスで制御します
  */
 export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {

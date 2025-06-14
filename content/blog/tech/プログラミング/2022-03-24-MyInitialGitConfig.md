@@ -77,6 +77,4 @@ git config --global init.defaultBranch main
 | credential.helper  | 認証情報の参照先                 |
 | init.defaultBranch | デフォルトブランチ名             |
 
-```amazon:B07BRTBRXV
-Denon AH-D1200 ヘッドフォン ハイレゾ対応 密閉ダイナミック型
-```
+::amazon{asin="B07BRTBRXV" name="Denon AH-D1200 ヘッドフォン ハイレゾ対応 密閉ダイナミック型"}

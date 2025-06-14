@@ -77,6 +77,4 @@ VTACとして[製品紹介ビデオ](https://www.youtube.com/watch?v=FFz682X2oQs
 - 余った部分を切り取る(VTAC推奨)
 - ベルトキーパーなどでまとめる
 
-```amazon:B09D6PLH2V
-FIRST SPEAR デューティベルト AGB アサルターズガンベルト
-```
+::amazon{asin="B09D6PLH2V" name="FIRST SPEAR デューティベルト AGB アサルターズガンベルト"}

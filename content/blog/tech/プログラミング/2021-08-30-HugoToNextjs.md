@@ -125,6 +125,4 @@ Next.jsを使用してから初めてMarkdownをHTMLに変換する処理につ�
 
 [https://big-mon.github.io/react-component-amazon-block/](https://big-mon.github.io/react-component-amazon-block/)
 
-```amazon:B07JVCVF12
-イスルイン物語　預言されし王
-```
+::amazon{asin="B07JVCVF12" name="イスルイン物語 預言されし王"}
