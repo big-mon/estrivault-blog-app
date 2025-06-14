@@ -15,10 +15,16 @@ export interface PostWithPath {
 /**
  * 共通のファイル探索ユーティリティ
  * ディレクトリを再帰的に探索してMarkdownファイルを処理
+ * 結果は投稿日の新しい順でソートされる
  */
 export async function walkMarkdownFiles(options: FileWalkOptions = {}): Promise<PostMeta[]> {
   const postsWithPath = await walkMarkdownFilesWithPath(options);
-  return postsWithPath.map(p => p.meta);
+  const posts = postsWithPath.map(p => p.meta);
+  
+  // 投稿日の新しい順でソート
+  posts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  
+  return posts;
 }
 
 /**

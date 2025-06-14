@@ -1,6 +1,3 @@
-// サービス（メインAPI）
-export * from './services/content-service';
-
 // ローダー（低レベルAPI）
 export { loadFile } from './loaders/file-loader';
 
