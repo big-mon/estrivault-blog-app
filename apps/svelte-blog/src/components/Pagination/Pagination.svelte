@@ -17,7 +17,10 @@
 
   // ページリンクの生成
   function getPageUrl(page: number): string {
-    return `${baseUrl}/${page}`;
+    if (page === 1) {
+      return baseUrl === '/' ? '/' : baseUrl;
+    }
+    return `${baseUrl}${page}`;
   }
 
   // 表示するページ番号の配列を生成
