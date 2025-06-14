@@ -1,11 +1,17 @@
 <script lang="ts">
   import PostCard from '$components/PostCard/PostCard.svelte';
   import Pagination from '$components/Pagination/Pagination.svelte';
+  import { SITE_TITLE, SITE_DESCRIPTION } from '$constants';
   import type { PageData } from './$types';
 
   export let data: PageData;
   const { posts, pagination } = data;
 </script>
+
+<svelte:head>
+  <title>{SITE_TITLE}</title>
+  <meta name="description" content={SITE_DESCRIPTION} />
+</svelte:head>
 
 <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
   {#each posts as post}

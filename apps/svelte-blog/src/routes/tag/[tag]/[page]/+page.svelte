@@ -3,6 +3,7 @@
   import { afterNavigate } from '$app/navigation';
   import PostCard from '$components/PostCard/PostCard.svelte';
   import Pagination from '$components/Pagination/Pagination.svelte';
+  import { SITE_TITLE } from '$constants';
   import type { PageData } from '../../../$types';
   import type { PostMeta } from '@estrivault/content-processor';
 
@@ -56,7 +57,7 @@
 </script>
 
 <svelte:head>
-  <title>{pageData.tag}の記事一覧</title>
+  <title>{pageData.tag}の記事一覧 | {SITE_TITLE}</title>
   <meta name="description" content="{pageData.tag.toUpperCase()}タグの記事一覧ページです。" />
 </svelte:head>
 
