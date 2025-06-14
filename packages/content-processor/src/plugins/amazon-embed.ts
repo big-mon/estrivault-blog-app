@@ -1,100 +1,67 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
+import type { Root } from 'mdast';
 
 /**
  * ::amazon{asin="..."} ディレクティブをHTML要素に変換するremarkプラグイン
  */
-export const remarkAmazonEmbed: Plugin = () => {
+export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
   return (tree) => {
-    visit(tree, 'containerDirective', (node: any) => {
-      if (node.name !== 'amazon') return;
+    visit(tree, function (node) {
+        const isTargetType =
+          node.type === 'containerDirective' ||
+          node.type === 'leafDirective' ||
+          node.type === 'textDirective';
+        if (!isTargetType) return;
+        if (node.name !== 'amazon') return;
 
-      const data = node.data || (node.data = {});
-      const attributes = node.attributes || {};
-      const { asin } = attributes;
+        const data = node.data || (node.data = {});
+        const attributes = node.attributes || {};
+        const asin = attributes.asin;
 
-      if (!asin) {
-        console.warn('Amazon embed directive missing asin attribute');
-        return;
-      }
+        if (node.type === 'textDirective') {
+            console.error(
+                'Unexpected `:amazon` text directive, use two colons for a leaf directive',
+                node
+            );
+            return;
+        }
 
-      // HTMLノードに変換
-      data.hName = 'div';
-      data.hProperties = {
-        className: ['amazon-embed'],
-        style: 'margin: 1.5rem 0; border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px;',
-      };
+        if (!asin) {
+            console.error('Unexpected missing `asin` on `amazon` directive', node);
+            return;
+        }
 
-      // Amazon商品リンクを子要素として追加
-      node.children = [
-        {
-          type: 'paragraph',
-          data: {
-            hName: 'a',
-            hProperties: {
-              href: `https://www.amazon.co.jp/dp/${asin}`,
-              target: '_blank',
-              rel: 'noopener noreferrer sponsored',
-              className: ['amazon-link'],
-              style: 'display: flex; text-decoration: none; color: inherit;',
+        // ラッパーdivの設定
+        data.hName = 'div';
+        data.hProperties = {
+            className: ['amazon-embed'],
+            style: 'margin: 1.5rem 0; border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px;',
+        };
+
+        // Amazon商品リンクを子要素として追加
+        data.hChildren = [{
+            type: 'element',
+            tagName: 'div',
+            properties: {
+                className: ['amazon-embed'],
+                style: 'margin: 1.5rem 0; border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px;',
             },
-          },
-          children: [
-            {
-              type: 'paragraph',
-              data: {
-                hName: 'div',
-                hProperties: {
-                  className: ['amazon-image'],
-                  style: 'margin-right: 16px; min-width: 120px;',
-                },
-              },
-              children: [
+            children: [
                 {
-                  type: 'paragraph',
-                  data: {
-                    hName: 'img',
-                    hProperties: {
-                      src: `https://images-na.ssl-images-amazon.com/images/P/${asin}.09.MZZZZZZZ`,
-                      alt: 'Amazon商品画像',
-                      style: 'max-width: 120px; max-height: 120px;',
+                    type: 'element',
+                    tagName: 'iframe',
+                    properties: {
+                        src: 'https://www.amazon.co.jp/dp/' + asin,
+                        frameBorder: '0',
+                        allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+                        allowFullScreen: true,
+                        style: 'position: absolute; top: 0; left: 0; width: 100%; height: 100%;'
                     },
-                  },
-                  children: [],
-                },
-              ],
-            },
-            {
-              type: 'paragraph',
-              data: {
-                hName: 'div',
-                hProperties: {
-                  className: ['amazon-info'],
-                  style: 'flex: 1;',
-                },
-              },
-              children: [
-                {
-                  type: 'paragraph',
-                  data: {
-                    hName: 'div',
-                    hProperties: {
-                      className: ['amazon-title'],
-                      style: 'font-weight: bold; margin-bottom: 8px;',
-                    },
-                  },
-                  children: [
-                    {
-                      type: 'text',
-                      value: 'Amazon商品を見る',
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ];
+                    children: []
+                }
+            ]
+        }]
     });
   };
 };

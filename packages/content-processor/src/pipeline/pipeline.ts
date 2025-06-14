@@ -10,6 +10,7 @@ import { rehypeLinkTransform } from '../plugins/link-transform';
 import { remarkYoutubeEmbed } from '../plugins/youtube-embed';
 import { remarkTwitterEmbed } from '../plugins/twitter-embed';
 import { remarkGithubEmbed } from '../plugins/github-embed';
+import { remarkAmazonEmbed } from '../plugins/amazon-embed';
 import type { ProcessorOptions as BaseProcessorOptions } from '../types';
 
 /**
@@ -40,6 +41,7 @@ export function createPipeline(options: ProcessorOptions = {}) {
       .use(remarkYoutubeEmbed)
       .use(remarkTwitterEmbed)
       .use(remarkGithubEmbed)
+      .use(remarkAmazonEmbed)
 
       // HTML 変換
       .use(remarkRehype, { allowDangerousHtml: true })
