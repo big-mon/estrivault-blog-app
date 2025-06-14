@@ -3,6 +3,7 @@
   import Header from '$components/Post/Header.svelte';
   import PostBody from '$components/Post/PostBody.svelte';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
+  import './+page.css';
 
   interface PageData {
     post: PostHTML;
@@ -28,7 +29,7 @@
   {/if}
 </svelte:head>
 
-<article class="container mx-auto">
+<article class="container mx-auto px-4">
   <Header meta={post.meta} />
   <PostBody {post} />
 </article>

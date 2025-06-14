@@ -1,0 +1,77 @@
+/* Amazon 商品カード */
+.amazon-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin: 1.5rem 0;
+}
+
+@media (min-width: 768px) {
+  .amazon-card {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+}
+
+.amazon-card__image {
+  grid-column: span 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  background-color: white;
+}
+
+.amazon-card__image__img {
+  max-width: 100%;
+  height: auto;
+  max-height: 12rem;
+  object-fit: contain;
+}
+
+.amazon-card__content {
+  grid-column: span 7;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.amazon-card__title {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+}
+
+.amazon-card__title:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.amazon-card__cta {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #fbbf24;
+  color: #111827;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  text-align: center;
+  transition-property:
+    background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+.amazon-card__cta:hover {
+  background-color: #f59e0b;
+}
