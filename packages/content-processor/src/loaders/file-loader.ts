@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
-import { createPipeline } from '../pipeline/pipeline';
+import { createPipeline } from '../pipeline';
 import { buildUrl } from '@estrivault/cloudinary-utils';
 import type { PostMeta, PostHTML, ProcessorOptions } from '../types';
 import { FrontMatterError, MarkdownParseError } from '../errors';

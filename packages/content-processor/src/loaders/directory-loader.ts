@@ -1,5 +1,5 @@
 import type { ProcessorOptions } from '../types';
-import type { PostMeta, PostHTML } from '../types/post';
+import type { PostMeta, PostHTML } from '../types';
 import { walkMarkdownFiles, findPostBySlug } from '../utils/file-walker';
 import { normalizeForTagFilter } from '../utils/normalize';
 

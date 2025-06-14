@@ -6,25 +6,20 @@ export const load = (async ({ params }) => {
   const { category, page: pageParam } = params;
   const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
 
-  // カテゴリーでフィルタリングして全記事を取得
-  const { posts: allPosts } = await getPosts({
+  // getPostsのオプションでカテゴリーフィルタリングとページネーションを実行
+  const result = await getPosts({
     category,
+    page: currentPage,
+    perPage: POSTS_PER_PAGE,
   });
 
-  // ページネーション処理
-  const totalPosts = allPosts.length;
-  const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
-  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
-  const endIndex = startIndex + POSTS_PER_PAGE;
-  const posts = allPosts.slice(startIndex, endIndex);
-
   return {
-    posts,
+    posts: result.posts,
     pagination: {
-      page: currentPage,
-      perPage: POSTS_PER_PAGE,
-      total: totalPosts,
-      totalPages,
+      page: result.page,
+      perPage: result.perPage,
+      total: result.total,
+      totalPages: result.totalPages,
     },
     category,
   };

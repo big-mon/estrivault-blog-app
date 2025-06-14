@@ -1,0 +1,33 @@
+export interface EmbedOptions {
+  youtube?: boolean;
+  twitter?: boolean;
+  github?: boolean;
+  amazon?: boolean;
+}
+
+export interface ProcessorOptions {
+  embeds?: EmbedOptions;
+  cloudinaryCloudName?: string;
+  imageBase?: string;
+  sanitizeSchema?: import('hast-util-sanitize').Schema;
+}
+
+/** 投稿のメタ情報 */
+export interface PostMeta {
+  slug: string;
+  title: string;
+  description: string;
+  publishedAt: string;
+  updatedAt?: string;
+  category: string;
+  tags: string[];
+  coverImage?: string;
+  draft?: boolean;
+  readingTime?: number;
+}
+
+/** 投稿のメタ・本文 */
+export interface PostHTML {
+  meta: PostMeta;
+  html: string;
+}

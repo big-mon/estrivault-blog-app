@@ -1,6 +1,6 @@
 import { getPostBySlug } from '$lib/posts';
 import { error } from '@sveltejs/kit';
-import type { PostHTML } from '@estrivault/content-processor';
+import { type PostHTML } from '@estrivault/content-processor';
 
 export const load = async ({
   params,

@@ -1,11 +1,12 @@
-// ローダー
-export * from './loaders/directory-loader';
+// ローダー（低レベルAPI）
+export { loadFile } from './loaders/file-loader';
 
 // 型
 export * from './types';
 
 // パイプライン
-export { createPipeline } from './pipeline/pipeline';
+export { createPipeline } from './pipeline';
 
 // ユーティリティ
 export { normalizeForTagFilter, normalizeForSlug } from './utils/normalize';
+export { walkMarkdownFiles, walkMarkdownFilesWithPath } from './utils/file-walker';

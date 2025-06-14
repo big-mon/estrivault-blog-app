@@ -1,7 +1,6 @@
 import path from 'path';
 import fs from 'node:fs';
-import type { PostMeta, PostHTML } from '../types/post';
-import type { ProcessorOptions } from '../types';
+import type { PostMeta, PostHTML, ProcessorOptions } from '../types';
 import { loadFile } from '../loaders/file-loader';
 
 export interface FileWalkOptions extends ProcessorOptions {
@@ -16,10 +15,16 @@ export interface PostWithPath {
 /**
  * 共通のファイル探索ユーティリティ
  * ディレクトリを再帰的に探索してMarkdownファイルを処理
+ * 結果は投稿日の新しい順でソートされる
  */
 export async function walkMarkdownFiles(options: FileWalkOptions = {}): Promise<PostMeta[]> {
   const postsWithPath = await walkMarkdownFilesWithPath(options);
-  return postsWithPath.map(p => p.meta);
+  const posts = postsWithPath.map(p => p.meta);
+  
+  // 投稿日の新しい順でソート
+  posts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  
+  return posts;
 }
 
 /**
@@ -58,7 +63,7 @@ export async function walkMarkdownFilesWithPath(options: FileWalkOptions = {}): 
  */
 export async function findPostBySlug(slug: string, options: FileWalkOptions = {}): Promise<PostHTML | null> {
   const postsWithPath = await walkMarkdownFilesWithPath(options);
-  
+
   for (const { meta, filePath } of postsWithPath) {
     if (meta.slug === slug) {
       try {
@@ -68,6 +73,6 @@ export async function findPostBySlug(slug: string, options: FileWalkOptions = {}
       }
     }
   }
-  
+
   return null;
 }

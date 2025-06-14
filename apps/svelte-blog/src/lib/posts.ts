@@ -1,14 +1,27 @@
 import {
-  getPosts as getPostsFromProcessor,
-  getPostBySlug as getPostBySlugFromProcessor,
-  getPostsByTag as getPostsByTagFromProcessor,
+  walkMarkdownFiles,
+  walkMarkdownFilesWithPath,
+  loadFile,
   type PostMeta,
   type PostHTML,
+  normalizeForTagFilter,
 } from '@estrivault/content-processor';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
 
+// 設定オプション
+const processorOptions = {
+  cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
+  baseDir: '/workspaces/test-wsl-version/content/blog'
+};
+
 /**
  * すべての記事メタデータを取得
+ * @returns 記事のメタデータの配列
+ * @param options ページネーションやフィルタリングのオプション
+ * @param options.page ページ番号（デフォルトは1）
+ * @param options.perPage 1ページあたりの記事数（デフォルトは20）
+ * @param options.category カテゴリでフィルタリング
+ * @param options.tag タグでフィルタリング
  */
 export async function getPosts(options?: {
   page?: number;
@@ -27,16 +40,39 @@ export async function getPosts(options?: {
     const page = options?.page || 1;
     const perPage = options?.perPage || 20;
 
-    // content-processor側でフィルタされるため、ここでのfilter処理は不要
-    const allPostsObj = await getPostsFromProcessor({
-      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
+    // 全記事を取得
+    const allPosts = await walkMarkdownFiles(processorOptions);
+
+    // カテゴリやタグでフィルタリング
+    let filteredPosts = allPosts;
+    if (options?.category) {
+      const normalizedCategory = normalizeForTagFilter(options.category);
+      filteredPosts = filteredPosts.filter((post: PostMeta) =>
+        normalizeForTagFilter(post.category) === normalizedCategory
+      );
+    }
+    if (options?.tag) {
+      const normalizedTag = normalizeForTagFilter(options.tag);
+      filteredPosts = filteredPosts.filter((post: PostMeta) =>
+        post.tags?.some((tag: string) => normalizeForTagFilter(tag) === normalizedTag)
+      );
+    }
+
+    // ページネーション処理
+    const total = filteredPosts.length;
+    const totalPages = Math.ceil(total / perPage);
+    const startIndex = (page - 1) * perPage;
+    const posts = filteredPosts.slice(startIndex, startIndex + perPage);
+
+    const result = {
+      posts,
+      total,
       page,
       perPage,
-      category: options?.category,
-      tag: options?.tag,
-    });
+      totalPages
+    };
 
-    return allPostsObj;
+    return result;
   } catch (err) {
     console.error('Failed to get posts:', err);
     throw new Error('Failed to get posts');
@@ -49,20 +85,14 @@ export async function getPosts(options?: {
  * @returns 記事のメタデータとHTMLコンテンツ
  */
 export async function getPostBySlug(slug: string): Promise<PostHTML> {
-  const post = await getPostBySlugFromProcessor(slug, {
-    cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
-  });
-  return post;
-}
-
-/**
- * タグに基づいて記事を取得
- * @param tag タグのスラッグ
- * @returns タグに一致する記事のメタデータの配列
- */
-export async function getPostsByTag(tag: string): Promise<PostMeta[]> {
-  const items = await getPostsByTagFromProcessor(tag, {
-    cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
-  });
-  return items;
+  // ファイルパス付きで全記事を取得してslugで検索
+  const allPostsWithPath = await walkMarkdownFilesWithPath(processorOptions);
+  const postWithPath = allPostsWithPath.find(post => post.meta.slug === slug);
+  
+  if (!postWithPath) {
+    throw new Error(`Post with slug '${slug}' not found`);
+  }
+  
+  // loadFileで完全なPostHTMLを取得
+  return await loadFile(postWithPath.filePath, processorOptions);
 }
