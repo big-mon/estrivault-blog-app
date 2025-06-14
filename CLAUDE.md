@@ -14,7 +14,6 @@ This is a **monorepo blog application** built with **SvelteKit** and **TypeScrip
 **Packages:**
 - `@estrivault/content-processor` - Core package that processes Markdown files using unified/remark/rehype pipeline with custom plugins for YouTube, Twitter, GitHub, and Amazon embeds
 - `@estrivault/cloudinary-utils` - Image optimization utilities using Cloudinary
-- `@estrivault/remark-cloudinary-images` - Remark plugin for Cloudinary integration
 
 **Content Flow:**
 1. Markdown files in `content/blog/` (organized by category)
@@ -33,7 +32,7 @@ pnpm run build:all  # Build all packages (required for workspace dependencies)
 ### Development
 ```bash
 pnpm dev                              # Start development server (http://localhost:5173)
-pnpm --filter svelte-blog build      # Build for production  
+pnpm --filter svelte-blog build      # Build for production
 pnpm --filter svelte-blog preview    # Preview production build
 ```
 
