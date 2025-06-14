@@ -8,11 +8,13 @@ $color-cta-hover: #f59e0b;
 $color-bg: white;
 
 // ミックスイン
+@use 'sass:list';
+
 @mixin transition($properties...) {
   $transition: ();
 
   @each $property in $properties {
-    $transition: append($transition, #{$property} 200ms cubic-bezier(0.4, 0, 0.2, 1), comma);
+    $transition: list.append($transition, #{$property} 200ms cubic-bezier(0.4, 0, 0.2, 1), $separator: comma);
   }
 
   transition: $transition;

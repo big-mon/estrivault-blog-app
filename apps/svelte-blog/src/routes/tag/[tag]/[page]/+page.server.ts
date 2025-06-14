@@ -8,7 +8,7 @@ export async function entries() {
   // すべての記事を取得してタグを収集
   const allPosts = await getPosts();
   const tags = new Set<string>();
-  
+
   allPosts.posts.forEach((post: PostMeta) => {
     post.tags?.forEach((tag: string) => tags.add(tag.toLowerCase()));
   });
@@ -18,48 +18,82 @@ export async function entries() {
   for (const tag of tags) {
     const postsForTag = await getPosts({ tag });
     const totalPages = Math.ceil(postsForTag.total / POSTS_PER_PAGE);
-    const pagesToPrerender = Math.min(5, totalPages); // 最大5ページまでプリレンダリング
-    
-    for (let page = 1; page <= pagesToPrerender; page++) {
+    const pages = Math.max(1, totalPages);
+
+    for (let page = 1; page <= pages; page++) {
       entries.push({ tag, page: page.toString() });
     }
   }
-  
+
   return entries;
 }
 
 // プリレンダリングを有効化
 export const prerender = true;
 
-export const load = (async ({ params }) => {
-  const { tag, page: pageParam } = params;
-  const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
+export const load = (async ({ params, setHeaders }) => {
+  try {
+    const { tag, page: pageParam } = params;
+    const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
 
-  // タグでフィルタリングして全記事を取得
-  const { posts: allPosts } = await getPosts({
-    tag,
-  });
+    // ページ番号のバリデーション
+    if (isNaN(currentPage) || currentPage < 1) {
+      return {
+        status: 404,
+        error: 'Page not found',
+      };
+    }
 
-  // ページネーション処理
-  const totalPosts = allPosts.length;
-  const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
-  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
-  const endIndex = startIndex + POSTS_PER_PAGE;
-  const posts = allPosts.slice(startIndex, endIndex);
+    // タグでフィルタリングして全記事を取得
+    const { posts: allPosts } = await getPosts({ tag });
 
-  // 存在しないページの場合は404
-  if (currentPage > totalPages && currentPage !== 1) {
-    throw new Error('Page not found');
+    // タグが存在しない、または記事がない場合
+    if (!allPosts || allPosts.length === 0) {
+      return {
+        status: 404,
+        error: 'Tag not found',
+      };
+    }
+
+    // ページネーション処理
+    const totalPosts = allPosts.length;
+    const totalPages = Math.max(1, Math.ceil(totalPosts / POSTS_PER_PAGE));
+
+    // 存在しないページにアクセスした場合
+    if (currentPage > totalPages) {
+      return {
+        status: 404,
+        error: 'Page not found',
+      };
+    }
+
+    const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+    const endIndex = startIndex + POSTS_PER_PAGE;
+    const posts = allPosts.slice(startIndex, endIndex);
+
+    // キャッシュ制御ヘッダーを設定（オプション）
+    setHeaders({
+      'Cache-Control': 'public, max-age=3600', // 1時間キャッシュ
+    });
+
+    return {
+      posts,
+      pagination: {
+        page: currentPage,
+        perPage: POSTS_PER_PAGE,
+        total: totalPosts,
+        totalPages,
+        hasNextPage: currentPage < totalPages,
+        hasPreviousPage: currentPage > 1,
+      },
+      tag,
+      status: 200,
+    };
+  } catch (error) {
+    console.error(`Error loading tag page (${params.tag}/${params.page}):`, error);
+    return {
+      status: 500,
+      error: 'Internal server error',
+    };
   }
-
-  return {
-    posts,
-    pagination: {
-      page: currentPage,
-      perPage: POSTS_PER_PAGE,
-      total: totalPosts,
-      totalPages,
-    },
-    tag,
-  };
 }) satisfies PageServerLoad;
