@@ -3,7 +3,7 @@
   import Header from '$components/Post/Header.svelte';
   import PostBody from '$components/Post/PostBody.svelte';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
-  import './+page.css';
+  import './amazon-card.scss';
 
   interface PageData {
     post: PostHTML;
