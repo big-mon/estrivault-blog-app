@@ -5,9 +5,6 @@
     "dev": "pnpm --filter svelte-blog dev",
     "build:all": "pnpm -r build"
   },
-  "dependencies": {
-    "@cloudinary/url-gen": "^1.21.0"
-  },
   "devDependencies": {
     "dotenv-cli": "^8.0.0",
     "prettier": "^3.5.3",
