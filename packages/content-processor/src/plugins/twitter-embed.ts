@@ -1,13 +1,28 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
+import type { Root } from 'mdast';
+
+interface TwitterEmbedOptions {
+  onTwitterFound?: () => void;
+}
+
+// PostHTML型を拡張
+export interface PostHTMLWithMeta {
+  html: string;
+}
 
 /**
  * ::twitter{id="..."} ディレクティブをHTML要素に変換するremarkプラグイン
  */
-export const remarkTwitterEmbed: Plugin = () => {
-  return (tree) => {
-    visit(tree, 'containerDirective', (node: any) => {
-      if (node.name !== 'twitter') return;
+export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (options = {}) => {
+  return (tree, file) => {
+    visit(tree, function (node: any) {
+      const isTargetType =
+        node.type === 'containerDirective' ||
+        node.type === 'leafDirective' ||
+        node.type === 'textDirective';
+
+      if (!isTargetType || node.name !== 'twitter') return;
 
       const data = node.data || (node.data = {});
       const attributes = node.attributes || {};
@@ -18,57 +33,43 @@ export const remarkTwitterEmbed: Plugin = () => {
         return;
       }
 
-      // HTMLノードに変換
-      data.hName = 'div';
+      if (node.type === 'textDirective') {
+        console.error(
+          'Unexpected `:twitter` text directive, use two colons for a leaf directive',
+          node
+        );
+        return;
+      }
+
+      // HTMLノードに変換 - blockquoteを直接作成
+      data.hName = 'blockquote';
       data.hProperties = {
-        className: ['twitter-embed'],
-        style: 'display: flex; justify-content: center; margin: 1.5rem 0;',
+        className: ['twitter-tweet'],
+        'data-theme': 'light',
+        'data-width': '550'
       };
 
-      // Twitter埋め込みコードを子要素として追加
+      // Twitterの正しいURL（x.comまたはtwitter.com）
+      const tweetUrl = `https://x.com/i/status/${id}`;
+
+      // blockquoteの子要素として最小限のコンテンツを設定
       node.children = [
         {
           type: 'paragraph',
-          data: {
-            hName: 'blockquote',
-            hProperties: {
-              className: ['twitter-tweet'],
-              'data-dnt': 'true',
-            },
-          },
           children: [
             {
-              type: 'paragraph',
-              data: {
-                hName: 'a',
-                hProperties: {
-                  href: `https://twitter.com/user/status/${id}`,
-                },
-              },
+              type: 'link',
+              url: tweetUrl,
               children: [
                 {
                   type: 'text',
-                  value: 'Loading tweet...',
-                },
-              ],
-            },
-          ],
-        },
+                  value: `View tweet ${id}`
+                }
+              ]
+            }
+          ]
+        }
       ];
-
-      // Twitter埋め込みスクリプトを追加
-      node.children.push({
-        type: 'paragraph',
-        data: {
-          hName: 'script',
-          hProperties: {
-            async: true,
-            src: 'https://platform.twitter.com/widgets.js',
-            charset: 'utf-8',
-          },
-        },
-        children: [],
-      });
     });
   };
 };

@@ -1,4 +1,16 @@
+<script context="module" lang="ts">
+  // 型アサーションをモジュールスコープで宣言
+  declare const window: Window & {
+    twitter?: {
+      widgets: {
+        load: () => void;
+      };
+    };
+  };
+</script>
+
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { page } from '$app/state';
   import Header from '$components/Post/Header.svelte';
   import PostBody from '$components/Post/PostBody.svelte';
@@ -8,6 +20,7 @@
   interface PageData {
     post: PostHTML;
     metadata?: PostMeta;
+    hasTwitterEmbed: boolean;
   }
 
   export let data: PageData;
@@ -18,6 +31,29 @@
     ...data,
     metadata: post.meta,
   };
+
+  // Twitter埋め込みがある場合のみスクリプトを読み込み
+  onMount(async () => {
+    if (data.hasTwitterEmbed) {
+      await loadTwitterWidgets();
+    }
+  });
+
+  async function loadTwitterWidgets() {
+    // すでに読み込まれている場合は再初期化のみ
+    if (window.twitter) {
+      window.twitter.widgets.load();
+      return;
+    }
+
+    return new Promise<void>((resolve) => {
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://platform.twitter.com/widgets.js';
+      script.onload = () => resolve();
+      document.head.appendChild(script);
+    });
+  }
 </script>
 
 <svelte:head>
