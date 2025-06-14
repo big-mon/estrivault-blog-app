@@ -62,9 +62,7 @@ MaverickシリーズはAimpoint T1/T2を意識したと思われるシリーズ�
 
 **バッテリーのCR2032は付属しない**ので別途用意する必要があります。
 
-```amazon:B09GKHSGM9
-ベクターオプティクス Maverick-IV 1x20 Mini Red Dot Scope Vector Optics SCRD-51
-```
+::amazon{asin="B09GKHSGM9" name="ベクターオプティクス Maverick-IV 1x20 Mini Red Dot Scope Vector Optics SCRD-51"}
 
 # SCRD-51の外観レビュー
 
@@ -166,6 +164,4 @@ ICS Hera Arms CQRに装着してみました。
 
 このレビューが参考になれば幸いです。
 
-```amazon:B09GKHSGM9
-ベクターオプティクス Maverick-IV 1x20 Mini Red Dot Scope Vector Optics SCRD-51
-```
+::amazon{asin="B09GKHSGM9" name="ベクターオプティクス Maverick-IV 1x20 Mini Red Dot Scope Vector Optics SCRD-51"}

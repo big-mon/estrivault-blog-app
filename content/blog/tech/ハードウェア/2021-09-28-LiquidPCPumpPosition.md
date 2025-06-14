@@ -49,6 +49,4 @@ AIOは出荷時に十分なエアー抜きが行われているため直ちに�
 
 より詳細な解説を確認したい場合は[JayzTwoCents](https://youtu.be/DKwA7ygTJn0)や[Gamers Nexus](https://youtu.be/BbGomv195sk)の動画を参照してください。
 
-```amazon:B08BKPHHZ4
-Cooler Master MasterBox NR200P ホワイト Mini-ITX/DTX
-```
+::amazon{asin="B08BKPHHZ4" name="Cooler Master MasterBox NR200P ホワイト Mini-ITX/DTX"}

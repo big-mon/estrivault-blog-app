@@ -38,9 +38,7 @@ MOTU M2で書いていますが、MOTU M4も手順は同じです。
 
 私自身はELPAの変換アダプタを使用してSennheiserの[IE 100 PRO](https://amzn.to/3LtGp6Z)や[Moondrop KATO](https://amzn.to/3EZFJDP)を接続しています。
 
-```amazon:B002KAP6BG
-ELPA 変換アダプタ ステレオ標準プラグ-3.5φステレオミニプラグ PA-100
-```
+::amazon{asin="B002KAP6BG" name="ELPA 変換アダプタ ステレオ標準プラグ-3.5φステレオミニプラグ PA-100"}
 
 ### MOTU M2のドライバをインストール
 
@@ -141,6 +139,4 @@ MOTU M2の音の良さに目覚めたら、次はバランス接続ってどん�
 
 オーディオ沼って本当にずぶずぶと沼のように沈んでいくから怖いですねぇ。
 
-```amazon:B09KLX5KLV
-水月雨(MOONDROP) 耳掛け式 カナル型 イヤホン KATO ダイヤモンドライクカーボン複合振動板 MIMステンレス鋼筐体 再生周波数帯域10~45,000Hz
-```
+::amazon{asin="B09KLX5KLV" name="水月雨(MOONDROP) 耳掛け式 カナル型 イヤホン KATO ダイヤモンドライクカーボン複合振動板 MIMステンレス鋼筐体 再生周波数帯域10~45,000Hz"}

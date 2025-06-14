@@ -39,9 +39,7 @@ NOVEL ARMSは本製品のモデルチェンジを行っており、各所でレ�
 - 工具類
 - クロス
 
-```amazon:B00JKAYUWU
-ノーベルアームズ 3X Tactical Magnifier タクティカルマグニファイヤー
-```
+::amazon{asin="B00JKAYUWU" name="ノーベルアームズ 3X Tactical Magnifier タクティカルマグニファイヤー"}
 
 # 3X Tactical Magnifierの外観レビュー
 
@@ -85,9 +83,7 @@ NOVEL ARMSは本製品のモデルチェンジを行っており、各所でレ�
 
 HAKUBAのレンズフィルターはキルフラッシュやポリカーボネートのサバゲー用途のレンズ保護ではなく、本来は水滴などの汚れを防止するためのフィルターであるためBB弾の直撃に必ずしも耐えられるとは限らない点は注意が必要です。一撃だけかばってくれる可能性が高い使い捨てのお守りの感覚でつけておくものなので、**心配な方はちゃんとサバゲー用途が想定されたキルフラッシュを導入した方が良い**です。
 
-```amazon:B005CETX84
-HAKUBA 28mm レンズフィルター 保護用 MCレンズガード 日本製 CF-LG28D
-```
+::amazon{asin="B005CETX84" name="HAKUBA 28mm レンズフィルター 保護用 MCレンズガード 日本製 CF-LG28D"}
 
 # 銃に取り付けた際の様子
 
@@ -111,6 +107,4 @@ ICS Hera Arms CQRに装着してみました。
 
 このレビューが参考になれば幸いです。
 
-```amazon:B00JKAYUWU
-ノーベルアームズ 3X Tactical Magnifier タクティカルマグニファイヤー
-```
+::amazon{asin="B00JKAYUWU" name="ノーベルアームズ 3X Tactical Magnifier タクティカルマグニファイヤー"}

@@ -1,99 +1,134 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
+import type { Root } from 'mdast';
+
+interface AmazonAttributes {
+  asin: string;
+  name?: string;
+  [key: string]: string | undefined;
+}
 
 /**
- * ::amazon{asin="..."} ディレクティブをHTML要素に変換するremarkプラグイン
+ * ::amazon{asin="..." name="..."} ディレクティブをHTML要素に変換するremarkプラグイン
+ * スタイリングは呼び出し元のCSSクラスで制御します
  */
-export const remarkAmazonEmbed: Plugin = () => {
+export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
   return (tree) => {
-    visit(tree, 'containerDirective', (node: any) => {
-      if (node.name !== 'amazon') return;
+    visit(tree, function (node) {
+      const isTargetType =
+        node.type === 'containerDirective' ||
+        node.type === 'leafDirective' ||
+        node.type === 'textDirective';
+
+      if (!isTargetType || node.name !== 'amazon') return;
 
       const data = node.data || (node.data = {});
-      const attributes = node.attributes || {};
-      const { asin } = attributes;
+      const attributes = node.attributes as AmazonAttributes || {};
+      const asin = attributes.asin;
+      const name = attributes.name;
 
       if (!asin) {
-        console.warn('Amazon embed directive missing asin attribute');
+        console.error('Unexpected missing `asin` on `amazon` directive', node);
         return;
       }
 
-      // HTMLノードに変換
+      const affiliateId = 'd6l0g03-22';
+      const link = `https://www.amazon.co.jp/gp/product/${asin}?tag=${affiliateId}`;
+      const imageUrl = `https://images-na.ssl-images-amazon.com/images/P/${asin}.09.MZZZZZZZ`;
+      const title = name || '商品の詳細を見る';
+
+      if (node.type === 'textDirective') {
+        console.error(
+          'Unexpected `:amazon` text directive, use two colons for a leaf directive',
+          node
+        );
+        return;
+      }
+
+      // 商品カードの構造を構築
       data.hName = 'div';
       data.hProperties = {
-        className: ['amazon-embed'],
-        style: 'margin: 1.5rem 0; border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px;',
+        className: 'amazon-embed',
+        'data-amazon-asin': asin,
+        'data-component-name': 'AmazonEmbed'
       };
 
-      // Amazon商品リンクを子要素として追加
-      node.children = [
+      data.hChildren = [
         {
-          type: 'paragraph',
-          data: {
-            hName: 'a',
-            hProperties: {
-              href: `https://www.amazon.co.jp/dp/${asin}`,
-              target: '_blank',
-              rel: 'noopener noreferrer sponsored',
-              className: ['amazon-link'],
-              style: 'display: flex; text-decoration: none; color: inherit;',
-            },
+          type: 'element',
+          tagName: 'div',
+          properties: {
+            className: ['amazon-card']
           },
           children: [
+            // 商品画像部分
             {
-              type: 'paragraph',
-              data: {
-                hName: 'div',
-                hProperties: {
-                  className: ['amazon-image'],
-                  style: 'margin-right: 16px; min-width: 120px;',
-                },
+              type: 'element',
+              tagName: 'a',
+              properties: {
+                href: link,
+                rel: 'noopener noreferrer',
+                target: '_blank',
+                className: ['amazon-card__image']
               },
               children: [
                 {
-                  type: 'paragraph',
-                  data: {
-                    hName: 'img',
-                    hProperties: {
-                      src: `https://images-na.ssl-images-amazon.com/images/P/${asin}.09.MZZZZZZZ`,
-                      alt: 'Amazon商品画像',
-                      style: 'max-width: 120px; max-height: 120px;',
-                    },
+                  type: 'element',
+                  tagName: 'img',
+                  properties: {
+                    src: imageUrl,
+                    alt: title,
+                    loading: 'lazy',
+                    className: ['amazon-card__image__img']
                   },
-                  children: [],
-                },
-              ],
+                  children: []
+                }
+              ]
             },
+            // 商品情報部分
             {
-              type: 'paragraph',
-              data: {
-                hName: 'div',
-                hProperties: {
-                  className: ['amazon-info'],
-                  style: 'flex: 1;',
-                },
+              type: 'element',
+              tagName: 'div',
+              properties: {
+                className: ['amazon-card__content']
               },
               children: [
                 {
-                  type: 'paragraph',
-                  data: {
-                    hName: 'div',
-                    hProperties: {
-                      className: ['amazon-title'],
-                      style: 'font-weight: bold; margin-bottom: 8px;',
-                    },
+                  type: 'element',
+                  tagName: 'a',
+                  properties: {
+                    href: link,
+                    rel: 'noopener noreferrer',
+                    target: '_blank',
+                    className: ['amazon-card__title']
                   },
                   children: [
                     {
                       type: 'text',
-                      value: 'Amazon商品を見る',
-                    },
-                  ],
+                      value: title
+                    }
+                  ]
                 },
-              ],
-            },
-          ],
-        },
+                {
+                  type: 'element',
+                  tagName: 'a',
+                  properties: {
+                    href: link,
+                    rel: 'noopener noreferrer',
+                    target: '_blank',
+                    className: ['amazon-card__cta']
+                  },
+                  children: [
+                    {
+                      type: 'text',
+                      value: 'Amazonで見る'
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       ];
     });
   };

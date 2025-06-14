@@ -16,9 +16,7 @@ CTRストック自体は[MAGPULが出している純正品](https://magpul.com/c
 
 今回はBCM MCMR 11.5の電動ガンモデルのストックを、標準のBCMガンファイターストックから交換します。
 
-```amazon:B07JYL24QW
-[実物] MAGPUL(マグプル) CTRストック Mil-Spec (Black) M-4 AR-15
-```
+::amazon{asin="B07JYL24QW" name="MAGPUL(マグプル) CTRストック Mil-Spec (Black) M-4 AR-15"}
 
 # 内容物
 
@@ -83,14 +81,8 @@ BCM MCMRへのフィット感についてですが、正直悪いです。元々
 
 パッドは[MAGPUL純正でよりリコイルを吸収できる厚みの増えたアクセサリー](https://magpul.com/enhancedrubberbutt-pad-0-70.html?mp_global_color=118)がリリースされているので、気になる方はチェックするといいと思います。他にもサードパーティとなりますが、電動ガンの[バッテリーを収納するスペースを確保したエクステンダー](https://materialcustom001.stores.jp/items/6193c5f4c15c5a5d097529e6)も販売されているようです。見た目が不格好になるので許容できる人専用ですね。
 
-```amazon:B07JYL24QW
-[実物] MAGPUL(マグプル) CTRストック Mil-Spec (Black) M-4 AR-15
-```
+::amazon{asin="B07JYL24QW" name="MAGPUL(マグプル) CTRストック Mil-Spec (Black) M-4 AR-15"}
 
-```amazon:B003IWFTZ8
-MAGPUL(マグプル) Enhanced Rubber Butt-Pad, 0.70" BLK[MAG317-BLK]
-```
+::amazon{asin="B003IWFTZ8" name="MAGPUL(マグプル) Enhanced Rubber Butt-Pad, 0.70" BLK[MAG317-BLK]"}
 
-```amazon:B0BN7SWRM8
-[BCM AIR]GATE製ASTER 電子トリガー 内蔵 BCM SBR 11.5インチ MCMR AEG ブラック ( VF1-LBCM_MCMR_S-BK02 )
-```
+::amazon{asin="B0BN7SWRM8" name="BCM AIR製ASTER 電子トリガー 内蔵 BCM SBR 11.5インチ MCMR AEG ブラック ( VF1-LBCM_MCMR_S-BK02 )"}
