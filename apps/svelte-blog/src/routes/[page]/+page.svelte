@@ -4,7 +4,7 @@
   import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, SITE_AUTHOR, SOCIAL_LINK_X } from '$constants';
   import type { PageData } from './$types';
 
-  export let data: PageData;
+  const { data } = $props<{ data: PageData }>();
   const { posts, pagination } = data;
   
   const pageTitle = $derived(`記事一覧 - ページ${pagination.page} | ${SITE_TITLE}`);
