@@ -1,6 +1,6 @@
 ---
 title: 腎臓移植が全米3位の病院、TransMedics製品の導入を評価
-description: 本病院が移植分野で全米で6番目に患者の集中する医療機関へと昇格
+description: Tampa General HospitalがTransMedicsのOrgan Care System(OCS)導入で全米腸臓移植3位を達成。611件の固形臓器移植で歴史上最多記録を更新。常温保存技術が移植医療にもたらす革新的インパクトを実証。
 slug: organ-care-system-in-tampa-2020
 publishedAt: 2021-03-17T12:30:00
 coverImage: /Hero/tmdx-website_chqakn.jpg

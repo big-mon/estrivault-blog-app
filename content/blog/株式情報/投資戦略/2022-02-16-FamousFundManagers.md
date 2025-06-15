@@ -1,6 +1,6 @@
 ---
 title: 著名ファンドマネージャー・機関投資家のCIKリスト
-description: Form 13Fを検索する際のリンク集
+description: EDGARでForm 13Fを検索する際の著名ファンドマネージャー・CIKリスト。レイ・ダリオ(Bridgewater)、ジョージ・ソロス、ドラッケンミラー、ケネス・グリフィン(Citadel)など14人の機関名とCIKを一覧掲載。
 slug: famous-fund-managers
 publishedAt: 2022-02-16T17:00:00
 coverImage: /Hero/famous-fund-managers

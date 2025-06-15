@@ -1,6 +1,6 @@
 ---
 title: Redditが2022年IPOに向けてアドバイザーの雇用を模索
-description: ついに動き出したRedditをロイターが捕捉
+description: Redditの2022年IPO計画をロイターが報道。100億ドル評価から150億ドル以上を目指しアドバイザー採用を開始。MEME株熱狂でユーザー数急増、Q2広告収益1億ドルで前年同朑3倍成長を達成。
 slug: reddit-ipo-adviser-hire
 publishedAt: 2021-09-03T13:36:00
 coverImage: /Hero/pexels-brett-jordan-5437588.jpg

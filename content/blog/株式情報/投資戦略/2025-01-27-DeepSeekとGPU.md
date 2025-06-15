@@ -1,6 +1,6 @@
 ---
 title: DeepSeek後もGPU需要に強気を継続する理由
-description: GPUの絶対的な需要は増加する
+description: DeepSeek後もGPU需要に強気を継続する理由を簡潔にまとめた追加考察。CUDA+GPUの汎用性・スケーラビリティ・エコシステム優位性、合成データ需要増加、AGI開発に必要な超大型クラスターなどから絶対的需要増加を予測。
 slug: bullish-on-gpu-demand-even-after-deepseek
 publishedAt: 2025-01-27T12:00:00
 coverImage: /Hero/pexels-cottonbro-5483064

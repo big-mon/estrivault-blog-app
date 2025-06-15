@@ -1,6 +1,6 @@
 ---
 title: 2023年前半戦、債券市場は不景気に賭けている
-description: 長短金利差から市場が考える未来を見つめる
+description: 2023年前半の長短金利差逆転を分析。短期金利(2年物)4.5%、長期金利(10年物)3.7%で逆イールド発生。債券市場が景気後退を予想し、投資家にとっての危険信号となる理由を詳細解説。
 slug: government-bond-yield-2023-early
 publishedAt: 2023-03-11T20:45:00
 coverImage: /Hero/pexels-pixabay-290386

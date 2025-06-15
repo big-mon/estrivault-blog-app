@@ -1,6 +1,6 @@
 ---
 title: 長短金利差など金利の基礎知識メモ
-description: 金利の基礎知識と2022年の予測
+description: インフレと金利の関係性、政策金利と国債の仕組み、長短金利差で分かる景気後退の織り込みを詳細解説。2022年のコロナ禁ドルバラマキ後のインフレ状況を踏まえたコモディティ投資戦略も紹介。
 slug: bond-interest-rate-2022
 publishedAt: 2022-03-24T20:10:00
 coverImage: /Hero/bond-interest-rate-2022
