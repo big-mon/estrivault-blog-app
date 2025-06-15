@@ -28,6 +28,52 @@
 
   export let data: PageData;
   $: post = data.post as PostHTML;
+  
+  // 日本語文字数カウント関数
+  const getJapaneseWordCount = (content: string) => {
+    // HTMLタグを除去
+    const textOnly = content.replace(/<[^>]*>/g, '');
+    // 改行、空白を除去
+    const cleanText = textOnly.replace(/\s+/g, '');
+    // 日本語文字のみをカウント（ひらがな、カタカナ、漢字）
+    const japaneseChars = cleanText.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g);
+    return japaneseChars ? japaneseChars.length : 0;
+  };
+  
+  // Schema.org構造化データ
+  $: schemaData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.meta.title,
+    "description": post.meta.description || `${post.meta.title}についての記事です。`,
+    "image": post.meta.coverImage ? [post.meta.coverImage] : undefined,
+    "author": {
+      "@type": "Person",
+      "name": "big-mon",
+      "url": `https://x.com/${SOCIAL_LINK_X}`,
+      "sameAs": [
+        `https://x.com/${SOCIAL_LINK_X}`,
+        `https://github.com/big-mon`
+      ]
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": SITE_TITLE,
+      "url": SITE_URL
+    },
+    "datePublished": new Date(post.meta.publishedAt).toISOString(),
+    "dateModified": post.meta.updatedAt ? new Date(post.meta.updatedAt).toISOString() : new Date(post.meta.publishedAt).toISOString(),
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${SITE_URL.replace(/\/$/, '')}/post/${post.meta.slug}`
+    },
+    "articleSection": post.meta.category,
+    "keywords": [post.meta.category].concat(post.meta.tags || []).filter(Boolean).join(', '),
+    "wordCount": post.html ? getJapaneseWordCount(post.html) : 0,
+    "timeRequired": post.meta.readingTime ? `PT${Math.ceil(post.meta.readingTime)}M` : undefined,
+    "inLanguage": "ja-JP",
+    "url": `${SITE_URL.replace(/\/$/, '')}/post/${post.meta.slug}`
+  };
 
 
   // Twitter埋め込みがある場合のみスクリプトを読み込み
@@ -167,6 +213,9 @@
     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6950127103154689"
     crossorigin="anonymous"
   ></script>
+  
+  <!-- Schema.org Structured Data -->
+  {@html `<script type="application/ld+json">${JSON.stringify(schemaData)}</script>`}
 </svelte:head>
 
 <article class="container mx-auto px-4 xl:max-w-6xl">
