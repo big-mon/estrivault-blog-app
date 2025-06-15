@@ -1,6 +1,6 @@
 // Post content link styling with consistent blue hover effect
-article {
-  a {
+.prose {
+  :global(p a) {
     color: inherit;
     text-decoration: underline;
     transition: color 0.2s ease-in-out;

@@ -1,14 +1,14 @@
 <script lang="ts">
   import type { PostHTML } from '@estrivault/content-processor';
-  import './style/amazon-card.scss';
-  import './style/twitter-embed.scss';
-  import './style/post-links.scss';
+  import amazonCardStyles from './style/amazon-card.module.scss';
+  import postLinksStyles from './style/post-links.module.scss';
+  import twitterEmbedStyles from './style/twitter-embed.module.scss';
 
   export let post: PostHTML;
 </script>
 
 <div class="container mx-auto max-w-4xl px-4 py-8">
-  <div class="prose max-w-none">
+  <div class="{postLinksStyles.prose} {twitterEmbedStyles.prose} prose max-w-none">
     {@html post.html || 'コンテンツがありません'}
   </div>
 
