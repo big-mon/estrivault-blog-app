@@ -10,39 +10,18 @@
     }
   }
 
-  // Add # symbols to headings based on their level
-  :global(h2::before) {
-    content: "# ";
-    color: #6b7280;
-    font-weight: normal;
-    margin-right: 0.5rem;
-  }
 
-  :global(h3::before) {
-    content: "## ";
+  // Heading anchor link styling
+  :global(.heading-anchor) {
     color: #6b7280;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
     font-weight: normal;
     margin-right: 0.5rem;
-  }
 
-  :global(h4::before) {
-    content: "### ";
-    color: #6b7280;
-    font-weight: normal;
-    margin-right: 0.5rem;
-  }
-
-  :global(h5::before) {
-    content: "#### ";
-    color: #6b7280;
-    font-weight: normal;
-    margin-right: 0.5rem;
-  }
-
-  :global(h6::before) {
-    content: "##### ";
-    color: #6b7280;
-    font-weight: normal;
-    margin-right: 0.5rem;
+    &:hover {
+      color: #2563eb;
+      text-decoration: none;
+    }
   }
 }

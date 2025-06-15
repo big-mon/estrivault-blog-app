@@ -7,6 +7,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
 import { rehypeImageTransform } from './plugins/transforms/image-transform';
 import { rehypeLinkTransform } from './plugins/transforms/link-transform';
+import { rehypeHeadingAnchor } from './plugins/transforms/heading-anchor';
 import { remarkYoutubeEmbed } from './plugins/embeds/youtube-embed';
 import { remarkTwitterEmbed } from './plugins/embeds/twitter-embed';
 import { remarkGithubEmbed } from './plugins/embeds/github-embed';
@@ -48,6 +49,9 @@ export function createPipeline(options: ProcessorOptions = {}) {
 
       // リンク変換
       .use(rehypeLinkTransform)
+
+      // 見出しアンカー追加
+      .use(rehypeHeadingAnchor)
 
       // 最終出力
       .use(rehypeStringify)
