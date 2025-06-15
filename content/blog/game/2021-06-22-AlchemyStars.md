@@ -1,6 +1,6 @@
 ---
 title: 白夜極光のガチャの課金レートの計算
-description: ゲーム内通貨の交換比率と単価の産出
+description: 白夜極光のガチャ課金レートを詳細計算。特別招集星標、招集星標、光珀、クリスタルの複雑な変換関係を整理し、ガチャ1回あたりの実際の課金額と最適な課金額を算出。
 slug: alchemy-stars-price-rate
 publishedAt: 2021-06-22T23:54:00
 coverImage: /Hero/alchemy-stars-title.jpg
