@@ -1,6 +1,6 @@
 ---
 title: Cloudflare PagesでHugoデプロイ時のバージョンを変更する方法
-description: エラーが発生してデプロイに失敗
+description: Cloudflare PagesでHugoデプロイ時のバージョンエラー解決方法。hugo-theme-janeの古いHugoバージョン対応問題を環境変数HUGO_VERSIONで解決する手順を解説。
 slug: cloudflare-hugo-change-version
 publishedAt: 2021-03-06T18:05:00
 coverImage: /Hero/cloudflare-logo_f10qrs.jpg

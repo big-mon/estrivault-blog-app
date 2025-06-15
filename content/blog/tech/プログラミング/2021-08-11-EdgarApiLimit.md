@@ -1,6 +1,6 @@
 ---
 title: EDGARのAPIで「Undeclared Automated Tool」が発生する場合の解決法
-description: ひょっとしてUAの設定を忘れていませんか？
+description: EDGAR API「Undeclared Automated Tool」エラーの解決方法。User-Agentヘッダーの設定不備が原因でAPIコール制限される問題と、正しいリクエストヘッダーの設定手順を解説。
 slug: edgar-api-limit
 publishedAt: 2021-08-11T18:24:00
 coverImage: /Hero/pexels-thisisengineering-3861967.jpg

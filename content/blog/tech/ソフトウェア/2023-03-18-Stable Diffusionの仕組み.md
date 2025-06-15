@@ -1,6 +1,6 @@
 ---
 title: Stable Diffusionの魔法：非AI技術者向けに画像生成技術を解説
-description: 非AI技術者でも分かりやすい簡単な原理の紹介
+description: Stable Diffusion画像生成技術の仕組みを非AI技術者向けに解説。拡散モデル、ノイズ除去、条件付きモデル、学習プロセスまで、AIがテキストから画像を生成する魔法の原理を分かりやすく説明。
 slug: stable-diffusion-image-generation-explain
 publishedAt: 2023-03-18T21:40:00
 coverImage: /Hero/stable-diffusion-schoolgirl-in-shop

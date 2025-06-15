@@ -1,6 +1,6 @@
 ---
 title: 決算データ規格XBRLを理解する
-description: XBRLの概要と構造イメージを簡潔に把握する
+description: XMLベースの事業報告用規格XBRLの基礎知識。タクソノミーとインスタンスの概念、リンクベースの構造、インラインXBRLの特徴まで、決算データ解析に必要な仕組みを分かりやすく解説。
 slug: what-is-xbrl
 publishedAt: 2021-07-31T18:40:00
 coverImage: /Hero/pexels-thisisengineering-3861967.jpg

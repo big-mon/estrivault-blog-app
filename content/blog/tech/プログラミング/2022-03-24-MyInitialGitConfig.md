@@ -1,6 +1,6 @@
 ---
 title: OSクリーンインストール後の開発環境の初期設定(Git)
-description: Gitの初期設定など個人メモ
+description: Windows 11クリーンインストール後の開発環境セットアップ手順。VSCode、Node.js、yarnのインストールからGitの詳細設定まで、次回のために記録した個人的な作業メモ。
 slug: my-initial-git-config
 publishedAt: 2022-03-24T17:42:00
 coverImage: /Hero/pexels-josh-sorenson-1714208

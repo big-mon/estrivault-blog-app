@@ -1,6 +1,6 @@
 ---
 title: EDGARからデータ取得：XBRLの代表的なタグ名のリスト
-description: US-GAAP 2021をベースに作成
+description: EDGAR APIで使用するXBRLタグ名の一覧表。US-GAAP 2021をベースに決算項目(純売上高、営業利益、貸借対照表、キャッシュフロー)の代表的なタグ名を整理して紹介。
 slug: xbrl-edgar-elements-list
 publishedAt: 2021-08-02T05:26:00
 coverImage: /Hero/pexels-photomix-company-95916.jpg

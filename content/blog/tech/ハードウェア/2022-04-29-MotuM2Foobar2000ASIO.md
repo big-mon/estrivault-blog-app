@@ -1,6 +1,6 @@
 ---
 title: MOTU M2をfoobar2000でASIO再生する手順
-description: とりあえず最速でセットアップ手順が知りたい人向け
+description: MOTU M2オーディオインターフェースでfoobar2000のASIO再生を設定する完全ガイド。ドライバ・ファームウェア更新、ASIOコンポーネントインストールから音質設定まで詳細手順を解説。
 slug: foobar2000-motu-m2-asio
 publishedAt: 2022-04-29T01:42:00
 coverImage: /Hero/pexels-wellington-cunha-2489988

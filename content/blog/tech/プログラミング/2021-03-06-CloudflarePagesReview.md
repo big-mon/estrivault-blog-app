@@ -1,6 +1,6 @@
 ---
 title: Cloudflare PagesとVercelを比べてみた
-description: Cloudflare PagesとVercelに同一アプリケーションをデプロイし比較
+description: Cloudflare PagesとVercelのJAMstackホスティング性能比較。同一Hugoアプリケーションでのビルド速度、サイト表示速度、機能面を実測して評価した詳細レポート。
 slug: cloudflare-vercel-compare
 publishedAt: 2021-03-06T19:05:00
 coverImage: /Hero/cloudflare-logo_f10qrs.jpg

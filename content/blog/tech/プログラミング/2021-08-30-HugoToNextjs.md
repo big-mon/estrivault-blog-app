@@ -1,6 +1,6 @@
 ---
 title: HugoのショートコードをNext.jsに移行
-description: unifiedエコシステムを利用した置き換え
+description: HugoのショートコードをNext.jsに移行する手順。unifiedエコシステムのremark/rehypeを使用してMarkdownからHTML、Reactコンポーネントへ変換する実装方法を詳細解説。
 slug: hugo-shortcode-to-nextjs
 publishedAt: 2021-08-30T12:00:00
 coverImage: /Hero/nextjs-logo.jpg

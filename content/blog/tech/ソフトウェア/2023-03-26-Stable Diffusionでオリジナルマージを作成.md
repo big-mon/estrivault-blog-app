@@ -1,6 +1,6 @@
 ---
 title: Stable Diffusionでオリジナルマージを作成
-description: Checkpoint Merger機能でお手軽マージを試す
+description: AUTOMATIC1111のCheckpoint Merger機能で簡単モデルマージ。viewer-mixとMeinaPastelを組み合わせてEstrildaMixを作成。異なる比率でのマージ結果比較と実践的な手順を解説。
 slug: try-stable-diffusion-merge
 publishedAt: 2023-03-26T03:30:00
 coverImage: /Hero/stable-diffusion-try-merge

@@ -1,6 +1,6 @@
 ---
 title: 【Tofu 60】シンプルで絞り込まれた60％キーボードを組み立てた
-description: KBDfans.comで購入したDIYキットを組み立て
+description: Tofu 60％自作キーボードのビルドログ。KBDfansのDIYキット組み立て手順、Gateron Ink V2スイッチのルブ作業、真鍮プレート組み込みまで初心者向けに詳細解説。
 slug: keyboard-tofu60
 publishedAt: 2022-01-26T14:32:00
 coverImage: /Hero/keyboard-custom.jpg

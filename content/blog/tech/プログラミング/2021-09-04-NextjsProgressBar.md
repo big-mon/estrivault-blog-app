@@ -1,6 +1,6 @@
 ---
 title: Next.jsに2行でプログレスバーを導入する
-description: YouTubeなどでも実装されている機能を手軽に実現
+description: Next.jsでYouTubeやMediumのようなページ遷移プログレスバーを2行で簡単実装。nextjs-progressbarライブラリを使ったインストールから設定まで、カスタマイズ例付きで解説。
 slug: nextjs-install-progressbar
 publishedAt: 2021-09-04T02:50:00
 coverImage: /Hero/nextjs-logo.jpg

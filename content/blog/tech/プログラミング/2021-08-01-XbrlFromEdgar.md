@@ -1,6 +1,6 @@
 ---
 title: EDGARからデータ取得：ティッカーとCIKの関連を割り出す
-description: CIKに紐づくティッカー、会社名、取引所を取得
+description: EDGARシステムでティッカーとCIKの関連を調べる方法。company_tickers.jsonを使用した企業検索、Form 10-K/10-QなどのXBRL形式決算データ取得の基礎知識を解説。
 slug: how-to-get-ticker-and-cik-from-edgar
 publishedAt: 2021-08-01T02:15:00
 coverImage: /Hero/pexels-photomix-company-95916.jpg

@@ -1,6 +1,6 @@
 ---
 title: EDGARからデータ取得：APIで複数年度の純利益を取得
-description: 任意の決算項目を複数年度分取得する
+description: EDGAR β版APIを使用した企業決算データの取得方法。companyconcepts、companyfacts、framesの各APIエンドポイントの使い方と複数年度にわたる純利益などの財務データ取得手順を解説。
 slug: edgar-api-items
 publishedAt: 2021-08-02T02:15:00
 coverImage: /Hero/pexels-photomix-company-95916.jpg
