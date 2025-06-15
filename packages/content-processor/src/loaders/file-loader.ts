@@ -69,6 +69,9 @@ export async function loadFile(filePath: string, options: LoadFileOptions = {}):
     const result = await pipeline.process(markdown);
     const html = String(result);
 
+    // 見出し情報を取得（heading-extractorプラグインで抽出されたもの）
+    const headings = (result.data as any)?.headings || [];
+
     // タグを検証して正規化
     const tags = Array.isArray(data.tags)
       ? data.tags
@@ -91,7 +94,7 @@ export async function loadFile(filePath: string, options: LoadFileOptions = {}):
       readingTime: Math.ceil(stats.minutes),
     };
 
-    return { meta, html };
+    return { meta, html, headings };
   } catch (error) {
     if (error instanceof FrontMatterError) {
       throw error;
