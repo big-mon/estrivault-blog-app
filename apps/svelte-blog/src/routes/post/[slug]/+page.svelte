@@ -17,7 +17,7 @@
   import Header from '$components/Post/Header.svelte';
   import PostBody from '$components/Post/PostBody.svelte';
   import TableOfContents from '$components/Post/TableOfContents.svelte';
-  import { SITE_TITLE, SITE_AUTHOR } from '$constants';
+  import { SITE_TITLE, SITE_AUTHOR, SITE_URL, SOCIAL_LINK_X } from '$constants';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
 
   interface PageData {
@@ -119,12 +119,48 @@
       <meta name="updated" content={new Date(post.meta.updatedAt).toISOString()} />
     {/if}
   {/if}
+  <!-- Open Graph -->
   <meta property="og:title" content={post.meta.title} />
   <meta property="og:description" content={post.meta.description || post.meta.description || `${post.meta.title}についての記事です。`} />
   <meta property="og:type" content="article" />
+  <meta property="og:url" content={`${SITE_URL}/post/${post.meta.slug}`} />
+  <meta property="og:site_name" content={SITE_TITLE} />
+  <meta property="og:locale" content="ja_JP" />
   {#if post.meta.coverImage}
     <meta property="og:image" content={post.meta.coverImage} />
+    <meta property="og:image:alt" content={post.meta.title} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
   {/if}
+  
+  <!-- Article specific -->
+  <meta property="article:author" content={SITE_AUTHOR} />
+  <meta property="article:published_time" content={new Date(post.meta.publishedAt).toISOString()} />
+  {#if post.meta.updatedAt}
+    <meta property="article:modified_time" content={new Date(post.meta.updatedAt).toISOString()} />
+  {/if}
+  {#if post.meta.category}
+    <meta property="article:section" content={post.meta.category} />
+  {/if}
+  {#if post.meta.tags && post.meta.tags.length > 0}
+    {#each post.meta.tags as tag}
+      <meta property="article:tag" content={tag} />
+    {/each}
+  {/if}
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content={`@${SOCIAL_LINK_X}`} />
+  <meta name="twitter:creator" content={`@${SOCIAL_LINK_X}`} />
+  <meta name="twitter:title" content={post.meta.title} />
+  <meta name="twitter:description" content={post.meta.description || post.meta.description || `${post.meta.title}についての記事です。`} />
+  {#if post.meta.coverImage}
+    <meta name="twitter:image" content={post.meta.coverImage} />
+    <meta name="twitter:image:alt" content={post.meta.title} />
+  {/if}
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href={`${SITE_URL}/post/${post.meta.slug}`} />
 </svelte:head>
 
 <article class="container mx-auto px-4 xl:max-w-6xl">
