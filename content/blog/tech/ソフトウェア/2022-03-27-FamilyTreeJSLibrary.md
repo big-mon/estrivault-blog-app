@@ -12,11 +12,15 @@ tags: ['ソフトウェア', 'ELDEN RING', 'ライブラリ']
 
 結果的に[big-mon/eldenring-relationship](https://github.com/big-mon/eldenring-relationship)として成果物を作成できたのですが、思った以上に家系図作成のライブラリは少なかったので、後続のために調査して目を付けたライブラリをまとめておきます。
 
+https://github.com/big-mon/eldenring-relationship
+
 組織図用のライブラリは豊富に見つかるけれど、家系図や血統図は貴重すぎる。
 
 ## 無料ライブラリ
 
 ### kingraph
+
+https://github.com/rstacruz/kingraph
 
 [rstacruz/kingraph](https://github.com/rstacruz/kingraph)としてGitHubで公開されているライブラリ。
 
@@ -25,6 +29,8 @@ npmやyarnでインストールして使用する形式で、YAML形式で記述
 前述したエルデンリングの家系図を生成するために最終的に使用したのがこのライブラリです。
 
 ### dTree
+
+https://github.com/ErikGartner/dTree
 
 [ErikGartner/dTree](https://github.com/ErikGartner/dTree)としてGitHubで公開されているライブラリ。
 

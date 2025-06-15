@@ -56,6 +56,8 @@ WordPressからHugoへの移行についても[先人の知恵](https://randd.kw
 
 WordPressの記事データをHugoで扱いやすい形式で取得するための、まさにそれを目的としたプラグイン「[WordPress to Hugo Exporter](https://github.com/SchumacherFM/wordpress-to-hugo-exporter)」が存在するので、それを利用してデータを取得します。
 
+https://github.com/SchumacherFM/wordpress-to-hugo-exporter
+
 記事数と画像数が多いためかブラウザから実行するとタイムアウトとなってしまうため、サーバーのコマンドラインから直接実行しました。コマンドラインによるエクスポート手順はプラグインの公式手順通りです。
 
 ```bash
@@ -97,6 +99,8 @@ Hugoは初期設定だと、Markdown内のHTMLをセキュリティ上の観点�
 だいたいの記事内容はここまでの手順でHugoでも同じように出力できるようになりましたが、まだレイアウトが怪しいコンポーネントが残っているので、次はそれらをHugo向けに調整していく必要があります。私の場合はTwitterの埋め込み、Amazonアフィリエイトリンクがそれに該当しました。
 
 これらの調整には[wordpress-to-hugo-tools](https://github.com/big-mon/wordpress-to-hugo-tools)を使っていきます。
+
+https://github.com/big-mon/wordpress-to-hugo-tools
 
 #### Twitter埋め込みタグを整形
 
