@@ -1,6 +1,6 @@
 ---
 title: Tales of Ariseをウルトラワイド(21:9)に対応させる
-description: MOD利用はご計画的に
+description: Tales of Ariseをウルトラワイドモニター（21:9）に対応させる方法。Universal Unreal Engine Unlockerを使用したアスペクト比修正の手順と注意点を解説。
 slug: tales-of-arise-fix-aspect
 publishedAt: 2021-09-12T01:14:00
 coverImage: /Hero/talesOfArise-title.jpg

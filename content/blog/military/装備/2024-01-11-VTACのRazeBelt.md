@@ -1,6 +1,6 @@
 ---
 title: レビュー：VTAC Raze Belt
-description: コンパクトなファーストラインのベルトの有力候補
+description: VTAC Raze Belt(リガーベルト)のレビュー。Austrialpin製コブラバックル採用のインナーベルト付きモデル。ランヤード用ナイロンループ配置とサイズ調整時の余りベルトの課題を解説。
 slug: vtac-raze-belt-review
 publishedAt: 2024-01-10T18:10:00
 coverImage: /Hero/vtac-raze-belt

@@ -1,6 +1,6 @@
 ---
 title: エルデンリングのキーワードやデミゴッドへの覚書
-description: 世界観への個人的なメモ
+description: エルデンリングの世界観やストーリーを理解するための個人的覚書。エルデンリング、狭間の地、破砕戦争、大いなる意志といった重要キーワードの解説とデミゴッドの相関関係、各エンディングの意味を整理。
 slug: eldenring-memo
 publishedAt: 2022-03-26T15:25:00
 coverImage: /Hero/eldenring-ranni

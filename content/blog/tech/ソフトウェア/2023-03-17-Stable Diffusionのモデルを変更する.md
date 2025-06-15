@@ -1,6 +1,6 @@
 ---
 title: Docker版Stable Diffusionのモデルを変更する
-description: 学習モデルの入手先と配置方法を簡潔にまとめる
+description: Docker版Stable Diffusion WebUIで学習モデルを変更する方法。Hugging Faceからのモデル入手からdata/StableDiffusionフォルダへの配置まで、カスタムモデル導入の基本手順。
 slug: change-stable-diffusion-model
 publishedAt: 2023-03-17T01:30:00
 coverImage: /Hero/stableDiffusion-20230317testOutput

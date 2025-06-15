@@ -1,6 +1,6 @@
 ---
 title: FastlyのCDNとエッジ・コンピューティングへの取り組み
-description: FastlyがどのようにCDNとエッジ・コンピューティングへ取り組んでいるのか、思想と技術の観点で紹介します。
+description: Fastlyの企業戦略と技術的優位性を解説。従来CDN市場への挑戦、ソフトウェア主導の思想、エッジコンピューティング「Compute@Edge」の革新性、AWSやCloudflareなど競合との比較分析まで詳細に紹介。
 slug: fastly-approach-cdn-and-edge-computing
 publishedAt: 2020-08-15
 coverImage: /Hero/fastly-logo_vcgkls.jpg

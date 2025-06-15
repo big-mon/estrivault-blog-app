@@ -1,6 +1,6 @@
 ---
 title: Audioengine A2+のUSBケーブルをType-Cに変更
-description: 変更後も問題なく再生可能
+description: Audioengine A2+スピーカーのUSB接続ケーブルをType-A to micro BからType-C to micro Bに変更。DAC内蔵スピーカーでの互換性検証と音質への影響を確認した結果報告。
 slug: audioengine-a2plus-re-cable
 publishedAt: 2022-01-07T16:32:00
 coverImage: /Hero/pexels-matthias-zomer-914915.jpg

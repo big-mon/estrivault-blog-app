@@ -1,6 +1,6 @@
 ---
 title: Next.jsの「第三者コードの影響を抑えてください」の改善失敗
-description: 「x-dns-prefetch-control」を使用した改善策はスコア変動なし
+description: PageSpeed InsightsのGoogle Adsense「第三者コードの影響を抑えてください」エラー対策を検証。x-dns-prefetch-controlとpreconnectを使った改善も効果なしの結果報告。
 slug: nextjs-fail-reduce-the-impact-of-third-party-code
 publishedAt: 2021-09-02T22:22:00
 coverImage: /Hero/pexels-cottonbro-5483064.jpg

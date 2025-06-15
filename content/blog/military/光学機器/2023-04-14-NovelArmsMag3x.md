@@ -1,6 +1,6 @@
 ---
 title: レビュー：NOVEL ARMS 3X TACTICAL MAGNIFIER
-description: モデルチェンジによりプッシュボタンが廃止され使い勝手が向上
+description: NOVEL ARMS 3Xマグニファイアのレビュー。モデルチェンジで不評だったプッシュボタンが廃止され、スイングマウントに改良。レンズ保護用フィルターの装着例と実際の使用感を解説。
 slug: novelarms-3x-magnifier
 publishedAt: 2023-04-13T23:44:00
 coverImage: /Hero/reviewNovelArmsMagnifire3x

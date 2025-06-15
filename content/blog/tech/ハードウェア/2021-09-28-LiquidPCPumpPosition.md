@@ -1,6 +1,6 @@
 ---
 title: 間違った簡易水冷クーラーの取り付け方
-description: 正しく付けて性能や寿命を最大限に伸ばしましょう
+description: 簡易水冷クーラー(AIO)の正しい設置方法。ラジエーターをポンプより下に配置するとエアー噛みで性能低下・騒音発生する理由と、適切なサイド・トップ設置の重要性を詳説。
 slug: aio-pump-position
 publishedAt: 2021-09-28T22:26:00
 coverImage: /Hero/aio-position.jpg

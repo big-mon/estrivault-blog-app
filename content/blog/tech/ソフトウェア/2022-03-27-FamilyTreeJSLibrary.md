@@ -1,6 +1,6 @@
 ---
 title: 家系図作成のJSライブラリを探してみた
-description: 無料で簡単な家系図ライブラリは貴重
+description: JavaScript家系図作成ライブラリの比較調査。エルデンリング登場人物の関係図作成のため、kingraph、dTree、D3、有償のBALKAN FamilyTreeJSとGoJSを検証し選定した経験談。
 slug: familytree-js-library-2022
 publishedAt: 2022-03-27T19:42:00
 coverImage: /Hero/pexels-david-gomes-2647471

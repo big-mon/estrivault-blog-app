@@ -1,6 +1,6 @@
 ---
 title: Steam版Cookie Clickerの自動クリックMOD導入
-description: MOD利用はご計画的に
+description: Steam版Cookie Clickerに自動クリック機能を追加するMODの導入方法。自動購入、ゴールデンクッキー自動クリックなどの機能付きMODの設定手順とキー操作一覧を解説。
 slug: steam-cookie-clicker-auto-click-mod
 publishedAt: 2021-09-10T02:50:00
 coverImage: /Hero/pexels-vitaly-vlasov-3095041.jpg

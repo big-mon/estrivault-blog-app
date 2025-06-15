@@ -1,6 +1,6 @@
 ---
 title: CreativeML Open RAIL-Mの翻訳
-description: 押さえておきたいStable Diffusionのライセンス
+description: Stable DiffusionのCreativeML Open RAIL-Mライセンス日本語翻訳。知的財産権、使用制限、配布条件、責任範囲まで、AIモデル利用で押さえるべき法的要件を詳細解説。
 slug: japanese-translation-for-license-of-stable-diffusion
 publishedAt: 2023-03-26T01:00:00
 coverImage: /Hero/stable-diffusion-pastel-output
