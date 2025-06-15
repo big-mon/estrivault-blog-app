@@ -30,7 +30,7 @@ This site contains technical articles, investment analysis, gaming guides, and m
 
 ## All Articles (${posts.length} total)
 
-${posts.map(post => `- [${post.title}](${SITE_URL.replace(/\/$/, '')}/post/${post.slug}) (${new Date(post.publishedAt).toISOString().split('T')[0]}) [${post.category}]`).join('\n')}
+${posts.map(post => `- [${post.title}](${SITE_URL.replace(/\/$/, '')}/post/${post.slug}) (${new Date(post.publishedAt).toISOString().split('T')[0]}) [${post.category}] - ${post.description || '記事の詳細な解説'}`).join('\n')}
 
 ## Key Topics
 

@@ -30,7 +30,7 @@ This site contains technical articles, investment analysis, gaming guides, and m
 
 ## Featured Articles
 
-${posts.slice(0, 25).map(post => `- [${post.title}](${SITE_URL.replace(/\/$/, '')}/post/${post.slug}) (${new Date(post.publishedAt).toISOString().split('T')[0]})`).join('\n')}
+${posts.slice(0, 25).map(post => `- [${post.title}](${SITE_URL.replace(/\/$/, '')}/post/${post.slug}) (${new Date(post.publishedAt).toISOString().split('T')[0]}) - ${post.description || '記事の詳細な解説'}`).join('\n')}
 
 *For complete article list, see: ${SITE_URL.replace(/\/$/, '')}/llms-full.txt*
 
