@@ -14,13 +14,11 @@
 
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import { page } from '$app/state';
   import Header from '$components/Post/Header.svelte';
   import PostBody from '$components/Post/PostBody.svelte';
-  import { SITE_TITLE, SITE_AUTHOR } from '$constants';
+  import TableOfContents from '$components/Post/TableOfContents.svelte';
+  import { SITE_TITLE, SITE_AUTHOR, SITE_URL, SOCIAL_LINK_X } from '$constants';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
-  import './amazon-card.scss';
-  import './twitter-embed.scss';
 
   interface PageData {
     post: PostHTML;
@@ -29,13 +27,8 @@
   }
 
   export let data: PageData;
-  const post = page.data.post as PostHTML;
+  $: post = data.post as PostHTML;
 
-  // メタデータを設定
-  $: data = {
-    ...data,
-    metadata: post.meta,
-  };
 
   // Twitter埋め込みがある場合のみスクリプトを読み込み
   onMount(async () => {
@@ -120,21 +113,64 @@
     <meta name="keywords" content={post.meta.tags.join(', ')} />
   {/if}
   <meta name="author" content={SITE_AUTHOR} />
-  {#if data.metadata}
-    <meta name="published" content={new Date(data.metadata.publishedAt).toISOString()} />
-    {#if data.metadata.updatedAt}
-      <meta name="updated" content={new Date(data.metadata.updatedAt).toISOString()} />
+  {#if post.meta}
+    <meta name="published" content={new Date(post.meta.publishedAt).toISOString()} />
+    {#if post.meta.updatedAt}
+      <meta name="updated" content={new Date(post.meta.updatedAt).toISOString()} />
     {/if}
   {/if}
+  <!-- Open Graph -->
   <meta property="og:title" content={post.meta.title} />
   <meta property="og:description" content={post.meta.description || post.meta.description || `${post.meta.title}についての記事です。`} />
   <meta property="og:type" content="article" />
+  <meta property="og:url" content={`${SITE_URL}/post/${post.meta.slug}`} />
+  <meta property="og:site_name" content={SITE_TITLE} />
+  <meta property="og:locale" content="ja_JP" />
   {#if post.meta.coverImage}
     <meta property="og:image" content={post.meta.coverImage} />
+    <meta property="og:image:alt" content={post.meta.title} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
   {/if}
+  
+  <!-- Article specific -->
+  <meta property="article:author" content={SITE_AUTHOR} />
+  <meta property="article:published_time" content={new Date(post.meta.publishedAt).toISOString()} />
+  {#if post.meta.updatedAt}
+    <meta property="article:modified_time" content={new Date(post.meta.updatedAt).toISOString()} />
+  {/if}
+  {#if post.meta.category}
+    <meta property="article:section" content={post.meta.category} />
+  {/if}
+  {#if post.meta.tags && post.meta.tags.length > 0}
+    {#each post.meta.tags as tag}
+      <meta property="article:tag" content={tag} />
+    {/each}
+  {/if}
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content={`@${SOCIAL_LINK_X}`} />
+  <meta name="twitter:creator" content={`@${SOCIAL_LINK_X}`} />
+  <meta name="twitter:title" content={post.meta.title} />
+  <meta name="twitter:description" content={post.meta.description || post.meta.description || `${post.meta.title}についての記事です。`} />
+  {#if post.meta.coverImage}
+    <meta name="twitter:image" content={post.meta.coverImage} />
+    <meta name="twitter:image:alt" content={post.meta.title} />
+  {/if}
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href={`${SITE_URL}/post/${post.meta.slug}`} />
 </svelte:head>
 
-<article class="container mx-auto px-4">
+<article class="container mx-auto px-4 xl:max-w-6xl">
   <Header meta={post.meta} />
-  <PostBody {post} />
+  <div class="xl:flex xl:gap-8">
+    <div class="xl:flex-1 xl:max-w-4xl">
+      <PostBody {post} />
+    </div>
+    <aside class="xl:w-64 xl:flex-shrink-0">
+      <TableOfContents headings={post.headings} />
+    </aside>
+  </div>
 </article>

@@ -20,26 +20,26 @@ WordPressにて運営していた趣味サイトを、静的サイトジェネ�
 - 記事データをMarkdown形式で管理して可搬性を高めたかった
 - 有料でレンタルしているサーバーの維持費が無料になる
 
-# WordPressからの移行を決意
+## WordPressからの移行を決意
 
 SSGとして有名なフレームワークにはGatsbyJSやHugoがあります。それらを[比較した先人たちの記事](https://exlair.net/trend-for-static-site-generator/)が大量にある上にもちろん参考になるので、比較は特に本記事では掘り下げません。どちらも試してみましたがHugoの方が分かりやすかったのでHugoにしました。カスタマイズをがっつりとやるのであればGatsbyJSの方がやりやすいと思います。
 
 結論は私とは真逆ですが、[HugoからGatsbyJSへと乗り換えた先人の記事](https://blog.wadackel.me/2020/hugo-to-gatsby/)が分かりやすいのでお勧めです。
 
-## 移行元となるWordPress環境
+### 移行元となるWordPress環境
 
 - サーバー：[ConoHa VPS](https://px.a8.net/svt/ejp?a8mat=35F6JU+EDZ5UI+50+4YT441) 1GBプラン
 - 実行環境：KUSANAGI + Luxeritas
 - CMS：WordPress
 
-## 移行先となるブログ環境
+### 移行先となるブログ環境
 
 - サーバー：Vercel
 - CMS：自力
 
 移行後はヘッドレスCMSを利用する手もありますが、Markdownによる可搬性を重視したいことと、移行対象サイトの性質上あまり大きな記事変更などは頻繁に行わないことからCMSを導入する必要はないと判断しました。コード類は上記に記載していませんが、GitHubに保管します。
 
-# 移行手順
+## 移行手順
 
 いよいよ本題です。
 
@@ -52,7 +52,7 @@ WordPressからHugoへの移行についても[先人の知恵](https://randd.kw
 1. Hugoの設定
 1. Vercelでホスティング
 
-## 記事データの取得
+### 記事データの取得
 
 WordPressの記事データをHugoで扱いやすい形式で取得するための、まさにそれを目的としたプラグイン「[WordPress to Hugo Exporter](https://github.com/SchumacherFM/wordpress-to-hugo-exporter)」が存在するので、それを利用してデータを取得します。
 
@@ -65,7 +65,7 @@ php hugo-export-cli.php .
 
 `/home/kusanagi/XXXXX/DocumentRoot/wp-content/plugins/wordpress-to-hugo-exporter-master/`に`wp-hugo.zip`が出力されるのでFileZillaなどを使用してローカルへダウンロードします。
 
-## HugoでHTML出力を許可
+### HugoでHTML出力を許可
 
 Hugoは初期設定だと、Markdown内のHTMLをセキュリティ上の観点から出力しません。
 
@@ -78,7 +78,7 @@ Hugoは初期設定だと、Markdown内のHTMLをセキュリティ上の観点�
       unsafe = true
 ```
 
-## 画像データを移動
+### 画像データを移動
 
 画像フォルダのバックアップを`/static/images`に配置します。
 
@@ -88,33 +88,33 @@ Hugoは初期設定だと、Markdown内のHTMLをセキュリティ上の観点�
 
 `/static/images`に格納した場合、example.com/imagesで画像はアクセスできます。
 
-## 記事データを移動
+### 記事データを移動
 
 `/content/post`に生成された`.md`ファイル一式を格納します。
 
-## 記事データをHugo用に調整
+### 記事データをHugo用に調整
 
 だいたいの記事内容はここまでの手順でHugoでも同じように出力できるようになりましたが、まだレイアウトが怪しいコンポーネントが残っているので、次はそれらをHugo向けに調整していく必要があります。私の場合はTwitterの埋め込み、Amazonアフィリエイトリンクがそれに該当しました。
 
 これらの調整には[wordpress-to-hugo-tools](https://github.com/big-mon/wordpress-to-hugo-tools)を使っていきます。
 
-### Twitter埋め込みタグを整形
+#### Twitter埋め込みタグを整形
 
 コンソールが立ち上がるので、ダウンロードしてきた記事データフォルダを指定して実行します。
 
-### Rinkerタグ
+#### Rinkerタグ
 
 Amazon の商品紹介プラグインとしてRinkerにお世話になっていたのですが、こちらも簡易的なHTMLに変換します。コンソールが立ち上がるので、ダウンロードしてきた記事データフォルダを指定して実行します。
 
 簡易なHTMLにした後は、自分でCSSを定義して見えるものにするという事ですね。
 
-## 画像データを整理
+### 画像データを整理
 
 引き続き[wordpress-to-hugo-tools](https://github.com/big-mon/wordpress-to-hugo-tools)を使用して画像データを整理していきます。
 
 WordPressを利用していると画像が無尽蔵にサイズ違いの差分が生成されるので、オリジナル以外はバッサリと削除してしまいます。
 
-## Vercelでホスティング
+### Vercelでホスティング
 
 これまでの作業中、適宜`hugo server`で動作を確認していればこの時点で見れるものが出来上がっているはずです。
 
@@ -122,7 +122,7 @@ GitHubにリポジトリを作り、必要なファイル類一式をプッシ�
 
 あとはVercelからGitHubのリポジトリを取り込んで、デプロイして、DNSの向き先をVercelに変えればおしまいです。DNSでCloudflareなどのCDNも併用していた場合、Vercelは自前のCDNを利用しているので事情がない限りはプロキシを切った方が性能が出るようになります。
 
-### Vercelのリダイレクト設定
+#### Vercelのリダイレクト設定
 
 WordPressでは動的なパーマリンク設定を使用していたので、`/p=xxxxx`のようなクエリ文字列が使用されたURLが生成されていましたが、Hugoでは`=`といった記号は通常は削除されて認識されます。(最初期に設定を誤ったまま来てしまったので、この例は厳密にはクエリ文字列ではありません)
 
@@ -145,7 +145,7 @@ Vercelでリダイレクト設定を行うには`vercel.json`をルートに作�
 
 上記の設定だと`/p=xxxxx`にアクセスすると`/post/xxxxx`にリダイレクトされる設定となります。
 
-# おわり
+## おわり
 
 VercelやNetlifyなど便利なJAMstackプラットフォームが登場して日々便利さを実感しますね。
 

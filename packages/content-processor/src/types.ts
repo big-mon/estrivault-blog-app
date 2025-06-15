@@ -26,8 +26,16 @@ export interface PostMeta {
   readingTime?: number;
 }
 
+/** 見出し情報 */
+export interface HeadingInfo {
+  id: string;
+  level: number;
+  text: string;
+}
+
 /** 投稿のメタ・本文 */
 export interface PostHTML {
   meta: PostMeta;
   html: string;
+  headings: HeadingInfo[];
 }

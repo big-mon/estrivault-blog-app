@@ -12,7 +12,7 @@ Tales of Ariseは記事時点でウルトラワイドモニターに対応して
 
 MODがリリースされるのを待つのもいいですが、せっかくですから自力でアスペクト比を修正してしまいましょう。Unreal Engineで作成されているため修正は比較的簡単なようです。海外メディア[Android Gram](https://androidgram.com/tales-of-arise-ultrawide-219-support-not-available-how-to-fix-it/)にて対応方法が説明されているので、やり方を紹介します。
 
-# Universal Unreal Engine Unlockerをダウンロード
+## Universal Unreal Engine Unlockerをダウンロード
 
 1. [Universal Unreal Engine Unlocker](https://mega.nz/file/JQgmmTDQ#JicdedqwrbiCwj-DzfOIgJUD-HiKphSlO8Ppvkvqwfc)をダウンロード
 

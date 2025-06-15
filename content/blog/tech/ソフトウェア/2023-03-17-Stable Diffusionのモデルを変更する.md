@@ -16,7 +16,7 @@ Stable Diffusionを使いやすくしたAUTOMATIC1111。
 
 ただ、デフォルトだとStable Diffusionのモデルは自動でダウンロードされる「v1-5-pruned-emaonly.ckpt」と「sd-v1-5-inpainting.ckpt」しか選べないため、別の学習モデルを使用する方法を書き留めておきます。
 
-# 学習モデルの入手方法
+## 学習モデルの入手方法
 
 AI系コミュニティの[Hugging Face](https://huggingface.co/models?other=stable-diffusion)にてモデルが多数公開されています。
 
@@ -26,7 +26,7 @@ AI系コミュニティの[Hugging Face](https://huggingface.co/models?other=sta
 
 モデルによって出来ることや出来ないこと、得意不得意や用途があるので各自で調べましょう。
 
-# モデルの配置
+## モデルの配置
 
 ```txt
 \stable-diffusion-webui-docker\data\StableDiffusion

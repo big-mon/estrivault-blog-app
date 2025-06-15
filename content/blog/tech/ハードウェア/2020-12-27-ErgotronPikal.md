@@ -16,7 +16,7 @@ tags: ['ハードウェア']
 
 ::amazon{asin="B0036RDOT8" name="LXデュアル デスク マウント アーム スタッキング"}
 
-# 錆び？アームがくすんできた
+## 錆び？アームがくすんできた
 
 ![エルゴトロン使用の様子](/Tech/displayArm-view_w7xf1w.jpg)
 

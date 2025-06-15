@@ -16,9 +16,9 @@ nextjs-progressbarはTypeScriptにも対応しています。
 
 [デモページ](https://demo-nextjs-progressbar.vercel.app/)が公開されているので気になる方はご覧ください。
 
-# nextjs-progressbar の導入方法
+## nextjs-progressbar の導入方法
 
-## インストール
+### インストール
 
 まずはパッケージのインストールを行います。
 
@@ -28,7 +28,7 @@ or
 yarn add nextjs-progressbar
 ```
 
-## \_app.js の編集
+### \_app.js の編集
 
 次は`_app.js`もしくは`_app.tsx`を編集します。
 
@@ -46,7 +46,7 @@ import NextNprogress from 'nextjs-progressbar';
 
 以上で実装完了です。
 
-## カスタマイズ
+### カスタマイズ
 
 パラメータを付けてやることで色や線の太さといったカスタマイズが行えます。
 
@@ -54,7 +54,7 @@ import NextNprogress from 'nextjs-progressbar';
 <NextNprogress color="#29D" startPosition={0.3} stopDelayMs={200} height={3} showOnShallow={true} />
 ```
 
-# おまけ
+## おまけ
 
 私の`_app.tsx`を晒しておきます。上記の説明でイメージが沸かなかった場合に参考にしてください。
 

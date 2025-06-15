@@ -3,7 +3,7 @@
   import { afterNavigate } from '$app/navigation';
   import PostCard from '$components/PostCard/PostCard.svelte';
   import Pagination from '$components/Pagination/Pagination.svelte';
-  import { SITE_TITLE } from '$constants';
+  import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, SITE_AUTHOR, SOCIAL_LINK_X } from '$constants';
   import type { PageData } from '../../../$types';
   import type { PostMeta } from '@estrivault/content-processor';
 
@@ -54,14 +54,43 @@
       }
     });
   }
+  
+  // OGP用のデータを動的生成
+  const pageTitle = $derived(`${pageData.category.toUpperCase()}の記事一覧${pageData.pagination.page > 1 ? ` - ページ${pageData.pagination.page}` : ''} | ${SITE_TITLE}`);
+  const pageDescription = $derived(`${pageData.category.toUpperCase()}カテゴリーの記事一覧${pageData.pagination.page > 1 ? `（${pageData.pagination.page}ページ目）` : ''}です。全${pageData.pagination.total}件の記事を掲載しています。`);
+  const pageUrl = $derived(`${SITE_URL}/category/${pageData.category}/${pageData.pagination.page}`);
 </script>
 
 <svelte:head>
-  <title>{pageData.category.toUpperCase()}の記事一覧 | {SITE_TITLE}</title>
-  <meta
-    name="description"
-    content="{pageData.category.toUpperCase()}カテゴリーの記事一覧ページです。"
-  />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription} />
+  <meta name="author" content={SITE_AUTHOR} />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={pageDescription} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:site_name" content={SITE_TITLE} />
+  <meta property="og:locale" content="ja_JP" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content={`@${SOCIAL_LINK_X}`} />
+  <meta name="twitter:creator" content={`@${SOCIAL_LINK_X}`} />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={pageDescription} />
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href={pageUrl} />
+  
+  <!-- Pagination meta -->
+  {#if pageData.pagination.page > 1}
+    <link rel="prev" href={`${SITE_URL}/category/${pageData.category}/${pageData.pagination.page > 2 ? pageData.pagination.page - 1 : '1'}`} />
+  {/if}
+  {#if pageData.pagination.page < pageData.pagination.totalPages}
+    <link rel="next" href={`${SITE_URL}/category/${pageData.category}/${pageData.pagination.page + 1}`} />
+  {/if}
 </svelte:head>
 
 <main class="container mx-auto px-4 py-8">

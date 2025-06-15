@@ -10,7 +10,7 @@ tags: ['プログラミング', 'EDGAR']
 
 EDGARが公開しているAPIを使用して、任意の企業が過去に決算報告した情報を取得することができます。今回はそのAPIを使用して複数年度にまたがる純利益などの情報を取得する方法を紹介します。
 
-# EDGARのAPI
+## EDGARのAPI
 
 先日β版ではありますがEDGARがAPIの公開を始めました。これは画期的なことです。今まではシステマティックにデータを読み取るためにはXBRLをダウンロードして自分で解析するソフトウェアを使用する必要がありましたが、例えば売上高の推移を知りたいといった簡易的な用途であればAPIを使用するだけで済んでしまうのです。
 
@@ -20,7 +20,7 @@ EDGARが公開しているAPIを使用して、任意の企業が過去に決算
 
 現在のところAPIが対象としている書式(Form)は10-Q, 10-K, 8-K, 20-F, 40-F, 6-Kとそれらの変形(修正など)です。これら以外の書式を必要とする場合は従来通りの方法が必要となります。β版のため予告なく記事の内容とAPI仕様が変わる可能性がある点に留意ください。
 
-## data.sec.gov/submissions/
+### data.sec.gov/submissions/
 
 対象となる企業のファイリング履歴を確認できるAPIです。
 
@@ -30,7 +30,7 @@ EDGARが公開しているAPIを使用して、任意の企業が過去に決算
 
 ティッカーシンボルや会社名、取引所などのメタデータの他に少なくとも過去1年間もしくは1000件のファイリング履歴が取得できます。どの開示資料がいつ開示されたのかなどを調べる際に利用できそうです。また XBRLに対応しているのか、それはインラインXBRLなのかといった真偽値も保持しており、主体となるインスタンスのファイル名なども取得できます。
 
-## data.sec.gov/api/xbrl/companyconcepts/
+### data.sec.gov/api/xbrl/companyconcepts/
 
 対象となる企業の特定の項目に関する過去の開示データを取得する API です。
 
@@ -41,7 +41,7 @@ EDGARが公開しているAPIを使用して、任意の企業が過去に決算
 
 > https://data.sec.gov/api/xbrl/companyconcept/CIK##########/us-gaap/AccountsPayableCurrent.json
 
-## data.sec.gov/api/xbrl/companyfacts/
+### data.sec.gov/api/xbrl/companyfacts/
 
 上述した`companyconcepts`の情報をすべて1度に取得するAPIです。
 
@@ -49,7 +49,7 @@ EDGARが公開しているAPIを使用して、任意の企業が過去に決算
 
 全てのデータが1度にまとめて出力されるためかなりレスポンスが遅いAPIです。なるべく取得する項目を絞って`companyconcepts`を利用した方が良いでしょう。
 
-## data.sec.gov/api/xbrl/frames/
+### data.sec.gov/api/xbrl/frames/
 
 指定期間内の開示書類を全て取得するAPIです。
 
@@ -59,7 +59,7 @@ EDGARが公開しているAPIを使用して、任意の企業が過去に決算
 
 任意の項目を全企業で横並びに確認したい場合などに使用できそうです。
 
-# まとめ
+## まとめ
 
 AAPLの純利益を過去年度にわたって取得したい場合、`https://data.sec.gov/api/xbrl/companyconcept/CIK0000320193/us-gaap/AccountsPayableCurrent.json`をコールすることで簡単に取得できます。
 
