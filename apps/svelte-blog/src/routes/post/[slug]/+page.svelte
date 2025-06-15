@@ -16,6 +16,7 @@
   import { onMount, tick } from 'svelte';
   import Header from '$components/Post/Header.svelte';
   import PostBody from '$components/Post/PostBody.svelte';
+  import TableOfContents from '$components/Post/TableOfContents.svelte';
   import { SITE_TITLE, SITE_AUTHOR } from '$constants';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
 
@@ -128,5 +129,6 @@
 
 <article class="container mx-auto px-4">
   <Header meta={post.meta} />
+  <TableOfContents headings={post.headings} />
   <PostBody {post} />
 </article>
