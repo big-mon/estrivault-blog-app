@@ -4,6 +4,7 @@
   import GitHub from '../Icons/GitHub.svelte';
   import X from '../Icons/X.svelte';
   import { fly } from 'svelte/transition';
+  import { SOCIAL_LINK_GITHUB, SOCIAL_LINK_X } from '../../constants';
 
   export let pathname: string;
   export let onClose: () => void;
@@ -35,11 +36,11 @@
 
     <!-- フッターアイコン -->
     <div class="mt-8 flex justify-center gap-6">
-      <a href="https://github.com/your-username" target="_blank" aria-label="GitHub">
-        <GitHub className="h-6 w-6 hover:opacity-80" />
-      </a>
-      <a href="https://twitter.com/your-handle" target="_blank" aria-label="X">
+      <a href={`https://twitter.com/${SOCIAL_LINK_X}`} target="_blank" aria-label="X">
         <X className="h-6 w-6 hover:opacity-80" />
+      </a>
+      <a href={`https://github.com/${SOCIAL_LINK_GITHUB}`} target="_blank" aria-label="GitHub">
+        <GitHub className="h-6 w-6 hover:opacity-80" />
       </a>
     </div>
   </div>
