@@ -29,9 +29,9 @@
         <a
           {href}
           onclick={(event) => handleClick(event, href)}
-          class="block rounded-md px-2 py-2 transition hover:bg-gray-100 {isActive(href)
-            ? 'font-semibold text-blue-600'
-            : 'text-gray-800'}"
+          class="block rounded-md px-2 py-2 transition-colors hover:bg-gray-100 hover:text-gray-900 {isActive(href)
+            ? 'font-semibold text-gray-900 bg-gray-100'
+            : 'text-gray-600'}"
           aria-current={isActive(href) ? 'page' : undefined}
         >
           {label}

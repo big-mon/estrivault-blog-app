@@ -34,12 +34,12 @@
 </script>
 
 <header
-  class="sticky top-0 z-50 w-full px-4 py-3 transition-transform duration-300 ease-in-out"
+  class="sticky top-0 z-50 w-full px-4 py-4 transition-transform duration-300 ease-in-out"
   class:-translate-y-full={!isHeaderVisible}
 >
   <div
-    class="mx-auto max-w-6xl rounded-xl bg-white
-         px-4 py-3 shadow-md sm:px-6 lg:px-8"
+    class="mx-auto max-w-6xl rounded-2xl bg-gradient-to-br from-white to-gray-50 border border-gray-200/50
+         px-6 py-4 shadow-xl shadow-gray-900/10 sm:px-8 lg:px-10"
   >
     <div class="flex items-center justify-between">
       <div><Title /></div>
