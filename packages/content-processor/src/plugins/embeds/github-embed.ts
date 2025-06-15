@@ -13,26 +13,14 @@ export const remarkGithubEmbed: Plugin = () => {
         const githubUrlRegex = /^https:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)(?:\/(?:issues|pull)\/(\d+))?(?:\/.*)?$/;
         const match = url.match(githubUrlRegex);
 
-        // デバッグログ
-        console.log('GitHub URL check (link node):', { url, match: !!match, children: node.children });
-
-        // デバッグ: ノード構造を確認
-        console.log('Node structure debug:', {
-          nodeType: node.type,
-          parentType: parent?.type,
-          parentParentType: parent?.parent?.type,
-          parentChildrenLength: parent?.children?.length,
-          index
-        });
-
         // 単独のリンクの場合（パラグラフ内に1つだけのリンクノード）
         if (match && parent && parent.type === 'paragraph' && parent.children.length === 1) {
           const [fullUrl, owner, repo, issueOrPrNumber] = match;
-          
+
           // リポジトリ情報を解析
           let type = 'repo';
           let displayText = `${owner}/${repo}`;
-          
+
           if (issueOrPrNumber) {
             if (fullUrl.includes('/issues/')) {
               type = 'issue';
@@ -43,37 +31,35 @@ export const remarkGithubEmbed: Plugin = () => {
             }
           }
 
-          console.log('Converting GitHub URL to embed:', { fullUrl, owner, repo, type });
+          // OGP画像URL（GitHubが自動生成するOGP画像）
+          const ogpImageUrl = `https://opengraph.githubassets.com/1/${owner}/${repo}`;
 
-          // GitHub埋め込みカードを作成
+          // GitHub埋め込みカードを作成（フル幅、ホバー効果付き）
           const embedNode = {
             type: 'html',
-            value: `<div class="github-embed-card" style="margin: 1.5rem 0; padding: 1rem; border: 1px solid #e1e5e9; border-radius: 8px; background: #f6f8fa;">
-  <div class="github-embed-header" style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 0.5rem;">
-      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-    </svg>
-    <span style="font-weight: 600; color: #24292f;">${displayText}</span>
+            value: `<div style="margin: 1rem 0;">
+<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" style="display: flex; height: 150px; width: 100%; border: 1px solid #d1d9e0; border-radius: 8px; background: #ffffff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); text-decoration: none; color: inherit; overflow: hidden; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.12)'; this.style.borderColor='#0969da';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.06)'; this.style.borderColor='#d1d9e0';">
+  <div style="flex: 1; min-width: 0; padding: 20px; display: flex; flex-direction: column; justify-content: center;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="#24292f">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+      </svg>
+      <span style="font-weight: 600; font-size: 16px; color: #24292f;">${displayText}</span>
+    </div>
+    <div style="font-size: 13px; color: #656d76; background: #eef2f5; padding: 4px 10px; border-radius: 5px; display: inline-block; width: fit-content;">
+      ${type === 'repo' ? 'Repository' : type === 'issue' ? 'Issue' : 'Pull Request'}
+    </div>
   </div>
-  <div class="github-embed-description" style="color: #656d76; font-size: 0.875rem; margin-bottom: 0.75rem;">
-    ${type === 'repo' ? 'Repository' : type === 'issue' ? 'Issue' : 'Pull Request'}
+  <div style="flex-shrink: 0; width: 300px; height: 150px; background: #f6f8fa; display: flex; align-items: center; justify-content: center;">
+    <img src="${ogpImageUrl}" alt="GitHub repository preview" style="max-width: 300px; max-height: 150px; object-fit: contain; display: block;" loading="lazy" onerror="this.parentElement.style.display='none';" />
   </div>
-  <a href="${fullUrl}" target="_blank" rel="noopener noreferrer" class="github-embed-link" style="display: inline-block; padding: 0.5rem 1rem; background: #2da44e; color: white; text-decoration: none; border-radius: 6px; font-size: 0.875rem; font-weight: 500;">
-    View on GitHub
-  </a>
+</a>
 </div>`
           };
 
-          // パラグラフノード自体を置き換える方法を試す
+          // 現在のリンクノードをHTML埋め込みに直接置き換え
           if (parent && typeof index === 'number') {
-            // 現在のリンクノードをHTML埋め込みに直接置き換え
             parent.children[index] = embedNode;
-            console.log('Successfully replaced link node with GitHub embed');
-          } else {
-            console.log('Could not replace link node:', { 
-              hasParent: !!parent,
-              indexType: typeof index 
-            });
           }
         }
       }
