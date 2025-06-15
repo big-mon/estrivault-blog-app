@@ -9,4 +9,40 @@
       color: #2563eb; // Same blue as text-blue-600 used in post cards
     }
   }
+
+  // Add # symbols to headings based on their level
+  :global(h2::before) {
+    content: "# ";
+    color: #6b7280;
+    font-weight: normal;
+    margin-right: 0.5rem;
+  }
+
+  :global(h3::before) {
+    content: "## ";
+    color: #6b7280;
+    font-weight: normal;
+    margin-right: 0.5rem;
+  }
+
+  :global(h4::before) {
+    content: "### ";
+    color: #6b7280;
+    font-weight: normal;
+    margin-right: 0.5rem;
+  }
+
+  :global(h5::before) {
+    content: "#### ";
+    color: #6b7280;
+    font-weight: normal;
+    margin-right: 0.5rem;
+  }
+
+  :global(h6::before) {
+    content: "##### ";
+    color: #6b7280;
+    font-weight: normal;
+    margin-right: 0.5rem;
+  }
 }
