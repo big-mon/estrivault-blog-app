@@ -18,9 +18,6 @@
   import PostBody from '$components/Post/PostBody.svelte';
   import { SITE_TITLE, SITE_AUTHOR } from '$constants';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
-  import './amazon-card.scss';
-  import './twitter-embed.scss';
-  import './post-links.scss';
 
   interface PageData {
     post: PostHTML;
