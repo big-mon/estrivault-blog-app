@@ -14,9 +14,9 @@ tags: ['ソフトウェア', 'ELDEN RING', 'ライブラリ']
 
 組織図用のライブラリは豊富に見つかるけれど、家系図や血統図は貴重すぎる。
 
-# 無料ライブラリ
+## 無料ライブラリ
 
-## kingraph
+### kingraph
 
 [rstacruz/kingraph](https://github.com/rstacruz/kingraph)としてGitHubで公開されているライブラリ。
 
@@ -24,13 +24,13 @@ npmやyarnでインストールして使用する形式で、YAML形式で記述
 
 前述したエルデンリングの家系図を生成するために最終的に使用したのがこのライブラリです。
 
-## dTree
+### dTree
 
 [ErikGartner/dTree](https://github.com/ErikGartner/dTree)としてGitHubで公開されているライブラリ。
 
 グラフ作成ライブラリとして著名な「D3」をベースとしたライブラリです。
 
-## D3
+### D3
 
 [D3を直接使用して家系図を作成する方法](https://bl.ocks.org/mell0kat/5cb91a2048384560dfa8f041fd9a0295)です。
 
@@ -40,15 +40,15 @@ D3のバージョン4を使用するコードで、調査時点では7までリ�
 
 挿入するデータはJSON形式で直感的にわかりやすかったです。
 
-# 有償ライブラリ
+## 有償ライブラリ
 
-## BALKAN FamilyTreeJS
+### BALKAN FamilyTreeJS
 
 買い切り型のライセンスで提供されている[FamilyTreeJS](https://balkan.app/FamilyTreeJS/Demos/royal-family-tree)です。
 
 デモを見る限りは分かりやすく見やすい家系図が作成できそうです。
 
-## GoJS
+### GoJS
 
 はちゃめちゃにライセンスが高いですがあらゆる図形作成に対応している[GoJS](https://gojs.net/latest/samples/genogram.html)です。
 

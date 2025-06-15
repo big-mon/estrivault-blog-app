@@ -14,26 +14,26 @@ Steam版Cookie Clickerへ自動クリックMODを導入します。
 
 **Steam 実績も有効です。**
 
-# MODを適用する
+## MODを適用する
 
-## MODのダウンロード
+### MODのダウンロード
 
 MODは2種類あります。自動クリックからゴールデンクッキーの自動クリックなど全部込みのMODと、自動クリックのみに機能を絞ったMODです。好きな方をダウンロードしてください。
 
 - [https://nexose.com/cookieclicker/autoclickandbuyMod.zip](https://nexose.com/cookieclicker/autoclickandbuyMod.zip)
 - 自動クリックのみ -> [https://nexose.com/cookieclicker/autoclickMod.zip](https://nexose.com/cookieclicker/autoclickMod.zip)
 
-## MODの配置
+### MODの配置
 
 ダウンロードしたZipファイルを解凍すると、`info.txt`と`main.js`が入ったフォルダが取得できます。そのフォルダを`...\SteamLibrary\steamapps\common\Cookie Clicker\resources\app\mods\local`の中にコピーします。
 
 上記のフォルダはゲーム内のオプション「MODの管理」から「/modsのフォルダーを開く」で開くこともできます。
 
-## ゲームの再起動
+### ゲームの再起動
 
 ゲームを再起動するとMODフォルダの再読み込みが行われ、コピーしたMODが一覧に表示されるようになります。
 
-## MODの有効化
+### MODの有効化
 
 初期状態ではMODは無効化されています。
 
@@ -41,7 +41,7 @@ MODは2種類あります。自動クリックからゴールデンクッキー�
 
 心配な人は有効化を行う前にセーブをエクスポートしておくと良いでしょう。
 
-## MODの機能のオンオフ
+### MODの機能のオンオフ
 
 | キー | 説明                            |
 | :--: | ------------------------------- |

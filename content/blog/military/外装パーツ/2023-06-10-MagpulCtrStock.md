@@ -18,7 +18,7 @@ CTRストック自体は[MAGPULが出している純正品](https://magpul.com/c
 
 ::amazon{asin="B07JYL24QW" name="MAGPUL(マグプル) CTRストック Mil-Spec (Black) M-4 AR-15"}
 
-# 内容物
+## 内容物
 
 ![内容物](/Review/arwycxy0hxmxvmmgatvo)
 
@@ -33,7 +33,7 @@ CTRストックは取り付け可能なストックチューブの規格とし�
 
 BCM MCMR 11.5はミルスペックのストックチューブとなっています。
 
-# Magpul CTRストックの外観レビュー
+## Magpul CTRストックの外観レビュー
 
 ![Magpul CTRストックの右側面](/Review/pzxnwqgawycyel7gjrxh)
 
@@ -59,7 +59,7 @@ CTRストックは下位互換のMOEストックに対してスライド位置�
 
 一般的なストック内収納に対応したリポバッテリーであれば問題ないと思います。ストックのスライド位置を最短にする場合、ケーブルの余りを押し込む形になるかもしれないので長さ調節が必要になる可能性があります。
 
-# BCM MCMRに取り付け
+## BCM MCMRに取り付け
 
 ![Magpul CTRストックを取り付けた様子](/Review/jzsvrdgat4pqpjenugtg)
 

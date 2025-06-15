@@ -16,9 +16,9 @@ PageSpeed Insightsで「第三者コードの影響を抑えてください」�
 
 **結論として検索して上位に出てくる方法はNext.js 向けには効果がありません**でした。(Next.jsはSSGとして利用、スコア上の有意差は感じられなかった)
 
-# PageSpeed Insight - スコア
+## PageSpeed Insight - スコア
 
-## Before - 50
+### Before - 50
 
 数回計測しなおしたところ約50点でした。以下が改善前の \_document.tsx の記載です。
 
@@ -33,7 +33,7 @@ PageSpeed Insightsで「第三者コードの影響を抑えてください」�
 </Head>
 ```
 
-## After - 50
+### After - 50
 
 改善後も変わらず。
 
@@ -53,7 +53,7 @@ PageSpeed Insightsで「第三者コードの影響を抑えてください」�
 </Head>
 ```
 
-# まとめ
+## まとめ
 
 Google Adsenseの速度改善は諦めることにしました。ちなみにGoogle Adsenseを外して計測するとモバイルは97点、パソコンは100点になりました。
 

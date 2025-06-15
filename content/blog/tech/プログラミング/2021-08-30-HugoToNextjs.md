@@ -12,7 +12,7 @@ tags: ['プログラミング', 'JAMstack']
 
 最終的にはゴリ押しとなったので改善の余地はあります。
 
-# Hugoショートコード
+## Hugoショートコード
 
 Markdownでブログ記事を書くことの多いSSG界隈ですが、Markdownの記法だけでは表現しきれない要素を埋め込みたいニーズがあります。それを満たすためにHugo利用時に使用していたのが[ショートコード](https://gohugo.io/content-management/shortcodes/)です。
 
@@ -22,7 +22,7 @@ Markdownでブログ記事を書くことの多いSSG界隈ですが、Markdown�
 {{< amazon asin="B092ZGNKVC" title="え、社内システム全てワンオペしている私を解雇ですか？" >}}
 ```
 
-# Next.jsへのショートコード移行のアプローチ
+## Next.jsへのショートコード移行のアプローチ
 
 Hugoでは標準でMarkdownをHTMLへ変換できるため意識していませんでしたが、Next.jsでは変換部分に関して追加の実装が必要です。この実装部分にさらにショートコードを読み替えるための処理を追加することで実現していきます。
 
@@ -33,7 +33,7 @@ Hugoでは標準でMarkdownをHTMLへ変換できるため意識していませ�
 1. HTMLをrehypeで解析しhastとして読み込む
 1. hastをコンパイルしてReactコンポーネントにする
 
-## MarkdownからHTMLへ変換
+### MarkdownからHTMLへ変換
 
 Markdownの変換は通常[Unified](https://github.com/unifiedjs/unified)のエコシステムを採用し、大まかには下記のような構成となっているはずです。
 
@@ -62,7 +62,7 @@ unifiedとremark-parseを使用して、Markdownを解析。HTMLへ変換可能�
 
 本当はMarkdownをHTMLに変換する時点でショートコードを独自のHTMLタグとして出力したかったのですが、mdastの加工処理が難しく少々時間がかかりそうだったので実装を優先してmdastの加工は見送ることにしました。
 
-## Markdown - HTML - React
+### Markdown - HTML - React
 
 ```js
 import React from 'react';
@@ -113,7 +113,7 @@ export function amazonBlockConvert(html) {
 
 こうすることでrehypeが読み込む際にamazonタグとして認識されるので、あとはそれを用意しておいたReactコンポーネントに置換しています。
 
-# まとめ
+## まとめ
 
 Next.jsを使用してから初めてMarkdownをHTMLに変換する処理について勉強しました。Unifiedすごい。そして自分が今まで書いていたMarkdownは元々のオリジナルではなく、gfmというデファクトスタンダードな方言だったことにも驚きました。
 
