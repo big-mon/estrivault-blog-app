@@ -47,12 +47,12 @@
       <div class="flex items-center gap-4">
         <a
           href="/llms.txt"
-          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+          class="hidden rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 md:block"
           title="AI向け記事一覧(llms.txt)"
           target="_blank"
+          aria-label="AI向け記事一覧"
         >
           <Robot />
-          <span class="hidden sm:inline">AI</span>
         </a>
         <ResponsiveMenu {pathname} />
       </div>
