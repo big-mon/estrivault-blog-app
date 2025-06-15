@@ -127,8 +127,14 @@
   {/if}
 </svelte:head>
 
-<article class="container mx-auto px-4">
+<article class="container mx-auto px-4 xl:max-w-6xl">
   <Header meta={post.meta} />
-  <TableOfContents headings={post.headings} />
-  <PostBody {post} />
+  <div class="xl:flex xl:gap-8">
+    <div class="xl:flex-1 xl:max-w-4xl">
+      <PostBody {post} />
+    </div>
+    <aside class="xl:w-64 xl:flex-shrink-0">
+      <TableOfContents headings={post.headings} />
+    </aside>
+  </div>
 </article>

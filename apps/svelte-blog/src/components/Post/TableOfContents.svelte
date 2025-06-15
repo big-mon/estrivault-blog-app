@@ -31,7 +31,10 @@
 </script>
 
 {#if headings && headings.length > 0}
-  <nav class="table-of-contents bg-gray-50 border border-gray-200 rounded-lg p-4 mb-8">
+  <nav class="table-of-contents 
+    bg-gray-50 border border-gray-200 rounded-lg p-4 mb-8
+    xl:sticky xl:top-8 xl:mb-0 xl:max-h-[calc(100vh-4rem)] xl:overflow-y-auto
+    xl:shadow-lg">
     <h2 class="text-lg font-bold text-gray-800 mb-3">目次</h2>
     <ul class="space-y-2">
       {#each headings as heading}
