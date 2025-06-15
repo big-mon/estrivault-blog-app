@@ -8,10 +8,12 @@ import {
 } from '@estrivault/content-processor';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
 
+import { resolve } from 'path';
+
 // 設定オプション
 const processorOptions = {
   cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
-  baseDir: '/workspaces/test-wsl-version/content/blog'
+  baseDir: resolve(process.cwd(), '../../content/blog')
 };
 
 /**
