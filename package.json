@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --filter svelte-blog dev",
-    "build:all": "pnpm -r build"
+    "build:all": "pnpm -r build",
+    "build": "pnpm run build:all && pnpm --filter svelte-blog build"
   },
   "devDependencies": {
     "dotenv-cli": "^8.0.0",
