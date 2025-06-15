@@ -32,16 +32,16 @@
 
 {#if headings && headings.length > 0}
   <nav class="table-of-contents
-    bg-gray-50 border border-gray-200 rounded-lg p-4 mb-8
-    xl:sticky xl:top-16 xl:mb-0 xl:mt-16 xl:max-h-[calc(100vh-16rem)] xl:overflow-y-auto
-    xl:shadow-lg">
-    <h2 class="text-lg font-bold text-gray-800 mb-3">目次</h2>
+    bg-gradient-to-br from-white to-gray-50 border border-gray-200/50 rounded-2xl p-6 mb-8
+    xl:sticky xl:top-24 xl:mb-0 xl:mt-16 xl:max-h-[calc(100vh-16rem)] xl:overflow-y-auto
+    xl:shadow-xl xl:shadow-gray-900/10">
+    <h2 class="text-lg font-bold text-gray-900 mb-4">目次</h2>
     <ul class="space-y-2">
       {#each headings as heading}
         <li class={getIndentClass(heading.level)}>
           <a
             href="#{heading.id}"
-            class="block py-1 text-gray-700 hover:text-blue-600 transition-colors duration-200 {getTextSizeClass(heading.level)}"
+            class="block py-1 text-gray-600 hover:text-gray-900 transition-colors duration-200 {getTextSizeClass(heading.level)}"
           >
             {heading.text}
           </a>
@@ -61,6 +61,6 @@
   }
 
   .table-of-contents a:hover {
-    background-color: rgb(243 244 246);
+    background-color: rgb(243 244 246 / 0.8);
   }
 </style>
