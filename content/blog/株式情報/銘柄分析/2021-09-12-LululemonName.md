@@ -1,6 +1,6 @@
 ---
 title: lululemonの社名、日本人の"L"の発音との関係
-description: 日本人が"L"が含まれるブランド名を好むだろうという考え
+description: lululemonの社名由来の調査記事。創業者Chip Wilsonが日本人の"L"発音と北米ブランドへの憧憬を背景に3つの"L"を含む社名を考案した経緯。過去のhomlessブランド売却経験から着想、日本市場戦略としてのブランドネーミング論。
 slug: how-the-name-lululemon-was-created
 publishedAt: 2021-09-12T00:01:00
 coverImage: /Hero/pexels-david-gomes-2647471.jpg
