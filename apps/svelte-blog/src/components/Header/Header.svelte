@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import Title from './Title.svelte';
   import ResponsiveMenu from './ResponsiveMenu.svelte';
-  import Robot from '$components/Icons/Robot.svelte';
 
   interface Props {
     pathname: string;
@@ -44,18 +43,7 @@
   >
     <div class="flex items-center justify-between">
       <div><Title /></div>
-      <div class="flex items-center gap-4">
-        <a
-          href="/llms.txt"
-          class="hidden rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 md:block"
-          title="AI向け記事一覧(llms.txt)"
-          target="_blank"
-          aria-label="AI向け記事一覧"
-        >
-          <Robot />
-        </a>
-        <ResponsiveMenu {pathname} />
-      </div>
+      <ResponsiveMenu {pathname} />
     </div>
   </div>
 </header>
