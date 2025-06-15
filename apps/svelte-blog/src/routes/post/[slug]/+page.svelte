@@ -161,6 +161,12 @@
   
   <!-- Canonical URL -->
   <link rel="canonical" href={`${SITE_URL}/post/${post.meta.slug}`} />
+  
+  <!-- Google AdSense -->
+  <script
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6950127103154689"
+    crossorigin="anonymous"
+  ></script>
 </svelte:head>
 
 <article class="container mx-auto px-4 xl:max-w-6xl">
