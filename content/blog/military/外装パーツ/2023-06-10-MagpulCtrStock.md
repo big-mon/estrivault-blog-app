@@ -1,6 +1,6 @@
 ---
 title: レビュー：MAGPUL CTR ストックをBCM MCMRに装着
-description: スケルトンな王道のマグプルストック
+description: MAGPUL CTR実物ストックをBCM MCMRに装着。スライド位置ロック機構付きの高機能ストック。バッテリーアクセス性とフィット感の課題、標準ストックとの比較を詳しく解説。
 slug: magpul-ctr-stock
 publishedAt: 2023-06-10T02:10:00
 coverImage: /Hero/magpulCtrStock

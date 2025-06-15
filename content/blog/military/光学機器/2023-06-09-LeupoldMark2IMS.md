@@ -1,6 +1,6 @@
 ---
 title: レビュー：LEUPOLD Mark 2 IMS 30mmマウント
-description: 安価だが確かな実銃スコープマウント
+description: LEUPOLD Mark 2 IMS 30mmスコープマウントのレビュー。アメリカの実銃光学機器メーカーによる確実な品質と工作精度。レプリカと比較した隙間や装着感の違いを検証。
 slug: leopold-mark-2-ims-30mm-scope-mount
 publishedAt: 2023-06-10T00:10:00
 coverImage: /Hero/leupoldMark2IMSScopeMount

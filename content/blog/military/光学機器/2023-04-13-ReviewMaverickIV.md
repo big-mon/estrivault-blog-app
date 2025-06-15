@@ -1,6 +1,6 @@
 ---
 title: レビュー：Vector Optics Maverick GEN4 SCRD-51
-description: 外観や輝度、レンズの歪みを確認する
+description: Vector Optics Maverick-Ⅳ SCRD-51レッドドットサイトの詳細レビュー。外観、輝度設定、レンズ歪み、重量測定から銃への装着例まで実機検証。Aimpoint T2系デザインの評価。
 slug: vectoroptics-maverick-scrd51
 publishedAt: 2023-04-13T20:55:00
 coverImage: /Hero/reviewMaverickIV
