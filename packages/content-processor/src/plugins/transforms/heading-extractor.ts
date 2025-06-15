@@ -12,8 +12,8 @@ export const rehypeHeadingExtractor: Plugin<[], Root, Root> = () => {
 
   const transformer: Transformer<Root, Root> = (tree: Root, file) => {
     visit(tree, 'element', (node: Element) => {
-      // h1-h6タグのみ処理
-      if (!node.tagName.match(/^h[1-6]$/)) return;
+      // h1-h3タグのみ処理（深さ1段目まで）
+      if (!node.tagName.match(/^h[1-3]$/)) return;
 
       // 見出しレベルを取得
       const level = parseInt(node.tagName[1]);

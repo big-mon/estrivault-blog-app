@@ -31,16 +31,16 @@
 </script>
 
 {#if headings && headings.length > 0}
-  <nav class="table-of-contents 
+  <nav class="table-of-contents
     bg-gray-50 border border-gray-200 rounded-lg p-4 mb-8
-    xl:sticky xl:top-8 xl:mb-0 xl:max-h-[calc(100vh-4rem)] xl:overflow-y-auto
+    xl:sticky xl:top-24 xl:mb-0 xl:mt-16 xl:max-h-[calc(100vh-16rem)] xl:overflow-y-auto
     xl:shadow-lg">
     <h2 class="text-lg font-bold text-gray-800 mb-3">目次</h2>
     <ul class="space-y-2">
       {#each headings as heading}
         <li class={getIndentClass(heading.level)}>
-          <a 
-            href="#{heading.id}" 
+          <a
+            href="#{heading.id}"
             class="block py-1 text-gray-700 hover:text-blue-600 transition-colors duration-200 {getTextSizeClass(heading.level)}"
           >
             {heading.text}
@@ -52,10 +52,6 @@
 {/if}
 
 <style>
-  .table-of-contents {
-    /* スムーズスクロール用のスタイル */
-  }
-  
   .table-of-contents a {
     text-decoration: none;
     display: block;
@@ -63,7 +59,7 @@
     padding: 0.25rem 0.5rem;
     margin: -0.25rem -0.5rem;
   }
-  
+
   .table-of-contents a:hover {
     background-color: rgb(243 244 246);
   }
