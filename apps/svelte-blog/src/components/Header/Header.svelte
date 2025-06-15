@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import Title from './Title.svelte';
   import ResponsiveMenu from './ResponsiveMenu.svelte';
+  import Robot from '$components/Icons/Robot.svelte';
 
   interface Props {
     pathname: string;
@@ -15,25 +16,25 @@
   onMount(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         isHeaderVisible = false;
       } else if (currentScrollY < lastScrollY) {
         isHeaderVisible = true;
       }
-      
+
       lastScrollY = currentScrollY;
     };
 
     window.addEventListener('scroll', handleScroll);
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   });
 </script>
 
-<header 
+<header
   class="sticky top-0 z-50 w-full px-4 py-3 transition-transform duration-300 ease-in-out"
   class:-translate-y-full={!isHeaderVisible}
 >
@@ -43,7 +44,18 @@
   >
     <div class="flex items-center justify-between">
       <div><Title /></div>
-      <ResponsiveMenu {pathname} />
+      <div class="flex items-center gap-4">
+        <a
+          href="/llms.txt"
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+          title="AI向け記事一覧(llms.txt)"
+          target="_blank"
+        >
+          <Robot />
+          <span class="hidden sm:inline">AI</span>
+        </a>
+        <ResponsiveMenu {pathname} />
+      </div>
     </div>
   </div>
 </header>
