@@ -11,6 +11,16 @@ export async function GET() {
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>${SITE_URL.replace(/\/$/, '')}/llms.txt</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL.replace(/\/$/, '')}/llms-full.txt</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
   ${posts.map(post => `<url>
     <loc>${SITE_URL.replace(/\/$/, '')}/post/${post.slug}</loc>
     <lastmod>${new Date(post.updatedAt || post.publishedAt).toISOString()}</lastmod>

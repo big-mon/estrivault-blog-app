@@ -3,6 +3,7 @@
   import Title from './Title.svelte';
   import GitHub from '../Icons/GitHub.svelte';
   import X from '../Icons/X.svelte';
+  import Robot from '../Icons/Robot.svelte';
   import { fly } from 'svelte/transition';
   import { SOCIAL_LINK_GITHUB, SOCIAL_LINK_X } from '../../constants';
 
@@ -41,6 +42,9 @@
       </a>
       <a href={`https://github.com/${SOCIAL_LINK_GITHUB}`} target="_blank" aria-label="GitHub">
         <GitHub className="h-6 w-6 hover:opacity-80" />
+      </a>
+      <a href="/llms.txt" target="_blank" aria-label="AI向け記事一覧">
+        <Robot className="h-6 w-6 hover:opacity-80" />
       </a>
     </div>
   </div>
