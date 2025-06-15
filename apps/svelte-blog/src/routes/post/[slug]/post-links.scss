@@ -1,0 +1,12 @@
+// Post content link styling with consistent blue hover effect
+article {
+  a {
+    color: inherit;
+    text-decoration: underline;
+    transition: color 0.2s ease-in-out;
+
+    &:hover {
+      color: #2563eb; // Same blue as text-blue-600 used in post cards
+    }
+  }
+}

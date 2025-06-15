@@ -20,6 +20,7 @@
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
   import './amazon-card.scss';
   import './twitter-embed.scss';
+  import './post-links.scss';
 
   interface PageData {
     post: PostHTML;
