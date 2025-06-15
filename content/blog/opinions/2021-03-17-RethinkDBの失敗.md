@@ -1,6 +1,6 @@
 ---
 title: テック企業が流行の今、かつての敗者を振り返る
-description: 売れるソフトウェア開発は本来とても高難易度
+description: 2016年に破綻したオープンソースデータベース「RethinkDB」の失敗レポートを分析。開発者ツール市場の厳しさ、「タイムリーさ」「実感できる速度」「ユースケース」重視の重要性をテック企業への教訓として考察。
 slug: rethinkdb-farewell
 publishedAt: 2021-03-18T02:05:00
 coverImage: /Hero/pexels-annalouise-674732_vsufe6.jpg
