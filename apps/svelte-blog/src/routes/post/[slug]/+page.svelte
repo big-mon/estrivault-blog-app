@@ -14,7 +14,6 @@
 
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import { page } from '$app/state';
   import Header from '$components/Post/Header.svelte';
   import PostBody from '$components/Post/PostBody.svelte';
   import { SITE_TITLE, SITE_AUTHOR } from '$constants';
@@ -29,13 +28,8 @@
   }
 
   export let data: PageData;
-  const post = page.data.post as PostHTML;
+  $: post = data.post as PostHTML;
 
-  // メタデータを設定
-  $: data = {
-    ...data,
-    metadata: post.meta,
-  };
 
   // Twitter埋め込みがある場合のみスクリプトを読み込み
   onMount(async () => {
@@ -120,10 +114,10 @@
     <meta name="keywords" content={post.meta.tags.join(', ')} />
   {/if}
   <meta name="author" content={SITE_AUTHOR} />
-  {#if data.metadata}
-    <meta name="published" content={new Date(data.metadata.publishedAt).toISOString()} />
-    {#if data.metadata.updatedAt}
-      <meta name="updated" content={new Date(data.metadata.updatedAt).toISOString()} />
+  {#if post.meta}
+    <meta name="published" content={new Date(post.meta.publishedAt).toISOString()} />
+    {#if post.meta.updatedAt}
+      <meta name="updated" content={new Date(post.meta.updatedAt).toISOString()} />
     {/if}
   {/if}
   <meta property="og:title" content={post.meta.title} />
