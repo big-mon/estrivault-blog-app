@@ -3,6 +3,18 @@ import type { PageServerLoad } from './$types';
 import { POSTS_PER_PAGE } from '../../constants';
 import { error } from '@sveltejs/kit';
 
+export async function entries() {
+  const result = await getPosts();
+  const totalPages = result.totalPages;
+  
+  const entries = [];
+  for (let page = 2; page <= totalPages; page++) {
+    entries.push({ page: page.toString() });
+  }
+  
+  return entries;
+}
+
 export const load = (async ({ params }) => {
   const pageParam = params.page;
   const page = pageParam ? parseInt(pageParam, 10) : 1;

@@ -2,8 +2,6 @@ import { getPosts } from '$lib';
 import { POSTS_PER_PAGE } from '$constants';
 import type { PageServerLoad } from './$types';
 
-export const prerender = true;
-
 export async function entries() {
   const allPosts = await getPosts();
   const categories = [...new Set(allPosts.posts.map(post => post.category))];
