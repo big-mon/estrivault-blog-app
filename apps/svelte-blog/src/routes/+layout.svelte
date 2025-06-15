@@ -4,6 +4,7 @@
   import { onNavigate } from '$app/navigation';
   import Header from '$components/Header/Header.svelte';
   import Footer from '$components/Footer/Footer.svelte';
+  import LoadingBar from '$components/LoadingBar/LoadingBar.svelte';
 
   let { children } = $props();
 
@@ -19,6 +20,7 @@
   });
 </script>
 
+<LoadingBar />
 <Header pathname={page.url.pathname} />
 
 <main class="mx-auto w-full max-w-6xl px-4 py-4">
