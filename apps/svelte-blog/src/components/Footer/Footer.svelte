@@ -15,7 +15,7 @@
     <a href="https://github.com/big-mon" target="_blank" aria-label="GitHub">
       <GitHub className="h-6 w-6 transition-opacity hover:opacity-80" />
     </a>
-    
+
     <a href="/llms.txt" target="_blank" aria-label="AI向け記事一覧" title="LLM-friendly content guide">
       <Robot className="h-6 w-6 transition-opacity hover:opacity-80" />
     </a>
