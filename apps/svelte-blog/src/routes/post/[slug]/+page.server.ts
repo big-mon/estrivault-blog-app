@@ -13,6 +13,12 @@ export const config = {
   }
 };
 
+// Aboutページは重要なのでプリレンダリングする
+// 他の記事はISRで動的生成
+export async function entries() {
+  return [{ slug: 'about' }];
+}
+
 export const load = async ({
   params,
 }: {

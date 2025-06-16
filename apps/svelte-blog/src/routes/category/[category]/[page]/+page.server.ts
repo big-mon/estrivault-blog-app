@@ -16,18 +16,18 @@ export const config = {
 export async function entries() {
   const allPosts = await getPosts();
   const categories = [...new Set(allPosts.posts.map(post => post.category))];
-  
+
   const entries = [];
   for (const category of categories) {
     const categoryPosts = await getPosts({ category });
     const totalPages = categoryPosts.totalPages;
-    
+
     for (let page = 1; page <= totalPages; page++) {
       // Generate only lowercase URLs for consistency
       entries.push({ category: category.toLowerCase(), page: page.toString() });
     }
   }
-  
+
   return entries;
 }
 
@@ -47,7 +47,7 @@ export const load = (async ({ params }) => {
     const allPosts = await getPosts();
     const categories = [...new Set(allPosts.posts.map(post => post.category))];
     const correctCategory = categories.find(cat => cat.toLowerCase() === category.toLowerCase());
-    
+
     if (correctCategory) {
       result = await getPosts({
         category: correctCategory,
