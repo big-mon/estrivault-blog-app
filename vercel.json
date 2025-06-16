@@ -2,5 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install",
   "buildCommand": "pnpm run build:all",
+  "outputDirectory": "apps/svelte-blog/.svelte-kit/output/client",
   "framework": "sveltekit"
 }
