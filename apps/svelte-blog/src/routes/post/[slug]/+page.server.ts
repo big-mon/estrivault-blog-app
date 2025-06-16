@@ -8,8 +8,8 @@ export const config = {
   isr: {
     // Cache for 1 hour (3600 seconds)
     expiration: 3600,
-    // Allow bypass for development/preview purposes
-    bypassToken: process.env.PRERENDER_BYPASS_TOKEN,
+    // Allow bypass for development/preview purposes (optional)
+    ...(process.env.PRERENDER_BYPASS_TOKEN && { bypassToken: process.env.PRERENDER_BYPASS_TOKEN }),
     // Allow these query parameters for social sharing, analytics, etc.
     allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
   }
