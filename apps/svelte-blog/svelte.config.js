@@ -5,12 +5,8 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     adapter: adapter({
-      // Image optimization configuration
-      images: {
-        sizes: [640, 828, 1200, 1920, 3840],
-        formats: ['image/avif', 'image/webp'],
-        minimumCacheTTL: 300,
-      }
+      // ISRとプリレンダリングの混在を許可
+      runtime: 'nodejs20.x'
     }),
     alias: {
       $components: './src/components',

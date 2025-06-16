@@ -1,18 +1,3 @@
 {
-  "buildCommand": "pnpm run build:all && pnpm --filter svelte-blog build",
-  "outputDirectory": "apps/svelte-blog/.svelte-kit/output/client",
-  "routes": [
-    {
-      "src": "^/_app/(.*)",
-      "dest": "/_app/$1"
-    },
-    {
-      "src": "^/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
+  "buildCommand": "pnpm run build:all && pnpm --filter svelte-blog build"
 }
