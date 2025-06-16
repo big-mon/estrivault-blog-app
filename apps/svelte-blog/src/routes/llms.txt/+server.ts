@@ -1,6 +1,8 @@
 import { getPosts } from '$lib/posts';
 import { SITE_URL, SOCIAL_LINK_X, SOCIAL_LINK_GITHUB } from '$constants';
 
+export const prerender = true;
+
 export async function GET() {
   const { posts } = await getPosts({ perPage: 1000 });
   
