@@ -3,7 +3,7 @@
   "outputDirectory": "apps/svelte-blog/.svelte-kit/output/client",
   "functions": {
     "apps/svelte-blog/.svelte-kit/output/server/index.js": {
-      "runtime": "nodejs18.x"
+      "runtime": "nodejs22.x"
     }
   },
   "routes": [
