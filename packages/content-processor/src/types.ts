@@ -17,8 +17,8 @@ export interface PostMeta {
   slug: string;
   title: string;
   description: string;
-  publishedAt: string;
-  updatedAt?: string;
+  publishedAt: Date;
+  updatedAt?: Date;
   category: string;
   tags: string[];
   coverImage?: string;

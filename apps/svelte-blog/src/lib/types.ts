@@ -5,5 +5,8 @@ export interface Post {
   coverImage?: string;
   category: string;
   tags: string[];
-  publishedAt: string;
+  publishedAt: Date;
+  updatedAt?: Date;
+  draft?: boolean;
+  readingTime?: number;
 }

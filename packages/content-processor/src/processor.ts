@@ -81,13 +81,51 @@ export async function processMarkdown(
           .filter((tag) => tag.length > 0)
       : [];
 
+    // 日付の正規化とDate型への変換
+    let publishedAtStr = data.publishedAt;
+    if (publishedAtStr) {
+      if (typeof publishedAtStr === 'string') {
+        // "2022-03-24T17:42:00" のような形式を "2022-03-24T17:42:00.000Z" に修正
+        if (publishedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
+          publishedAtStr = publishedAtStr + '.000Z';
+        }
+        // "2022-03-24" のような形式を "2022-03-24T00:00:00.000Z" に修正
+        else if (publishedAtStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          publishedAtStr = publishedAtStr + 'T00:00:00.000Z';
+        }
+        // 無効な日付の場合は現在日時を使用
+        if (isNaN(Date.parse(publishedAtStr))) {
+          console.warn(`Invalid publishedAt format: ${data.publishedAt}, using current date`);
+          publishedAtStr = new Date().toISOString();
+        }
+      }
+    } else {
+      publishedAtStr = new Date().toISOString();
+    }
+    const publishedAt = new Date(publishedAtStr);
+
+    let updatedAtStr = data.updatedAt || publishedAtStr;
+    if (updatedAtStr && typeof updatedAtStr === 'string') {
+      // 同様にupdatedAtも正規化
+      if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
+        updatedAtStr = updatedAtStr + '.000Z';
+      } else if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        updatedAtStr = updatedAtStr + 'T00:00:00.000Z';
+      }
+      if (isNaN(Date.parse(updatedAtStr))) {
+        console.warn(`Invalid updatedAt format: ${data.updatedAt}, using publishedAt`);
+        updatedAtStr = publishedAtStr;
+      }
+    }
+    const updatedAt = new Date(updatedAtStr);
+
     // メタデータの構築
     const meta: PostMeta = {
       slug: data.slug || slug || '',
       title: data.title,
       description: data.description || '',
-      publishedAt: data.publishedAt || new Date().toISOString(),
-      updatedAt: data.updatedAt || data.publishedAt || new Date().toISOString(),
+      publishedAt,
+      updatedAt,
       category: data.category || '',
       tags,
       coverImage: resolveCoverImage(data.coverImage, options.cloudinaryCloudName),
@@ -139,13 +177,51 @@ export async function extractMetadata(
           .filter((tag) => tag.length > 0)
       : [];
 
+    // 日付の正規化とDate型への変換
+    let publishedAtStr = data.publishedAt;
+    if (publishedAtStr) {
+      if (typeof publishedAtStr === 'string') {
+        // "2022-03-24T17:42:00" のような形式を "2022-03-24T17:42:00.000Z" に修正
+        if (publishedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
+          publishedAtStr = publishedAtStr + '.000Z';
+        }
+        // "2022-03-24" のような形式を "2022-03-24T00:00:00.000Z" に修正
+        else if (publishedAtStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          publishedAtStr = publishedAtStr + 'T00:00:00.000Z';
+        }
+        // 無効な日付の場合は現在日時を使用
+        if (isNaN(Date.parse(publishedAtStr))) {
+          console.warn(`Invalid publishedAt format: ${data.publishedAt}, using current date`);
+          publishedAtStr = new Date().toISOString();
+        }
+      }
+    } else {
+      publishedAtStr = new Date().toISOString();
+    }
+    const publishedAt = new Date(publishedAtStr);
+
+    let updatedAtStr = data.updatedAt || publishedAtStr;
+    if (updatedAtStr && typeof updatedAtStr === 'string') {
+      // 同様にupdatedAtも正規化
+      if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
+        updatedAtStr = updatedAtStr + '.000Z';
+      } else if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        updatedAtStr = updatedAtStr + 'T00:00:00.000Z';
+      }
+      if (isNaN(Date.parse(updatedAtStr))) {
+        console.warn(`Invalid updatedAt format: ${data.updatedAt}, using publishedAt`);
+        updatedAtStr = publishedAtStr;
+      }
+    }
+    const updatedAt = new Date(updatedAtStr);
+
     // メタデータの構築
     const meta: PostMeta = {
       slug: data.slug || slug || '',
       title: data.title,
       description: data.description || '',
-      publishedAt: data.publishedAt || new Date().toISOString(),
-      updatedAt: data.updatedAt || data.publishedAt || new Date().toISOString(),
+      publishedAt,
+      updatedAt,
       category: data.category || '',
       tags,
       coverImage: resolveCoverImage(data.coverImage, options.cloudinaryCloudName),

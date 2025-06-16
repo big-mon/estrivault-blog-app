@@ -8,8 +8,7 @@
   const { post }: Props = $props();
 
   // 日付を yyyy-MM-dd 形式にフォーマット
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
+  const formatDate = (date: Date): string => {
     return new Intl.DateTimeFormat('ja-JP', {
       year: 'numeric',
       month: '2-digit',
@@ -39,7 +38,7 @@
         <div class="space-y-1">
           <div class="flex items-center justify-between">
             <p class="text-xs uppercase tracking-wide text-gray-500">{post.category}</p>
-            <time datetime={post.publishedAt} class="text-xs text-gray-500"
+            <time datetime={post.publishedAt.toISOString()} class="text-xs text-gray-500"
               >{formatDate(post.publishedAt)}</time
             >
           </div>
