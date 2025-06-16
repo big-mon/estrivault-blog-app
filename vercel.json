@@ -1,7 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install",
-  "build": {
-    "command": "pnpm --filter ...svelte-blog build"
-  }
+  "buildCommand": "pnpm --filter ...svelte-blog build"
 }
