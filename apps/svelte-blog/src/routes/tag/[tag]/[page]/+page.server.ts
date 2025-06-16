@@ -3,15 +3,15 @@ import { POSTS_PER_PAGE } from '$constants';
 import type { PageServerLoad } from './$types';
 import type { PostMeta } from '@estrivault/content-processor';
 
-// ISR configuration for tag pages
-// Tag pages change when new posts are added with that tag
+// タグページのISR設定
+// そのタグの新しい記事が追加されたときにタグページが変更される
 export const config = {
   isr: {
-    // Cache for 45 minutes (2700 seconds)
+    // 45分間キャッシュ（2700秒）
     expiration: 2700,
-    // Allow bypass for development/preview purposes (optional)
+    // 開発・プレビュー用のバイパス機能（オプション）
     ...(process.env.PRERENDER_BYPASS_TOKEN && { bypassToken: process.env.PRERENDER_BYPASS_TOKEN }),
-    // Allow these query parameters for analytics
+    // アナリティクス用のクエリパラメータを許可
     allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
   }
 };

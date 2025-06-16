@@ -2,15 +2,15 @@ import { getPostBySlug } from '$lib/posts';
 import { error } from '@sveltejs/kit';
 import { type PostHTML } from '@estrivault/content-processor';
 
-// ISR configuration for blog posts
-// Blog posts are relatively static content, so we can cache them for longer periods
+// ブログ記事のISR設定
+// ブログ記事は比較的静的なコンテンツなので、長時間キャッシュできる
 export const config = {
   isr: {
-    // Cache for 1 hour (3600 seconds)
+    // 1時間キャッシュ（3600秒）
     expiration: 3600,
-    // Allow bypass for development/preview purposes (optional)
+    // 開発・プレビュー用のバイパス機能（オプション）
     ...(process.env.PRERENDER_BYPASS_TOKEN && { bypassToken: process.env.PRERENDER_BYPASS_TOKEN }),
-    // Allow these query parameters for social sharing, analytics, etc.
+    // ソーシャルシェアやアナリティクスなどのクエリパラメータを許可
     allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
   }
 };

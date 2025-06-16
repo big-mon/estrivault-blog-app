@@ -2,15 +2,15 @@ import { getPosts } from '$lib';
 import type { PageServerLoad } from './$types';
 import { POSTS_PER_PAGE } from '../constants';
 
-// ISR configuration for main blog listing
-// This page changes more frequently as new posts are added, so shorter cache time
+// メインブログ一覧ページのISR設定
+// 新しい記事が追加されると频繁に変更されるため、キャッシュ時間を短く設定
 export const config = {
   isr: {
-    // Cache for 30 minutes (1800 seconds)
+    // 30分間キャッシュ（1800秒）
     expiration: 1800,
-    // Allow bypass for development/preview purposes (optional)
+    // 開発・プレビュー用のバイパス機能（オプション）
     ...(process.env.PRERENDER_BYPASS_TOKEN && { bypassToken: process.env.PRERENDER_BYPASS_TOKEN }),
-    // Allow these query parameters for analytics
+    // アナリティクス用のクエリパラメータを許可
     allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
   }
 };

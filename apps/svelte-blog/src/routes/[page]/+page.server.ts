@@ -3,15 +3,15 @@ import type { PageServerLoad } from './$types';
 import { POSTS_PER_PAGE } from '../../constants';
 import { error } from '@sveltejs/kit';
 
-// ISR configuration for paginated blog listing
-// Similar to main listing but with slightly longer cache as older pages change less frequently
+// ページネーション付きブログ一覧ページのISR設定
+// メイン一覧と似ているが、古いページは変更频度が低いためキャッシュ時間をやや長く設定
 export const config = {
   isr: {
-    // Cache for 45 minutes (2700 seconds)
+    // 45分間キャッシュ（2700秒）
     expiration: 2700,
-    // Allow bypass for development/preview purposes (optional)
+    // 開発・プレビュー用のバイパス機能（オプション）
     ...(process.env.PRERENDER_BYPASS_TOKEN && { bypassToken: process.env.PRERENDER_BYPASS_TOKEN }),
-    // Allow these query parameters for analytics
+    // アナリティクス用のクエリパラメータを許可
     allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
   }
 };
