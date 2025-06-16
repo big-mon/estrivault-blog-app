@@ -12,7 +12,8 @@ export async function entries() {
     const totalPages = categoryPosts.totalPages;
     
     for (let page = 1; page <= totalPages; page++) {
-      entries.push({ category, page: page.toString() });
+      // Generate only lowercase URLs for consistency
+      entries.push({ category: category.toLowerCase(), page: page.toString() });
     }
   }
   
@@ -23,12 +24,27 @@ export const load = (async ({ params }) => {
   const { category, page: pageParam } = params;
   const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
 
-  // getPostsのオプションでカテゴリーフィルタリングとページネーションを実行
-  const result = await getPosts({
+  // First try exact match, then try case-insensitive match
+  let result = await getPosts({
     category,
     page: currentPage,
     perPage: POSTS_PER_PAGE,
   });
+
+  // If no results with exact match, try finding the correct case
+  if (result.posts.length === 0) {
+    const allPosts = await getPosts();
+    const categories = [...new Set(allPosts.posts.map(post => post.category))];
+    const correctCategory = categories.find(cat => cat.toLowerCase() === category.toLowerCase());
+    
+    if (correctCategory) {
+      result = await getPosts({
+        category: correctCategory,
+        page: currentPage,
+        perPage: POSTS_PER_PAGE,
+      });
+    }
+  }
 
   return {
     posts: result.posts,
