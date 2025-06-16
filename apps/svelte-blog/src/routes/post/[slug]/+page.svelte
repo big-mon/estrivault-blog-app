@@ -222,9 +222,12 @@
   <Header meta={post.meta} />
   <div class="xl:flex xl:gap-8">
     <div class="xl:flex-1 xl:max-w-4xl">
+      <div class="xl:hidden">
+        <TableOfContents headings={post.headings} />
+      </div>
       <PostBody {post} />
     </div>
-    <aside class="xl:w-64 xl:flex-shrink-0">
+    <aside class="hidden xl:block xl:w-64 xl:flex-shrink-0">
       <TableOfContents headings={post.headings} />
     </aside>
   </div>
