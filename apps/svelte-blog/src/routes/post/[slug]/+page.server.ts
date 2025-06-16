@@ -8,8 +8,6 @@ export const config = {
   isr: {
     // 1時間キャッシュ（3600秒）
     expiration: 3600,
-    // 開発・プレビュー用のバイパス機能（オプション）
-    ...(process.env.PRERENDER_BYPASS_TOKEN && { bypassToken: process.env.PRERENDER_BYPASS_TOKEN }),
     // ソーシャルシェアやアナリティクスなどのクエリパラメータを許可
     allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
   }
