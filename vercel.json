@@ -1,11 +1,6 @@
 {
   "buildCommand": "pnpm run build:all && pnpm --filter svelte-blog build",
   "outputDirectory": "apps/svelte-blog/.svelte-kit/output/client",
-  "functions": {
-    "apps/svelte-blog/.svelte-kit/output/server/index.js": {
-      "runtime": "nodejs22.x"
-    }
-  },
   "routes": [
     {
       "src": "^/_app/(.*)",
