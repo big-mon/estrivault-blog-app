@@ -2,6 +2,19 @@ import { getPosts } from '$lib';
 import { POSTS_PER_PAGE } from '$constants';
 import type { PageServerLoad } from './$types';
 
+// ISR configuration for category pages
+// Category pages change when new posts are added to that category
+export const config = {
+  isr: {
+    // Cache for 45 minutes (2700 seconds)
+    expiration: 2700,
+    // Allow bypass for development/preview purposes
+    bypassToken: process.env.PRERENDER_BYPASS_TOKEN,
+    // Allow these query parameters for analytics
+    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
+  }
+};
+
 export async function entries() {
   const allPosts = await getPosts();
   const categories = [...new Set(allPosts.posts.map(post => post.category))];

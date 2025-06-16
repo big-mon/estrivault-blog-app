@@ -3,6 +3,19 @@ import type { PageServerLoad } from './$types';
 import { POSTS_PER_PAGE } from '../../constants';
 import { error } from '@sveltejs/kit';
 
+// ISR configuration for paginated blog listing
+// Similar to main listing but with slightly longer cache as older pages change less frequently
+export const config = {
+  isr: {
+    // Cache for 45 minutes (2700 seconds)
+    expiration: 2700,
+    // Allow bypass for development/preview purposes
+    bypassToken: process.env.PRERENDER_BYPASS_TOKEN,
+    // Allow these query parameters for analytics
+    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
+  }
+};
+
 export async function entries() {
   const result = await getPosts();
   const totalPages = result.totalPages;

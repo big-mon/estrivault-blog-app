@@ -5,11 +5,10 @@
   import type { PageData } from './$types';
 
   const { data } = $props<{ data: PageData }>();
-  const { posts, pagination } = data;
   
-  const pageTitle = $derived(`記事一覧 - ページ${pagination.page} | ${SITE_TITLE}`);
-  const pageDescription = $derived(`${SITE_TITLE}の記事一覧ページ${pagination.page}です。技術記事やプログラミング情報を探すことができます。`);
-  const pageUrl = $derived(`${SITE_URL}${pagination.page > 1 ? `/${pagination.page}` : ''}`);
+  const pageTitle = $derived(`記事一覧 - ページ${data.pagination.page} | ${SITE_TITLE}`);
+  const pageDescription = $derived(`${SITE_TITLE}の記事一覧ページ${data.pagination.page}です。技術記事やプログラミング情報を探すことができます。`);
+  const pageUrl = $derived(`${SITE_URL}${data.pagination.page > 1 ? `/${data.pagination.page}` : ''}`);
 </script>
 
 <svelte:head>
@@ -36,22 +35,22 @@
   <link rel="canonical" href={pageUrl} />
   
   <!-- Pagination meta -->
-  {#if pagination.page > 1}
-    <link rel="prev" href={`${SITE_URL}${pagination.page > 2 ? `/${pagination.page - 1}` : ''}`} />
+  {#if data.pagination.page > 1}
+    <link rel="prev" href={`${SITE_URL}${data.pagination.page > 2 ? `/${data.pagination.page - 1}` : ''}`} />
   {/if}
-  {#if pagination.page < pagination.totalPages}
-    <link rel="next" href={`${SITE_URL}/${pagination.page + 1}`} />
+  {#if data.pagination.page < data.pagination.totalPages}
+    <link rel="next" href={`${SITE_URL}/${data.pagination.page + 1}`} />
   {/if}
 </svelte:head>
 
 <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-  {#each posts as post}
+  {#each data.posts as post}
     <PostCard {post} />
   {/each}
 </div>
 
-{#if pagination.totalPages > 1}
+{#if data.pagination.totalPages > 1}
   <div class="mt-12">
-    <Pagination currentPage={pagination.page} totalPages={pagination.totalPages} baseUrl="/" />
+    <Pagination currentPage={data.pagination.page} totalPages={data.pagination.totalPages} baseUrl="/" />
   </div>
 {/if}
