@@ -29,13 +29,13 @@ export const load = (async ({ params }) => {
   if (result.posts.length === 0) {
     const allPosts = await getPosts();
     const allTags = new Set<string>();
-    
+
     allPosts.posts.forEach((post) => {
       post.tags?.forEach((t: string) => allTags.add(t));
     });
-    
+
     const correctTag = Array.from(allTags).find(t => t.toLowerCase() === tag.toLowerCase());
-    
+
     if (correctTag) {
       result = await getPosts({
         tag: correctTag,

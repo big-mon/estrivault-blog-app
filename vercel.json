@@ -1,10 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm run build:all",
-  "functions": {
-    "apps/svelte-blog/.svelte-kit/output/server/index.js": {
-      "runtime": "nodejs20.x"
-    }
-  }
+  "buildCommand": "pnpm run build:all"
 }

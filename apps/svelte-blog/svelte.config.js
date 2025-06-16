@@ -5,8 +5,9 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     adapter: adapter({
-      // ISRとプリレンダリングの混在を許可
-      runtime: 'nodejs20.x'
+      isr: {
+        expiration: 60, // Cache for 60 seconds
+      }
     }),
     alias: {
       $components: './src/components',

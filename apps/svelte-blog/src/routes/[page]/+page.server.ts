@@ -3,26 +3,23 @@ import type { PageServerLoad } from './$types';
 import { POSTS_PER_PAGE } from '../../constants';
 import { error } from '@sveltejs/kit';
 
-// ページネーション付きブログ一覧ページのISR設定
-// メイン一覧と似ているが、古いページは変更频度が低いためキャッシュ時間をやや長く設定
+// メイン一覧と似ているが、古いページは変更頻度が低いためキャッシュ時間をやや長く設定
 export const config = {
   isr: {
     // 45分間キャッシュ（2700秒）
     expiration: 2700,
-    // アナリティクス用のクエリパラメータを許可
-    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
   }
 };
 
 export async function entries() {
   const result = await getPosts();
   const totalPages = result.totalPages;
-  
+
   const entries = [];
   for (let page = 2; page <= totalPages; page++) {
     entries.push({ page: page.toString() });
   }
-  
+
   return entries;
 }
 
