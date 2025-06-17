@@ -17,3 +17,11 @@ export const SOCIAL_LINK_X = 'big_mon';
 export const SOCIAL_LINK_GITHUB = 'big-mon/estrivault-blog-app';
 
 export const POSTS_PER_PAGE = 9;
+
+export const GITHUB_REPO = 'https://github.com/big-mon/estrivault-blog-app';
+export const MAIN_BRANCH = 'main';
+
+// GitHub API Configuration
+export const GITHUB_API_BASE = 'https://api.github.com';
+export const GITHUB_REPO_OWNER = 'big-mon';
+export const GITHUB_REPO_NAME = 'estrivault-blog-app';

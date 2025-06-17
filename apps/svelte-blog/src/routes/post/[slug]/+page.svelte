@@ -18,13 +18,16 @@
   import PostBody from '$components/Post/PostBody.svelte';
   import TableOfContents from '$components/Post/TableOfContents.svelte';
   import EditOnGitHub from '$components/Post/EditOnGitHub.svelte';
+  import GitHubContributors from '$components/Post/GitHubContributors.svelte';
   import { SITE_TITLE, SITE_AUTHOR, SITE_URL, SOCIAL_LINK_X } from '$constants';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
+  import type { Contributor } from '$lib/types/github';
 
   interface PageData {
     post: PostHTML;
     metadata?: PostMeta;
     hasTwitterEmbed: boolean;
+    contributors: Contributor[];
   }
 
   export let data: PageData;
@@ -153,13 +156,55 @@
   }
 </script>
 
+<style>
+  .post-footer {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+  }
+
+  .post-footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .post-footer-edit {
+    display: flex;
+    justify-content: center;
+  }
+
+  .post-footer-contributors {
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (min-width: 640px) {
+    .post-footer-content {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+
+    .post-footer-edit {
+      flex-shrink: 0;
+      justify-content: flex-start;
+    }
+
+    .post-footer-contributors {
+      flex-shrink: 0;
+      justify-content: flex-start;
+    }
+  }
+</style>
+
 <svelte:head>
   <title>{post.meta.title} | {SITE_TITLE}</title>
   <meta
     name="description"
-    content={post.meta.description ||
-      post.meta.description ||
-      `${post.meta.title}についての記事です。`}
+    content={post.meta.description || `${post.meta.title}についての記事です。`}
   />
   {#if post.meta.tags && post.meta.tags.length > 0}
     <meta name="keywords" content={post.meta.tags.join(', ')} />
@@ -175,9 +220,7 @@
   <meta property="og:title" content={post.meta.title} />
   <meta
     property="og:description"
-    content={post.meta.description ||
-      post.meta.description ||
-      `${post.meta.title}についての記事です。`}
+    content={post.meta.description || `${post.meta.title}についての記事です。`}
   />
   <meta property="og:type" content="article" />
   <meta property="og:url" content={`${SITE_URL}/post/${post.meta.slug}`} />
@@ -212,9 +255,7 @@
   <meta name="twitter:title" content={post.meta.title} />
   <meta
     name="twitter:description"
-    content={post.meta.description ||
-      post.meta.description ||
-      `${post.meta.title}についての記事です。`}
+    content={post.meta.description || `${post.meta.title}についての記事です。`}
   />
   {#if post.meta.coverImage}
     <meta name="twitter:image" content={post.meta.coverImage} />
@@ -241,11 +282,23 @@
       <div class="xl:hidden">
         <TableOfContents headings={post.headings} />
       </div>
+
       <PostBody {post} />
+
       {#if post.originalPath}
-        <EditOnGitHub originalPath={post.originalPath} />
+        <div class="post-footer">
+          <div class="post-footer-content">
+            <div class="post-footer-edit">
+              <EditOnGitHub originalPath={post.originalPath} />
+            </div>
+            <div class="post-footer-contributors">
+              <GitHubContributors contributors={data.contributors} />
+            </div>
+          </div>
+        </div>
       {/if}
     </div>
+
     <aside class="hidden xl:block xl:w-64 xl:flex-shrink-0">
       <TableOfContents headings={post.headings} />
     </aside>
