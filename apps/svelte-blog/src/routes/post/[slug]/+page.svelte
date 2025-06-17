@@ -154,6 +154,50 @@
   }
 </script>
 
+<style>
+  .post-footer {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+  }
+
+  .post-footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .post-footer-edit {
+    display: flex;
+    justify-content: center;
+  }
+
+  .post-footer-contributors {
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (min-width: 640px) {
+    .post-footer-content {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+
+    .post-footer-edit {
+      flex-shrink: 0;
+      justify-content: flex-start;
+    }
+
+    .post-footer-contributors {
+      flex-shrink: 0;
+      justify-content: flex-start;
+    }
+  }
+</style>
+
 <svelte:head>
   <title>{post.meta.title} | {SITE_TITLE}</title>
   <meta
@@ -240,8 +284,16 @@
       <PostBody {post} />
 
       {#if post.originalPath}
-        <EditOnGitHub originalPath={post.originalPath} />
-        <GitHubContributors originalPath={post.originalPath} />
+        <div class="post-footer">
+          <div class="post-footer-content">
+            <div class="post-footer-edit">
+              <EditOnGitHub originalPath={post.originalPath} />
+            </div>
+            <div class="post-footer-contributors">
+              <GitHubContributors originalPath={post.originalPath} />
+            </div>
+          </div>
+        </div>
       {/if}
     </div>
 
