@@ -4,6 +4,22 @@
   export let meta: PostMeta;
 </script>
 
+<style>
+  .description-text {
+    /* タブレット以下では全文表示 */
+  }
+
+  @media (min-width: 1024px) {
+    .description-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+</style>
+
 <header class="bg-white pb-12 pt-8">
   <div class="container mx-auto px-4">
     <div class="flex flex-col items-start gap-8 lg:flex-row lg:items-stretch">
@@ -93,10 +109,7 @@
 
         <!-- リード文 -->
         {#if meta.description}
-          <p
-            class="overflow-hidden text-ellipsis text-gray-700"
-            style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;"
-          >
+          <p class="description-text text-gray-700">
             {meta.description}
           </p>
         {/if}
