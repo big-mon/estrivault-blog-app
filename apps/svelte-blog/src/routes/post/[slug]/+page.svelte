@@ -157,9 +157,7 @@
   <title>{post.meta.title} | {SITE_TITLE}</title>
   <meta
     name="description"
-    content={post.meta.description ||
-      post.meta.description ||
-      `${post.meta.title}についての記事です。`}
+    content={post.meta.description || `${post.meta.title}についての記事です。`}
   />
   {#if post.meta.tags && post.meta.tags.length > 0}
     <meta name="keywords" content={post.meta.tags.join(', ')} />
@@ -175,9 +173,7 @@
   <meta property="og:title" content={post.meta.title} />
   <meta
     property="og:description"
-    content={post.meta.description ||
-      post.meta.description ||
-      `${post.meta.title}についての記事です。`}
+    content={post.meta.description || `${post.meta.title}についての記事です。`}
   />
   <meta property="og:type" content="article" />
   <meta property="og:url" content={`${SITE_URL}/post/${post.meta.slug}`} />
@@ -212,9 +208,7 @@
   <meta name="twitter:title" content={post.meta.title} />
   <meta
     name="twitter:description"
-    content={post.meta.description ||
-      post.meta.description ||
-      `${post.meta.title}についての記事です。`}
+    content={post.meta.description || `${post.meta.title}についての記事です。`}
   />
   {#if post.meta.coverImage}
     <meta name="twitter:image" content={post.meta.coverImage} />
