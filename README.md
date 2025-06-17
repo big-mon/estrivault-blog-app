@@ -16,7 +16,7 @@
 - **コンテンツ**: Markdown + frontmatter、unified/remark/rehype パイプライン
 - **ビルド**: Vite 6.x、TypeScript、PNPMワークスペース
 - **テスト**: Vitest（ユニット）、Playwright（E2E）
-- **デプロイ**: `@sveltejs/adapter-static`による静的サイト生成
+- **デプロイ**: `@sveltejs/adapter-vercel`によるVercelデプロイ
 
 ## 🛠 初回セットアップ手順（初めてクローンした場合）
 
@@ -31,7 +31,7 @@ npm install -g pnpm
 pnpm install
 
 # 全パッケージのビルド（モノレポ必須）
-pnpm run build:all
+pnpm run build
 
 # 開発サーバーの起動
 pnpm dev
@@ -81,7 +81,7 @@ pnpm --filter svelte-blog preview    # 本番ビルドのプレビュー
 
 - **Node.js >= 18** 必須（Vite と SvelteKit 推奨バージョン）
 - **PNPM** 利用前提（npm や yarn では未サポート）
-- **モノレポ構成**: ワークスペース依存関係のため、初回や依存更新時は `pnpm run build:all` が必要
+- **モノレポ構成**: ワークスペース依存関係のため、初回や依存更新時は `pnpm run build` が必要
 - **Content Pipeline**: Markdown ファイルは `content/blog/` に配置し、カテゴリ別にフォルダ分け
 - **Image Optimization**: Cloudinary 連携による自動画像最適化
 - **Custom Embeds**: YouTube、Twitter、GitHub、Amazon の埋め込み対応

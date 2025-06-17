@@ -25,8 +25,8 @@ This is a **monorepo blog application** built with **SvelteKit** and **TypeScrip
 
 ### Initial Setup (Required)
 ```bash
-pnpm install        # Install dependencies
-pnpm run build:all  # Build all packages (required for workspace dependencies)
+pnpm install     # Install dependencies
+pnpm run build   # Build all packages (required for workspace dependencies)
 ```
 
 ### Development
@@ -89,7 +89,7 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
 - Handles link transformations
 
 ### SvelteKit Routing
-- Static site generation using `@sveltejs/adapter-static`
+- Vercel deployment using `@sveltejs/adapter-vercel`
 - File-based routing with dynamic segments:
   - `/post/[slug]` - Individual posts
   - `/category/[category]/[page]` - Category filtering with pagination
@@ -97,5 +97,5 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
 
 ### Monorepo Dependencies
 - Uses PNPM workspaces
-- **Critical**: Always run `pnpm run build:all` after dependency changes or fresh clones
+- **Critical**: Always run `pnpm run build` after dependency changes or fresh clones
 - SvelteKit app depends on built packages in workspace, not source files
