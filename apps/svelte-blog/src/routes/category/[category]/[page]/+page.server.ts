@@ -9,13 +9,13 @@ export const config = {
     // 45分間キャッシュ（2700秒）
     expiration: 2700,
     // アナリティクス用のクエリパラメータを許可
-    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
-  }
+    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref'],
+  },
 };
 
 export async function entries() {
   const allPosts = await getPosts();
-  const categories = [...new Set(allPosts.posts.map(post => post.category))];
+  const categories = [...new Set(allPosts.posts.map((post) => post.category))];
 
   const entries = [];
   for (const category of categories) {
@@ -45,8 +45,8 @@ export const load = (async ({ params }) => {
   // If no results with exact match, try finding the correct case
   if (result.posts.length === 0) {
     const allPosts = await getPosts();
-    const categories = [...new Set(allPosts.posts.map(post => post.category))];
-    const correctCategory = categories.find(cat => cat.toLowerCase() === category.toLowerCase());
+    const categories = [...new Set(allPosts.posts.map((post) => post.category))];
+    const correctCategory = categories.find((cat) => cat.toLowerCase() === category.toLowerCase());
 
     if (correctCategory) {
       result = await getPosts({

@@ -15,7 +15,7 @@
 
 {#if isNavigating}
   <div
-    class="fixed top-0 left-0 right-0 z-50 h-1 bg-gradient-to-r from-blue-500 to-purple-600 shadow-sm {className}"
+    class="fixed left-0 right-0 top-0 z-50 h-1 bg-gradient-to-r from-blue-500 to-purple-600 shadow-sm {className}"
     style="animation: loading-bar 2s infinite linear;"
   ></div>
 {/if}

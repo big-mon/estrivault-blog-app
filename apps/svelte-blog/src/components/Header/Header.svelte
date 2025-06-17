@@ -38,7 +38,7 @@
   class:-translate-y-full={!isHeaderVisible}
 >
   <div
-    class="mx-auto max-w-6xl rounded-2xl bg-gradient-to-br from-white to-gray-50 border border-gray-200/50
+    class="mx-auto max-w-6xl rounded-2xl border border-gray-200/50 bg-gradient-to-br from-white to-gray-50
          px-6 py-4 shadow-xl shadow-gray-900/10 sm:px-8 lg:px-10"
   >
     <div class="flex items-center justify-between">

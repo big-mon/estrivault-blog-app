@@ -10,8 +10,8 @@ export const config = {
     // 45分間キャッシュ（2700秒）
     expiration: 2700,
     // アナリティクス用のクエリパラメータを許可
-    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
-  }
+    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref'],
+  },
 };
 
 export const load = (async ({ params }) => {
@@ -34,7 +34,7 @@ export const load = (async ({ params }) => {
       post.tags?.forEach((t: string) => allTags.add(t));
     });
 
-    const correctTag = Array.from(allTags).find(t => t.toLowerCase() === tag.toLowerCase());
+    const correctTag = Array.from(allTags).find((t) => t.toLowerCase() === tag.toLowerCase());
 
     if (correctTag) {
       result = await getPosts({

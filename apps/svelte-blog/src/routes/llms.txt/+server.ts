@@ -5,7 +5,7 @@ export const prerender = true;
 
 export async function GET() {
   const { posts } = await getPosts({ perPage: 1000 });
-  
+
   const llmsTxt = `# Estrilda Blog
 
 > Personal blog by big-mon covering technology, investments, gaming, and military gear reviews
@@ -32,7 +32,13 @@ This site contains technical articles, investment analysis, gaming guides, and m
 
 ## Featured Articles
 
-${posts.slice(0, 25).map(post => `- [${post.title}](${SITE_URL.replace(/\/$/, '')}/post/${post.slug}) (${new Date(post.publishedAt).toISOString().split('T')[0]}) - ${post.description || '記事の詳細な解説'}`).join('\n')}
+${posts
+  .slice(0, 25)
+  .map(
+    (post) =>
+      `- [${post.title}](${SITE_URL.replace(/\/$/, '')}/post/${post.slug}) (${new Date(post.publishedAt).toISOString().split('T')[0]}) - ${post.description || '記事の詳細な解説'}`
+  )
+  .join('\n')}
 
 *For complete article list, see: ${SITE_URL.replace(/\/$/, '')}/llms-full.txt*
 
@@ -62,7 +68,7 @@ GitHub: https://github.com/${SOCIAL_LINK_GITHUB}`.trim();
 
   return new Response(llmsTxt, {
     headers: {
-      'Content-Type': 'text/plain; charset=utf-8'
-    }
+      'Content-Type': 'text/plain; charset=utf-8',
+    },
   });
 }

@@ -4,7 +4,7 @@
   export let meta: PostMeta;
 </script>
 
-<header class="bg-white pt-8 pb-12">
+<header class="bg-white pb-12 pt-8">
   <div class="container mx-auto px-4">
     <div class="flex flex-col items-start gap-8 lg:flex-row lg:items-stretch">
       <!-- 画像を左側に配置 -->
@@ -34,7 +34,12 @@
           {#if meta.publishedAt || meta.updatedAt}
             <div class="flex items-center text-sm text-gray-500">
               {#if meta.updatedAt}
-                <svg class="mr-1 h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg
+                  class="mr-1 h-4 w-4 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -46,7 +51,12 @@
                   {meta.updatedAt.toISOString().split('T')[0]}
                 </time>
               {:else}
-                <svg class="mr-1 h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg
+                  class="mr-1 h-4 w-4 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -83,7 +93,10 @@
 
         <!-- リード文 -->
         {#if meta.description}
-          <p class="text-gray-700 overflow-hidden text-ellipsis" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
+          <p
+            class="overflow-hidden text-ellipsis text-gray-700"
+            style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;"
+          >
             {meta.description}
           </p>
         {/if}

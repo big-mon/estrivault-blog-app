@@ -1,13 +1,10 @@
 import { normalizeForTagFilter, type PostMeta, type PostHTML } from '@estrivault/content-processor';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
-import { 
-  getAllPostsMetaStatic, 
-  getPostBySlugStatic 
-} from './file-utils';
+import { getAllPostsMetaStatic, getPostBySlugStatic } from './file-utils';
 
 // 設定オプション（import.meta.globではbaseDirは不要）
 const processorOptions = {
-  cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME
+  cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
 };
 
 /**
@@ -43,8 +40,8 @@ export async function getPosts(options?: {
     let filteredPosts = allPosts;
     if (options?.category) {
       const normalizedCategory = normalizeForTagFilter(options.category);
-      filteredPosts = filteredPosts.filter((post: PostMeta) =>
-        normalizeForTagFilter(post.category) === normalizedCategory
+      filteredPosts = filteredPosts.filter(
+        (post: PostMeta) => normalizeForTagFilter(post.category) === normalizedCategory
       );
     }
     if (options?.tag) {
@@ -65,7 +62,7 @@ export async function getPosts(options?: {
       total,
       page,
       perPage,
-      totalPages
+      totalPages,
     };
 
     return result;
@@ -82,10 +79,10 @@ export async function getPosts(options?: {
  */
 export async function getPostBySlug(slug: string): Promise<PostHTML> {
   const post = await getPostBySlugStatic(slug, processorOptions);
-  
+
   if (!post) {
     throw new Error(`Post with slug '${slug}' not found`);
   }
-  
+
   return post;
 }
