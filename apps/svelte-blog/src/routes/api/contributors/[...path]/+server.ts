@@ -5,17 +5,17 @@ import type { RequestHandler } from './$types';
 import type { GitHubCommit, Contributor } from '$lib/types/github';
 
 const CONTRIBUTORS_CACHE = new Map<string, { data: Contributor[]; timestamp: number }>();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
 export const GET: RequestHandler = async ({ params }) => {
   const filePath = params.path;
-  
+
   if (!filePath) {
     throw error(400, 'File path is required');
   }
 
   const GITHUB_TOKEN = env.GITHUB_TOKEN;
-  
+
   if (!GITHUB_TOKEN) {
     throw error(500, 'GitHub token not configured');
   }
@@ -62,7 +62,7 @@ export const GET: RequestHandler = async ({ params }) => {
       if (commit.author && commit.author.login) {
         const login = commit.author.login;
         const existing = contributorsMap.get(login);
-        
+
         if (existing) {
           existing.contributions++;
           // Update to most recent commit date
@@ -100,11 +100,11 @@ export const GET: RequestHandler = async ({ params }) => {
 
   } catch (err) {
     console.error('Error fetching contributors:', err);
-    
+
     if (err instanceof Error && 'status' in err) {
       throw err; // Re-throw SvelteKit errors
     }
-    
+
     throw error(500, 'Failed to fetch contributors from GitHub');
   }
 };

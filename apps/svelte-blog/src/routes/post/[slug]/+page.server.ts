@@ -3,27 +3,22 @@ import { error } from '@sveltejs/kit';
 import { type PostHTML } from '@estrivault/content-processor';
 import { GITHUB_API_BASE, GITHUB_REPO_OWNER, GITHUB_REPO_NAME } from '$constants';
 import { env } from '$env/dynamic/private';
-import type { Contributor } from '$lib/types/github';
+import type { Contributor, GitHubCommit } from '$lib/types/github';
 
 // ブログ記事のISR設定
 // ブログ記事は比較的静的なコンテンツなので、長時間キャッシュできる
 export const config = {
   isr: {
-    // 1時間キャッシュ（3600秒）
-    expiration: 3600,
+    // 1日キャッシュ（86400秒）
+    expiration: 86400,
     // ソーシャルシェアやアナリティクスなどのクエリパラメータを許可
     allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref'],
   },
 };
 
-// Aboutページのみプリレンダリングする
-export async function entries() {
-  return [{ slug: 'about' }];
-}
-
 async function fetchContributors(filePath: string): Promise<Contributor[]> {
   const GITHUB_TOKEN = env.GITHUB_TOKEN;
-  
+
   if (!GITHUB_TOKEN) {
     console.warn('GitHub token not configured, skipping contributors fetch');
     return [];
@@ -49,9 +44,9 @@ async function fetchContributors(filePath: string): Promise<Contributor[]> {
       return [];
     }
 
-    const commits: any[] = await response.json();
+    const commits: GitHubCommit[] = await response.json();
     const contributorsMap = new Map<string, Contributor>();
-    
+
     // 最初のコミット者（著者）を特定
     const firstCommit = commits[commits.length - 1];
     const authorLogin = firstCommit?.author?.login;
@@ -60,7 +55,7 @@ async function fetchContributors(filePath: string): Promise<Contributor[]> {
       if (commit.author && commit.author.login) {
         const login = commit.author.login;
         const existing = contributorsMap.get(login);
-        
+
         if (existing) {
           existing.contributions++;
           if (new Date(commit.commit.author.date) > new Date(existing.last_commit_date)) {
@@ -83,7 +78,7 @@ async function fetchContributors(filePath: string): Promise<Contributor[]> {
       // 著者を最初に表示
       if (a.login === authorLogin && b.login !== authorLogin) return -1;
       if (b.login === authorLogin && a.login !== authorLogin) return 1;
-      
+
       // その他は編集回数と最終編集日でソート
       if (a.contributions !== b.contributions) {
         return b.contributions - a.contributions;
