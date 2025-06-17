@@ -5,17 +5,8 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [sveltekit(), tailwindcss()],
-  optimizeDeps: {
-    exclude: ['gray-matter', 'glob'],
-  },
-  ssr: {
-    noExternal: ['glob'],
-  },
   server: {
     host: true,
-    fs: {
-      allow: ['..', '../..', '../../content']
-    }
   },
   resolve: {
     alias: {

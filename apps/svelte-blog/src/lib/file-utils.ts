@@ -20,7 +20,7 @@ export interface PostWithPath {
  * @returns ファイルパスとコンテンツのマップ
  */
 function getMarkdownFiles(): Record<string, string> {
-  // @contentエイリアスを使用してMarkdownファイルを静的に取得
+  // Vite alias を使用したパス
   const modules = import.meta.glob('@content/blog/**/*.{md,mdx}', { 
     query: '?raw',
     import: 'default',
@@ -86,9 +86,8 @@ export async function getAllPostsMetaStatic(options: FileWalkOptions = {}): Prom
   );
   
   // nullを除外し、メタデータのみを抽出
-  const posts = postsWithPath
-    .filter((post): post is PostWithPath => post !== null)
-    .map(post => post.meta);
+  const validPosts = postsWithPath.filter((post): post is PostWithPath => post !== null);
+  const posts = validPosts.map(post => post.meta);
   
   // 投稿日の新しい順でソート（Date型なので直接比較）
   posts.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
