@@ -1,9 +1,9 @@
-import { 
-  processMarkdown, 
-  extractMetadata, 
-  type PostMeta, 
-  type PostHTML, 
-  type ProcessorOptions 
+import {
+  processMarkdown,
+  extractMetadata,
+  type PostMeta,
+  type PostHTML,
+  type ProcessorOptions
 } from '@estrivault/content-processor';
 
 export interface FileWalkOptions extends ProcessorOptions {
@@ -21,12 +21,12 @@ export interface PostWithPath {
  */
 function getMarkdownFiles(): Record<string, string> {
   // Vite alias を使用したパス
-  const modules = import.meta.glob('@content/blog/**/*.{md,mdx}', { 
+  const modules = import.meta.glob('@content/blog/**/*.{md,mdx}', {
     query: '?raw',
     import: 'default',
-    eager: true 
+    eager: true
   });
-  
+
   return modules as Record<string, string>;
 }
 
@@ -50,19 +50,19 @@ function generateSlugFromPath(filePath: string): string {
  * @returns ファイルパス付きのPostMeta
  */
 async function loadMarkdownMetaFromContent(
-  filePath: string, 
-  content: string, 
+  filePath: string,
+  content: string,
   options: FileWalkOptions = {}
 ): Promise<PostWithPath | null> {
   try {
     const slug = generateSlugFromPath(filePath);
     const meta = await extractMetadata(content, options, slug);
-    
+
     // ドラフトは除外
     if (meta.draft) {
       return null;
     }
-    
+
     return { meta, filePath };
   } catch (error) {
     // 無効なファイルはスキップ
@@ -78,20 +78,20 @@ async function loadMarkdownMetaFromContent(
  */
 export async function getAllPostsMetaStatic(options: FileWalkOptions = {}): Promise<PostMeta[]> {
   const markdownFiles = getMarkdownFiles();
-  
+
   const postsWithPath = await Promise.all(
-    Object.entries(markdownFiles).map(([filePath, content]) => 
+    Object.entries(markdownFiles).map(([filePath, content]) =>
       loadMarkdownMetaFromContent(filePath, content, options)
     )
   );
-  
+
   // nullを除外し、メタデータのみを抽出
   const validPosts = postsWithPath.filter((post): post is PostWithPath => post !== null);
   const posts = validPosts.map(post => post.meta);
-  
+
   // 投稿日の新しい順でソート（Date型なので直接比較）
   posts.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
-  
+
   return posts;
 }
 
@@ -102,13 +102,13 @@ export async function getAllPostsMetaStatic(options: FileWalkOptions = {}): Prom
  */
 export async function getAllPostsWithPathStatic(options: FileWalkOptions = {}): Promise<PostWithPath[]> {
   const markdownFiles = getMarkdownFiles();
-  
+
   const postsWithPath = await Promise.all(
-    Object.entries(markdownFiles).map(([filePath, content]) => 
+    Object.entries(markdownFiles).map(([filePath, content]) =>
       loadMarkdownMetaFromContent(filePath, content, options)
     )
   );
-  
+
   // nullを除外
   return postsWithPath.filter((post): post is PostWithPath => post !== null);
 }
@@ -121,13 +121,13 @@ export async function getAllPostsWithPathStatic(options: FileWalkOptions = {}): 
  */
 export async function getPostBySlugStatic(slug: string, options: FileWalkOptions = {}): Promise<PostHTML | null> {
   const markdownFiles = getMarkdownFiles();
-  
+
   // スラッグに一致するファイルを検索
   for (const [filePath, content] of Object.entries(markdownFiles)) {
     try {
       // メタデータを抽出してスラッグを確認
       const meta = await extractMetadata(content, options, generateSlugFromPath(filePath));
-      
+
       // フロントマターのslugまたはファイル名から生成されたslugが一致するかチェック
       if (meta.slug === slug) {
         // HTML変換して返却
@@ -139,7 +139,7 @@ export async function getPostBySlugStatic(slug: string, options: FileWalkOptions
       continue;
     }
   }
-  
+
   return null;
 }
 
@@ -152,13 +152,13 @@ export async function getPostBySlugStatic(slug: string, options: FileWalkOptions
 export async function loadPostStatic(filePath: string, options: FileWalkOptions = {}): Promise<PostHTML | null> {
   const markdownFiles = getMarkdownFiles();
   const content = markdownFiles[filePath];
-  
+
   if (!content) {
     return null;
   }
-  
+
   const slug = generateSlugFromPath(filePath);
-  
+
   try {
     return await processMarkdown(content, options, slug);
   } catch (error) {
