@@ -38,4 +38,5 @@ export interface PostHTML {
   meta: PostMeta;
   html: string;
   headings: HeadingInfo[];
+  originalPath?: string;
 }
