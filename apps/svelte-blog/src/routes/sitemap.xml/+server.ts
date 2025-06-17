@@ -3,8 +3,6 @@ import { SITE_URL } from '$constants';
 import { POSTS_PER_PAGE } from '$constants';
 import type { PostMeta } from '@estrivault/content-processor';
 
-export const prerender = true;
-
 export async function GET() {
   const { posts } = await getPosts({ perPage: 1000 });
 
