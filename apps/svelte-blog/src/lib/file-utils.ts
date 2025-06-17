@@ -6,10 +6,6 @@ import {
   type ProcessorOptions
 } from '@estrivault/content-processor';
 
-export interface FileWalkOptions extends ProcessorOptions {
-  // import.meta.globではbaseDir不要（パターンで指定）
-}
-
 export interface PostWithPath {
   meta: PostMeta;
   filePath: string;
@@ -52,7 +48,7 @@ function generateSlugFromPath(filePath: string): string {
 async function loadMarkdownMetaFromContent(
   filePath: string,
   content: string,
-  options: FileWalkOptions = {}
+  options: ProcessorOptions = {}
 ): Promise<PostWithPath | null> {
   try {
     const slug = generateSlugFromPath(filePath);
@@ -76,7 +72,7 @@ async function loadMarkdownMetaFromContent(
  * @param options ファイル処理オプション
  * @returns PostMetaの配列（新しい順でソート済み）
  */
-export async function getAllPostsMetaStatic(options: FileWalkOptions = {}): Promise<PostMeta[]> {
+export async function getAllPostsMetaStatic(options: ProcessorOptions = {}): Promise<PostMeta[]> {
   const markdownFiles = getMarkdownFiles();
 
   const postsWithPath = await Promise.all(
@@ -100,7 +96,7 @@ export async function getAllPostsMetaStatic(options: FileWalkOptions = {}): Prom
  * @param options ファイル処理オプション
  * @returns PostWithPathの配列
  */
-export async function getAllPostsWithPathStatic(options: FileWalkOptions = {}): Promise<PostWithPath[]> {
+export async function getAllPostsWithPathStatic(options: ProcessorOptions = {}): Promise<PostWithPath[]> {
   const markdownFiles = getMarkdownFiles();
 
   const postsWithPath = await Promise.all(
@@ -119,7 +115,7 @@ export async function getAllPostsWithPathStatic(options: FileWalkOptions = {}): 
  * @param options ファイル処理オプション
  * @returns 記事のメタデータとHTMLコンテンツ
  */
-export async function getPostBySlugStatic(slug: string, options: FileWalkOptions = {}): Promise<PostHTML | null> {
+export async function getPostBySlugStatic(slug: string, options: ProcessorOptions = {}): Promise<PostHTML | null> {
   const markdownFiles = getMarkdownFiles();
 
   // スラッグに一致するファイルを検索
@@ -149,7 +145,7 @@ export async function getPostBySlugStatic(slug: string, options: FileWalkOptions
  * @param options 処理オプション
  * @returns PostHTML
  */
-export async function loadPostStatic(filePath: string, options: FileWalkOptions = {}): Promise<PostHTML | null> {
+export async function loadPostStatic(filePath: string, options: ProcessorOptions = {}): Promise<PostHTML | null> {
   const markdownFiles = getMarkdownFiles();
   const content = markdownFiles[filePath];
 
