@@ -1,8 +1,7 @@
 <script lang="ts">
-  export let originalPath: string;
+  import { GITHUB_REPO, MAIN_BRANCH } from '$lib/../constants';
 
-  const GITHUB_REPO = 'https://github.com/big-mon/estrivault-blog-app';
-  const MAIN_BRANCH = 'main';
+  export let originalPath: string;
 
   $: editUrl = `${GITHUB_REPO}/edit/${MAIN_BRANCH}/${originalPath}`;
 </script>
