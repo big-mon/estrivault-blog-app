@@ -2,13 +2,12 @@ import { getPosts } from '$lib';
 import { POSTS_PER_PAGE } from '$constants';
 import type { PageServerLoad } from './$types';
 
-// カテゴリページのISR設定
-// そのカテゴリに新しい記事が追加されたときにカテゴリページが変更される
+// ISR設定
 export const config = {
   isr: {
-    // 45分間キャッシュ（2700秒）
-    expiration: 2700,
-    // アナリティクス用のクエリパラメータを許可
+    // 6時間キャッシュ（21600秒）
+    expiration: 21600,
+    // ソーシャルシェアやアナリティクスなどのクエリパラメータを許可
     allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref'],
   },
 };

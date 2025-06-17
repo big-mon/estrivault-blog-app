@@ -1,7 +1,13 @@
 import { getPosts } from '$lib/posts';
 import { SITE_URL, SOCIAL_LINK_X, SOCIAL_LINK_GITHUB } from '$constants';
 
-export const prerender = true;
+// ISR設定
+export const config = {
+  isr: {
+    // 6時間キャッシュ（21600秒）
+    expiration: 21600,
+  },
+};
 
 export async function GET() {
   const { posts } = await getPosts({ perPage: 1000 });
@@ -18,9 +24,9 @@ This site contains technical articles, investment analysis, gaming guides, and m
 
 - Japanese tech professionals and developers
 - Individual investors interested in US markets
-- Gaming enthusiasts (especially Black Desert Online players)  
+- Gaming enthusiasts (especially Black Desert Online players)
 - Tactical gear and airsoft users
-- Bilingual readers seeking technical content
+- Readers seeking technical content
 
 ## Content Categories
 
