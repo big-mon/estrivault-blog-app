@@ -10,7 +10,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@content': path.resolve(__dirname, '../../content')
-    }
-  }
+      '@content': path.resolve(__dirname, '../../content'),
+    },
+  },
 });

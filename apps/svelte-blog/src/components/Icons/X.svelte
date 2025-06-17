@@ -3,7 +3,7 @@
     className?: string;
   }
 
-  const { className = "h-6 w-6" }: Props = $props();
+  const { className = 'h-6 w-6' }: Props = $props();
 </script>
 
 <svg class={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

@@ -3,7 +3,7 @@ import {
   extractMetadata,
   type PostMeta,
   type PostHTML,
-  type ProcessorOptions
+  type ProcessorOptions,
 } from '@estrivault/content-processor';
 
 export interface PostWithPath {
@@ -20,7 +20,7 @@ function getMarkdownFiles(): Record<string, string> {
   const modules = import.meta.glob('@content/blog/**/*.{md,mdx}', {
     query: '?raw',
     import: 'default',
-    eager: true
+    eager: true,
   });
 
   return modules as Record<string, string>;
@@ -83,7 +83,7 @@ export async function getAllPostsMetaStatic(options: ProcessorOptions = {}): Pro
 
   // nullを除外し、メタデータのみを抽出
   const validPosts = postsWithPath.filter((post): post is PostWithPath => post !== null);
-  const posts = validPosts.map(post => post.meta);
+  const posts = validPosts.map((post) => post.meta);
 
   // 投稿日の新しい順でソート（Date型なので直接比較）
   posts.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
@@ -96,7 +96,9 @@ export async function getAllPostsMetaStatic(options: ProcessorOptions = {}): Pro
  * @param options ファイル処理オプション
  * @returns PostWithPathの配列
  */
-export async function getAllPostsWithPathStatic(options: ProcessorOptions = {}): Promise<PostWithPath[]> {
+export async function getAllPostsWithPathStatic(
+  options: ProcessorOptions = {}
+): Promise<PostWithPath[]> {
   const markdownFiles = getMarkdownFiles();
 
   const postsWithPath = await Promise.all(
@@ -115,7 +117,10 @@ export async function getAllPostsWithPathStatic(options: ProcessorOptions = {}):
  * @param options ファイル処理オプション
  * @returns 記事のメタデータとHTMLコンテンツ
  */
-export async function getPostBySlugStatic(slug: string, options: ProcessorOptions = {}): Promise<PostHTML | null> {
+export async function getPostBySlugStatic(
+  slug: string,
+  options: ProcessorOptions = {}
+): Promise<PostHTML | null> {
   const markdownFiles = getMarkdownFiles();
 
   // スラッグに一致するファイルを検索
@@ -127,7 +132,11 @@ export async function getPostBySlugStatic(slug: string, options: ProcessorOption
       // フロントマターのslugまたはファイル名から生成されたslugが一致するかチェック
       if (meta.slug === slug) {
         // HTML変換して返却
-        return await processMarkdown(content, options, slug);
+        const postHTML = await processMarkdown(content, options, slug);
+        // originalPathを設定（content/blog/から始まる相対パスに変換）
+        const relativePath = filePath.replace(/^.*\/content\/blog\//, 'content/blog/');
+        postHTML.originalPath = relativePath;
+        return postHTML;
       }
     } catch (error) {
       // エラーのあるファイルはスキップ
@@ -145,7 +154,10 @@ export async function getPostBySlugStatic(slug: string, options: ProcessorOption
  * @param options 処理オプション
  * @returns PostHTML
  */
-export async function loadPostStatic(filePath: string, options: ProcessorOptions = {}): Promise<PostHTML | null> {
+export async function loadPostStatic(
+  filePath: string,
+  options: ProcessorOptions = {}
+): Promise<PostHTML | null> {
   const markdownFiles = getMarkdownFiles();
   const content = markdownFiles[filePath];
 
@@ -156,7 +168,11 @@ export async function loadPostStatic(filePath: string, options: ProcessorOptions
   const slug = generateSlugFromPath(filePath);
 
   try {
-    return await processMarkdown(content, options, slug);
+    const postHTML = await processMarkdown(content, options, slug);
+    // originalPathを設定（content/blog/から始まる相対パスに変換）
+    const relativePath = filePath.replace(/^.*\/content\/blog\//, 'content/blog/');
+    postHTML.originalPath = relativePath;
+    return postHTML;
   } catch (error) {
     console.error(`Failed to process markdown for path: ${filePath}`, error);
     return null;

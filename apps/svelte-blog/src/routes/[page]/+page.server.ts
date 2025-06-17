@@ -8,7 +8,7 @@ export const config = {
   isr: {
     // 45分間キャッシュ（2700秒）
     expiration: 2700,
-  }
+  },
 };
 
 export async function entries() {

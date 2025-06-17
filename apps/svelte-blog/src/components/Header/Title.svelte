@@ -3,7 +3,7 @@
 </script>
 
 <span class="text-xl font-bold text-gray-900">
-  <a href="/" class="hover:text-gray-700 transition-colors">
+  <a href="/" class="transition-colors hover:text-gray-700">
     {SITE_TITLE}
   </a>
 </span>

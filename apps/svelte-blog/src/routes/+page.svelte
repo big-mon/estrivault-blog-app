@@ -12,7 +12,7 @@
   <title>{SITE_TITLE}</title>
   <meta name="description" content={SITE_DESCRIPTION} />
   <meta name="author" content={SITE_AUTHOR} />
-  
+
   <!-- Open Graph -->
   <meta property="og:title" content={SITE_TITLE} />
   <meta property="og:description" content={SITE_DESCRIPTION} />
@@ -20,14 +20,14 @@
   <meta property="og:url" content={SITE_URL} />
   <meta property="og:site_name" content={SITE_TITLE} />
   <meta property="og:locale" content="ja_JP" />
-  
+
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content={`@${SOCIAL_LINK_X}`} />
   <meta name="twitter:creator" content={`@${SOCIAL_LINK_X}`} />
   <meta name="twitter:title" content={SITE_TITLE} />
   <meta name="twitter:description" content={SITE_DESCRIPTION} />
-  
+
   <!-- Canonical URL -->
   <link rel="canonical" href={SITE_URL} />
 </svelte:head>

@@ -9,8 +9,8 @@ export const config = {
     // 1時間キャッシュ（3600秒）
     expiration: 3600,
     // ソーシャルシェアやアナリティクスなどのクエリパラメータを許可
-    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref']
-  }
+    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref'],
+  },
 };
 
 // Aboutページのみプリレンダリングする

@@ -5,10 +5,12 @@
     max-width: 550px !important;
     border-radius: 12px !important;
     border: 1px solid #e1e8ed !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24) !important;
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.12),
+      0 1px 2px rgba(0, 0, 0, 0.24) !important;
   }
 
-  :global(iframe[id^="twitter-widget"]) {
+  :global(iframe[id^='twitter-widget']) {
     border-radius: 12px !important;
     max-width: 100% !important;
   }
