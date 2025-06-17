@@ -1,6 +1,14 @@
 import { getPosts } from '$lib/posts';
 import { SITE_URL, SOCIAL_LINK_X, SOCIAL_LINK_GITHUB } from '$constants';
 
+// ISR設定
+export const config = {
+  isr: {
+    // 6時間キャッシュ（21600秒）
+    expiration: 21600,
+  },
+};
+
 export async function GET() {
   const { posts } = await getPosts({ perPage: 1000 });
 

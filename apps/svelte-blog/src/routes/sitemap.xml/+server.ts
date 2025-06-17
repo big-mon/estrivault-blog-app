@@ -3,6 +3,14 @@ import { SITE_URL } from '$constants';
 import { POSTS_PER_PAGE } from '$constants';
 import type { PostMeta } from '@estrivault/content-processor';
 
+// ISR設定
+export const config = {
+  isr: {
+    // 1日キャッシュ（86400秒）
+    expiration: 86400,
+  },
+};
+
 export async function GET() {
   const { posts } = await getPosts({ perPage: 1000 });
 

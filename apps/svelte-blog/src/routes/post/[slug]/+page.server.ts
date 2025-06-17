@@ -5,8 +5,7 @@ import { GITHUB_API_BASE, GITHUB_REPO_OWNER, GITHUB_REPO_NAME } from '$constants
 import { env } from '$env/dynamic/private';
 import type { Contributor, GitHubCommit } from '$lib/types/github';
 
-// ブログ記事のISR設定
-// ブログ記事は比較的静的なコンテンツなので、長時間キャッシュできる
+// ISR設定
 export const config = {
   isr: {
     // 1日キャッシュ（86400秒）

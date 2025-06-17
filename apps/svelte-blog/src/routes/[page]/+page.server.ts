@@ -3,11 +3,11 @@ import type { PageServerLoad } from './$types';
 import { POSTS_PER_PAGE } from '../../constants';
 import { error } from '@sveltejs/kit';
 
-// メイン一覧と似ているが、古いページは変更頻度が低いためキャッシュ時間をやや長く設定
+// ISR設定
 export const config = {
   isr: {
-    // 45分間キャッシュ（2700秒）
-    expiration: 2700,
+    // 1日キャッシュ（86400秒）
+    expiration: 86400,
   },
 };
 
