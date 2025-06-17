@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Contributor } from '../../routes/api/contributors/[...path]/+server';
+  import type { Contributor } from '$lib/types/github';
 
   export let contributors: Contributor[];
 

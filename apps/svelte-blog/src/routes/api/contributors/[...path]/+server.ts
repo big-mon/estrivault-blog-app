@@ -2,33 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import { GITHUB_API_BASE, GITHUB_REPO_OWNER, GITHUB_REPO_NAME } from '$constants';
 import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
-
-export interface GitHubCommit {
-  sha: string;
-  commit: {
-    author: {
-      name: string;
-      email: string;
-      date: string;
-    };
-    message: string;
-  };
-  author: {
-    login: string;
-    id: number;
-    avatar_url: string;
-    html_url: string;
-  } | null;
-}
-
-export interface Contributor {
-  login: string;
-  id: number;
-  avatar_url: string;
-  html_url: string;
-  contributions: number;
-  last_commit_date: string;
-}
+import type { GitHubCommit, Contributor } from '$lib/types/github';
 
 const CONTRIBUTORS_CACHE = new Map<string, { data: Contributor[]; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes

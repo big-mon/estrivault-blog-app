@@ -21,7 +21,7 @@
   import GitHubContributors from '$components/Post/GitHubContributors.svelte';
   import { SITE_TITLE, SITE_AUTHOR, SITE_URL, SOCIAL_LINK_X } from '$constants';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
-  import type { Contributor } from '../api/contributors/[...path]/+server';
+  import type { Contributor } from '$lib/types/github';
 
   interface PageData {
     post: PostHTML;

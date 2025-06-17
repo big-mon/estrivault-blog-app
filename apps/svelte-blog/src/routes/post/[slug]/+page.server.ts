@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import { type PostHTML } from '@estrivault/content-processor';
 import { GITHUB_API_BASE, GITHUB_REPO_OWNER, GITHUB_REPO_NAME } from '$constants';
 import { env } from '$env/dynamic/private';
-import type { Contributor } from '../api/contributors/[...path]/+server';
+import type { Contributor } from '$lib/types/github';
 
 // ブログ記事のISR設定
 // ブログ記事は比較的静的なコンテンツなので、長時間キャッシュできる
