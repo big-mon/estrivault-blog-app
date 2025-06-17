@@ -2,7 +2,7 @@
 title: 2020年末のPCデスク周りとデバイス類
 description: 2020年のPCデスク環境とガジェット紹介。IKEA HILVER竹製デスク、オカムラ サブリナチェア、NZXT自作PC、ASUS 35インチウルトラワイドモニター、Razerゲーミングデバイスなど愛用品を詳細レビュー。
 slug: my-gear-2020
-publishedAt: 2020-12-26
+publishedAt: 2020-12-26T00:00:00
 coverImage: /Hero/mygear-setup_vzu816.jpg
 category: Tech
 tags: ['ハードウェア', 'Stable Diffusion']

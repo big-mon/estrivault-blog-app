@@ -2,7 +2,7 @@
 title: エルゴトロンのディスプレイアームを磨く
 description: エルゴトロンモニターアームのアルミニウムくすみをピカール金属磨きで除去。5年使用でくすんだアームの研磨作業手順と劇的な仕上がりの変化を写真付きで紹介。
 slug: ergotoron-pikal
-publishedAt: 2020-12-27
+publishedAt: 2020-12-27T00:00:00
 coverImage: /Hero/displayArm-logo_dc9rja.jpg
 category: Tech
 tags: ['ハードウェア']

@@ -54,23 +54,23 @@
     <!-- 前のページへのリンク -->
     {#if currentPage > 1}
       <li>
-          <a
-            href={getPageUrl(currentPage - 1)}
-            class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
-            aria-label="前のページ"
-          >
-            <span class="sr-only">前のページ</span>
-            <ChevronLeft size="5" />
+        <a
+          href={getPageUrl(currentPage - 1)}
+          class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
+          aria-label="前のページ"
+        >
+          <span class="sr-only">前のページ</span>
+          <ChevronLeft size="5" />
         </a>
       </li>
     {:else}
       <li>
-          <span
-            class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400"
-            aria-disabled="true"
-          >
-            <span class="sr-only">前のページ</span>
-            <ChevronLeft size="5" classNames="text-gray-400"/>
+        <span
+          class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400"
+          aria-disabled="true"
+        >
+          <span class="sr-only">前のページ</span>
+          <ChevronLeft size="5" classNames="text-gray-400" />
         </span>
       </li>
     {/if}
@@ -136,23 +136,23 @@
     <!-- 次のページへのリンク -->
     {#if currentPage < totalPages}
       <li>
-          <a
-            href={getPageUrl(currentPage + 1)}
-            class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
-            aria-label="次のページ"
-          >
-            <span class="sr-only">次のページ</span>
-            <ChevronRight size="5" />
+        <a
+          href={getPageUrl(currentPage + 1)}
+          class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
+          aria-label="次のページ"
+        >
+          <span class="sr-only">次のページ</span>
+          <ChevronRight size="5" />
         </a>
       </li>
     {:else}
       <li>
-          <span
-            class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400"
-            aria-disabled="true"
-          >
-            <span class="sr-only">次のページ</span>
-            <ChevronRight size="5" classNames="text-gray-400"/>
+        <span
+          class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400"
+          aria-disabled="true"
+        >
+          <span class="sr-only">次のページ</span>
+          <ChevronRight size="5" classNames="text-gray-400" />
         </span>
       </li>
     {/if}

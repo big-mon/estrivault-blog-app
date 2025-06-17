@@ -61,8 +61,8 @@
       "name": SITE_TITLE,
       "url": SITE_URL
     },
-    "datePublished": new Date(post.meta.publishedAt).toISOString(),
-    "dateModified": post.meta.updatedAt ? new Date(post.meta.updatedAt).toISOString() : new Date(post.meta.publishedAt).toISOString(),
+    "datePublished": post.meta.publishedAt.toISOString(),
+    "dateModified": post.meta.updatedAt ? post.meta.updatedAt.toISOString() : post.meta.publishedAt.toISOString(),
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": `${SITE_URL.replace(/\/$/, '')}/post/${post.meta.slug}`
@@ -160,9 +160,9 @@
   {/if}
   <meta name="author" content={SITE_AUTHOR} />
   {#if post.meta}
-    <meta name="published" content={new Date(post.meta.publishedAt).toISOString()} />
+    <meta name="published" content={post.meta.publishedAt.toISOString()} />
     {#if post.meta.updatedAt}
-      <meta name="updated" content={new Date(post.meta.updatedAt).toISOString()} />
+      <meta name="updated" content={post.meta.updatedAt.toISOString()} />
     {/if}
   {/if}
   <!-- Open Graph -->
@@ -181,9 +181,9 @@
   
   <!-- Article specific -->
   <meta property="article:author" content={SITE_AUTHOR} />
-  <meta property="article:published_time" content={new Date(post.meta.publishedAt).toISOString()} />
+  <meta property="article:published_time" content={post.meta.publishedAt.toISOString()} />
   {#if post.meta.updatedAt}
-    <meta property="article:modified_time" content={new Date(post.meta.updatedAt).toISOString()} />
+    <meta property="article:modified_time" content={post.meta.updatedAt.toISOString()} />
   {/if}
   {#if post.meta.category}
     <meta property="article:section" content={post.meta.category} />

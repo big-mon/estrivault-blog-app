@@ -2,7 +2,7 @@
 title: WordPressからHugoへの移行
 description: WordPressからHugoへの完全移行手順。WordPress to Hugo Exporterでのデータ移行、画像処理、VercelでのホスティングまでSSG移行の実践ガイド。セキュリティと保守性の向上を実現。
 slug: wordpress-to-hugo
-publishedAt: 2020-12-26
+publishedAt: 2020-12-26T00:00:00
 coverImage: /Hero/YS4_5968_69_70-2-3_x9dlrp.jpg
 category: Tech
 tags: ['プログラミング', 'JAMstack']

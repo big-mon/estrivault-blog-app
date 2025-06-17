@@ -7,7 +7,7 @@
   }
 
   const { headings }: Props = $props();
-  
+
   let activeHeadingId = $state<string>('');
   let observer: IntersectionObserver;
 
@@ -57,7 +57,7 @@
         if (element) {
           const rect = element.getBoundingClientRect();
           const elementTop = rect.top + scrollY;
-          
+
           // 見出しが triggerPoint を通過した場合
           if (elementTop <= triggerPoint) {
             const distance = triggerPoint - elementTop;
@@ -102,7 +102,7 @@
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
+
     // 初期化時に一度実行
     setTimeout(updateActiveHeading, 100);
 
@@ -130,8 +130,8 @@
         <li class={getIndentClass(heading.level)}>
           <a
             href="#{heading.id}"
-            class="block py-1 transition-colors duration-200 {getTextSizeClass(heading.level)} {isActive(heading.id) 
-              ? 'text-gray-900 font-semibold bg-gray-100 rounded-md px-2 -mx-2' 
+            class="block py-1 transition-colors duration-200 {getTextSizeClass(heading.level)} {isActive(heading.id)
+              ? 'text-gray-900 font-semibold bg-gray-100 rounded-md px-2 -mx-2'
               : 'text-gray-600 hover:text-gray-900'}"
           >
             {heading.text}

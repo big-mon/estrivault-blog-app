@@ -1,6 +1,6 @@
 ---
 title: 'Ryse: Son of Romeの日本語化'
-description: Steam版Ryse: Son of Romeに有志製作の日本語化MODを適用する方法。英語版言語ファイルを日本語版に置換する手順と、MOD適用後の日本語化状態を画像付きで解説。
+description: 'Steam版Ryse: Son of Romeに有志製作の日本語化MODを適用する方法。英語版言語ファイルを日本語版に置換する手順と、MOD適用後の日本語化状態を画像付きで解説。'
 slug: ryse-son-of-rome-japanese-localize
 publishedAt: 2021-05-04T16:34:00
 coverImage: /Hero/ryse-sor-pic1.jpg

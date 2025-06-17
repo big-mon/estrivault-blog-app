@@ -2,7 +2,7 @@
 title: AmazonのPA-API用URLを手動で作成する方法
 description: Amazon PA-API権利停止時の解決法。直近30日売上なしでアクセス権剥奪された場合の手動アフィリエイトリンク作成方法。商品固有IDとアソシエイトIDを使った復活手順を詳説。
 slug: amazon-paapi-url-handmade
-publishedAt: 2019-05-24
+publishedAt: 2019-05-24T00:00:00
 coverImage: /Hero/pexels-sagar-soneji-4560039_o0imwu.jpg
 category: Tech
 tags: ['プログラミング']

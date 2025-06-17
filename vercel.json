@@ -1,26 +1,5 @@
 {
-  "buildCommand": "pnpm run build:all && pnpm --filter svelte-blog build",
-  "outputDirectory": "apps/svelte-blog/.svelte-kit/output/client",
-  "functions": {
-    "apps/svelte-blog/.svelte-kit/output/server/index.js": {
-      "runtime": "nodejs22.x"
-    }
-  },
-  "routes": [
-    {
-      "src": "^/_app/(.*)",
-      "dest": "/_app/$1"
-    },
-    {
-      "src": "^/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "env": {
-    "PRERENDER_BYPASS_TOKEN": "@prerender_bypass_token"
-  }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm -r --filter svelte-blog... run build"
 }

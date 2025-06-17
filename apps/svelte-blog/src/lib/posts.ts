@@ -1,19 +1,13 @@
-import {
-  walkMarkdownFiles,
-  walkMarkdownFilesWithPath,
-  loadFile,
-  type PostMeta,
-  type PostHTML,
-  normalizeForTagFilter,
-} from '@estrivault/content-processor';
+import { normalizeForTagFilter, type PostMeta, type PostHTML } from '@estrivault/content-processor';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
+import { 
+  getAllPostsMetaStatic, 
+  getPostBySlugStatic 
+} from './file-utils';
 
-import { resolve } from 'path';
-
-// 設定オプション
+// 設定オプション（import.meta.globではbaseDirは不要）
 const processorOptions = {
-  cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
-  baseDir: resolve(process.cwd(), '../../content/blog')
+  cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME
 };
 
 /**
@@ -42,8 +36,8 @@ export async function getPosts(options?: {
     const page = options?.page || 1;
     const perPage = options?.perPage || 20;
 
-    // 全記事を取得
-    const allPosts = await walkMarkdownFiles(processorOptions);
+    // 全記事を取得（静的版）
+    const allPosts = await getAllPostsMetaStatic(processorOptions);
 
     // カテゴリやタグでフィルタリング
     let filteredPosts = allPosts;
@@ -87,14 +81,11 @@ export async function getPosts(options?: {
  * @returns 記事のメタデータとHTMLコンテンツ
  */
 export async function getPostBySlug(slug: string): Promise<PostHTML> {
-  // ファイルパス付きで全記事を取得してslugで検索
-  const allPostsWithPath = await walkMarkdownFilesWithPath(processorOptions);
-  const postWithPath = allPostsWithPath.find(post => post.meta.slug === slug);
+  const post = await getPostBySlugStatic(slug, processorOptions);
   
-  if (!postWithPath) {
+  if (!post) {
     throw new Error(`Post with slug '${slug}' not found`);
   }
   
-  // loadFileで完全なPostHTMLを取得
-  return await loadFile(postWithPath.filePath, processorOptions);
+  return post;
 }
