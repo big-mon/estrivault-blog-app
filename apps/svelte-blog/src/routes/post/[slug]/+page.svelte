@@ -18,6 +18,7 @@
   import PostBody from '$components/Post/PostBody.svelte';
   import TableOfContents from '$components/Post/TableOfContents.svelte';
   import EditOnGitHub from '$components/Post/EditOnGitHub.svelte';
+  import GitHubContributors from '$components/Post/GitHubContributors.svelte';
   import { SITE_TITLE, SITE_AUTHOR, SITE_URL, SOCIAL_LINK_X } from '$constants';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
 
@@ -235,11 +236,15 @@
       <div class="xl:hidden">
         <TableOfContents headings={post.headings} />
       </div>
+
       <PostBody {post} />
+
       {#if post.originalPath}
         <EditOnGitHub originalPath={post.originalPath} />
+        <GitHubContributors originalPath={post.originalPath} />
       {/if}
     </div>
+
     <aside class="hidden xl:block xl:w-64 xl:flex-shrink-0">
       <TableOfContents headings={post.headings} />
     </aside>
