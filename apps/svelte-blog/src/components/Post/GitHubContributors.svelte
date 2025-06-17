@@ -1,40 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import type { Contributor } from '../../routes/api/contributors/[...path]/+server';
 
-  export let originalPath: string;
+  export let contributors: Contributor[];
 
-  let loading = true;
-  let error: string | null = null;
-  let contributors: Contributor[] = [];
-
-  onMount(async () => {
-    try {
-      const response = await fetch(`/api/contributors/${originalPath}`);
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          error = 'ファイルが見つかりませんでした';
-        } else if (response.status === 403) {
-          error = 'GitHub APIの制限に達しました';
-        } else {
-          error = '貢献者情報の取得に失敗しました';
-        }
-        return;
-      }
-
-      contributors = await response.json();
-    } catch (err) {
-      console.error('Error fetching contributors:', err);
-      error = '貢献者情報の取得に失敗しました';
-    } finally {
-      loading = false;
-    }
-  });
-
-  function formatContributions(count: number): string {
-    return count === 1 ? '1回の編集' : `${count}回の編集`;
-  }
 
   function formatDate(dateString: string): string {
     const date = new Date(dateString);
@@ -57,26 +25,7 @@
     Authors & Editors
   </h3>
 
-  {#if loading}
-    <div class="loading-state">
-      <div class="loading-spinner"></div>
-      <span>読み込み中...</span>
-    </div>
-  {:else if error}
-    <div class="error-state">
-      <svg class="error-icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16">
-        <path
-          fill="currentColor"
-          d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM7.25 8.25v-3a.75.75 0 0 1 1.5 0v3a.75.75 0 0 1-1.5 0Zm1.5 2.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-        />
-      </svg>
-      <span>{error}</span>
-    </div>
-  {:else if contributors.length === 0}
-    <div class="empty-state">
-      <span>貢献者情報が見つかりませんでした</span>
-    </div>
-  {:else}
+  {#if contributors.length > 0}
     <div class="contributors-list">
       {#each contributors as contributor}
         <a
@@ -119,50 +68,6 @@
     flex-shrink: 0;
   }
 
-  .loading-state,
-  .error-state,
-  .empty-state {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-radius: 6px;
-    font-size: 0.875rem;
-  }
-
-  .loading-state {
-    background-color: #f9fafb;
-    color: #6b7280;
-  }
-
-  .loading-spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid #e5e7eb;
-    border-top-color: #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  .error-state {
-    background-color: #fef2f2;
-    color: #dc2626;
-  }
-
-  .error-icon {
-    flex-shrink: 0;
-  }
-
-  .empty-state {
-    background-color: #f9fafb;
-    color: #6b7280;
-  }
 
   .contributors-list {
     display: flex;
