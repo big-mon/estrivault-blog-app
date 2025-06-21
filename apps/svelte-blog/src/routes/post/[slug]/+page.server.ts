@@ -94,21 +94,17 @@ export const load = async ({
   params,
 }: {
   params: { slug: string };
-}): Promise<{ post: PostHTML; hasTwitterEmbed: boolean; contributors: Contributor[] }> => {
+}): Promise<{ post: PostHTML; contributors: Contributor[] }> => {
   try {
     const { slug } = params;
 
     const post = await getPostBySlug(slug);
-
-    // コンテンツプロセッサーからのTwitter埋め込み情報を使用
-    const hasTwitterEmbed = post.hasTwitterEmbed || false;
 
     // GitHub貢献者情報を取得（ビルド時/ISR時のみ）
     const contributors = post.originalPath ? await fetchContributors(post.originalPath) : [];
 
     return {
       post,
-      hasTwitterEmbed,
       contributors,
     };
   } catch (err) {

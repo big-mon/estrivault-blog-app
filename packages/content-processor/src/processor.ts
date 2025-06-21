@@ -72,9 +72,6 @@ export async function processMarkdown(
 
     // 見出し情報を取得（heading-extractorプラグインで抽出されたもの）
     const headings: HeadingInfo[] = (result.data as any)?.headings || [];
-    
-    // Twitter埋め込み情報を取得
-    const hasTwitterEmbed: boolean = (result.data as any)?.hasTwitterEmbed || false;
 
     // タグを検証して正規化
     const tags = Array.isArray(data.tags)
@@ -136,7 +133,7 @@ export async function processMarkdown(
       readingTime: Math.ceil(stats.minutes),
     };
 
-    return { meta, html, headings, hasTwitterEmbed };
+    return { meta, html, headings };
   } catch (error) {
     if (error instanceof FrontMatterError || error instanceof MarkdownParseError) {
       throw error;

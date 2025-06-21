@@ -25,6 +25,3 @@ export const MAIN_BRANCH = 'main';
 export const GITHUB_API_BASE = 'https://api.github.com';
 export const GITHUB_REPO_OWNER = 'big-mon';
 export const GITHUB_REPO_NAME = 'estrivault-blog-app';
-
-// Twitter埋め込み機能の有効/無効フラグ
-export const TWITTER_EMBED_ENABLED = true;

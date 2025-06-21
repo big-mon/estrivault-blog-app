@@ -39,5 +39,4 @@ export interface PostHTML {
   html: string;
   headings: HeadingInfo[];
   originalPath?: string;
-  hasTwitterEmbed?: boolean;
 }

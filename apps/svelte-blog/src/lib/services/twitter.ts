@@ -16,9 +16,6 @@ class TwitterService {
   private state: 'idle' | 'loading' | 'loaded' | 'error' = 'idle';
   private initPromise: Promise<void> | null = null;
 
-  constructor() {
-    // 設定は固定値を使用（過度な抽象化を避ける）
-  }
 
   /**
    * Twitter APIの初期化（冪等性を保証）
@@ -56,7 +53,6 @@ class TwitterService {
 
     await window.twttr.widgets.load(container);
   }
-
 
   /**
    * Twitterスクリプトの読み込み

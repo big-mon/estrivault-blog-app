@@ -4,13 +4,7 @@
   import TableOfContents from '$components/Post/TableOfContents.svelte';
   import EditOnGitHub from '$components/Post/EditOnGitHub.svelte';
   import GitHubContributors from '$components/Post/GitHubContributors.svelte';
-  import {
-    SITE_TITLE,
-    SITE_AUTHOR,
-    SITE_URL,
-    SOCIAL_LINK_X,
-    TWITTER_EMBED_ENABLED,
-  } from '$constants';
+  import { SITE_TITLE, SITE_AUTHOR, SITE_URL, SOCIAL_LINK_X } from '$constants';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
   import type { Contributor } from '$lib/types/github';
   import { twitterEmbed } from '$lib/actions/twitter-embed';
@@ -18,7 +12,6 @@
   interface PageData {
     post: PostHTML;
     metadata?: PostMeta;
-    hasTwitterEmbed: boolean;
     contributors: Contributor[];
   }
 
@@ -149,13 +142,10 @@
   ></script>
 
   <!-- Schema.org Structured Data -->
-  {@html `<script type="application/ld+json">${schemaJsonString}</script>`}
+  <script type="application/ld+json">{@html schemaJsonString}</script>
 </svelte:head>
 
-<article
-  class="container mx-auto px-2 sm:px-4 xl:max-w-6xl"
-  use:twitterEmbed={{ enabled: TWITTER_EMBED_ENABLED && data.hasTwitterEmbed }}
->
+<article class="container mx-auto px-2 sm:px-4 xl:max-w-6xl" use:twitterEmbed>
   <Header meta={post.meta} />
   <div class="xl:flex xl:gap-8">
     <div class="xl:max-w-4xl xl:flex-1">

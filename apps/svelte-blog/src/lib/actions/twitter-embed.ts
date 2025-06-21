@@ -1,30 +1,23 @@
 import { twitterService } from '$lib/services/twitter';
 import type { ActionReturn } from 'svelte/action';
 
-export interface TwitterEmbedParams {
-  /** Twitter埋め込みが有効かどうか */
-  enabled?: boolean;
-}
-
 /**
  * Twitter埋め込み用のSvelteアクション
+ * Twitter埋め込み要素がある場合のみウィジェットを読み込み
  *
  * 使用例:
  * ```svelte
- * <div use:twitterEmbed={{ enabled: hasTwitterEmbed }}>
+ * <div use:twitterEmbed>
  *   <!-- Twitter埋め込みを含むコンテンツ -->
  * </div>
  * ```
  */
-export function twitterEmbed(
-  node: HTMLElement,
-  params: TwitterEmbedParams = {}
-): ActionReturn<TwitterEmbedParams> {
-  let { enabled = false } = params;
+export function twitterEmbed(node: HTMLElement): ActionReturn {
   let abortController: AbortController | null = null;
 
   async function loadTwitterWidgets() {
-    if (!enabled) return;
+    // Twitter埋め込み要素があるかチェック
+    if (!node.querySelector('.twitter-tweet')) return;
 
     // 既存の処理をキャンセル
     if (abortController) {
@@ -77,16 +70,6 @@ export function twitterEmbed(
   loadTwitterWidgets();
 
   return {
-    update(newParams: TwitterEmbedParams) {
-      const prevEnabled = enabled;
-      enabled = newParams.enabled ?? false;
-
-      // enabledの状態が変わった場合のみ再読み込み
-      if (enabled !== prevEnabled) {
-        loadTwitterWidgets();
-      }
-    },
-
     destroy() {
       cleanup();
     },
