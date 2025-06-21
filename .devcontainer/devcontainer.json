@@ -1,8 +1,10 @@
 {
+  "name": "Anthropic Claude Code",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu24.04",
   "features": {
     "ghcr.io/anthropics/devcontainer-features/claude-code:latest": {},
-    "ghcr.io/devcontainers-community/npm-features/typescript:1.1.0": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers-community/npm-features/typescript": {}
   },
   "customizations": {
     "vscode": {

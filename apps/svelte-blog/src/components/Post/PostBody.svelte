@@ -7,7 +7,7 @@
   export let post: PostHTML;
 </script>
 
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-2 sm:px-4 py-8">
   <div class="{postStyles.prose} {twitterEmbedStyles.prose} prose max-w-none">
     {@html post.html || 'コンテンツがありません'}
   </div>

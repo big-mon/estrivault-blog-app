@@ -275,7 +275,7 @@
   {@html `<script type="application/ld+json">${JSON.stringify(schemaData)}</script>`}
 </svelte:head>
 
-<article class="container mx-auto px-4 xl:max-w-6xl">
+<article class="container mx-auto px-2 sm:px-4 xl:max-w-6xl">
   <Header meta={post.meta} />
   <div class="xl:flex xl:gap-8">
     <div class="xl:max-w-4xl xl:flex-1">
