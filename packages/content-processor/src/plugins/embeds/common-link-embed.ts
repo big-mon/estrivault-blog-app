@@ -77,7 +77,7 @@ function createOgpEmbedCard(url: string, ogpData: OgpMetadata) {
   // OGP標準アスペクト比 1.91:1を正確に実装
   const imageHtml = image 
     ? `<div style="flex-shrink: 0; width: 200px; aspect-ratio: 1.91; background: #f6f8fa; display: flex; align-items: center; justify-content: center; border-radius: 0 8px 8px 0;">
-         <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 0 8px 8px 0;" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: #8b949e; font-size: 14px;\\'>🖼️</div>';" />
+         <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 0 8px 8px 0;" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: #8b949e; font-size: 14px;\\' role=\\'img\\' aria-label=\\'画像の読み込みに失敗しました\\'>🖼️</div>';" />
        </div>`
     : `<div style="flex-shrink: 0; width: 200px; aspect-ratio: 1.91; background: #f6f8fa; display: flex; align-items: center; justify-content: center; border-radius: 0 8px 8px 0; color: #8b949e; font-size: 24px;">
          🖼️
