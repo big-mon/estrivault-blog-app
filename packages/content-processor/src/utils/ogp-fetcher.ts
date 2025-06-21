@@ -97,17 +97,17 @@ function parseOgpFromHtml(html: string): OgpMetadata {
   // Try OGP patterns first
   for (const [key, pattern] of Object.entries(ogpPatterns)) {
     const match = html.match(pattern);
-    if (match && match[1]) {
-      (metadata as any)[key] = decodeHtmlEntities(match[1].trim());
+    if (match?.[1]) {
+      metadata[key as keyof OgpMetadata] = decodeHtmlEntities(match[1].trim());
     }
   }
 
   // Try reversed patterns if no match found
   for (const [key, pattern] of Object.entries(ogpPatternsReversed)) {
-    if (!(metadata as any)[key]) {
+    if (!metadata[key as keyof OgpMetadata]) {
       const match = html.match(pattern);
-      if (match && match[1]) {
-        (metadata as any)[key] = decodeHtmlEntities(match[1].trim());
+      if (match?.[1]) {
+        metadata[key as keyof OgpMetadata] = decodeHtmlEntities(match[1].trim());
       }
     }
   }
