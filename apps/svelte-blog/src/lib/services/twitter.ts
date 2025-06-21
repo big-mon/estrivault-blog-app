@@ -155,6 +155,8 @@ class TwitterService {
       script.onerror = () => {
         const error = new Error('Failed to load Twitter script');
         this.log('Script load error:', error);
+        // 失敗したスクリプトタグを削除してリトライ可能にする
+        script.remove();
         reject(error);
       };
 

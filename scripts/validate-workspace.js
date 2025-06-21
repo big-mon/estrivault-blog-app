@@ -3,19 +3,7 @@
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
-
-const PACKAGES = [
-  {
-    name: '@estrivault/content-processor',
-    path: 'packages/content-processor',
-    distPath: 'packages/content-processor/dist'
-  },
-  {
-    name: '@estrivault/cloudinary-utils', 
-    path: 'packages/cloudinary-utils',
-    distPath: 'packages/cloudinary-utils/dist'
-  }
-];
+import { PACKAGES } from './workspace-config.js';
 
 function checkPackageExists(pkg) {
   const packagePath = join(process.cwd(), pkg.path, 'package.json');
