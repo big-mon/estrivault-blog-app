@@ -9,3 +9,4 @@ export { createPipeline } from './pipeline';
 
 // ユーティリティ
 export { normalizeForTagFilter, normalizeForSlug } from './utils/normalize';
+export { fetchOgpMetadata, shouldFetchOgp, type OgpMetadata } from './utils/ogp-fetcher';
