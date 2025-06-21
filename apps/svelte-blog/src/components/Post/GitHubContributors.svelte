@@ -8,7 +8,7 @@
     return date.toLocaleDateString('ja-JP', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 </script>
@@ -67,7 +67,6 @@
     flex-shrink: 0;
   }
 
-
   .contributors-list {
     display: flex;
     flex-wrap: wrap;
@@ -91,12 +90,15 @@
     border-radius: 50%;
     border: 3px solid #e2e8f0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    box-shadow:
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 1px 2px -1px rgba(0, 0, 0, 0.1);
   }
 
   .contributor-avatar-link:hover .contributor-avatar {
     border-color: #3b82f6;
-    box-shadow: 0 8px 25px -5px rgba(59, 130, 246, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow:
+      0 8px 25px -5px rgba(59, 130, 246, 0.25),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
-
 </style>

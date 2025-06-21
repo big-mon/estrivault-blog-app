@@ -16,9 +16,7 @@
     </svg>
     GitHubで編集を提案する
   </a>
-  <p class="edit-description">
-    間違いを見つけたら教えてください
-  </p>
+  <p class="edit-description">間違いを見つけたら教えてください</p>
 </div>
 
 <style>
@@ -28,7 +26,6 @@
     align-items: center;
     text-align: center;
   }
-
 
   .edit-description {
     margin: 0.75rem 0 0 0;
@@ -49,14 +46,18 @@
     font-size: 0.875rem;
     font-weight: 600;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 
   .edit-link:hover {
     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
     border-color: #475569;
     transform: translateY(-1px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
     text-decoration: none;
   }
 

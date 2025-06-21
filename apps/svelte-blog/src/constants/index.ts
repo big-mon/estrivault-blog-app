@@ -25,3 +25,20 @@ export const MAIN_BRANCH = 'main';
 export const GITHUB_API_BASE = 'https://api.github.com';
 export const GITHUB_REPO_OWNER = 'big-mon';
 export const GITHUB_REPO_NAME = 'estrivault-blog-app';
+
+// Twitter Embed Configuration
+export const TWITTER_EMBED_CONFIG = {
+  // Twitter埋め込み機能を有効にするか
+  enabled: true,
+  // デバッグモードを有効にするか（開発時のみ）
+  debug: false,
+  // スクリプト読み込みのタイムアウト時間（ミリ秒）
+  timeout: 15000,
+  // デフォルトのウィジェットオプション
+  defaultOptions: {
+    theme: 'light' as const,
+    dnt: true,
+    conversation: 'none' as const,
+    width: 550,
+  },
+};

@@ -1,27 +1,19 @@
-<script context="module" lang="ts">
-  // 型アサーションをモジュールスコープで宣言
-  declare global {
-    interface Window {
-      twttr?: {
-        widgets: {
-          load(): Promise<void>;
-        };
-        ready?: (callback: () => void) => void;
-      };
-    }
-  }
-</script>
-
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
   import Header from '$components/Post/Header.svelte';
   import PostBody from '$components/Post/PostBody.svelte';
   import TableOfContents from '$components/Post/TableOfContents.svelte';
   import EditOnGitHub from '$components/Post/EditOnGitHub.svelte';
   import GitHubContributors from '$components/Post/GitHubContributors.svelte';
-  import { SITE_TITLE, SITE_AUTHOR, SITE_URL, SOCIAL_LINK_X } from '$constants';
+  import {
+    SITE_TITLE,
+    SITE_AUTHOR,
+    SITE_URL,
+    SOCIAL_LINK_X,
+    TWITTER_EMBED_CONFIG,
+  } from '$constants';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
   import type { Contributor } from '$lib/types/github';
+  import { twitterEmbed } from '$lib/actions/twitter-embed';
 
   interface PageData {
     post: PostHTML;
@@ -81,124 +73,9 @@
     url: `${SITE_URL.replace(/\/$/, '')}/post/${post.meta.slug}`,
   };
 
-  // Twitter埋め込みがある場合のみスクリプトを読み込み
-  onMount(async () => {
-    if (data.hasTwitterEmbed) {
-      // DOMが完全に描画されるまで待つ
-      await tick();
-      await loadTwitterWidgets();
-    }
-  });
-
-  async function loadTwitterWidgets(): Promise<void> {
-    return new Promise<void>((resolve) => {
-      if (window.twttr) {
-        // 既に存在する場合は即座に実行
-        console.log('Twitter already loaded, calling widgets.load()');
-        window.twttr.widgets.load().then(() => {
-          console.log('Twitter widgets loaded successfully');
-          resolve();
-        });
-        return;
-      }
-
-      // Twitter スクリプトが既に存在するかチェック
-      const existingScript = document.getElementById('twitter-wjs');
-      if (existingScript) {
-        // スクリプトは存在するがtwttrがまだ利用できない場合
-        const checkTwttr = () => {
-          if (window.twttr) {
-            window.twttr.widgets.load().then(() => resolve());
-          } else {
-            setTimeout(checkTwttr, 100);
-          }
-        };
-        checkTwttr();
-        return;
-      }
-
-      // 新しくスクリプトを作成
-      console.log('Loading Twitter script...');
-      const script = document.createElement('script');
-      script.id = 'twitter-wjs';
-      script.async = true;
-      script.src = 'https://platform.twitter.com/widgets.js';
-
-      script.onload = () => {
-        console.log('Twitter script loaded');
-        const waitForTwttr = () => {
-          if (window.twttr && window.twttr.widgets) {
-            console.log('Calling widgets.load()');
-            window.twttr.widgets
-              .load()
-              .then(() => {
-                console.log('Widgets loaded successfully');
-                resolve();
-              })
-              .catch((err) => {
-                console.error('Error loading widgets:', err);
-                resolve();
-              });
-          } else {
-            setTimeout(waitForTwttr, 50);
-          }
-        };
-        waitForTwttr();
-      };
-
-      script.onerror = () => {
-        console.error('Failed to load Twitter script');
-        resolve();
-      };
-
-      document.head.appendChild(script);
-    });
-  }
+  // Schema.org JSONの文字列化（ESLintエラー回避のため）
+  $: schemaJsonString = JSON.stringify(schemaData);
 </script>
-
-<style>
-  .post-footer {
-    margin-top: 3rem;
-    padding: 2rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 1rem;
-    border: 1px solid #e2e8f0;
-  }
-
-  .post-footer-content {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .post-footer-edit {
-    display: flex;
-    justify-content: center;
-  }
-
-  .post-footer-contributors {
-    display: flex;
-    justify-content: center;
-  }
-
-  @media (min-width: 640px) {
-    .post-footer-content {
-      flex-direction: row;
-      align-items: flex-start;
-      gap: 2rem;
-    }
-
-    .post-footer-edit {
-      flex-shrink: 0;
-      justify-content: flex-start;
-    }
-
-    .post-footer-contributors {
-      flex-shrink: 0;
-      justify-content: flex-start;
-    }
-  }
-</style>
 
 <svelte:head>
   <title>{post.meta.title} | {SITE_TITLE}</title>
@@ -272,10 +149,16 @@
   ></script>
 
   <!-- Schema.org Structured Data -->
-  {@html `<script type="application/ld+json">${JSON.stringify(schemaData)}</script>`}
+  {@html `<script type="application/ld+json">${schemaJsonString}</script>`}
 </svelte:head>
 
-<article class="container mx-auto px-2 sm:px-4 xl:max-w-6xl">
+<article
+  class="container mx-auto px-2 sm:px-4 xl:max-w-6xl"
+  use:twitterEmbed={{
+    enabled: TWITTER_EMBED_CONFIG.enabled && data.hasTwitterEmbed,
+    debug: TWITTER_EMBED_CONFIG.debug,
+  }}
+>
   <Header meta={post.meta} />
   <div class="xl:flex xl:gap-8">
     <div class="xl:max-w-4xl xl:flex-1">
@@ -304,3 +187,47 @@
     </aside>
   </div>
 </article>
+
+<style>
+  .post-footer {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+  }
+
+  .post-footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .post-footer-edit {
+    display: flex;
+    justify-content: center;
+  }
+
+  .post-footer-contributors {
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (min-width: 640px) {
+    .post-footer-content {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+
+    .post-footer-edit {
+      flex-shrink: 0;
+      justify-content: flex-start;
+    }
+
+    .post-footer-contributors {
+      flex-shrink: 0;
+      justify-content: flex-start;
+    }
+  }
+</style>

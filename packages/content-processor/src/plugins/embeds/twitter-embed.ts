@@ -6,11 +6,16 @@ interface TwitterEmbedOptions {
   onTwitterFound?: () => void;
 }
 
+interface TwitterEmbedState {
+  hasTwitterEmbed: boolean;
+}
+
 /**
  * ::twitter{id="..."} ディレクティブをHTML要素に変換するremarkプラグイン
  */
-export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = () => {
-  return (tree) => {
+export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (options = {}) => {
+  return (tree, file) => {
+    let hasTwitterEmbed = false;
     visit(tree, function (node: any) {
       const isTargetType =
         node.type === 'containerDirective' ||
@@ -34,6 +39,12 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = ()
           node
         );
         return;
+      }
+
+      // Twitter埋め込みが見つかったことを記録
+      hasTwitterEmbed = true;
+      if (options.onTwitterFound) {
+        options.onTwitterFound();
       }
 
       // HTMLノードに変換 - blockquoteを直接作成
@@ -81,5 +92,9 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = ()
         }
       ];
     });
+
+    // ファイルのデータにTwitter埋め込み情報を保存
+    if (!file.data) file.data = {};
+    file.data.hasTwitterEmbed = hasTwitterEmbed;
   };
 };

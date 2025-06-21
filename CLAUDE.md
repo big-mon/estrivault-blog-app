@@ -23,17 +23,30 @@ This is a **monorepo blog application** built with **SvelteKit** and **TypeScrip
 
 ## Development Commands
 
-### Initial Setup (Required)
+### Initial Setup (Automatic)
 ```bash
-pnpm install     # Install dependencies
-pnpm run build   # Build all packages (required for workspace dependencies)
+pnpm install     # Installs dependencies and auto-builds packages via postinstall
 ```
 
-### Development
+### Development (Improved DX)
 ```bash
-pnpm dev                              # Start development server (http://localhost:5173)
+pnpm dev                              # 🚀 Smart dev start with auto-validation and hot reload
+pnpm dev:safe                         # 🔍 Extra validation before starting
+pnpm dev:quick                        # ⚡ Skip validation (for experienced developers)
+pnpm validate:workspace               # 🧪 Check workspace health
+```
+
+### Production & Preview
+```bash
 pnpm --filter svelte-blog build      # Build for production
 pnpm --filter svelte-blog preview    # Preview production build
+```
+
+### Troubleshooting
+```bash
+pnpm reset                            # 🔄 Full reset: clean, install, rebuild
+pnpm clean                            # 🧹 Clean all build artifacts
+pnpm run build:packages              # 🔨 Rebuild workspace packages only
 ```
 
 ### Quality Assurance
@@ -95,7 +108,9 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
   - `/category/[category]/[page]` - Category filtering with pagination
   - `/tag/[tag]/[page]` - Tag filtering with pagination
 
-### Monorepo Dependencies
-- Uses PNPM workspaces
-- **Critical**: Always run `pnpm run build` after dependency changes or fresh clones
-- SvelteKit app depends on built packages in workspace, not source files
+### Monorepo Dependencies (Improved)
+- Uses PNPM workspaces with automatic setup
+- **Development**: TypeScript path mapping enables direct source file imports with hot reload
+- **Production**: SvelteKit app uses built packages from workspace
+- **Auto-build**: `postinstall` hook ensures packages are built after `pnpm install`
+- **Smart dev**: `pnpm dev` validates workspace and handles build dependencies automatically
