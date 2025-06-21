@@ -9,7 +9,7 @@ interface TwitterEmbedOptions {
 /**
  * ::twitter{id="..."} ディレクティブをHTML要素に変換するremarkプラグイン
  */
-export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = () => {
+export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (options = {}) => {
   return (tree) => {
     visit(tree, function (node: any) {
       const isTargetType =
@@ -34,6 +34,11 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = ()
           node
         );
         return;
+      }
+
+      // コールバックがあれば呼び出し
+      if (options.onTwitterFound) {
+        options.onTwitterFound();
       }
 
       // HTMLノードに変換 - blockquoteを直接作成

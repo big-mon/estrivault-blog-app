@@ -1,11 +1,21 @@
 {
   "name": "estrivault-blog-app",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "pnpm --filter svelte-blog dev",
-    "build": "pnpm -r --filter svelte-blog... run build"
+    "dev": "node scripts/dev-helper.js",
+    "dev:quick": "pnpm run build:packages && concurrently \"pnpm run dev:packages\" \"pnpm --filter svelte-blog dev\"",
+    "dev:safe": "pnpm run validate:workspace && pnpm run dev:quick",
+    "dev:packages": "pnpm --filter @estrivault/cloudinary-utils run dev",
+    "build": "pnpm -r --filter svelte-blog... run build",
+    "build:packages": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor run build",
+    "validate:workspace": "node scripts/validate-workspace.js",
+    "postinstall": "pnpm run build:packages",
+    "clean": "pnpm --filter @estrivault/cloudinary-utils run clean && rm -rf packages/content-processor/dist",
+    "reset": "pnpm run clean && pnpm install && pnpm run build:packages"
   },
   "devDependencies": {
+    "concurrently": "^9.1.0",
     "dotenv-cli": "^8.0.0",
     "prettier": "^3.5.3",
     "prettier-plugin-svelte": "^3.4.0",

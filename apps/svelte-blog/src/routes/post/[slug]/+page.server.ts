@@ -27,15 +27,15 @@ async function fetchContributors(filePath: string): Promise<Contributor[]> {
     const commitsUrl = `${GITHUB_API_BASE}/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/commits`;
     const commitsParams = new URLSearchParams({
       path: filePath,
-      per_page: '100'
+      per_page: '100',
     });
 
     const response = await fetch(`${commitsUrl}?${commitsParams}`, {
       headers: {
-        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'estrivault-blog-app'
-      }
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github.v3+json',
+        'User-Agent': 'estrivault-blog-app',
+      },
     });
 
     if (!response.ok) {
@@ -67,7 +67,7 @@ async function fetchContributors(filePath: string): Promise<Contributor[]> {
             avatar_url: commit.author.avatar_url,
             html_url: commit.author.html_url,
             contributions: 1,
-            last_commit_date: commit.commit.author.date
+            last_commit_date: commit.commit.author.date,
           });
         }
       }
@@ -84,7 +84,6 @@ async function fetchContributors(filePath: string): Promise<Contributor[]> {
       }
       return new Date(b.last_commit_date).getTime() - new Date(a.last_commit_date).getTime();
     });
-
   } catch (err) {
     console.error(`Error fetching contributors for ${filePath}:`, err);
     return [];
@@ -95,21 +94,17 @@ export const load = async ({
   params,
 }: {
   params: { slug: string };
-}): Promise<{ post: PostHTML; hasTwitterEmbed: boolean; contributors: Contributor[] }> => {
+}): Promise<{ post: PostHTML; contributors: Contributor[] }> => {
   try {
     const { slug } = params;
 
     const post = await getPostBySlug(slug);
-
-    // HTMLコンテンツからTwitter埋め込みを検出
-    const hasTwitterEmbed = post.html.includes('class="twitter-tweet"');
 
     // GitHub貢献者情報を取得（ビルド時/ISR時のみ）
     const contributors = post.originalPath ? await fetchContributors(post.originalPath) : [];
 
     return {
       post,
-      hasTwitterEmbed,
       contributors,
     };
   } catch (err) {
