@@ -97,17 +97,17 @@ function parseOgpFromHtml(html: string): OgpMetadata {
   // Try OGP patterns first
   for (const [key, pattern] of Object.entries(ogpPatterns)) {
     const match = html.match(pattern);
-    if (match && match[1]) {
-      (metadata as any)[key] = decodeHtmlEntities(match[1].trim());
+    if (match?.[1]) {
+      metadata[key as keyof OgpMetadata] = decodeHtmlEntities(match[1].trim());
     }
   }
 
   // Try reversed patterns if no match found
   for (const [key, pattern] of Object.entries(ogpPatternsReversed)) {
-    if (!(metadata as any)[key]) {
+    if (!metadata[key as keyof OgpMetadata]) {
       const match = html.match(pattern);
-      if (match && match[1]) {
-        (metadata as any)[key] = decodeHtmlEntities(match[1].trim());
+      if (match?.[1]) {
+        metadata[key as keyof OgpMetadata] = decodeHtmlEntities(match[1].trim());
       }
     }
   }
@@ -238,7 +238,7 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
               try {
                 metadata.image = new URL(metadata.image, url).href;
               } catch (e) {
-                delete metadata.image;
+                metadata.image = undefined;
               }
             }
 
@@ -261,7 +261,6 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
         } else if (response.status === 403 || response.status === 429) {
           // 403/429はリトライを継続
           lastError = `${response.status} ${response.statusText}`;
-          continue;
         } else {
           // その他のエラーは早期終了
           lastError = `${response.status} ${response.statusText}`;
@@ -270,7 +269,6 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
       } catch (error) {
         lastError = (error as Error).message;
         // タイムアウトやネットワークエラーは次の戦略を試行
-        continue;
       }
     }
 
