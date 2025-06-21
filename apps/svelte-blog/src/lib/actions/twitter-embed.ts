@@ -4,8 +4,6 @@ import type { ActionReturn } from 'svelte/action';
 export interface TwitterEmbedParams {
   /** Twitter埋め込みが有効かどうか */
   enabled?: boolean;
-  /** デバッグモードを有効にするか */
-  debug?: boolean;
 }
 
 /**
@@ -22,14 +20,11 @@ export function twitterEmbed(
   node: HTMLElement,
   params: TwitterEmbedParams = {}
 ): ActionReturn<TwitterEmbedParams> {
-  let { enabled = false, debug = false } = params;
+  let { enabled = false } = params;
   let abortController: AbortController | null = null;
 
   async function loadTwitterWidgets() {
-    if (!enabled) {
-      if (debug) console.log('[TwitterEmbed] Twitter embed disabled');
-      return;
-    }
+    if (!enabled) return;
 
     // 既存の処理をキャンセル
     if (abortController) {
@@ -38,19 +33,10 @@ export function twitterEmbed(
     abortController = new AbortController();
 
     try {
-      if (debug) console.log('[TwitterEmbed] Loading Twitter widgets...');
-
-      // Twitter APIサービスを使用してウィジェットを読み込み
       await twitterService.loadWidgets(node);
-
-      if (!abortController.signal.aborted && debug) {
-        console.log('[TwitterEmbed] Twitter widgets loaded successfully');
-      }
     } catch (error) {
       if (!abortController.signal.aborted) {
         console.error('[TwitterEmbed] Failed to load Twitter widgets:', error);
-
-        // フォールバック: リンクのみ表示
         showFallbackLinks(node);
       }
     }
@@ -94,7 +80,6 @@ export function twitterEmbed(
     update(newParams: TwitterEmbedParams) {
       const prevEnabled = enabled;
       enabled = newParams.enabled ?? false;
-      debug = newParams.debug ?? false;
 
       // enabledの状態が変わった場合のみ再読み込み
       if (enabled !== prevEnabled) {

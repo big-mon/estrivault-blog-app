@@ -3,7 +3,20 @@
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
-import { PACKAGES } from './workspace-config.js';
+
+// 固定のパッケージ設定（2つだけなので共通化は不要）
+const PACKAGES = [
+  {
+    name: '@estrivault/content-processor',
+    path: 'packages/content-processor',
+    distPath: 'packages/content-processor/dist'
+  },
+  {
+    name: '@estrivault/cloudinary-utils', 
+    path: 'packages/cloudinary-utils',
+    distPath: 'packages/cloudinary-utils/dist'
+  }
+];
 
 function checkPackageExists(pkg) {
   const packagePath = join(process.cwd(), pkg.path, 'package.json');

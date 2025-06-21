@@ -1,28 +1,23 @@
-import type {
-  TwitterEmbedState,
-  TwitterServiceOptions,
-  TwitterWidgetOptions,
-} from '$lib/types/twitter';
+// 必要最小限のTwitter Widget API型定義
+declare global {
+  interface Window {
+    twttr?: {
+      widgets: {
+        load(element?: HTMLElement): Promise<void>;
+      };
+    };
+  }
+}
 
 /**
- * Twitter埋め込みサービス
- * スクリプトの読み込み、初期化、エラーハンドリングを一元管理
+ * Twitter埋め込みサービス - 最小限の実装
  */
 class TwitterService {
-  private state: TwitterEmbedState = 'idle';
+  private state: 'idle' | 'loading' | 'loaded' | 'error' = 'idle';
   private initPromise: Promise<void> | null = null;
-  private options: Required<TwitterServiceOptions>;
 
-  constructor(options: TwitterServiceOptions = {}) {
-    this.options = {
-      timeout: options.timeout ?? 15000, // 15秒
-      debug: options.debug ?? false,
-      defaultWidgetOptions: options.defaultWidgetOptions ?? {
-        theme: 'light',
-        dnt: true,
-        conversation: 'none',
-      },
-    };
+  constructor() {
+    // 設定は固定値を使用（過度な抽象化を避ける）
   }
 
   /**
@@ -30,12 +25,10 @@ class TwitterService {
    */
   async initialize(): Promise<void> {
     if (this.state === 'loaded') {
-      this.log('Twitter API already loaded');
       return;
     }
 
     if (this.state === 'loading' && this.initPromise) {
-      this.log('Twitter API loading in progress, waiting...');
       return this.initPromise;
     }
 
@@ -45,10 +38,8 @@ class TwitterService {
     try {
       await this.initPromise;
       this.state = 'loaded';
-      this.log('Twitter API loaded successfully');
     } catch (error) {
       this.state = 'error';
-      this.log('Failed to load Twitter API:', error);
       throw error;
     }
   }
@@ -63,65 +54,9 @@ class TwitterService {
       throw new Error('Twitter widgets API not available');
     }
 
-    try {
-      await window.twttr.widgets.load(container);
-      this.log('Twitter widgets loaded successfully');
-    } catch (error) {
-      this.log('Error loading Twitter widgets:', error);
-      throw new Error(`Failed to load Twitter widgets: ${error}`);
-    }
+    await window.twttr.widgets.load(container);
   }
 
-  /**
-   * 単一ツイートの埋め込み
-   */
-  async embedTweet(
-    tweetId: string,
-    container: HTMLElement,
-    options?: TwitterWidgetOptions
-  ): Promise<HTMLElement> {
-    await this.initialize();
-
-    if (!window.twttr?.widgets) {
-      throw new Error('Twitter widgets API not available');
-    }
-
-    const widgetOptions = { ...this.options.defaultWidgetOptions, ...options };
-
-    try {
-      const element = await window.twttr.widgets.createTweet(tweetId, container, widgetOptions);
-      if (!element) {
-        throw new Error('Failed to create tweet embed');
-      }
-      this.log(`Tweet ${tweetId} embedded successfully`);
-      return element;
-    } catch (error) {
-      this.log(`Error embedding tweet ${tweetId}:`, error);
-      throw new Error(`Failed to embed tweet: ${error}`);
-    }
-  }
-
-  /**
-   * 現在の状態を取得
-   */
-  getState(): TwitterEmbedState {
-    return this.state;
-  }
-
-  /**
-   * APIが利用可能かチェック
-   */
-  isAvailable(): boolean {
-    return this.state === 'loaded' && !!window.twttr?.widgets;
-  }
-
-  /**
-   * サービスをリセット（テスト用）
-   */
-  reset(): void {
-    this.state = 'idle';
-    this.initPromise = null;
-  }
 
   /**
    * Twitterスクリプトの読み込み
@@ -148,16 +83,12 @@ class TwitterService {
       script.src = 'https://platform.twitter.com/widgets.js';
 
       script.onload = () => {
-        this.log('Twitter script loaded');
         this.waitForAPI(resolve, reject);
       };
 
       script.onerror = () => {
-        const error = new Error('Failed to load Twitter script');
-        this.log('Script load error:', error);
-        // 失敗したスクリプトタグを削除してリトライ可能にする
         script.remove();
-        reject(error);
+        reject(new Error('Failed to load Twitter script'));
       };
 
       document.head.appendChild(script);
@@ -169,6 +100,7 @@ class TwitterService {
    */
   private waitForAPI(resolve: () => void, reject: (error: Error) => void): void {
     const startTime = Date.now();
+    const TIMEOUT = 15000; // 15秒固定
 
     const checkAPI = () => {
       if (window.twttr?.widgets) {
@@ -176,12 +108,8 @@ class TwitterService {
         return;
       }
 
-      if (Date.now() - startTime > this.options.timeout) {
-        const error = new Error(
-          `Twitter API initialization timeout after ${this.options.timeout}ms`
-        );
-        this.log('API wait timeout:', error);
-        reject(error);
+      if (Date.now() - startTime > TIMEOUT) {
+        reject(new Error('Twitter API initialization timeout'));
         return;
       }
 
@@ -190,24 +118,9 @@ class TwitterService {
 
     checkAPI();
   }
-
-  /**
-   * デバッグログ出力
-   */
-  private log(message: string, ...args: unknown[]): void {
-    if (this.options.debug) {
-      console.log(`[TwitterService] ${message}`, ...args);
-    }
-  }
 }
 
-import { TWITTER_EMBED_CONFIG } from '$constants';
-
-// シングルトンインスタンス
-export const twitterService = new TwitterService({
-  debug: TWITTER_EMBED_CONFIG.debug,
-  timeout: TWITTER_EMBED_CONFIG.timeout,
-  defaultWidgetOptions: TWITTER_EMBED_CONFIG.defaultOptions,
-});
+// シングルトンインスタンス（設定なし）
+export const twitterService = new TwitterService();
 
 export default twitterService;

@@ -9,7 +9,7 @@
     SITE_AUTHOR,
     SITE_URL,
     SOCIAL_LINK_X,
-    TWITTER_EMBED_CONFIG,
+    TWITTER_EMBED_ENABLED,
   } from '$constants';
   import type { PostHTML, PostMeta } from '@estrivault/content-processor';
   import type { Contributor } from '$lib/types/github';
@@ -154,10 +154,7 @@
 
 <article
   class="container mx-auto px-2 sm:px-4 xl:max-w-6xl"
-  use:twitterEmbed={{
-    enabled: TWITTER_EMBED_CONFIG.enabled && data.hasTwitterEmbed,
-    debug: TWITTER_EMBED_CONFIG.debug,
-  }}
+  use:twitterEmbed={{ enabled: TWITTER_EMBED_ENABLED && data.hasTwitterEmbed }}
 >
   <Header meta={post.meta} />
   <div class="xl:flex xl:gap-8">

@@ -2,7 +2,6 @@
 
 import { spawn } from 'child_process';
 import { existsSync } from 'fs';
-import { PACKAGES } from './workspace-config.js';
 
 function runCommand(command, options = {}) {
   return new Promise((resolve, reject) => {
@@ -26,8 +25,11 @@ function runCommand(command, options = {}) {
 }
 
 async function ensurePackagesBuilt() {
-  // 共通設定からパッケージのdistパスを取得
-  const packages = PACKAGES.map(pkg => pkg.distPath);
+  // 固定のパッケージパス（2つだけなので抽象化は不要）
+  const packages = [
+    'packages/content-processor/dist',
+    'packages/cloudinary-utils/dist'
+  ];
   
   const missingBuilds = packages.filter(path => !existsSync(path));
   
