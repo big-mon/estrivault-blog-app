@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
+import rehypePrettyCode from 'rehype-pretty-code';
 import { rehypeImageTransform } from './plugins/transforms/image-transform';
 import { rehypeLinkTransform } from './plugins/transforms/link-transform';
 import { rehypeHeadingAnchor } from './plugins/transforms/heading-anchor';
@@ -17,49 +18,68 @@ import { remarkAmazonEmbed } from './plugins/embeds/amazon-embed';
 import type { ProcessorOptions } from './types';
 
 /**
- * パイプラインを構築する
+ * 共通のパイプライン基盤を構築する
  * @param options 処理オプション
- * @returns 構築されたパイプライン
+ * @param enableSyntaxHighlight シンタックスハイライトを有効化するか
+ * @returns ベースパイプライン
  */
-export function createPipeline(options: ProcessorOptions = {}) {
+function createBasePipeline(options: ProcessorOptions = {}, enableSyntaxHighlight: boolean = false) {
   const { cloudinaryCloudName } = options;
 
-  // 1つのチェーンで全てのプラグインを適用
-  return (
-    unified()
-      // Markdown パース
-      .use(remarkParse)
-      .use(remarkDirective)
-      .use(remarkGfm)
+  const pipeline = unified()
+    // Markdown パース
+    .use(remarkParse)
+    .use(remarkDirective)
+    .use(remarkGfm)
 
-      // 埋め込みコンテンツ
-      .use(remarkYoutubeEmbed)
-      .use(remarkTwitterEmbed)
-      .use(remarkCommonLinkEmbed)
-      .use(remarkGithubEmbed)
-      .use(remarkAmazonEmbed)
+    // 埋め込みコンテンツ
+    .use(remarkYoutubeEmbed)
+    .use(remarkTwitterEmbed)
+    .use(remarkCommonLinkEmbed)
+    .use(remarkGithubEmbed)
+    .use(remarkAmazonEmbed)
 
-      // HTML 変換
-      .use(remarkRehype, { allowDangerousHtml: true })
-      .use(rehypeRaw)
+    // HTML 変換
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw);
 
-      // 画像変換 (HTML 変換後)
-      .use(rehypeImageTransform, {
-        cloudinaryCloudName: cloudinaryCloudName || '',
-        width: 1200,
-        mode: 'fit',
-      })
+  // シンタックスハイライトを条件で追加
+  if (enableSyntaxHighlight) {
+    pipeline.use(rehypePrettyCode, {
+      theme: 'github-dark',
+      keepBackground: false
+    });
+  }
 
-      // リンク変換
-      .use(rehypeLinkTransform)
+  return pipeline
+    // 画像変換
+    .use(rehypeImageTransform, {
+      cloudinaryCloudName: cloudinaryCloudName || '',
+      width: 1200,
+      mode: 'fit',
+    })
 
-      // 見出しアンカー追加
-      .use(rehypeHeadingAnchor)
+    // リンク変換
+    .use(rehypeLinkTransform)
 
-      // 見出し情報抽出
-      .use(rehypeHeadingExtractor)
+    // 見出しアンカー追加
+    .use(rehypeHeadingAnchor)
 
-      // 最終出力
-      .use(rehypeStringify)
-  );
+    // 見出し情報抽出
+    .use(rehypeHeadingExtractor)
+
+    // 最終出力
+    .use(rehypeStringify);
 }
+
+
+/**
+ * パイプラインを構築する
+ * @param options 処理オプション
+ * @param enableSyntaxHighlight シンタックスハイライトを有効化するか
+ * @returns 構築されたパイプライン
+ */
+export function createPipeline(options: ProcessorOptions = {}, enableSyntaxHighlight: boolean = false) {
+  return createBasePipeline(options, enableSyntaxHighlight);
+}
+

@@ -2,6 +2,13 @@ import matter from 'gray-matter';
 import readingTime from 'reading-time';
 import { buildUrl } from '@estrivault/cloudinary-utils';
 import { createPipeline } from './pipeline';
+import { hasCodeBlocks } from './utils/code-detector';
+import { hasTwitterEmbeds } from './utils/twitter-detector';
+import { hasAmazonEmbeds } from './utils/amazon-detector';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkDirective from 'remark-directive';
+import remarkGfm from 'remark-gfm';
 import type { PostMeta, PostHTML, ProcessorOptions, HeadingInfo } from './types';
 import { FrontMatterError, MarkdownParseError } from './errors';
 
@@ -49,7 +56,7 @@ function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''
  * @returns 処理されたPostHTML
  */
 export async function processMarkdown(
-  content: string, 
+  content: string,
   options: ProcessorOptions = {},
   slug?: string
 ): Promise<PostHTML> {
@@ -65,8 +72,21 @@ export async function processMarkdown(
     // 読了時間の計算
     const stats = readingTime(markdown);
 
-    // マークダウンをHTMLに変換
-    const pipeline = createPipeline(options);
+    // マークダウンをパースしてコードブロックを自動検出
+    const parseProcessor = unified()
+      .use(remarkParse)
+      .use(remarkDirective)
+      .use(remarkGfm);
+
+    const parseResult = parseProcessor.parse(markdown);
+
+    // 各種埋め込みの存在を検出
+    const enableSyntaxHighlight = hasCodeBlocks(parseResult);
+    const enableTwitterEmbeds = hasTwitterEmbeds(parseResult);
+    const enableAmazonEmbeds = hasAmazonEmbeds(parseResult);
+
+    // パイプラインでHTMLに変換
+    const pipeline = createPipeline(options, enableSyntaxHighlight);
     const result = await pipeline.process(markdown);
     const html = String(result);
 
@@ -133,7 +153,14 @@ export async function processMarkdown(
       readingTime: Math.ceil(stats.minutes),
     };
 
-    return { meta, html, headings };
+    return {
+      meta,
+      html,
+      headings,
+      hasCodeBlocks: enableSyntaxHighlight,
+      hasTwitterEmbeds: enableTwitterEmbeds,
+      hasAmazonEmbeds: enableAmazonEmbeds
+    };
   } catch (error) {
     if (error instanceof FrontMatterError || error instanceof MarkdownParseError) {
       throw error;
