@@ -17,15 +17,6 @@ import { remarkGithubEmbed } from './plugins/embeds/github-embed';
 import { remarkAmazonEmbed } from './plugins/embeds/amazon-embed';
 import type { ProcessorOptions, SyntaxHighlightOptions } from './types';
 
-/** デフォルトのシンタックスハイライト設定 */
-const DEFAULT_SYNTAX_HIGHLIGHT_OPTIONS: Required<SyntaxHighlightOptions> = {
-  theme: {
-    dark: 'github-dark',
-    light: 'github-light'
-  },
-  keepBackground: false
-};
-
 /**
  * 共通のパイプライン基盤を構築する
  * @param options 処理オプション
@@ -71,18 +62,6 @@ function createBasePipeline(options: ProcessorOptions = {}) {
     .use(rehypeStringify);
 }
 
-/**
- * シンタックスハイライト設定を正規化する
- * @param options ユーザー設定
- * @returns 正規化された設定
- */
-function normalizeSyntaxHighlightOptions(options?: SyntaxHighlightOptions): Required<SyntaxHighlightOptions> {
-  return {
-    ...DEFAULT_SYNTAX_HIGHLIGHT_OPTIONS,
-    ...options
-  };
-}
-
 
 /**
  * パイプラインを構築する
@@ -92,8 +71,14 @@ function normalizeSyntaxHighlightOptions(options?: SyntaxHighlightOptions): Requ
  */
 export function createPipeline(options: ProcessorOptions = {}, enableSyntaxHighlight: boolean = false) {
   if (enableSyntaxHighlight) {
-    const syntaxOptions = normalizeSyntaxHighlightOptions(options.syntaxHighlight);
-    const { cloudinaryCloudName } = options;
+    const { cloudinaryCloudName, syntaxHighlight } = options;
+    
+    // デフォルト設定
+    const theme = syntaxHighlight?.theme ?? {
+      dark: 'github-dark',
+      light: 'github-light'
+    };
+    const keepBackground = syntaxHighlight?.keepBackground ?? false;
 
     return unified()
       // Markdown パース
@@ -114,8 +99,8 @@ export function createPipeline(options: ProcessorOptions = {}, enableSyntaxHighl
 
       // シンタックスハイライト
       .use(rehypePrettyCode, {
-        theme: syntaxOptions.theme,
-        keepBackground: syntaxOptions.keepBackground
+        theme,
+        keepBackground
       } as any)
 
       // 画像変換 (シンタックスハイライト後)
