@@ -4,6 +4,7 @@ import { buildUrl } from '@estrivault/cloudinary-utils';
 import { createPipeline } from './pipeline';
 import { hasCodeBlocks } from './utils/code-detector';
 import { hasTwitterEmbeds } from './utils/twitter-detector';
+import { hasAmazonEmbeds } from './utils/amazon-detector';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkDirective from 'remark-directive';
@@ -85,6 +86,9 @@ export async function processMarkdown(
     // Twitterの埋め込みの存在を検出
     const enableTwitterEmbeds = hasTwitterEmbeds(parseResult);
     
+    // Amazonの埋め込みの存在を検出
+    const enableAmazonEmbeds = hasAmazonEmbeds(parseResult);
+    
     // パイプラインでHTMLに変換
     const pipeline = createPipeline(options, enableSyntaxHighlight);
     const result = await pipeline.process(markdown);
@@ -153,7 +157,7 @@ export async function processMarkdown(
       readingTime: Math.ceil(stats.minutes),
     };
 
-    return { meta, html, headings, hasCodeBlocks: enableSyntaxHighlight, hasTwitterEmbeds: enableTwitterEmbeds };
+    return { meta, html, headings, hasCodeBlocks: enableSyntaxHighlight, hasTwitterEmbeds: enableTwitterEmbeds, hasAmazonEmbeds: enableAmazonEmbeds };
   } catch (error) {
     if (error instanceof FrontMatterError || error instanceof MarkdownParseError) {
       throw error;

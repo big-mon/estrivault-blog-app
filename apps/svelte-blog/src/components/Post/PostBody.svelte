@@ -9,9 +9,11 @@
   
   // コードブロックがある場合のみシンタックスハイライトスタイルを適用
   // Twitterの埋め込みがある場合のみTwitterスタイルを適用
+  // Amazonの埋め込みがある場合のみAmazonスタイルを適用
   $: proseClasses = [
     postStyles.prose,
     post.hasTwitterEmbeds ? twitterEmbedStyles.prose : '',
+    post.hasAmazonEmbeds ? amazonCardStyles.prose : '',
     post.hasCodeBlocks ? syntaxHighlightStyles.prose : '',
     'prose max-w-none'
   ].filter(Boolean).join(' ');

@@ -41,4 +41,5 @@ export interface PostHTML {
   originalPath?: string;
   hasCodeBlocks?: boolean;
   hasTwitterEmbeds?: boolean;
+  hasAmazonEmbeds?: boolean;
 }
