@@ -1,6 +1,5 @@
 <script lang="ts">
   import '../app.css';
-  import '$lib/styles/syntax-highlight.css';
   import { page } from '$app/state';
   import { onNavigate } from '$app/navigation';
   import Header from '$components/Header/Header.svelte';

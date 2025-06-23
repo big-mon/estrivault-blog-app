@@ -3,12 +3,13 @@
   import amazonCardStyles from './style/amazon-card.module.scss';
   import postStyles from './style/post.module.scss';
   import twitterEmbedStyles from './style/twitter-embed.module.scss';
+  import syntaxHighlightStyles from './style/syntax-highlight.module.scss';
 
   export let post: PostHTML;
 </script>
 
 <div class="container mx-auto px-2 py-8 sm:px-4">
-  <div class="{postStyles.prose} {twitterEmbedStyles.prose} prose max-w-none">
+  <div class="{postStyles.prose} {twitterEmbedStyles.prose} {syntaxHighlightStyles.prose} prose max-w-none">
     {@html post.html || 'コンテンツがありません'}
   </div>
 
