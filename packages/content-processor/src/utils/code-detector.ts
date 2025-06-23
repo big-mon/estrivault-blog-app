@@ -1,5 +1,5 @@
 import type { Root } from 'mdast';
-import { visit } from 'unist-util-visit';
+import { visit, EXIT } from 'unist-util-visit';
 
 /**
  * Markdown ASTにコードブロックが存在するかを検出する
@@ -11,8 +11,7 @@ export function hasCodeBlocks(tree: Root): boolean {
 
   visit(tree, 'code', () => {
     hasCode = true;
-    // 検出したら早期終了
-    return false;
+    return EXIT; // 全体の探索を中断
   });
 
   return hasCode;
