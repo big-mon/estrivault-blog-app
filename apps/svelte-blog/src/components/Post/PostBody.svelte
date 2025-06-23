@@ -6,10 +6,19 @@
   import syntaxHighlightStyles from './style/syntax-highlight.module.scss';
 
   export let post: PostHTML;
+  
+  // コードブロックがある場合のみシンタックスハイライトスタイルを適用
+  // Twitterの埋め込みがある場合のみTwitterスタイルを適用
+  $: proseClasses = [
+    postStyles.prose,
+    post.hasTwitterEmbeds ? twitterEmbedStyles.prose : '',
+    post.hasCodeBlocks ? syntaxHighlightStyles.prose : '',
+    'prose max-w-none'
+  ].filter(Boolean).join(' ');
 </script>
 
 <div class="container mx-auto px-2 py-8 sm:px-4">
-  <div class="{postStyles.prose} {twitterEmbedStyles.prose} {syntaxHighlightStyles.prose} prose max-w-none">
+  <div class="{proseClasses}">
     {@html post.html || 'コンテンツがありません'}
   </div>
 

@@ -3,6 +3,7 @@ import readingTime from 'reading-time';
 import { buildUrl } from '@estrivault/cloudinary-utils';
 import { createPipeline } from './pipeline';
 import { hasCodeBlocks } from './utils/code-detector';
+import { hasTwitterEmbeds } from './utils/twitter-detector';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkDirective from 'remark-directive';
@@ -81,6 +82,9 @@ export async function processMarkdown(
     // コードブロックの存在を検出
     const enableSyntaxHighlight = hasCodeBlocks(parseResult);
     
+    // Twitterの埋め込みの存在を検出
+    const enableTwitterEmbeds = hasTwitterEmbeds(parseResult);
+    
     // パイプラインでHTMLに変換
     const pipeline = createPipeline(options, enableSyntaxHighlight);
     const result = await pipeline.process(markdown);
@@ -149,7 +153,7 @@ export async function processMarkdown(
       readingTime: Math.ceil(stats.minutes),
     };
 
-    return { meta, html, headings };
+    return { meta, html, headings, hasCodeBlocks: enableSyntaxHighlight, hasTwitterEmbeds: enableTwitterEmbeds };
   } catch (error) {
     if (error instanceof FrontMatterError || error instanceof MarkdownParseError) {
       throw error;
