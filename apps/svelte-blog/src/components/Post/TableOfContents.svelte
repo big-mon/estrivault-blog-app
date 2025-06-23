@@ -73,10 +73,13 @@
           if (newActiveId !== activeHeadingId) {
             activeHeadingId = newActiveId;
           }
+        } else {
+          // 見出しが見えない場合はアクティブ状態をクリア
+          activeHeadingId = '';
         }
       },
       {
-        rootMargin: '-20% 0% -80% 0%', // 上部20%の範囲で判定
+        rootMargin: '-10% 0% -70% 0%', // 上部10-30%の範囲で判定（より広い検出範囲）
         threshold: 0
       }
     );
