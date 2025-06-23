@@ -20,12 +20,13 @@ import type { ProcessorOptions } from './types';
 /**
  * 共通のパイプライン基盤を構築する
  * @param options 処理オプション
+ * @param enableSyntaxHighlight シンタックスハイライトを有効化するか
  * @returns ベースパイプライン
  */
-function createBasePipeline(options: ProcessorOptions = {}) {
+function createBasePipeline(options: ProcessorOptions = {}, enableSyntaxHighlight: boolean = false) {
   const { cloudinaryCloudName } = options;
 
-  return unified()
+  const pipeline = unified()
     // Markdown パース
     .use(remarkParse)
     .use(remarkDirective)
@@ -40,8 +41,17 @@ function createBasePipeline(options: ProcessorOptions = {}) {
 
     // HTML 変換
     .use(remarkRehype, { allowDangerousHtml: true })
-    .use(rehypeRaw)
+    .use(rehypeRaw);
 
+  // シンタックスハイライトを条件で追加
+  if (enableSyntaxHighlight) {
+    pipeline.use(rehypePrettyCode, {
+      theme: 'github-dark',
+      keepBackground: false
+    });
+  }
+
+  return pipeline
     // 画像変換
     .use(rehypeImageTransform, {
       cloudinaryCloudName: cloudinaryCloudName || '',
@@ -70,52 +80,6 @@ function createBasePipeline(options: ProcessorOptions = {}) {
  * @returns 構築されたパイプライン
  */
 export function createPipeline(options: ProcessorOptions = {}, enableSyntaxHighlight: boolean = false) {
-  if (enableSyntaxHighlight) {
-    const { cloudinaryCloudName } = options;
-
-    return unified()
-      // Markdown パース
-      .use(remarkParse)
-      .use(remarkDirective)
-      .use(remarkGfm)
-
-      // 埋め込みコンテンツ
-      .use(remarkYoutubeEmbed)
-      .use(remarkTwitterEmbed)
-      .use(remarkCommonLinkEmbed)
-      .use(remarkGithubEmbed)
-      .use(remarkAmazonEmbed)
-
-      // HTML 変換
-      .use(remarkRehype, { allowDangerousHtml: true })
-      .use(rehypeRaw)
-
-      // シンタックスハイライト
-      .use(rehypePrettyCode, {
-        theme: 'github-dark',
-        keepBackground: false
-      })
-
-      // 画像変換 (シンタックスハイライト後)
-      .use(rehypeImageTransform, {
-        cloudinaryCloudName: cloudinaryCloudName || '',
-        width: 1200,
-        mode: 'fit',
-      })
-
-      // リンク変換
-      .use(rehypeLinkTransform)
-
-      // 見出しアンカー追加
-      .use(rehypeHeadingAnchor)
-
-      // 見出し情報抽出
-      .use(rehypeHeadingExtractor)
-
-      // 最終出力
-      .use(rehypeStringify);
-  } else {
-    return createBasePipeline(options);
-  }
+  return createBasePipeline(options, enableSyntaxHighlight);
 }
 
