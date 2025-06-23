@@ -15,11 +15,11 @@
     "reset": "pnpm run clean && pnpm install && pnpm run build:packages"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0",
+    "concurrently": "^9.2.0",
     "dotenv-cli": "^8.0.0",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.0",
     "prettier-plugin-svelte": "^3.4.0",
-    "prettier-plugin-tailwindcss": "^0.6.12"
+    "prettier-plugin-tailwindcss": "^0.6.13"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
