@@ -80,13 +80,9 @@ export async function processMarkdown(
 
     const parseResult = parseProcessor.parse(markdown);
 
-    // コードブロックの存在を検出
+    // 各種埋め込みの存在を検出
     const enableSyntaxHighlight = hasCodeBlocks(parseResult);
-
-    // Twitterの埋め込みの存在を検出
     const enableTwitterEmbeds = hasTwitterEmbeds(parseResult);
-
-    // Amazonの埋め込みの存在を検出
     const enableAmazonEmbeds = hasAmazonEmbeds(parseResult);
 
     // パイプラインでHTMLに変換
