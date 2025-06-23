@@ -76,21 +76,30 @@ function createOgpEmbedCard(url: string, ogpData: OgpMetadata) {
   // 画像部分のHTML（常にプレースホルダ領域を表示）
   // OGP標準アスペクト比 1.91:1を正確に実装
   const imageHtml = image 
-    ? `<div style="flex-shrink: 0; width: 200px; aspect-ratio: 1.91; background: #f6f8fa; display: flex; align-items: center; justify-content: center; border-radius: 0 8px 8px 0;">
+    ? `<div style="flex-shrink: 0; width: 120px; height: 120px; aspect-ratio: 1; background: #f6f8fa; display: flex; align-items: center; justify-content: center; border-radius: 0 8px 8px 0;" class="link-card-image">
          <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 0 8px 8px 0;" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: #8b949e; font-size: 14px;\\' role=\\'img\\' aria-label=\\'画像の読み込みに失敗しました\\'>🖼️</div>';" />
        </div>`
-    : `<div style="flex-shrink: 0; width: 200px; aspect-ratio: 1.91; background: #f6f8fa; display: flex; align-items: center; justify-content: center; border-radius: 0 8px 8px 0; color: #8b949e; font-size: 24px;">
+    : `<div style="flex-shrink: 0; width: 120px; height: 120px; aspect-ratio: 1; background: #f6f8fa; display: flex; align-items: center; justify-content: center; border-radius: 0 8px 8px 0; color: #8b949e; font-size: 24px;" class="link-card-image">
          🖼️
        </div>`;
 
   // カードスタイルを統一（常にflexレイアウト）
-  // min-heightはaspect-ratioに合わせて自動計算（200px ÷ 1.91 ≈ 104.7px）
-  const cardStyle = 'display: flex; min-height: 104.7px; width: 100%;';
+  // モバイルファーストで120px、デスクトップ・タブレットでも120px
+  const cardStyle = 'display: flex; min-height: 120px; width: 100%;';
 
   return {
     type: 'html',
-    value: `<div style="margin: 1rem 0;">
-<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="${cardStyle} border: 1px solid #e1e4e8; border-radius: 8px; background: #ffffff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); text-decoration: none; color: inherit; overflow: hidden; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.12)'; this.style.borderColor='#0969da';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.06)'; this.style.borderColor='#e1e4e8';">
+    value: `<style>
+@media (min-width: 640px) {
+  .link-card-image {
+    width: 230px !important;
+    height: 120px !important;
+    aspect-ratio: 1.917 !important;
+  }
+}
+</style>
+<div style="margin: 1rem 0;">
+<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="link-card" style="${cardStyle} border: 1px solid #e1e4e8; border-radius: 8px; background: #ffffff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); text-decoration: none; color: inherit; overflow: hidden; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.12)'; this.style.borderColor='#0969da';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.06)'; this.style.borderColor='#e1e4e8';">
   <div style="flex: 1; min-width: 0; padding: 16px 20px; display: flex; flex-direction: column; justify-content: center;">
     <div style="font-weight: 600; font-size: 16px; color: #24292f; line-height: 1.4; margin-bottom: ${description ? '8px' : '4px'}; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
       ${escapeHtml(title)}
