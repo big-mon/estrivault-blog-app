@@ -1,4 +1,4 @@
-import { visit } from 'unist-util-visit';
+import { visit, EXIT } from 'unist-util-visit';
 import type { Root } from 'mdast';
 
 /**
@@ -9,14 +9,10 @@ import type { Root } from 'mdast';
 export function hasAmazonEmbeds(tree: Root): boolean {
   let hasAmazon = false;
   
-  visit(tree, (node) => {
-    const isTargetType = node.type === 'containerDirective' || 
-                        node.type === 'leafDirective' || 
-                        node.type === 'textDirective';
-    
-    if (isTargetType && 'name' in node && node.name === 'amazon') {
+  visit(tree, ['containerDirective', 'leafDirective', 'textDirective'], (node) => {
+    if ('name' in node && node.name === 'amazon') {
       hasAmazon = true;
-      return false; // 検出したら即座に終了
+      return EXIT; // ASTのトラバーサルを中断
     }
   });
   
