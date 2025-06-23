@@ -5,11 +5,24 @@ export interface EmbedOptions {
   amazon?: boolean;
 }
 
+export interface SyntaxHighlightOptions {
+  /** テーマ設定 */
+  theme?: 
+    | string 
+    | { 
+        light: string; 
+        dark: string; 
+      };
+  /** 背景色を保持するか */
+  keepBackground?: boolean;
+}
+
 export interface ProcessorOptions {
   embeds?: EmbedOptions;
   cloudinaryCloudName?: string;
   imageBase?: string;
   sanitizeSchema?: import('hast-util-sanitize').Schema;
+  syntaxHighlight?: SyntaxHighlightOptions;
 }
 
 /** 投稿のメタ情報 */

@@ -15,16 +15,23 @@ import { remarkTwitterEmbed } from './plugins/embeds/twitter-embed';
 import { remarkCommonLinkEmbed } from './plugins/embeds/common-link-embed';
 import { remarkGithubEmbed } from './plugins/embeds/github-embed';
 import { remarkAmazonEmbed } from './plugins/embeds/amazon-embed';
-import { hasCodeBlocks } from './utils/code-detector';
-import type { ProcessorOptions } from './types';
-import type { Root } from 'mdast';
+import type { ProcessorOptions, SyntaxHighlightOptions } from './types';
+
+/** デフォルトのシンタックスハイライト設定 */
+const DEFAULT_SYNTAX_HIGHLIGHT_OPTIONS: Required<SyntaxHighlightOptions> = {
+  theme: {
+    dark: 'github-dark',
+    light: 'github-light'
+  },
+  keepBackground: false
+};
 
 /**
- * パイプラインを構築する（コードブロック有り）
+ * 共通のパイプライン基盤を構築する
  * @param options 処理オプション
- * @returns 構築されたパイプライン
+ * @returns ベースパイプライン
  */
-export function createPipelineWithCode(options: ProcessorOptions = {}) {
+function createBasePipeline(options: ProcessorOptions = {}) {
   const { cloudinaryCloudName } = options;
 
   return unified()
@@ -44,16 +51,7 @@ export function createPipelineWithCode(options: ProcessorOptions = {}) {
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
 
-    // シンタックスハイライト
-    .use(rehypePrettyCode, {
-      theme: {
-        dark: 'github-dark',
-        light: 'github-light'
-      },
-      keepBackground: false
-    })
-
-    // 画像変換 (HTML 変換後)
+    // 画像変換
     .use(rehypeImageTransform, {
       cloudinaryCloudName: cloudinaryCloudName || '',
       width: 1200,
@@ -74,56 +72,72 @@ export function createPipelineWithCode(options: ProcessorOptions = {}) {
 }
 
 /**
- * パイプラインを構築する（コードブロック無し）
- * @param options 処理オプション
- * @returns 構築されたパイプライン
+ * シンタックスハイライト設定を正規化する
+ * @param options ユーザー設定
+ * @returns 正規化された設定
  */
-export function createPipelineWithoutCode(options: ProcessorOptions = {}) {
-  const { cloudinaryCloudName } = options;
-
-  return unified()
-    // Markdown パース
-    .use(remarkParse)
-    .use(remarkDirective)
-    .use(remarkGfm)
-
-    // 埋め込みコンテンツ
-    .use(remarkYoutubeEmbed)
-    .use(remarkTwitterEmbed)
-    .use(remarkCommonLinkEmbed)
-    .use(remarkGithubEmbed)
-    .use(remarkAmazonEmbed)
-
-    // HTML 変換
-    .use(remarkRehype, { allowDangerousHtml: true })
-    .use(rehypeRaw)
-
-    // 画像変換 (HTML 変換後)
-    .use(rehypeImageTransform, {
-      cloudinaryCloudName: cloudinaryCloudName || '',
-      width: 1200,
-      mode: 'fit',
-    })
-
-    // リンク変換
-    .use(rehypeLinkTransform)
-
-    // 見出しアンカー追加
-    .use(rehypeHeadingAnchor)
-
-    // 見出し情報抽出
-    .use(rehypeHeadingExtractor)
-
-    // 最終出力
-    .use(rehypeStringify);
+function normalizeSyntaxHighlightOptions(options?: SyntaxHighlightOptions): Required<SyntaxHighlightOptions> {
+  return {
+    ...DEFAULT_SYNTAX_HIGHLIGHT_OPTIONS,
+    ...options
+  };
 }
+
 
 /**
- * パイプラインを構築する（従来の互換性のため）
+ * パイプラインを構築する
  * @param options 処理オプション
+ * @param enableSyntaxHighlight シンタックスハイライトを有効化するか
  * @returns 構築されたパイプライン
  */
-export function createPipeline(options: ProcessorOptions = {}) {
-  // デフォルトではコードブロック有りのパイプラインを返す
-  return createPipelineWithCode(options);
+export function createPipeline(options: ProcessorOptions = {}, enableSyntaxHighlight: boolean = false) {
+  if (enableSyntaxHighlight) {
+    const syntaxOptions = normalizeSyntaxHighlightOptions(options.syntaxHighlight);
+    const { cloudinaryCloudName } = options;
+
+    return unified()
+      // Markdown パース
+      .use(remarkParse)
+      .use(remarkDirective)
+      .use(remarkGfm)
+
+      // 埋め込みコンテンツ
+      .use(remarkYoutubeEmbed)
+      .use(remarkTwitterEmbed)
+      .use(remarkCommonLinkEmbed)
+      .use(remarkGithubEmbed)
+      .use(remarkAmazonEmbed)
+
+      // HTML 変換
+      .use(remarkRehype, { allowDangerousHtml: true })
+      .use(rehypeRaw)
+
+      // シンタックスハイライト
+      .use(rehypePrettyCode, {
+        theme: syntaxOptions.theme,
+        keepBackground: syntaxOptions.keepBackground
+      } as any)
+
+      // 画像変換 (シンタックスハイライト後)
+      .use(rehypeImageTransform, {
+        cloudinaryCloudName: cloudinaryCloudName || '',
+        width: 1200,
+        mode: 'fit',
+      })
+
+      // リンク変換
+      .use(rehypeLinkTransform)
+
+      // 見出しアンカー追加
+      .use(rehypeHeadingAnchor)
+
+      // 見出し情報抽出
+      .use(rehypeHeadingExtractor)
+
+      // 最終出力
+      .use(rehypeStringify);
+  } else {
+    return createBasePipeline(options);
+  }
 }
+
