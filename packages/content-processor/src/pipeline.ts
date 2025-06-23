@@ -15,7 +15,7 @@ import { remarkTwitterEmbed } from './plugins/embeds/twitter-embed';
 import { remarkCommonLinkEmbed } from './plugins/embeds/common-link-embed';
 import { remarkGithubEmbed } from './plugins/embeds/github-embed';
 import { remarkAmazonEmbed } from './plugins/embeds/amazon-embed';
-import type { ProcessorOptions, SyntaxHighlightOptions } from './types';
+import type { ProcessorOptions } from './types';
 
 /**
  * 共通のパイプライン基盤を構築する
@@ -71,14 +71,7 @@ function createBasePipeline(options: ProcessorOptions = {}) {
  */
 export function createPipeline(options: ProcessorOptions = {}, enableSyntaxHighlight: boolean = false) {
   if (enableSyntaxHighlight) {
-    const { cloudinaryCloudName, syntaxHighlight } = options;
-    
-    // デフォルト設定
-    const theme = syntaxHighlight?.theme ?? {
-      dark: 'github-dark',
-      light: 'github-light'
-    };
-    const keepBackground = syntaxHighlight?.keepBackground ?? false;
+    const { cloudinaryCloudName } = options;
 
     return unified()
       // Markdown パース
@@ -99,9 +92,9 @@ export function createPipeline(options: ProcessorOptions = {}, enableSyntaxHighl
 
       // シンタックスハイライト
       .use(rehypePrettyCode, {
-        theme,
-        keepBackground
-      } as any)
+        theme: 'github-dark',
+        keepBackground: false
+      })
 
       // 画像変換 (シンタックスハイライト後)
       .use(rehypeImageTransform, {
