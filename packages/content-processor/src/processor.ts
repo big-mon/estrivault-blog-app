@@ -1,7 +1,12 @@
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
 import { buildUrl } from '@estrivault/cloudinary-utils';
-import { createPipeline } from './pipeline';
+import { createPipeline, createPipelineWithCode, createPipelineWithoutCode } from './pipeline';
+import { hasCodeBlocks } from './utils/code-detector';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkDirective from 'remark-directive';
+import remarkGfm from 'remark-gfm';
 import type { PostMeta, PostHTML, ProcessorOptions, HeadingInfo } from './types';
 import { FrontMatterError, MarkdownParseError } from './errors';
 
@@ -65,8 +70,22 @@ export async function processMarkdown(
     // 読了時間の計算
     const stats = readingTime(markdown);
 
-    // マークダウンをHTMLに変換
-    const pipeline = createPipeline(options);
+    // マークダウンをパースしてASTを作成
+    const parseProcessor = unified()
+      .use(remarkParse)
+      .use(remarkDirective)
+      .use(remarkGfm);
+    
+    const parseResult = parseProcessor.parse(markdown);
+    
+    // コードブロックの存在を検出
+    const hasCode = hasCodeBlocks(parseResult);
+    
+    // 適切なパイプラインを選択してHTMLに変換
+    const pipeline = hasCode 
+      ? createPipelineWithCode(options)
+      : createPipelineWithoutCode(options);
+    
     const result = await pipeline.process(markdown);
     const html = String(result);
 
