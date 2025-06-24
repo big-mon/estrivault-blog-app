@@ -10,13 +10,15 @@
     "build": "pnpm -r --filter svelte-blog... run build",
     "build:packages": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor run build",
     "validate:workspace": "node scripts/validate-workspace.js",
-    "postinstall": "pnpm run build:packages && husky install",
+    "postinstall": "pnpm run build:packages",
     "clean": "pnpm --filter @estrivault/cloudinary-utils run clean && rm -rf packages/content-processor/dist",
     "reset": "pnpm run clean && pnpm install && pnpm run build:packages",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -33,6 +35,7 @@
     "prettier": "^3.6.0",
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.6.13",
+    "typescript": "^5.8.3",
     "typescript-eslint": "^8.35.0"
   },
   "lint-staged": {
