@@ -17,7 +17,7 @@ export const rehypeHeadingExtractor: Plugin<[], Root, Root> = () => {
 
       // 見出しレベルを取得
       const level = parseInt(node.tagName[1]);
-      
+
       // 見出しテキストを取得
       const text = getTextContent(node);
       if (!text) return;
@@ -50,7 +50,7 @@ export const rehypeHeadingExtractor: Plugin<[], Root, Root> = () => {
  */
 function getTextContent(node: Element): string {
   let text = '';
-  
+
   for (const child of node.children) {
     if (child.type === 'text') {
       text += child.value;
@@ -63,6 +63,6 @@ function getTextContent(node: Element): string {
       text += getTextContent(child);
     }
   }
-  
+
   return text.trim();
 }

@@ -7,11 +7,13 @@
 ## 🏗️ アーキテクチャ
 
 **モノレポ構成:**
+
 - `apps/svelte-blog/` - メインのSvelteKitアプリケーション（静的サイト生成）
 - `packages/content-processor/` - Markdown処理のコアパイプライン
 - `packages/cloudinary-utils/` - 画像最適化ユーティリティ
 
 **技術スタック:**
+
 - **フロントエンド**: Svelte 5.x + SvelteKit 2.x + TailwindCSS 4.x
 - **コンテンツ**: Markdown + frontmatter、unified/remark/rehype パイプライン
 - **ビルド**: Vite 6.x、TypeScript、PNPMワークスペース

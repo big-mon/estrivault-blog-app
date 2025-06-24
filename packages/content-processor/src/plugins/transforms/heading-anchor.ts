@@ -18,7 +18,7 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
 
       // slugを生成（日本語対応）
       const slug = generateSlug(textContent);
-      
+
       // id属性を設定
       node.properties = {
         ...node.properties,
@@ -61,7 +61,7 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
  */
 function getTextContent(node: Element): string {
   let text = '';
-  
+
   for (const child of node.children) {
     if (child.type === 'text') {
       text += child.value;
@@ -69,7 +69,7 @@ function getTextContent(node: Element): string {
       text += getTextContent(child);
     }
   }
-  
+
   return text.trim();
 }
 
@@ -77,15 +77,17 @@ function getTextContent(node: Element): string {
  * テキストからslugを生成（日本語対応）
  */
 function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    // 日本語文字、英数字、ハイフン、アンダースコア以外を削除
-    .replace(/[^\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}a-z0-9\-_\s]/gu, '')
-    // 空白をハイフンに変換
-    .replace(/\s+/g, '-')
-    // 連続するハイフンを1つに
-    .replace(/-+/g, '-')
-    // 先頭末尾のハイフンを削除
-    .replace(/^-+|-+$/g, '');
+  return (
+    text
+      .toLowerCase()
+      .trim()
+      // 日本語文字、英数字、ハイフン、アンダースコア以外を削除
+      .replace(/[^\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}a-z0-9\-_\s]/gu, '')
+      // 空白をハイフンに変換
+      .replace(/\s+/g, '-')
+      // 連続するハイフンを1つに
+      .replace(/-+/g, '-')
+      // 先頭末尾のハイフンを削除
+      .replace(/^-+|-+$/g, '')
+  );
 }

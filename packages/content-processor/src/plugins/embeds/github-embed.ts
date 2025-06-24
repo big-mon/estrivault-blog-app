@@ -6,11 +6,12 @@ import type { Plugin } from 'unified';
  */
 export const remarkGithubEmbed: Plugin = () => {
   return (tree) => {
-    visit(tree, (node: any, index?: number, parent?: any) => {
+    visit(tree, (node: unknown, index?: number, parent?: unknown) => {
       // linkノードでGitHubURLをチェック (remarkが自動的にURLをlinkに変換するため)
       if (node.type === 'link') {
         const url = node.url;
-        const githubUrlRegex = /^https:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)(?:\/(?:issues|pull)\/(\d+))?(?:\/.*)?$/;
+        const githubUrlRegex =
+          /^https:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)(?:\/(?:issues|pull)\/(\d+))?(?:\/.*)?$/;
         const match = url.match(githubUrlRegex);
 
         // 単独のリンクの場合（パラグラフ内に1つだけのリンクノード）
@@ -47,14 +48,18 @@ export const remarkGithubEmbed: Plugin = () => {
       <span style="font-weight: 600; font-size: 16px; color: #24292f;">${displayText}</span>
     </div>
     <div style="font-size: 13px; color: #656d76; background: #eef2f5; padding: 4px 10px; border-radius: 5px; display: inline-block; width: fit-content;">
-      ${type === 'repo' ? 'Repository' : type === 'issue' ? 'Issue' : 'Pull Request'}
+      ${
+        type === 'repo' ? 'Repository'
+        : type === 'issue' ? 'Issue'
+        : 'Pull Request'
+      }
     </div>
   </div>
   <div style="flex-shrink: 0; width: 300px; height: 150px; background: #f6f8fa; display: flex; align-items: center; justify-content: center;">
     <img src="${ogpImageUrl}" alt="GitHub repository preview" style="max-width: 300px; max-height: 150px; object-fit: contain; display: block;" loading="lazy" onerror="this.parentElement.style.display='none';" />
   </div>
 </a>
-</div>`
+</div>`,
           };
 
           // 現在のリンクノードをHTML埋め込みに直接置き換え

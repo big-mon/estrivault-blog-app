@@ -22,11 +22,7 @@ export const IMAGE_PRESETS = {
 /**
  * Cloudinary画像URLを生成
  */
-export function buildUrl(
-  cloudName: string,
-  publicId: string,
-  opts: BuildUrlOptions
-): string {
+export function buildUrl(cloudName: string, publicId: string, opts: BuildUrlOptions): string {
   if (!cloudName || !publicId || !opts?.w) {
     throw new Error('Invalid parameters');
   }

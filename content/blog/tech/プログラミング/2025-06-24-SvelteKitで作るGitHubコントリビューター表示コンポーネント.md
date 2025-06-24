@@ -17,6 +17,7 @@ GitHubでブログ記事を管理している場合、コミット履歴から�
 ## 実現する機能と仕組み
 
 ### 完成イメージ
+
 - 記事の下部にコントリビューターのアバター画像を表示
 - ホバーで詳細情報（ユーザー名、最終編集日）を表示
 - クリックでGitHubプロフィールにリンク
@@ -24,6 +25,7 @@ GitHubでブログ記事を管理している場合、コミット履歴から�
 ![実装イメージ](/Tech/k2qdfwgoa9rn9tsv32jx)
 
 ### データの流れ
+
 ```text
 [GitHub API] → [SvelteKit Server] → [Component] → [Browser]
      ↓              ↓                 ↓            ↓
@@ -32,6 +34,7 @@ GitHubでブログ記事を管理している場合、コミット履歴から�
 ```
 
 ### 必要なファイル
+
 ```text
 src/
 ├── routes/post/[slug]/
@@ -50,6 +53,7 @@ src/
 ### 1.1 GitHub Personal Access Token の取得
 
 **GitHub設定ページ**で新しいトークンを作成：
+
 1. https://github.com/settings/personal-access-tokens にアクセス
 2. "Generate new token" をクリック
 3. Permissions > Repository permissions > Contentsで"Read-only"を選択
@@ -105,7 +109,7 @@ export async function load({ params }) {
   const contributors = await fetchContributors(`content/blog/${params.slug}.md`);
 
   return {
-    contributors
+    contributors,
   };
 }
 
@@ -121,8 +125,8 @@ async function fetchContributors(filePath: string): Promise<Contributor[]> {
     const url = `https://api.github.com/repos/your-username/your-repo/commits?path=${filePath}`;
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json',
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github.v3+json',
       },
     });
 
@@ -132,7 +136,6 @@ async function fetchContributors(filePath: string): Promise<Contributor[]> {
 
     const commits: GitHubCommit[] = await response.json();
     return processContributors(commits);
-
   } catch (error) {
     console.error('Error fetching contributors:', error);
     return [];
@@ -142,7 +145,7 @@ async function fetchContributors(filePath: string): Promise<Contributor[]> {
 function processContributors(commits: GitHubCommit[]): Contributor[] {
   const contributorMap = new Map<string, Contributor>();
 
-  commits.forEach(commit => {
+  commits.forEach((commit) => {
     if (!commit.author) return;
 
     const login = commit.author.login;
@@ -259,16 +262,19 @@ npm run dev
 基本実装が完了したら、以下の改善を検討してみてください：
 
 ### エラーハンドリングとパフォーマンス
+
 - **詳細なエラーハンドリング**: 404、403エラーの個別対応
 - **キャッシュ実装**: メモリキャッシュやISRでAPI呼び出し削減
 - **レート制限対応**: 指数バックオフでの再試行機能
 
 ### UI/UX改善
+
 - **視覚的な改善**: ホバーアニメーション、グラデーション背景
 - **詳細情報表示**: 最終編集日、貢献回数の表示
 - **レスポンシブ対応**: モバイル端末での表示最適化
 
 ### 機能拡張
+
 - **ソート機能**: 貢献数、最終更新日での並び替え
 - **フィルタリング**: 期間や著者での絞り込み
 - **統計表示**: 貢献者数、総コミット数の表示

@@ -25,12 +25,14 @@
     margin: 0;
     padding: 1rem;
     overflow-x: auto;
-    font-family: 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-family:
+      'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New',
+      monospace;
     font-size: 0.875rem;
     line-height: 1.6;
     background-color: var(--syntax-bg);
     color: var(--syntax-text);
-    
+
     /* スクロールバーのスタイル（Firefox） */
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
@@ -62,7 +64,6 @@
     background-color: rgba(255, 255, 255, 0.05);
   }
 
-
   /* スクロールバーのスタイル（WebKit） */
   :global(figure[data-rehype-pretty-code-figure] pre::-webkit-scrollbar) {
     height: 8px;
@@ -76,6 +77,4 @@
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
   }
-
-
 }

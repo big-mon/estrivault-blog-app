@@ -74,7 +74,7 @@ export async function GET() {
     <lastmod>${new Date(post.updatedAt || post.publishedAt).toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>`
+  </url>`,
     )
     .join('')}
   ${categoryUrls.join('')}

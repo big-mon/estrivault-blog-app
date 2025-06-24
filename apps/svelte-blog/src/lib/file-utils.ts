@@ -48,7 +48,7 @@ function generateSlugFromPath(filePath: string): string {
 async function loadMarkdownMetaFromContent(
   filePath: string,
   content: string,
-  options: ProcessorOptions = {}
+  options: ProcessorOptions = {},
 ): Promise<PostWithPath | null> {
   try {
     const slug = generateSlugFromPath(filePath);
@@ -77,8 +77,8 @@ export async function getAllPostsMetaStatic(options: ProcessorOptions = {}): Pro
 
   const postsWithPath = await Promise.all(
     Object.entries(markdownFiles).map(([filePath, content]) =>
-      loadMarkdownMetaFromContent(filePath, content, options)
-    )
+      loadMarkdownMetaFromContent(filePath, content, options),
+    ),
   );
 
   // nullを除外し、メタデータのみを抽出
@@ -97,14 +97,14 @@ export async function getAllPostsMetaStatic(options: ProcessorOptions = {}): Pro
  * @returns PostWithPathの配列
  */
 export async function getAllPostsWithPathStatic(
-  options: ProcessorOptions = {}
+  options: ProcessorOptions = {},
 ): Promise<PostWithPath[]> {
   const markdownFiles = getMarkdownFiles();
 
   const postsWithPath = await Promise.all(
     Object.entries(markdownFiles).map(([filePath, content]) =>
-      loadMarkdownMetaFromContent(filePath, content, options)
-    )
+      loadMarkdownMetaFromContent(filePath, content, options),
+    ),
   );
 
   // nullを除外
@@ -119,7 +119,7 @@ export async function getAllPostsWithPathStatic(
  */
 export async function getPostBySlugStatic(
   slug: string,
-  options: ProcessorOptions = {}
+  options: ProcessorOptions = {},
 ): Promise<PostHTML | null> {
   const markdownFiles = getMarkdownFiles();
 
@@ -156,7 +156,7 @@ export async function getPostBySlugStatic(
  */
 export async function loadPostStatic(
   filePath: string,
-  options: ProcessorOptions = {}
+  options: ProcessorOptions = {},
 ): Promise<PostHTML | null> {
   const markdownFiles = getMarkdownFiles();
   const content = markdownFiles[filePath];

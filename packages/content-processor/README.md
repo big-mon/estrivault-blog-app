@@ -28,7 +28,7 @@ import { processMarkdown, extractMetadata } from '@estrivault/content-processor'
 
 // Markdownコンテンツの完全処理（HTML + メタデータ）
 const result = await processMarkdown(markdownContent, {
-  cloudinaryCloudName: 'your-cloud-name'
+  cloudinaryCloudName: 'your-cloud-name',
 });
 
 console.log(result.meta.title); // タイトル
@@ -84,21 +84,25 @@ const normalizedTag = normalizeForTagFilter('タグ名');
 ## サポートしている埋め込み
 
 ### YouTube
+
 ```markdown
 ::youtube[dQw4w9WgXcQ]
 ```
 
 ### Twitter
+
 ```markdown
 ::twitter[https://twitter.com/user/status/123456789]
 ```
 
 ### GitHub
+
 ```markdown
 ::github[https://github.com/user/repo]
 ```
 
 ### Amazon
+
 ```markdown
 ::amazon[B08N5WRWNW]
 ```

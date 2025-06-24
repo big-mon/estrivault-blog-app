@@ -22,7 +22,7 @@ export const remarkYoutubeEmbed: Plugin<[], Root, Root> = () => {
       if (node.type === 'textDirective') {
         console.error(
           'Unexpected `:youtube` text directive, use two colons for a leaf directive',
-          node
+          node,
         );
         return;
       }
@@ -36,22 +36,26 @@ export const remarkYoutubeEmbed: Plugin<[], Root, Root> = () => {
       data.hName = 'div';
       data.hProperties = {
         className: ['youtube-embed'],
-        style: 'position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 1rem 0;'
+        style:
+          'position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 1rem 0;',
       };
 
       // iframeの設定
-      data.hChildren = [{
-        type: 'element',
-        tagName: 'iframe',
-        properties: {
-          src: 'https://www.youtube.com/embed/' + id,
-          frameBorder: '0',
-          allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
-          allowFullScreen: true,
-          style: 'position: absolute; top: 0; left: 0; width: 100%; height: 100%;'
+      data.hChildren = [
+        {
+          type: 'element',
+          tagName: 'iframe',
+          properties: {
+            src: 'https://www.youtube.com/embed/' + id,
+            frameBorder: '0',
+            allow:
+              'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+            allowFullScreen: true,
+            style: 'position: absolute; top: 0; left: 0; width: 100%; height: 100%;',
+          },
+          children: [],
         },
-        children: []
-      }];
+      ];
     });
   };
 };

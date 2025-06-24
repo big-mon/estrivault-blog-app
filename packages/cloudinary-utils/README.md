@@ -40,21 +40,21 @@ import { IMAGE_PRESETS } from '@estrivault/cloudinary-utils';
 const thumbnailUrl = buildUrl(
   'your-cloud-name',
   'path/to/image.jpg',
-  IMAGE_PRESETS.thumbnail.SQUARE // 150x150 の正方形サムネイル
+  IMAGE_PRESETS.thumbnail.SQUARE, // 150x150 の正方形サムネイル
 );
 
 // ソーシャルメディア用画像を取得
 const socialImageUrl = buildUrl(
   'your-cloud-name',
   'path/to/image.jpg',
-  IMAGE_PRESETS.social.TWITTER // 1200x630 Twitter用画像
+  IMAGE_PRESETS.social.TWITTER, // 1200x630 Twitter用画像
 );
 
 // レスポンシブ画像（アスペクト比維持）
 const responsiveImage = buildUrl(
   'your-cloud-name',
   'path/to/image.jpg',
-  IMAGE_PRESETS.fit.MEDIUM // 幅600px（アスペクト比維持）
+  IMAGE_PRESETS.fit.MEDIUM, // 幅600px（アスペクト比維持）
 );
 ```
 

@@ -1,17 +1,17 @@
 <script lang="ts">
   import PostCard from '$components/PostCard/PostCard.svelte';
   import Pagination from '$components/Pagination/Pagination.svelte';
-  import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, SITE_AUTHOR, SOCIAL_LINK_X } from '$constants';
+  import { SITE_TITLE, SITE_URL, SITE_AUTHOR, SOCIAL_LINK_X } from '$constants';
   import type { PageData } from './$types';
 
   const { data } = $props<{ data: PageData }>();
 
   const pageTitle = $derived(`記事一覧 - ページ${data.pagination.page} | ${SITE_TITLE}`);
   const pageDescription = $derived(
-    `${SITE_TITLE}の記事一覧ページ${data.pagination.page}です。技術記事やプログラミング情報を探すことができます。`
+    `${SITE_TITLE}の記事一覧ページ${data.pagination.page}です。技術記事やプログラミング情報を探すことができます。`,
   );
   const pageUrl = $derived(
-    `${SITE_URL}${data.pagination.page > 1 ? `/${data.pagination.page}` : ''}`
+    `${SITE_URL}${data.pagination.page > 1 ? `/${data.pagination.page}` : ''}`,
   );
 </script>
 
@@ -51,7 +51,7 @@
 </svelte:head>
 
 <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-  {#each data.posts as post}
+  {#each data.posts as post (post.slug)}
     <PostCard {post} />
   {/each}
 </div>

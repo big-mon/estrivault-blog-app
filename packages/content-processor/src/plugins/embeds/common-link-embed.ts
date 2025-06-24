@@ -14,16 +14,16 @@ const STYLE_CONSTANTS = {
     TITLE: '#24292f',
     DESCRIPTION: '#656d76',
     SITE_NAME: '#8b949e',
-    PLACEHOLDER_TEXT: '#8b949e'
+    PLACEHOLDER_TEXT: '#8b949e',
   },
   SHADOW: {
     DEFAULT: '0 2px 8px rgba(0, 0, 0, 0.06)',
-    HOVER: '0 4px 16px rgba(0, 0, 0, 0.12)'
+    HOVER: '0 4px 16px rgba(0, 0, 0, 0.12)',
   },
   SIZES: {
     MOBILE: { width: 120, height: 120, aspectRatio: '1' },
-    DESKTOP: { width: 230, height: 120, aspectRatio: '1.917' }
-  }
+    DESKTOP: { width: 230, height: 120, aspectRatio: '1.917' },
+  },
 } as const;
 
 /**
@@ -34,11 +34,11 @@ export const remarkCommonLinkEmbed: Plugin = () => {
   return async (tree) => {
     const tasks: Promise<void>[] = [];
 
-    visit(tree, (node: any, index?: number, parent?: any) => {
+    visit(tree, (node: unknown, index?: number, parent?: unknown) => {
       // linkノードでURLをチェック (remarkが自動的にURLをlinkに変換するため)
       if (node.type === 'link') {
         const url = node.url;
-        
+
         // 単独のリンクの場合（パラグラフ内に1つだけのリンクノード）
         if (parent && parent.type === 'paragraph' && parent.children.length === 1) {
           // OGP処理対象かチェック
@@ -59,18 +59,18 @@ export const remarkCommonLinkEmbed: Plugin = () => {
  * リンクをOGP埋め込みに変換する処理
  */
 async function processLinkEmbed(
-  parent: any,
+  parent: unknown,
   index: number | undefined,
-  url: string
+  url: string,
 ): Promise<void> {
   try {
     // OGPメタデータを取得
     const ogpData = await fetchOgpMetadata(url);
-    
+
     if (ogpData && (ogpData.title || ogpData.description)) {
       // OGP埋め込みカードを作成
       const embedNode = createOgpEmbedCard(url, ogpData);
-      
+
       // 現在のリンクノードをHTML埋め込みに直接置き換え
       if (parent && typeof index === 'number') {
         parent.children[index] = embedNode;
@@ -94,8 +94,9 @@ function prepareCardContent(url: string, ogpData: OgpMetadata) {
   const siteName = ogpData.siteName || hostname;
 
   // 説明文を適切な長さに制限
-  const truncatedDescription = description.length > STYLE_CONSTANTS.DESCRIPTION_MAX_LENGTH
-    ? description.substring(0, STYLE_CONSTANTS.DESCRIPTION_MAX_LENGTH) + '...'
+  const truncatedDescription =
+    description.length > STYLE_CONSTANTS.DESCRIPTION_MAX_LENGTH ?
+      description.substring(0, STYLE_CONSTANTS.DESCRIPTION_MAX_LENGTH) + '...'
     : description;
 
   return {
@@ -103,7 +104,7 @@ function prepareCardContent(url: string, ogpData: OgpMetadata) {
     description,
     truncatedDescription,
     image,
-    siteName
+    siteName,
   };
 }
 
@@ -130,12 +131,12 @@ function generateResponsiveStyles(): string {
 function generateImageHtml(image: string, title: string): string {
   const { MOBILE } = STYLE_CONSTANTS.SIZES;
   const { PLACEHOLDER_BG, PLACEHOLDER_TEXT } = STYLE_CONSTANTS.COLORS;
-  
+
   const baseStyle = `flex-shrink: 0; width: ${MOBILE.width}px; height: ${MOBILE.height}px; aspect-ratio: ${MOBILE.aspectRatio}; background: ${PLACEHOLDER_BG}; display: flex; align-items: center; justify-content: center; border-radius: 0 8px 8px 0;`;
-  
+
   if (image) {
     const errorFallback = `this.style.display='none'; this.parentElement.innerHTML='<div style=\\'display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: ${PLACEHOLDER_TEXT}; font-size: 14px;\\' role=\\'img\\' aria-label=\\'画像の読み込みに失敗しました\\'>\uD83D\uDDBC\uFE0F</div>';`;
-    
+
     return `<div style="${baseStyle}" class="link-card-image">
          <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 0 8px 8px 0;" loading="lazy" onerror="${errorFallback}" />
        </div>`;
@@ -149,23 +150,29 @@ function generateImageHtml(image: string, title: string): string {
 /**
  * カードHTML生成
  */
-function generateCardHtml(url: string, content: ReturnType<typeof prepareCardContent>, imageHtml: string): string {
-  const { BACKGROUND, BORDER, BORDER_HOVER, TITLE, DESCRIPTION, SITE_NAME } = STYLE_CONSTANTS.COLORS;
+function generateCardHtml(
+  url: string,
+  content: ReturnType<typeof prepareCardContent>,
+  imageHtml: string,
+): string {
+  const { BACKGROUND, BORDER, BORDER_HOVER, TITLE, DESCRIPTION, SITE_NAME } =
+    STYLE_CONSTANTS.COLORS;
   const { DEFAULT: defaultShadow, HOVER: hoverShadow } = STYLE_CONSTANTS.SHADOW;
-  
+
   const cardStyle = `display: flex; min-height: 120px; width: 100%; border: 1px solid ${BORDER}; border-radius: 8px; background: ${BACKGROUND}; box-shadow: ${defaultShadow}; text-decoration: none; color: inherit; overflow: hidden; transition: all 0.3s ease; cursor: pointer;`;
-  
+
   const hoverEffects = {
     over: `this.style.transform='translateY(-2px)'; this.style.boxShadow='${hoverShadow}'; this.style.borderColor='${BORDER_HOVER}';`,
-    out: `this.style.transform='translateY(0)'; this.style.boxShadow='${defaultShadow}'; this.style.borderColor='${BORDER}';`
+    out: `this.style.transform='translateY(0)'; this.style.boxShadow='${defaultShadow}'; this.style.borderColor='${BORDER}';`,
   };
 
   const titleStyle = `font-weight: 600; font-size: 16px; color: ${TITLE}; line-height: 1.4; margin-bottom: ${content.description ? '8px' : '4px'}; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;`;
-  
-  const descriptionHtml = content.description 
-    ? `<div style="font-size: 14px; color: ${DESCRIPTION}; line-height: 1.4; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+
+  const descriptionHtml =
+    content.description ?
+      `<div style="font-size: 14px; color: ${DESCRIPTION}; line-height: 1.4; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
       ${escapeHtml(content.truncatedDescription)}
-    </div>` 
+    </div>`
     : '';
 
   const siteNameHtml = `<div style="font-size: 12px; color: ${SITE_NAME}; display: flex; align-items: center; gap: 6px;">
@@ -200,7 +207,7 @@ function createOgpEmbedCard(url: string, ogpData: OgpMetadata) {
 
   return {
     type: 'html',
-    value: `${styles}${cardHtml}`
+    value: `${styles}${cardHtml}`,
   };
 }
 
@@ -213,7 +220,7 @@ function escapeHtml(text: string): string {
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
-    "'": '&#039;'
+    "'": '&#039;',
   };
   return text.replace(/[&<>"']/g, (m) => map[m]);
 }

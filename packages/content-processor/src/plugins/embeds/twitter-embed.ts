@@ -11,7 +11,7 @@ interface TwitterEmbedOptions {
  */
 export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (options = {}) => {
   return (tree) => {
-    visit(tree, function (node: any) {
+    visit(tree, function (node: unknown) {
       const isTargetType =
         node.type === 'containerDirective' ||
         node.type === 'leafDirective' ||
@@ -31,7 +31,7 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
       if (node.type === 'textDirective') {
         console.error(
           'Unexpected `:twitter` text directive, use two colons for a leaf directive',
-          node
+          node,
         );
         return;
       }
@@ -48,7 +48,7 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
         'data-theme': 'light',
         'data-width': '550',
         'data-dnt': 'true',
-        'data-conversation': 'none'
+        'data-conversation': 'none',
       };
 
       // Twitterの正しいURL
@@ -61,16 +61,16 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
           children: [
             {
               type: 'text',
-              value: 'Loading tweet...'
-            }
-          ]
+              value: 'Loading tweet...',
+            },
+          ],
         },
         {
           type: 'paragraph',
           children: [
             {
               type: 'text',
-              value: '— '
+              value: '— ',
             },
             {
               type: 'link',
@@ -78,12 +78,12 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
               children: [
                 {
                   type: 'text',
-                  value: `View on X`
-                }
-              ]
-            }
-          ]
-        }
+                  value: `View on X`,
+                },
+              ],
+            },
+          ],
+        },
       ];
     });
   };

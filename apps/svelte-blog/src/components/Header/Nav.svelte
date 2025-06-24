@@ -24,16 +24,16 @@
 
 <nav aria-label="Main navigation">
   <ul class="flex flex-col gap-3 text-base font-medium md:flex-row md:items-center md:gap-6">
-    {#each NAVIGATION_LINKS as { label, href }}
+    {#each NAVIGATION_LINKS as { label, href } (href)}
       <li>
         <a
           {href}
           onclick={(event) => handleClick(event, href)}
-          class="block rounded-md px-2 py-2 transition-colors hover:bg-gray-100 hover:text-gray-900 {isActive(
-            href
-          )
-            ? 'bg-gray-100 font-semibold text-gray-900'
-            : 'text-gray-600'}"
+          class="block rounded-md px-2 py-2 transition-colors hover:bg-gray-100 hover:text-gray-900 {(
+            isActive(href)
+          ) ?
+            'bg-gray-100 font-semibold text-gray-900'
+          : 'text-gray-600'}"
           aria-current={isActive(href) ? 'page' : undefined}
         >
           {label}

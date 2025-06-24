@@ -11,9 +11,11 @@ interface LinkTransformOptions {
  * 外部リンクに target="_blank" rel="noopener noreferrer" を自動付与するrehypeプラグイン
  */
 export const rehypeLinkTransform: Plugin<[LinkTransformOptions?], Root, Root> = (
-  options: LinkTransformOptions = {}
+  options: LinkTransformOptions = {},
 ) => {
-    const internalPredicate = options.internalPredicate || ((url: string) => {
+  const internalPredicate =
+    options.internalPredicate ||
+    ((url: string) => {
       // 空のリンクやフラグメントは内部リンク
       if (!url || url.startsWith('#')) return true;
 

@@ -6,7 +6,7 @@
   import syntaxHighlightStyles from './style/syntax-highlight.module.scss';
 
   export let post: PostHTML;
-  
+
   // コードブロックがある場合のみシンタックスハイライトスタイルを適用
   // Twitterの埋め込みがある場合のみTwitterスタイルを適用
   // Amazonの埋め込みがある場合のみAmazonスタイルを適用
@@ -15,12 +15,15 @@
     post.hasTwitterEmbeds ? twitterEmbedStyles.prose : '',
     post.hasAmazonEmbeds ? amazonCardStyles.prose : '',
     post.hasCodeBlocks ? syntaxHighlightStyles.prose : '',
-    'prose max-w-none'
-  ].filter(Boolean).join(' ');
+    'prose max-w-none',
+  ]
+    .filter(Boolean)
+    .join(' ');
 </script>
 
 <div class="container mx-auto px-2 py-8 sm:px-4">
-  <div class="{proseClasses}">
+  <div class={proseClasses}>
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
     {@html post.html || 'コンテンツがありません'}
   </div>
 
