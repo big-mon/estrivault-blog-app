@@ -24,7 +24,7 @@ GitHubでブログ記事を管理している場合、コミット履歴から�
 ![実装イメージ](/Tech/k2qdfwgoa9rn9tsv32jx)
 
 ### データの流れ
-```
+```text
 [GitHub API] → [SvelteKit Server] → [Component] → [Browser]
      ↓              ↓                 ↓            ↓
 コミット履歴    コントリビューター    アバター     ユーザー
@@ -32,7 +32,7 @@ GitHubでブログ記事を管理している場合、コミット履歴から�
 ```
 
 ### 必要なファイル
-```
+```text
 src/
 ├── routes/post/[slug]/
 │   ├── +page.server.ts     # GitHub API呼び出し
