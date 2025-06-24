@@ -4,3 +4,36 @@ pnpm-lock.yaml
 yarn.lock
 bun.lock
 bun.lockb
+
+# Build Outputs
+.svelte-kit/
+build/
+dist/
+.output/
+.vercel/
+.netlify/
+.firebase/
+
+# Generated Files
+*.d.ts
+.env*
+!.env.example
+
+# Caches & Temp
+node_modules/
+.cache/
+.temp/
+.tmp/
+*.log
+*.tsbuildinfo
+
+# Development
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# IDE & OS
+.DS_Store
+.vscode/settings.json
+.idea/
