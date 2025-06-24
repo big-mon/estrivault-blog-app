@@ -13,7 +13,7 @@ export const config = {
   },
 };
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params }: { params: Record<string, string> }) => {
   const { tag, page: pageParam } = params;
   const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
 
@@ -29,11 +29,11 @@ export const load = (async ({ params }) => {
     const allPosts = await getPosts();
     const allTags = new Set<string>();
 
-    allPosts.posts.forEach((post) => {
+    allPosts.posts.forEach((post: { tags?: string[] }) => {
       post.tags?.forEach((t: string) => allTags.add(t));
     });
 
-    const correctTag = Array.from(allTags).find((t) => t.toLowerCase() === tag.toLowerCase());
+    const correctTag = Array.from(allTags).find((t) => t.toLowerCase() === tag?.toLowerCase());
 
     if (correctTag) {
       result = await getPosts({

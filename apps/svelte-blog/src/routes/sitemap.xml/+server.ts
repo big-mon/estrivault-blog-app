@@ -15,7 +15,7 @@ export async function GET() {
   const { posts } = await getPosts({ perPage: 1000 });
 
   // Generate category URLs (lowercase for consistency)
-  const categories = [...new Set(posts.map((post) => post.category))];
+  const categories = [...new Set(posts.map((post: { category: string }) => post.category))];
   const categoryUrls = [];
   for (const category of categories) {
     const categoryPosts = await getPosts({ category });
@@ -23,7 +23,7 @@ export async function GET() {
 
     for (let page = 1; page <= totalPages; page++) {
       categoryUrls.push(`<url>
-    <loc>${SITE_URL.replace(/\/$/, '')}/category/${category.toLowerCase()}/${page}</loc>
+    <loc>${SITE_URL.replace(/\/$/, '')}/category/${(category as string).toLowerCase()}/${page}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>`);
@@ -69,7 +69,7 @@ export async function GET() {
   </url>
   ${posts
     .map(
-      (post) => `<url>
+      (post: { slug: string; updatedAt?: string; publishedAt: string }) => `<url>
     <loc>${SITE_URL.replace(/\/$/, '')}/post/${post.slug}</loc>
     <lastmod>${new Date(post.updatedAt || post.publishedAt).toISOString()}</lastmod>
     <changefreq>weekly</changefreq>

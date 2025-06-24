@@ -7,7 +7,7 @@ import type { GitHubCommit, Contributor } from '$lib/types/github';
 const CONTRIBUTORS_CACHE = new Map<string, { data: Contributor[]; timestamp: number }>();
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params }: { params: Record<string, string> }) => {
   const filePath = params.path;
 
   if (!filePath) {

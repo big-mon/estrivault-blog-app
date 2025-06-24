@@ -35,6 +35,9 @@ function generateSlugFromPath(filePath: string): string {
   // ../../content/blog/category/2021-01-01-title.md -> 2021-01-01-title
   const pathParts = filePath.split('/');
   const filename = pathParts[pathParts.length - 1];
+  if (!filename) {
+    return '';
+  }
   return filename.replace(/\.(md|mdx)$/, '');
 }
 

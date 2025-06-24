@@ -23,7 +23,7 @@ export async function entries() {
   return entries;
 }
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params }: { params: Record<string, string> }) => {
   const pageParam = params.page;
   const page = pageParam ? parseInt(pageParam, 10) : 1;
 
