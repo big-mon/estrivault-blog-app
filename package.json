@@ -14,7 +14,6 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
-    "type-check:watch": "tsc --noEmit --watch",
     "prepare": "husky"
   },
   "devDependencies": {
