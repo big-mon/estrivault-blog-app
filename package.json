@@ -5,19 +5,16 @@
   "scripts": {
     "dev": "node scripts/dev-helper.js",
     "build": "pnpm -r --filter svelte-blog... run build",
+    "build:packages": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor run build",
     "validate:workspace": "node scripts/validate-workspace.js",
-    "postinstall": "pnpm run build",
+    "postinstall": "pnpm run build:packages",
     "clean": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor run clean",
-    "reset": "pnpm run clean && pnpm install && pnpm run build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
     "type-check:watch": "tsc --noEmit --watch",
-    "type-check:packages": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor exec tsc --noEmit",
-    "lint:packages": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor exec eslint src/",
-    "format:packages": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor exec prettier --write src/",
     "prepare": "husky"
   },
   "devDependencies": {
