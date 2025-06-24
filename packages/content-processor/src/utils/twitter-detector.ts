@@ -8,13 +8,13 @@ import type { Root } from 'mdast';
  */
 export function hasTwitterEmbeds(tree: Root): boolean {
   let hasTwitter = false;
-  
+
   visit(tree, ['containerDirective', 'leafDirective', 'textDirective'], (node) => {
-    if ('name' in node && node.name === 'twitter') {
+    if ('name' in node && typeof node.name === 'string' && node.name === 'twitter') {
       hasTwitter = true;
       return EXIT; // ASTのトラバーサルを中断
     }
   });
-  
+
   return hasTwitter;
 }
