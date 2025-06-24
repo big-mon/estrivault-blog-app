@@ -13,7 +13,6 @@
   "experimentalTernaries": true,
   "svelteSortOrder": "options-scripts-markup-styles",
   "svelteStrictMode": true,
-  "svelteBracketNewLine": false,
   "svelteIndentScriptAndStyle": true,
   "svelteAllowShorthand": true,
   "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"]
