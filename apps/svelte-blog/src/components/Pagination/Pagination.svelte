@@ -76,7 +76,7 @@
     {/if}
 
     <!-- 最初のページへのリンク（現在のページが表示範囲の最初より大きい場合） -->
-    {#if pageNumbers[0] > 1}
+    {#if pageNumbers[0] && pageNumbers[0] > 1}
       <li>
         <a
           href={getPageUrl(1)}
@@ -86,7 +86,7 @@
           1
         </a>
       </li>
-      {#if pageNumbers[0] > 2}
+      {#if pageNumbers[0] && pageNumbers[0] > 2}
         <li>
           <span class="flex h-10 w-10 items-center justify-center text-gray-500">...</span>
         </li>
@@ -116,21 +116,24 @@
     {/each}
 
     <!-- 最後のページへのリンク（現在のページが表示範囲の最後より小さい場合） -->
-    {#if pageNumbers[pageNumbers.length - 1] < totalPages}
-      {#if pageNumbers[pageNumbers.length - 1] < totalPages - 1}
+    {#if pageNumbers.length > 0}
+      {@const lastPageNumber = pageNumbers[pageNumbers.length - 1]}
+      {#if lastPageNumber && lastPageNumber < totalPages}
+        {#if lastPageNumber < totalPages - 1}
+          <li>
+            <span class="flex h-10 w-10 items-center justify-center text-gray-500">...</span>
+          </li>
+        {/if}
         <li>
-          <span class="flex h-10 w-10 items-center justify-center text-gray-500">...</span>
+          <a
+            href={getPageUrl(totalPages)}
+            class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+            aria-label="{totalPages}ページ目"
+          >
+            {totalPages}
+          </a>
         </li>
       {/if}
-      <li>
-        <a
-          href={getPageUrl(totalPages)}
-          class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-          aria-label="{totalPages}ページ目"
-        >
-          {totalPages}
-        </a>
-      </li>
     {/if}
 
     <!-- 次のページへのリンク -->

@@ -69,9 +69,9 @@ export async function GET() {
   </url>
   ${posts
     .map(
-      (post: { slug: string; updatedAt?: string; publishedAt: string }) => `<url>
+      (post: { slug: string; updatedAt?: Date; publishedAt: Date }) => `<url>
     <loc>${SITE_URL.replace(/\/$/, '')}/post/${post.slug}</loc>
-    <lastmod>${new Date(post.updatedAt || post.publishedAt).toISOString()}</lastmod>
+    <lastmod>${(post.updatedAt || post.publishedAt).toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`,
