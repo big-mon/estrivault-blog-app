@@ -31,7 +31,7 @@ function checkDistExists(pkg) {
   const distPath = join(process.cwd(), pkg.distPath);
   if (!existsSync(distPath)) {
     console.warn(`⚠️  Build directory missing for ${pkg.name}`);
-    console.warn(`   Run: pnpm run build:packages`);
+    console.warn(`   Run: pnpm run build`);
     return false;
   }
   return true;
@@ -82,7 +82,7 @@ function main() {
     console.log('❌ Workspace validation failed!');
     console.log('\n🔧 Quick fix commands:');
     console.log('   pnpm install');
-    console.log('   pnpm run build:packages');
+    console.log('   pnpm run build');
     console.log('   pnpm run dev');
     process.exit(1);
   }
