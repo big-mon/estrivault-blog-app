@@ -6,6 +6,7 @@
     "dev": "node scripts/dev-helper.js",
     "build": "pnpm -r --filter svelte-blog... run build",
     "build:packages": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor run build",
+    "dev:packages": "pnpm --filter @estrivault/cloudinary-utils run dev",
     "validate:workspace": "node scripts/validate-workspace.js",
     "postinstall": "pnpm run build:packages",
     "clean": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor run clean",
