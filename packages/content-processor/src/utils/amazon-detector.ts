@@ -8,13 +8,13 @@ import type { Root } from 'mdast';
  */
 export function hasAmazonEmbeds(tree: Root): boolean {
   let hasAmazon = false;
-  
+
   visit(tree, ['containerDirective', 'leafDirective', 'textDirective'], (node) => {
-    if ('name' in node && node.name === 'amazon') {
+    if ('name' in node && typeof node.name === 'string' && node.name === 'amazon') {
       hasAmazon = true;
       return EXIT; // ASTのトラバーサルを中断
     }
   });
-  
+
   return hasAmazon;
 }
