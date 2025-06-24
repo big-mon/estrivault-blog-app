@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "clean": "rm -rf dist"
+    "clean": "rimraf dist"
   },
   "dependencies": {
     "@estrivault/cloudinary-utils": "workspace:*",
@@ -41,6 +41,8 @@
     "@types/hast": "^3.0.4",
     "@types/mdast": "^4.0.4",
     "@types/node": "^24.0.3",
-    "@types/unist": "^3.0.3"
+    "@types/unist": "^3.0.3",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.3.5"
   }
 }
