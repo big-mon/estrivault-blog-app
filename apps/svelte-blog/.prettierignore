@@ -1,33 +1,25 @@
-# Package Managers
+# App-specific ignores (root .prettierignore handles common patterns)
+
+# Package Managers (app-specific)
 package-lock.json
-pnpm-lock.yaml
 yarn.lock
 bun.lock
 bun.lockb
 
-# Build Outputs
-.svelte-kit/
-build/
-dist/
-.output/
-.vercel/
-.netlify/
+# App-specific build outputs
 .firebase/
 
-# Generated Files
-*.d.ts
+# Environment files
 .env*
 !.env.example
 
-# Caches & Temp
-node_modules/
+# App-specific caches & temp
 .cache/
 .temp/
 .tmp/
-*.log
 *.tsbuildinfo
 
-# Development
+# Development & testing
 coverage/
 .nyc_output/
 playwright-report/
