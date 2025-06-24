@@ -105,12 +105,14 @@
 <style>
   .description-text {
     /* タブレット以下では全文表示 */
+    word-wrap: break-word;
   }
 
   @media (min-width: 1024px) {
     .description-text {
       display: -webkit-box;
       -webkit-line-clamp: 3;
+      line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;

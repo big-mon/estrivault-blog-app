@@ -14,7 +14,8 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "type-check": "tsc --noEmit",
+    "type-check": "pnpm run type-check:packages && pnpm --filter svelte-blog check",
+    "type-check:packages": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor exec tsc --noEmit",
     "prepare": "husky"
   },
   "devDependencies": {
