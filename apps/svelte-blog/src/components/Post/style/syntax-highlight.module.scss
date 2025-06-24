@@ -30,6 +30,10 @@
     line-height: 1.6;
     background-color: var(--syntax-bg);
     color: var(--syntax-text);
+    
+    /* スクロールバーのスタイル（Firefox） */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
   }
 
   /* Code要素の基本スタイル */
@@ -58,11 +62,6 @@
     background-color: rgba(255, 255, 255, 0.05);
   }
 
-  /* スクロールバーのスタイル（Firefox） */
-  :global(figure[data-rehype-pretty-code-figure] pre) {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-  }
 
   /* スクロールバーのスタイル（WebKit） */
   :global(figure[data-rehype-pretty-code-figure] pre::-webkit-scrollbar) {
