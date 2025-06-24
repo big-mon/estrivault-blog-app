@@ -8,7 +8,8 @@
 
   let { children } = $props();
 
-  onNavigate((navigation) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onNavigate((_navigation) => {
     if (!document.startViewTransition) return;
 
     return new Promise((resolve) => {

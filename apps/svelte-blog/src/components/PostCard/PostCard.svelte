@@ -57,7 +57,7 @@
 
     <footer class="p-4">
       <ul class="mt-2 flex shrink-0 flex-wrap gap-2 text-xs text-gray-500">
-        {#each post.tags as tag}
+        {#each post.tags as tag (tag)}
           <li class="rounded bg-gray-100 px-2 py-0.5">{tag}</li>
         {/each}
       </ul>

@@ -94,7 +94,7 @@
     {/if}
 
     <!-- ページ番号 -->
-    {#each pageNumbers as page}
+    {#each pageNumbers as page (page)}
       <li>
         {#if page === currentPage}
           <span
