@@ -24,22 +24,26 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
   return (tree: Root) => {
     visit(tree, 'element', (node) => {
       if (node.tagName !== 'img' || !node.properties) {
-        return;
+        return undefined;
       }
 
       const src = node.properties.src;
       if (typeof src !== 'string' || !src) {
-        return;
+        return undefined;
       }
 
       // すでに絶対URLまたはデータURLの場合はスキップ
       if (src.startsWith('http') || src.startsWith('data:')) {
-        return;
+        return undefined;
       }
 
       try {
         // 拡張子を除いたパス部分を取得
         const publicId = src.replace(/^\//, '').split('.')[0];
+
+        if (!publicId) {
+          return undefined;
+        }
 
         // Cloudinary URLを生成
         const mode =
@@ -65,6 +69,7 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
         console.error('Error transforming image URL:', error);
         // エラーが発生した場合は元のURLを維持
       }
+      return undefined;
     });
 
     return tree;

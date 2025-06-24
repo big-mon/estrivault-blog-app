@@ -1,5 +1,7 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
+import type { Node } from 'unist';
+import type { Paragraph, Link } from 'mdast';
 import { fetchOgpMetadata, shouldFetchOgp, type OgpMetadata } from '../../utils/ogp-fetcher';
 
 // Constants for styling and configuration
@@ -34,20 +36,25 @@ export const remarkCommonLinkEmbed: Plugin = () => {
   return async (tree) => {
     const tasks: Promise<void>[] = [];
 
-    visit(tree, (node: unknown, index?: number, parent?: unknown) => {
+    visit(tree, (node: Node, index?: number, parent?: Node) => {
       // linkノードでURLをチェック (remarkが自動的にURLをlinkに変換するため)
       if (node.type === 'link') {
-        const url = node.url;
+        const linkNode = node as Link;
+        const url = linkNode.url;
 
         // 単独のリンクの場合（パラグラフ内に1つだけのリンクノード）
-        if (parent && parent.type === 'paragraph' && parent.children.length === 1) {
-          // OGP処理対象かチェック
-          if (shouldFetchOgp(url)) {
-            const task = processLinkEmbed(parent, index, url);
-            tasks.push(task);
+        if (parent && parent.type === 'paragraph') {
+          const paragraphNode = parent as Paragraph;
+          if (paragraphNode.children.length === 1) {
+            // OGP処理対象かチェック
+            if (shouldFetchOgp(url)) {
+              const task = processLinkEmbed(paragraphNode, index, url);
+              tasks.push(task);
+            }
           }
         }
       }
+      return undefined;
     });
 
     // 全てのOGP取得を並行実行
@@ -59,7 +66,7 @@ export const remarkCommonLinkEmbed: Plugin = () => {
  * リンクをOGP埋め込みに変換する処理
  */
 async function processLinkEmbed(
-  parent: unknown,
+  parent: Paragraph,
   index: number | undefined,
   url: string,
 ): Promise<void> {
@@ -73,7 +80,7 @@ async function processLinkEmbed(
 
       // 現在のリンクノードをHTML埋め込みに直接置き換え
       if (parent && typeof index === 'number') {
-        parent.children[index] = embedNode;
+        (parent.children as Node[])[index] = embedNode;
       }
     }
     // OGP取得に失敗した場合は元のリンクのまま残す
@@ -222,5 +229,5 @@ function escapeHtml(text: string): string {
     '"': '&quot;',
     "'": '&#039;',
   };
-  return text.replace(/[&<>"']/g, (m) => map[m]);
+  return text.replace(/[&<>"']/g, (m) => map[m as keyof typeof map] || m);
 }

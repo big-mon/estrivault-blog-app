@@ -1,6 +1,7 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
 import type { Root } from 'mdast';
+import type { Node } from 'unist';
 
 interface TwitterEmbedOptions {
   onTwitterFound?: () => void;
@@ -11,21 +12,29 @@ interface TwitterEmbedOptions {
  */
 export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (options = {}) => {
   return (tree) => {
-    visit(tree, function (node: unknown) {
+    visit(tree, function (node: Node) {
       const isTargetType =
         node.type === 'containerDirective' ||
         node.type === 'leafDirective' ||
         node.type === 'textDirective';
 
-      if (!isTargetType || node.name !== 'twitter') return;
+      if (!isTargetType || !('name' in node) || node.name !== 'twitter') {
+        return undefined;
+      }
 
-      const data = node.data || (node.data = {});
-      const attributes = node.attributes || {};
+      const nodeWithData = node as Node & {
+        data?: Record<string, unknown>;
+        attributes?: Record<string, string>;
+        name: string;
+        children?: Node[];
+      };
+      const data = nodeWithData.data || (nodeWithData.data = {});
+      const attributes = nodeWithData.attributes || {};
       const id = attributes.id;
 
       if (!id) {
         console.warn('Twitter embed directive without id attribute');
-        return;
+        return undefined;
       }
 
       if (node.type === 'textDirective') {
@@ -33,7 +42,7 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
           'Unexpected `:twitter` text directive, use two colons for a leaf directive',
           node,
         );
-        return;
+        return undefined;
       }
 
       // コールバックがあれば呼び出し
@@ -55,23 +64,23 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
       const tweetUrl = `https://twitter.com/i/status/${id}`;
 
       // blockquoteの子要素として適切なコンテンツを設定
-      node.children = [
+      nodeWithData.children = [
         {
           type: 'paragraph',
           children: [
             {
               type: 'text',
               value: 'Loading tweet...',
-            },
+            } as Node,
           ],
-        },
+        } as Node,
         {
           type: 'paragraph',
           children: [
             {
               type: 'text',
               value: '— ',
-            },
+            } as Node,
             {
               type: 'link',
               url: tweetUrl,
@@ -79,12 +88,13 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
                 {
                   type: 'text',
                   value: `View on X`,
-                },
+                } as Node,
               ],
-            },
+            } as Node,
           ],
-        },
+        } as Node,
       ];
+      return undefined;
     });
   };
 };

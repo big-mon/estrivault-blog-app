@@ -10,11 +10,15 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
   const transformer: Transformer<Root, Root> = (tree: Root) => {
     visit(tree, 'element', (node: Element) => {
       // h1-h6タグのみ処理
-      if (!node.tagName.match(/^h[1-6]$/)) return;
+      if (!node.tagName.match(/^h[1-6]$/)) {
+        return undefined;
+      }
 
       // 見出しテキストを取得
       const textContent = getTextContent(node);
-      if (!textContent) return;
+      if (!textContent) {
+        return undefined;
+      }
 
       // slugを生成（日本語対応）
       const slug = generateSlug(textContent);
@@ -26,7 +30,11 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
       };
 
       // 見出しレベルに応じた#の数を決定
-      const level = parseInt(node.tagName[1]);
+      const levelChar = node.tagName[1];
+      if (!levelChar) {
+        return undefined;
+      }
+      const level = parseInt(levelChar);
       const hashSymbols = '#'.repeat(level);
 
       // アンカーリンク要素を作成
@@ -48,6 +56,7 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
 
       // 見出しの先頭にアンカーリンクを追加
       node.children = [anchorLink, ...node.children];
+      return undefined;
     });
 
     return tree;
