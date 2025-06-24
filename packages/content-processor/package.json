@@ -7,14 +7,15 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "@estrivault/cloudinary-utils": "workspace:*",
@@ -40,8 +41,6 @@
     "@types/hast": "^3.0.4",
     "@types/mdast": "^4.0.4",
     "@types/node": "^24.0.3",
-    "@types/unist": "^3.0.3",
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.3"
+    "@types/unist": "^3.0.3"
   }
 }
