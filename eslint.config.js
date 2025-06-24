@@ -17,6 +17,21 @@ export default ts.config(
   prettier,
   ...svelte.configs.prettier,
   {
+    ignores: [
+      // Build outputs
+      '**/dist/**',
+      '**/build/**',
+      '**/.svelte-kit/**',
+      '**/output/**',
+      '**/.vercel/**',
+      '**/.netlify/**',
+      // Generated files
+      '**/*.d.ts',
+      '**/*.js.map',
+      'pnpm-lock.yaml',
+    ],
+  },
+  {
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
     },
