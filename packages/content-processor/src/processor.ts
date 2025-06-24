@@ -101,7 +101,7 @@ export async function processMarkdown(
       : [];
 
     // 日付の正規化とDate型への変換
-    let publishedAtStr = data.publishedAt;
+    let publishedAtStr = data.publishedAt as string | undefined;
     if (publishedAtStr) {
       if (typeof publishedAtStr === 'string') {
         // "2022-03-24T17:42:00" のような形式を "2022-03-24T17:42:00.000Z" に修正
@@ -121,9 +121,9 @@ export async function processMarkdown(
     } else {
       publishedAtStr = new Date().toISOString();
     }
-    const publishedAt = new Date(publishedAtStr);
+    const publishedAt = new Date(publishedAtStr as string);
 
-    let updatedAtStr = data.updatedAt || publishedAtStr;
+    let updatedAtStr = (data.updatedAt as string | undefined) || publishedAtStr;
     if (updatedAtStr && typeof updatedAtStr === 'string') {
       // 同様にupdatedAtも正規化
       if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
@@ -136,19 +136,22 @@ export async function processMarkdown(
         updatedAtStr = publishedAtStr;
       }
     }
-    const updatedAt = new Date(updatedAtStr);
+    const updatedAt = new Date(updatedAtStr as string);
 
     // メタデータの構築
     const meta: PostMeta = {
-      slug: data.slug || slug || '',
-      title: data.title,
-      description: data.description || '',
+      slug: (data.slug as string) || slug || '',
+      title: data.title as string,
+      description: (data.description as string) || '',
       publishedAt,
       updatedAt,
-      category: data.category || '',
+      category: (data.category as string) || '',
       tags,
-      coverImage: resolveCoverImage(data.coverImage, options.cloudinaryCloudName),
-      draft: data.draft || false,
+      coverImage: resolveCoverImage(
+        data.coverImage as string | undefined,
+        options.cloudinaryCloudName,
+      ),
+      draft: (data.draft as boolean) || false,
       readingTime: Math.ceil(stats.minutes),
     };
 
@@ -203,7 +206,7 @@ export async function extractMetadata(
       : [];
 
     // 日付の正規化とDate型への変換
-    let publishedAtStr = data.publishedAt;
+    let publishedAtStr = data.publishedAt as string | undefined;
     if (publishedAtStr) {
       if (typeof publishedAtStr === 'string') {
         // "2022-03-24T17:42:00" のような形式を "2022-03-24T17:42:00.000Z" に修正
@@ -223,9 +226,9 @@ export async function extractMetadata(
     } else {
       publishedAtStr = new Date().toISOString();
     }
-    const publishedAt = new Date(publishedAtStr);
+    const publishedAt = new Date(publishedAtStr as string);
 
-    let updatedAtStr = data.updatedAt || publishedAtStr;
+    let updatedAtStr = (data.updatedAt as string | undefined) || publishedAtStr;
     if (updatedAtStr && typeof updatedAtStr === 'string') {
       // 同様にupdatedAtも正規化
       if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
@@ -238,19 +241,22 @@ export async function extractMetadata(
         updatedAtStr = publishedAtStr;
       }
     }
-    const updatedAt = new Date(updatedAtStr);
+    const updatedAt = new Date(updatedAtStr as string);
 
     // メタデータの構築
     const meta: PostMeta = {
-      slug: data.slug || slug || '',
-      title: data.title,
-      description: data.description || '',
+      slug: (data.slug as string) || slug || '',
+      title: data.title as string,
+      description: (data.description as string) || '',
       publishedAt,
       updatedAt,
-      category: data.category || '',
+      category: (data.category as string) || '',
       tags,
-      coverImage: resolveCoverImage(data.coverImage, options.cloudinaryCloudName),
-      draft: data.draft || false,
+      coverImage: resolveCoverImage(
+        data.coverImage as string | undefined,
+        options.cloudinaryCloudName,
+      ),
+      draft: (data.draft as boolean) || false,
       readingTime: Math.ceil(stats.minutes),
     };
 
