@@ -62,6 +62,10 @@ pnpm run build:packages              # 🔨 Rebuild workspace packages only
 pnpm --filter svelte-blog check      # TypeScript checking
 pnpm --filter svelte-blog lint       # ESLint + Prettier check
 pnpm --filter svelte-blog format     # Format code with Prettier
+pnpm lint                             # Root-level ESLint check
+pnpm format                           # Root-level Prettier format
+pnpm format:check                     # Check formatting without changes
+pnpm type-check                       # TypeScript check for all packages
 ```
 
 ### Testing
@@ -126,6 +130,12 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
   - `/category/[category]/[page]` - Category filtering with pagination
   - `/tag/[tag]/[page]` - Tag filtering with pagination
 
+### Smart Development Scripts
+
+- `scripts/dev-helper.js` - Automated development startup with validation and package building
+- `scripts/validate-workspace.js` - Workspace health check ensuring all packages and builds exist
+- Uses `concurrently` for parallel development server management
+
 ### Monorepo Dependencies (Improved)
 
 - Uses PNPM workspaces with automatic setup
@@ -133,3 +143,10 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
 - **Production**: SvelteKit app uses built packages from workspace
 - **Auto-build**: `postinstall` hook ensures packages are built after `pnpm install`
 - **Smart dev**: `pnpm dev` validates workspace and handles build dependencies automatically
+
+### Git Hooks & Code Quality
+
+- Husky integration for pre-commit hooks
+- lint-staged for automatic code formatting on commit
+- Comprehensive ESLint and Prettier configuration
+- TypeScript strict mode across all packages
