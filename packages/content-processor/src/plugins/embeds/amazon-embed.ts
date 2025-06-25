@@ -23,7 +23,7 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
       if (!isTargetType || node.name !== 'amazon') return;
 
       const data = node.data || (node.data = {});
-      const attributes = node.attributes as AmazonAttributes || {};
+      const attributes = (node.attributes as AmazonAttributes) || {};
       const asin = attributes.asin;
       const name = attributes.name;
 
@@ -40,7 +40,7 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
       if (node.type === 'textDirective') {
         console.error(
           'Unexpected `:amazon` text directive, use two colons for a leaf directive',
-          node
+          node,
         );
         return;
       }
@@ -50,7 +50,7 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
       data.hProperties = {
         className: 'amazon-embed',
         'data-amazon-asin': asin,
-        'data-component-name': 'AmazonEmbed'
+        'data-component-name': 'AmazonEmbed',
       };
 
       data.hChildren = [
@@ -58,7 +58,7 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
           type: 'element',
           tagName: 'div',
           properties: {
-            className: ['amazon-card']
+            className: ['amazon-card'],
           },
           children: [
             // 商品画像部分
@@ -69,7 +69,7 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
                 href: link,
                 rel: 'noopener noreferrer',
                 target: '_blank',
-                className: ['amazon-card__image']
+                className: ['amazon-card__image'],
               },
               children: [
                 {
@@ -79,18 +79,18 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
                     src: imageUrl,
                     alt: title,
                     loading: 'lazy',
-                    className: ['amazon-card__image__img']
+                    className: ['amazon-card__image__img'],
                   },
-                  children: []
-                }
-              ]
+                  children: [],
+                },
+              ],
             },
             // 商品情報部分
             {
               type: 'element',
               tagName: 'div',
               properties: {
-                className: ['amazon-card__content']
+                className: ['amazon-card__content'],
               },
               children: [
                 {
@@ -100,14 +100,14 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
                     href: link,
                     rel: 'noopener noreferrer',
                     target: '_blank',
-                    className: ['amazon-card__title']
+                    className: ['amazon-card__title'],
                   },
                   children: [
                     {
                       type: 'text',
-                      value: title
-                    }
-                  ]
+                      value: title,
+                    },
+                  ],
                 },
                 {
                   type: 'element',
@@ -116,19 +116,19 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
                     href: link,
                     rel: 'noopener noreferrer',
                     target: '_blank',
-                    className: ['amazon-card__cta']
+                    className: ['amazon-card__cta'],
                   },
                   children: [
                     {
                       type: 'text',
-                      value: 'Amazonで見る'
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
+                      value: 'Amazonで見る',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       ];
     });
   };

@@ -10,15 +10,19 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
   const transformer: Transformer<Root, Root> = (tree: Root) => {
     visit(tree, 'element', (node: Element) => {
       // h1-h6タグのみ処理
-      if (!node.tagName.match(/^h[1-6]$/)) return;
+      if (!node.tagName.match(/^h[1-6]$/)) {
+        return undefined;
+      }
 
       // 見出しテキストを取得
       const textContent = getTextContent(node);
-      if (!textContent) return;
+      if (!textContent) {
+        return undefined;
+      }
 
       // slugを生成（日本語対応）
       const slug = generateSlug(textContent);
-      
+
       // id属性を設定
       node.properties = {
         ...node.properties,
@@ -26,7 +30,11 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
       };
 
       // 見出しレベルに応じた#の数を決定
-      const level = parseInt(node.tagName[1]);
+      const levelChar = node.tagName[1];
+      if (!levelChar) {
+        return undefined;
+      }
+      const level = parseInt(levelChar);
       const hashSymbols = '#'.repeat(level);
 
       // アンカーリンク要素を作成
@@ -48,6 +56,7 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
 
       // 見出しの先頭にアンカーリンクを追加
       node.children = [anchorLink, ...node.children];
+      return undefined;
     });
 
     return tree;
@@ -61,7 +70,7 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
  */
 function getTextContent(node: Element): string {
   let text = '';
-  
+
   for (const child of node.children) {
     if (child.type === 'text') {
       text += child.value;
@@ -69,7 +78,7 @@ function getTextContent(node: Element): string {
       text += getTextContent(child);
     }
   }
-  
+
   return text.trim();
 }
 
@@ -77,15 +86,17 @@ function getTextContent(node: Element): string {
  * テキストからslugを生成（日本語対応）
  */
 function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    // 日本語文字、英数字、ハイフン、アンダースコア以外を削除
-    .replace(/[^\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}a-z0-9\-_\s]/gu, '')
-    // 空白をハイフンに変換
-    .replace(/\s+/g, '-')
-    // 連続するハイフンを1つに
-    .replace(/-+/g, '-')
-    // 先頭末尾のハイフンを削除
-    .replace(/^-+|-+$/g, '');
+  return (
+    text
+      .toLowerCase()
+      .trim()
+      // 日本語文字、英数字、ハイフン、アンダースコア以外を削除
+      .replace(/[^\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}a-z0-9\-_\s]/gu, '')
+      // 空白をハイフンに変換
+      .replace(/\s+/g, '-')
+      // 連続するハイフンを1つに
+      .replace(/-+/g, '-')
+      // 先頭末尾のハイフンを削除
+      .replace(/^-+|-+$/g, '')
+  );
 }

@@ -13,18 +13,28 @@ export const rehypeHeadingExtractor: Plugin<[], Root, Root> = () => {
   const transformer: Transformer<Root, Root> = (tree: Root, file) => {
     visit(tree, 'element', (node: Element) => {
       // h1-h3タグのみ処理（深さ1段目まで）
-      if (!node.tagName.match(/^h[1-3]$/)) return;
+      if (!node.tagName.match(/^h[1-3]$/)) {
+        return undefined;
+      }
 
       // 見出しレベルを取得
-      const level = parseInt(node.tagName[1]);
-      
+      const levelChar = node.tagName[1];
+      if (!levelChar) {
+        return undefined;
+      }
+      const level = parseInt(levelChar);
+
       // 見出しテキストを取得
       const text = getTextContent(node);
-      if (!text) return;
+      if (!text) {
+        return undefined;
+      }
 
       // id属性を取得（heading-anchorプラグインで設定されたもの）
       const id = node.properties?.id as string;
-      if (!id) return;
+      if (!id) {
+        return undefined;
+      }
 
       // 見出し情報を収集
       headings.push({
@@ -32,6 +42,7 @@ export const rehypeHeadingExtractor: Plugin<[], Root, Root> = () => {
         level,
         text,
       });
+      return undefined;
     });
 
     // 見出し情報をfile.dataに保存（パイプライン後に参照可能）
@@ -50,7 +61,7 @@ export const rehypeHeadingExtractor: Plugin<[], Root, Root> = () => {
  */
 function getTextContent(node: Element): string {
   let text = '';
-  
+
   for (const child of node.children) {
     if (child.type === 'text') {
       text += child.value;
@@ -63,6 +74,6 @@ function getTextContent(node: Element): string {
       text += getTextContent(child);
     }
   }
-  
+
   return text.trim();
 }

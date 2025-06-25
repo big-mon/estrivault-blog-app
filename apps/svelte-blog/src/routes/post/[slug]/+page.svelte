@@ -30,6 +30,7 @@
   };
 
   // Schema.org構造化データ
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   $: schemaData = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -48,9 +49,8 @@
       url: SITE_URL,
     },
     datePublished: post.meta.publishedAt.toISOString(),
-    dateModified: post.meta.updatedAt
-      ? post.meta.updatedAt.toISOString()
-      : post.meta.publishedAt.toISOString(),
+    dateModified:
+      post.meta.updatedAt ? post.meta.updatedAt.toISOString() : post.meta.publishedAt.toISOString(),
     mainEntityOfPage: {
       '@type': 'WebPage',
       '@id': `${SITE_URL.replace(/\/$/, '')}/post/${post.meta.slug}`,
@@ -65,9 +65,6 @@
     inLanguage: 'ja-JP',
     url: `${SITE_URL.replace(/\/$/, '')}/post/${post.meta.slug}`,
   };
-
-  // Schema.org JSONの文字列化（ESLintエラー回避のため）
-  $: schemaJsonString = JSON.stringify(schemaData);
 </script>
 
 <svelte:head>
@@ -113,7 +110,7 @@
     <meta property="article:section" content={post.meta.category} />
   {/if}
   {#if post.meta.tags && post.meta.tags.length > 0}
-    {#each post.meta.tags as tag}
+    {#each post.meta.tags as tag (tag)}
       <meta property="article:tag" content={tag} />
     {/each}
   {/if}
@@ -135,14 +132,16 @@
   <!-- Canonical URL -->
   <link rel="canonical" href={`${SITE_URL}/post/${post.meta.slug}`} />
 
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+    {JSON.stringify(schemaData)}
+  </script>
+
   <!-- Google AdSense -->
   <script
     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6950127103154689"
     crossorigin="anonymous"
   ></script>
-
-  <!-- Schema.org Structured Data -->
-  <script type="application/ld+json">{@html schemaJsonString}</script>
 </svelte:head>
 
 <article class="container mx-auto px-2 sm:px-4 xl:max-w-6xl" use:twitterEmbed>

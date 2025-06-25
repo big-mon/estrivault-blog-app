@@ -8,10 +8,10 @@
 
   // OGP用のデータを動的生成
   const pageTitle = $derived(
-    `${data.category.toUpperCase()}の記事一覧${data.pagination.page > 1 ? ` - ページ${data.pagination.page}` : ''} | ${SITE_TITLE}`
+    `${data.category.toUpperCase()}の記事一覧${data.pagination.page > 1 ? ` - ページ${data.pagination.page}` : ''} | ${SITE_TITLE}`,
   );
   const pageDescription = $derived(
-    `${data.category.toUpperCase()}カテゴリーの記事一覧${data.pagination.page > 1 ? `（${data.pagination.page}ページ目）` : ''}です。全${data.pagination.total}件の記事を掲載しています。`
+    `${data.category.toUpperCase()}カテゴリーの記事一覧${data.pagination.page > 1 ? `（${data.pagination.page}ページ目）` : ''}です。全${data.pagination.total}件の記事を掲載しています。`,
   );
   const pageUrl = $derived(`${SITE_URL}/category/${data.category}/${data.pagination.page}`);
 </script>
@@ -63,7 +63,7 @@
   {#if data.posts.length > 0}
     <div class="mb-8">
       <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {#each data.posts as post}
+        {#each data.posts as post (post.slug)}
           <PostCard {post} />
         {/each}
       </div>

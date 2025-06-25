@@ -9,13 +9,13 @@ const PACKAGES = [
   {
     name: '@estrivault/content-processor',
     path: 'packages/content-processor',
-    distPath: 'packages/content-processor/dist'
+    distPath: 'packages/content-processor/dist',
   },
   {
-    name: '@estrivault/cloudinary-utils', 
+    name: '@estrivault/cloudinary-utils',
     path: 'packages/cloudinary-utils',
-    distPath: 'packages/cloudinary-utils/dist'
-  }
+    distPath: 'packages/cloudinary-utils/dist',
+  },
 ];
 
 function checkPackageExists(pkg) {
@@ -50,14 +50,14 @@ function checkPnpmInstalled() {
 
 function main() {
   console.log('🔍 Validating workspace setup...\n');
-  
+
   let allValid = true;
-  
+
   // Check pnpm
   if (!checkPnpmInstalled()) {
     allValid = false;
   }
-  
+
   // Check packages
   for (const pkg of PACKAGES) {
     if (!checkPackageExists(pkg)) {
@@ -65,16 +65,16 @@ function main() {
     } else {
       console.log(`✅ Package ${pkg.name} found`);
     }
-    
+
     if (!checkDistExists(pkg)) {
       allValid = false;
     } else {
       console.log(`✅ Build artifacts for ${pkg.name} found`);
     }
   }
-  
+
   console.log();
-  
+
   if (allValid) {
     console.log('✅ Workspace validation passed!');
     console.log('🚀 You can now run: pnpm run dev');

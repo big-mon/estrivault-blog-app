@@ -1,0 +1,18 @@
+# Build outputs
+**/dist/
+**/build/
+**/.svelte-kit/
+**/.output/
+**/.vercel/
+**/.netlify/
+
+# Dependencies
+**/node_modules/
+
+# Generated files
+**/*.d.ts
+**/*.js.map
+pnpm-lock.yaml
+
+# Logs
+**/*.log

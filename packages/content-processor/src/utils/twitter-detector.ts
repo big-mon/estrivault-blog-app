@@ -14,6 +14,7 @@ export function hasTwitterEmbeds(tree: Root): boolean {
       hasTwitter = true;
       return EXIT; // ASTのトラバーサルを中断
     }
+    return undefined;
   });
 
   return hasTwitter;

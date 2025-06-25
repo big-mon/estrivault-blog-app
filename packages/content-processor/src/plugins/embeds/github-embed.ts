@@ -1,43 +1,49 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
+import type { Node } from 'unist';
+import type { Paragraph, Link } from 'mdast';
 
 /**
  * プレーンテキストのGitHubURLを自動的に埋め込みカードに変換するremarkプラグイン
  */
 export const remarkGithubEmbed: Plugin = () => {
   return (tree) => {
-    visit(tree, (node: any, index?: number, parent?: any) => {
+    visit(tree, (node: Node, index?: number, parent?: Node) => {
       // linkノードでGitHubURLをチェック (remarkが自動的にURLをlinkに変換するため)
       if (node.type === 'link') {
-        const url = node.url;
-        const githubUrlRegex = /^https:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)(?:\/(?:issues|pull)\/(\d+))?(?:\/.*)?$/;
+        const linkNode = node as Link;
+        const url = linkNode.url;
+        const githubUrlRegex =
+          /^https:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)(?:\/(?:issues|pull)\/(\d+))?(?:\/.*)?$/;
         const match = url.match(githubUrlRegex);
 
         // 単独のリンクの場合（パラグラフ内に1つだけのリンクノード）
-        if (match && parent && parent.type === 'paragraph' && parent.children.length === 1) {
-          const [fullUrl, owner, repo, issueOrPrNumber] = match;
+        if (match && parent && parent.type === 'paragraph') {
+          const paragraphNode = parent as Paragraph;
+          if (paragraphNode.children.length === 1) {
+            const [fullUrl, owner, repo, issueOrPrNumber] = match;
 
-          // リポジトリ情報を解析
-          let type = 'repo';
-          let displayText = `${owner}/${repo}`;
+            // リポジトリ情報を解析
+            let type = 'repo';
+            let displayText = `${owner}/${repo}`;
 
-          if (issueOrPrNumber) {
-            if (fullUrl.includes('/issues/')) {
-              type = 'issue';
-              displayText += ` Issue #${issueOrPrNumber}`;
-            } else if (fullUrl.includes('/pull/')) {
-              type = 'pr';
-              displayText += ` PR #${issueOrPrNumber}`;
+            if (issueOrPrNumber) {
+              if (fullUrl.includes('/issues/')) {
+                type = 'issue';
+                displayText += ` Issue #${issueOrPrNumber}`;
+              } else if (fullUrl.includes('/pull/')) {
+                type = 'pr';
+                displayText += ` PR #${issueOrPrNumber}`;
+              }
             }
-          }
 
-          // OGP画像URL（GitHubが自動生成するOGP画像）
-          const ogpImageUrl = `https://opengraph.githubassets.com/1/${owner}/${repo}`;
+            // OGP画像URL（GitHubが自動生成するOGP画像）
+            const ogpImageUrl = `https://opengraph.githubassets.com/1/${owner}/${repo}`;
 
-          // GitHub埋め込みカードを作成（フル幅、ホバー効果付き）
-          const embedNode = {
-            type: 'html',
-            value: `<div style="margin: 1rem 0;">
+            // GitHub埋め込みカードを作成（フル幅、ホバー効果付き）
+            const embedNode = {
+              type: 'html',
+              value: `<div style="margin: 1rem 0;">
 <a href="${fullUrl}" target="_blank" rel="noopener noreferrer" style="display: flex; height: 150px; width: 100%; border: 1px solid #d1d9e0; border-radius: 8px; background: #ffffff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); text-decoration: none; color: inherit; overflow: hidden; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.12)'; this.style.borderColor='#0969da';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.06)'; this.style.borderColor='#d1d9e0';">
   <div style="flex: 1; min-width: 0; padding: 20px; display: flex; flex-direction: column; justify-content: center;">
     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
@@ -47,22 +53,28 @@ export const remarkGithubEmbed: Plugin = () => {
       <span style="font-weight: 600; font-size: 16px; color: #24292f;">${displayText}</span>
     </div>
     <div style="font-size: 13px; color: #656d76; background: #eef2f5; padding: 4px 10px; border-radius: 5px; display: inline-block; width: fit-content;">
-      ${type === 'repo' ? 'Repository' : type === 'issue' ? 'Issue' : 'Pull Request'}
+      ${
+        type === 'repo' ? 'Repository'
+        : type === 'issue' ? 'Issue'
+        : 'Pull Request'
+      }
     </div>
   </div>
   <div style="flex-shrink: 0; width: 300px; height: 150px; background: #f6f8fa; display: flex; align-items: center; justify-content: center;">
     <img src="${ogpImageUrl}" alt="GitHub repository preview" style="max-width: 300px; max-height: 150px; object-fit: contain; display: block;" loading="lazy" onerror="this.parentElement.style.display='none';" />
   </div>
 </a>
-</div>`
-          };
+</div>`,
+            };
 
-          // 現在のリンクノードをHTML埋め込みに直接置き換え
-          if (parent && typeof index === 'number') {
-            parent.children[index] = embedNode;
+            // 現在のリンクノードをHTML埋め込みに直接置き換え
+            if (parent && typeof index === 'number') {
+              (paragraphNode.children as Node[])[index] = embedNode;
+            }
           }
         }
       }
+      return undefined;
     });
   };
 };

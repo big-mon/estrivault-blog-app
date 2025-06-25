@@ -19,45 +19,48 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
   if (!options?.cloudinaryCloudName) {
     throw new Error('cloudinaryCloudName is required in options');
   }
-  const { 
-    cloudinaryCloudName, 
-    width = 1200, 
-    mode = 'fit' 
-  } = options;
+  const { cloudinaryCloudName, width = 1200 } = options;
 
   return (tree: Root) => {
     visit(tree, 'element', (node) => {
       if (node.tagName !== 'img' || !node.properties) {
-        return;
+        return undefined;
       }
 
       const src = node.properties.src;
       if (typeof src !== 'string' || !src) {
-        return;
+        return undefined;
       }
 
       // すでに絶対URLまたはデータURLの場合はスキップ
       if (src.startsWith('http') || src.startsWith('data:')) {
-        return;
+        return undefined;
       }
 
       try {
         // 拡張子を除いたパス部分を取得
         const publicId = src.replace(/^\//, '').split('.')[0];
-        
+
+        if (!publicId) {
+          return undefined;
+        }
+
         // Cloudinary URLを生成
-        const mode = (node.properties['data-mode'] as string) === 'fill' ? 'fill' as const : 'fit' as const;
+        const mode =
+          (node.properties['data-mode'] as string) === 'fill' ?
+            ('fill' as const)
+          : ('fit' as const);
         const buildOptions: BuildUrlOptions = {
           w: width,
           mode,
         };
-        
+
         node.properties.src = buildUrl(cloudinaryCloudName, publicId, buildOptions);
 
         // レスポンシブ画像用の属性を追加
         node.properties.loading = 'lazy';
         node.properties.decoding = 'async';
-        
+
         // サイズヒントを追加
         if (!node.properties.sizes) {
           node.properties.sizes = '(max-width: 768px) 100vw, 50vw';
@@ -66,6 +69,7 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
         console.error('Error transforming image URL:', error);
         // エラーが発生した場合は元のURLを維持
       }
+      return undefined;
     });
 
     return tree;

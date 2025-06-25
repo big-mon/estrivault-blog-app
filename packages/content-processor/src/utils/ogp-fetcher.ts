@@ -24,21 +24,21 @@ function createFallbackMetadata(url: string): OgpMetadata {
   try {
     const parsedUrl = new URL(url);
     const hostname = parsedUrl.hostname.replace(/^www\./, '');
-    
+
     // Create a nice title from the domain
     const title = hostname
       .split('.')
       .slice(0, -1) // Remove TLD
-      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join(' ');
-    
+
     return {
       title: title || hostname,
       url: url,
       siteName: hostname,
       description: `Visit ${hostname}`,
     };
-  } catch (e) {
+  } catch {
     return {
       title: 'Website',
       url: url,
@@ -71,20 +71,24 @@ function parseOgpFromHtml(html: string): OgpMetadata {
   // より柔軟なOGP meta tag regex patterns (属性の順序や空白を考慮)
   const ogpPatterns = {
     title: /<meta\s+[^>]*property\s*=\s*["']og:title["'][^>]*content\s*=\s*["']([^"']*?)["']/i,
-    description: /<meta\s+[^>]*property\s*=\s*["']og:description["'][^>]*content\s*=\s*["']([^"']*?)["']/i,
+    description:
+      /<meta\s+[^>]*property\s*=\s*["']og:description["'][^>]*content\s*=\s*["']([^"']*?)["']/i,
     image: /<meta\s+[^>]*property\s*=\s*["']og:image["'][^>]*content\s*=\s*["']([^"']*?)["']/i,
     url: /<meta\s+[^>]*property\s*=\s*["']og:url["'][^>]*content\s*=\s*["']([^"']*?)["']/i,
-    siteName: /<meta\s+[^>]*property\s*=\s*["']og:site_name["'][^>]*content\s*=\s*["']([^"']*?)["']/i,
+    siteName:
+      /<meta\s+[^>]*property\s*=\s*["']og:site_name["'][^>]*content\s*=\s*["']([^"']*?)["']/i,
     type: /<meta\s+[^>]*property\s*=\s*["']og:type["'][^>]*content\s*=\s*["']([^"']*?)["']/i,
   };
 
   // Content-first patterns (より柔軟)
   const ogpPatternsReversed = {
     title: /<meta\s+[^>]*content\s*=\s*["']([^"']*?)["'][^>]*property\s*=\s*["']og:title["']/i,
-    description: /<meta\s+[^>]*content\s*=\s*["']([^"']*?)["'][^>]*property\s*=\s*["']og:description["']/i,
+    description:
+      /<meta\s+[^>]*content\s*=\s*["']([^"']*?)["'][^>]*property\s*=\s*["']og:description["']/i,
     image: /<meta\s+[^>]*content\s*=\s*["']([^"']*?)["'][^>]*property\s*=\s*["']og:image["']/i,
     url: /<meta\s+[^>]*content\s*=\s*["']([^"']*?)["'][^>]*property\s*=\s*["']og:url["']/i,
-    siteName: /<meta\s+[^>]*content\s*=\s*["']([^"']*?)["'][^>]*property\s*=\s*["']og:site_name["']/i,
+    siteName:
+      /<meta\s+[^>]*content\s*=\s*["']([^"']*?)["'][^>]*property\s*=\s*["']og:site_name["']/i,
     type: /<meta\s+[^>]*content\s*=\s*["']([^"']*?)["'][^>]*property\s*=\s*["']og:type["']/i,
   };
 
@@ -150,18 +154,23 @@ const USER_AGENTS = [
 /**
  * 単一の戦略でOGPを取得
  */
-async function fetchWithStrategy(url: string, userAgent: string, additionalHeaders: Record<string, string> = {}): Promise<Response> {
+async function fetchWithStrategy(
+  url: string,
+  userAgent: string,
+  additionalHeaders: Record<string, string> = {},
+): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒タイムアウト
 
   try {
     const baseHeaders: Record<string, string> = {
       'User-Agent': userAgent,
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+      Accept:
+        'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
       'Accept-Language': 'en-US,en;q=0.9,ja;q=0.8',
       'Accept-Encoding': 'gzip, deflate, br',
-      'DNT': '1',
-      'Connection': 'keep-alive',
+      DNT: '1',
+      Connection: 'keep-alive',
       'Upgrade-Insecure-Requests': '1',
       ...additionalHeaders,
     };
@@ -172,7 +181,7 @@ async function fetchWithStrategy(url: string, userAgent: string, additionalHeade
         method: 'GET',
         headers: {
           'User-Agent': userAgent,
-          'Accept': 'text/html',
+          Accept: 'text/html',
         },
         signal: controller.signal,
       });
@@ -213,11 +222,12 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
     // 複数の戦略を順番に試行
     for (let i = 0; i < USER_AGENTS.length; i++) {
       const userAgent = USER_AGENTS[i];
-      
+      if (!userAgent) continue;
+
       try {
         // 少し待機してレート制限を回避
         if (i > 0) {
-          await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+          await new Promise((resolve) => setTimeout(resolve, 500 + Math.random() * 1000));
         }
 
         const response = await fetchWithStrategy(url, userAgent, {
@@ -237,7 +247,7 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
             if (metadata.image && !metadata.image.startsWith('http')) {
               try {
                 metadata.image = new URL(metadata.image, url).href;
-              } catch (e) {
+              } catch {
                 metadata.image = undefined;
               }
             }
@@ -248,7 +258,9 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
 
             // ログ出力（成功時）
             if (process.env.NODE_ENV === 'development' || process.env.OGP_VERBOSE === 'true') {
-              console.log(`✅ OGP fetched successfully for ${parsedUrl.hostname} (attempt ${i + 1}, ${userAgent.split(' ')[0]})`);
+              console.log(
+                `✅ OGP fetched successfully for ${parsedUrl.hostname} (attempt ${i + 1}, ${userAgent?.split(' ')[0] || 'unknown'})`,
+              );
             }
 
             ogpCache.set(url, metadata);
@@ -276,7 +288,7 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
     if (process.env.NODE_ENV === 'development' || process.env.OGP_VERBOSE === 'true') {
       console.log(`❌ All strategies failed for ${parsedUrl.hostname}: ${lastError}`);
     }
-    
+
     const fallbackMetadata = createFallbackMetadata(url);
     ogpCache.set(url, fallbackMetadata);
     return fallbackMetadata;
@@ -286,7 +298,9 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
       if ((error as Error).name === 'AbortError') {
         console.log(`OGP fetch timeout for ${new URL(url).hostname}, using fallback card`);
       } else {
-        console.log(`OGP fetch error for ${new URL(url).hostname}: ${(error as Error).message}, using fallback card`);
+        console.log(
+          `OGP fetch error for ${new URL(url).hostname}: ${(error as Error).message}, using fallback card`,
+        );
       }
     }
 
@@ -305,7 +319,7 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
 export function shouldFetchOgp(url: string): boolean {
   try {
     const parsedUrl = new URL(url);
-    
+
     // Only process HTTP/HTTPS URLs
     if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
       return false;
@@ -317,14 +331,27 @@ export function shouldFetchOgp(url: string): boolean {
     }
 
     // Skip common file extensions
-    const skipExts = ['.pdf', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.mp4', '.mov', '.avi', '.zip', '.tar', '.gz'];
+    const skipExts = [
+      '.pdf',
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.gif',
+      '.svg',
+      '.mp4',
+      '.mov',
+      '.avi',
+      '.zip',
+      '.tar',
+      '.gz',
+    ];
     const pathname = parsedUrl.pathname.toLowerCase();
-    if (skipExts.some(ext => pathname.endsWith(ext))) {
+    if (skipExts.some((ext) => pathname.endsWith(ext))) {
       return false;
     }
 
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }

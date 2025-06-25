@@ -22,7 +22,6 @@
     "@cloudinary/url-gen": "^1.21.0"
   },
   "devDependencies": {
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.3"
+    "tsup": "^8.5.0"
   }
 }

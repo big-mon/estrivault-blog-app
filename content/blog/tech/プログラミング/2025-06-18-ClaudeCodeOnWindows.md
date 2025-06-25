@@ -72,7 +72,6 @@ Windows端末でDevContainerを用いた環境構築は下記ページを参考�
 
 https://zenn.dev/acntechjp/articles/fc111da7542e00
 
-
 ## 第1章：ビルドが遅い！SvelteKitのホットリロードが数分待ちに
 
 最初の壁は、パフォーマンスでした。以前は一瞬で起動していたSvelteKitの開発サーバーが、DevContainer環境では何をしても絶望的に遅く、最初の画面が表示されるまでに数分を要しました。これでは、Claude Codeにコード修正を頼んでも、その結果を確認する前に日が暮れてしまいます。

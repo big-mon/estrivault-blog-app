@@ -41,13 +41,13 @@ export async function getPosts(options?: {
     if (options?.category) {
       const normalizedCategory = normalizeForTagFilter(options.category);
       filteredPosts = filteredPosts.filter(
-        (post: PostMeta) => normalizeForTagFilter(post.category) === normalizedCategory
+        (post: PostMeta) => normalizeForTagFilter(post.category) === normalizedCategory,
       );
     }
     if (options?.tag) {
       const normalizedTag = normalizeForTagFilter(options.tag);
       filteredPosts = filteredPosts.filter((post: PostMeta) =>
-        post.tags?.some((tag: string) => normalizeForTagFilter(tag) === normalizedTag)
+        post.tags?.some((tag: string) => normalizeForTagFilter(tag) === normalizedTag),
       );
     }
 

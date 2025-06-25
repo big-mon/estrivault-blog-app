@@ -61,14 +61,14 @@
     observer = new IntersectionObserver(
       (entries) => {
         // ビューポート内にある見出しを収集
-        const visibleEntries = entries.filter(entry => entry.isIntersecting);
-        
+        const visibleEntries = entries.filter((entry) => entry.isIntersecting);
+
         if (visibleEntries.length > 0) {
           // 最上部にある見出しをアクティブとする
           const topEntry = visibleEntries.reduce((top, entry) => {
             return entry.boundingClientRect.top < top.boundingClientRect.top ? entry : top;
           });
-          
+
           const newActiveId = topEntry.target.id;
           if (newActiveId !== activeHeadingId) {
             activeHeadingId = newActiveId;
@@ -80,8 +80,8 @@
       },
       {
         rootMargin: '-10% 0% -70% 0%', // 上部10-30%の範囲で判定（より広い検出範囲）
-        threshold: 0
-      }
+        threshold: 0,
+      },
     );
 
     // 見出し要素を監視対象に追加
@@ -109,15 +109,15 @@
   >
     <h2 class="mb-4 text-lg font-bold text-gray-900">目次</h2>
     <ul class="space-y-2">
-      {#each headings as heading}
+      {#each headings as heading (heading.id)}
         <li class={getIndentClass(heading.level)}>
           <a
             href="#{heading.id}"
-            class="block py-1 transition-colors duration-200 {getTextSizeClass(
-              heading.level
-            )} {isActive(heading.id)
-              ? '-mx-2 rounded-md bg-gray-100 px-2 font-semibold text-gray-900'
-              : 'text-gray-600 hover:text-gray-900'}"
+            class="block py-1 transition-colors duration-200 {getTextSizeClass(heading.level)} {(
+              isActive(heading.id)
+            ) ?
+              '-mx-2 rounded-md bg-gray-100 px-2 font-semibold text-gray-900'
+            : 'text-gray-600 hover:text-gray-900'}"
           >
             {heading.text}
           </a>

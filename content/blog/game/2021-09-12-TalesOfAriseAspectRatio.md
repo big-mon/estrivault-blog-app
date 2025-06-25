@@ -15,7 +15,6 @@ MODがリリースされるのを待つのもいいですが、せっかくで�
 ## Universal Unreal Engine Unlockerをダウンロード
 
 1. [Universal Unreal Engine Unlocker](https://mega.nz/file/JQgmmTDQ#JicdedqwrbiCwj-DzfOIgJUD-HiKphSlO8Ppvkvqwfc)をダウンロード
-
    - 記事時点ではv3.0.19
 
 2. Tales of Ariseを起動

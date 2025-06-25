@@ -4,22 +4,44 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev-helper.js",
-    "dev:quick": "pnpm run build:packages && concurrently \"pnpm run dev:packages\" \"pnpm --filter svelte-blog dev\"",
-    "dev:safe": "pnpm run validate:workspace && pnpm run dev:quick",
-    "dev:packages": "pnpm --filter @estrivault/cloudinary-utils run dev",
     "build": "pnpm -r --filter svelte-blog... run build",
     "build:packages": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor run build",
+    "dev:packages": "pnpm --filter @estrivault/cloudinary-utils run dev",
     "validate:workspace": "node scripts/validate-workspace.js",
     "postinstall": "pnpm run build:packages",
-    "clean": "pnpm --filter @estrivault/cloudinary-utils run clean && rm -rf packages/content-processor/dist",
-    "reset": "pnpm run clean && pnpm install && pnpm run build:packages"
+    "clean": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor run clean",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "type-check": "pnpm run type-check:packages && pnpm --filter svelte-blog check",
+    "type-check:packages": "pnpm --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor exec tsc --noEmit",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.3.0",
+    "@eslint/js": "^9.29.0",
     "concurrently": "^9.2.0",
-    "dotenv-cli": "^8.0.0",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-svelte": "^3.9.3",
+    "globals": "^16.2.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
     "prettier": "^3.6.0",
     "prettier-plugin-svelte": "^3.4.0",
-    "prettier-plugin-tailwindcss": "^0.6.13"
+    "prettier-plugin-tailwindcss": "^0.6.13",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.35.0"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,svelte}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{json,md,css,scss}": [
+      "prettier --write"
+    ]
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -45,7 +45,7 @@
                     stroke-linejoin="round"
                     stroke-width="1.5"
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+                  ></path>
                 </svg>
                 <time datetime={meta.updatedAt.toISOString()} class="leading-relaxed">
                   {meta.updatedAt.toISOString().split('T')[0]}
@@ -62,7 +62,7 @@
                     stroke-linejoin="round"
                     stroke-width="1.5"
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
+                  ></path>
                 </svg>
                 <time datetime={meta.publishedAt.toISOString()} class="leading-relaxed">
                   {meta.publishedAt.toISOString().split('T')[0]}
@@ -80,7 +80,7 @@
         <!-- タグ -->
         {#if meta.tags && meta.tags.length > 0}
           <div class="mb-6 flex flex-wrap gap-2">
-            {#each meta.tags as tag}
+            {#each meta.tags as tag (tag)}
               <a
                 href={`/tag/${encodeURIComponent(tag.toLowerCase())}/1`}
                 class="rounded bg-gray-100 px-2 py-1 text-xs text-gray-600 transition-colors hover:bg-gray-200"
@@ -105,12 +105,14 @@
 <style>
   .description-text {
     /* タブレット以下では全文表示 */
+    word-wrap: break-word;
   }
 
   @media (min-width: 1024px) {
     .description-text {
       display: -webkit-box;
       -webkit-line-clamp: 3;
+      line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;

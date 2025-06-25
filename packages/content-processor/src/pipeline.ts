@@ -23,7 +23,10 @@ import type { ProcessorOptions } from './types';
  * @param enableSyntaxHighlight シンタックスハイライトを有効化するか
  * @returns ベースパイプライン
  */
-function createBasePipeline(options: ProcessorOptions = {}, enableSyntaxHighlight: boolean = false) {
+function createBasePipeline(
+  options: ProcessorOptions = {},
+  enableSyntaxHighlight: boolean = false,
+) {
   const { cloudinaryCloudName } = options;
 
   const pipeline = unified()
@@ -47,31 +50,32 @@ function createBasePipeline(options: ProcessorOptions = {}, enableSyntaxHighligh
   if (enableSyntaxHighlight) {
     pipeline.use(rehypePrettyCode, {
       theme: 'github-dark',
-      keepBackground: false
+      keepBackground: false,
     });
   }
 
-  return pipeline
-    // 画像変換
-    .use(rehypeImageTransform, {
-      cloudinaryCloudName: cloudinaryCloudName || '',
-      width: 1200,
-      mode: 'fit',
-    })
+  return (
+    pipeline
+      // 画像変換
+      .use(rehypeImageTransform, {
+        cloudinaryCloudName: cloudinaryCloudName || '',
+        width: 1200,
+        mode: 'fit',
+      })
 
-    // リンク変換
-    .use(rehypeLinkTransform)
+      // リンク変換
+      .use(rehypeLinkTransform)
 
-    // 見出しアンカー追加
-    .use(rehypeHeadingAnchor)
+      // 見出しアンカー追加
+      .use(rehypeHeadingAnchor)
 
-    // 見出し情報抽出
-    .use(rehypeHeadingExtractor)
+      // 見出し情報抽出
+      .use(rehypeHeadingExtractor)
 
-    // 最終出力
-    .use(rehypeStringify);
+      // 最終出力
+      .use(rehypeStringify)
+  );
 }
-
 
 /**
  * パイプラインを構築する
@@ -79,7 +83,9 @@ function createBasePipeline(options: ProcessorOptions = {}, enableSyntaxHighligh
  * @param enableSyntaxHighlight シンタックスハイライトを有効化するか
  * @returns 構築されたパイプライン
  */
-export function createPipeline(options: ProcessorOptions = {}, enableSyntaxHighlight: boolean = false) {
+export function createPipeline(
+  options: ProcessorOptions = {},
+  enableSyntaxHighlight: boolean = false,
+) {
   return createBasePipeline(options, enableSyntaxHighlight);
 }
-

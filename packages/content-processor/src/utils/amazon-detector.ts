@@ -14,6 +14,7 @@ export function hasAmazonEmbeds(tree: Root): boolean {
       hasAmazon = true;
       return EXIT; // ASTのトラバーサルを中断
     }
+    return undefined;
   });
 
   return hasAmazon;

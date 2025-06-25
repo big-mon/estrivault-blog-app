@@ -5,7 +5,7 @@ import svelte from 'eslint-plugin-svelte';
 import globals from 'globals';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript-eslint';
-import svelteConfig from './svelte.config.js';
+import svelteConfig from './apps/svelte-blog/svelte.config.js';
 
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
@@ -16,6 +16,21 @@ export default ts.config(
   ...svelte.configs.recommended,
   prettier,
   ...svelte.configs.prettier,
+  {
+    ignores: [
+      // Build outputs
+      '**/dist/**',
+      '**/build/**',
+      '**/.svelte-kit/**',
+      '**/output/**',
+      '**/.vercel/**',
+      '**/.netlify/**',
+      // Generated files
+      '**/*.d.ts',
+      '**/*.js.map',
+      'pnpm-lock.yaml',
+    ],
+  },
   {
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
@@ -32,5 +47,5 @@ export default ts.config(
         svelteConfig,
       },
     },
-  }
+  },
 );

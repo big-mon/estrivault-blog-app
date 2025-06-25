@@ -1,6 +1,31 @@
-# Package Managers
+# App-specific ignores (root .prettierignore handles common patterns)
+
+# Package Managers (app-specific)
 package-lock.json
-pnpm-lock.yaml
 yarn.lock
 bun.lock
 bun.lockb
+
+# App-specific build outputs
+.firebase/
+
+# Environment files
+.env*
+!.env.example
+
+# App-specific caches & temp
+.cache/
+.temp/
+.tmp/
+*.tsbuildinfo
+
+# Development & testing
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# IDE & OS
+.DS_Store
+.vscode/settings.json
+.idea/

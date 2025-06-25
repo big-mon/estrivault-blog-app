@@ -16,7 +16,6 @@ class TwitterService {
   private state: 'idle' | 'loading' | 'loaded' | 'error' = 'idle';
   private initPromise: Promise<void> | null = null;
 
-
   /**
    * Twitter APIの初期化（冪等性を保証）
    */

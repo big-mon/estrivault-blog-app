@@ -14,7 +14,9 @@ export const config = {
 
 export async function entries() {
   const allPosts = await getPosts();
-  const categories = [...new Set(allPosts.posts.map((post) => post.category))];
+  const categories = [
+    ...new Set(allPosts.posts.map((post: { category: string }) => post.category)),
+  ];
 
   const entries = [];
   for (const category of categories) {
@@ -23,14 +25,14 @@ export async function entries() {
 
     for (let page = 1; page <= totalPages; page++) {
       // Generate only lowercase URLs for consistency
-      entries.push({ category: category.toLowerCase(), page: page.toString() });
+      entries.push({ category: (category as string).toLowerCase(), page: page.toString() });
     }
   }
 
   return entries;
 }
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params }: { params: Record<string, string> }) => {
   const { category, page: pageParam } = params;
   const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
 
@@ -44,12 +46,16 @@ export const load = (async ({ params }) => {
   // If no results with exact match, try finding the correct case
   if (result.posts.length === 0) {
     const allPosts = await getPosts();
-    const categories = [...new Set(allPosts.posts.map((post) => post.category))];
-    const correctCategory = categories.find((cat) => cat.toLowerCase() === category.toLowerCase());
+    const categories = [
+      ...new Set(allPosts.posts.map((post: { category: string }) => post.category)),
+    ];
+    const correctCategory = categories.find(
+      (cat: unknown) => (cat as string).toLowerCase() === category?.toLowerCase(),
+    );
 
     if (correctCategory) {
       result = await getPosts({
-        category: correctCategory,
+        category: correctCategory as string,
         page: currentPage,
         perPage: POSTS_PER_PAGE,
       });

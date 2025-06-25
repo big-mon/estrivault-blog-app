@@ -18,18 +18,18 @@ import { FrontMatterError, MarkdownParseError } from './errors';
  * @returns 解析されたフロントマターとMarkdownコンテンツ
  */
 export function parseFrontmatter(content: string): {
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   content: string;
 } {
   try {
     const parsed = matter(content);
     return {
       data: parsed.data || {},
-      content: parsed.content
+      content: parsed.content,
     };
   } catch (parseError) {
     throw new MarkdownParseError(
-      `フロントマターのパースに失敗しました: ${parseError instanceof Error ? parseError.message : String(parseError)}`
+      `フロントマターのパースに失敗しました: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
     );
   }
 }
@@ -44,7 +44,7 @@ function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''
   if (!coverImage) return '';
   if (coverImage.startsWith('http') || coverImage.startsWith('data:')) return coverImage;
   // 先頭スラッシュ除去・拡張子除去
-  let publicId = coverImage.replace(/^\//, '').replace(/\.[^/.]+$/, '');
+  const publicId = coverImage.replace(/^\//, '').replace(/\.[^/.]+$/, '');
   return buildUrl(cloudinaryCloudName, publicId, { w: 800 });
 }
 
@@ -58,7 +58,7 @@ function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''
 export async function processMarkdown(
   content: string,
   options: ProcessorOptions = {},
-  slug?: string
+  slug?: string,
 ): Promise<PostHTML> {
   try {
     // フロントマターの解析
@@ -73,10 +73,7 @@ export async function processMarkdown(
     const stats = readingTime(markdown);
 
     // マークダウンをパースしてコードブロックを自動検出
-    const parseProcessor = unified()
-      .use(remarkParse)
-      .use(remarkDirective)
-      .use(remarkGfm);
+    const parseProcessor = unified().use(remarkParse).use(remarkDirective).use(remarkGfm);
 
     const parseResult = parseProcessor.parse(markdown);
 
@@ -91,18 +88,20 @@ export async function processMarkdown(
     const html = String(result);
 
     // 見出し情報を取得（heading-extractorプラグインで抽出されたもの）
-    const headings: HeadingInfo[] = (result.data as any)?.headings || [];
+    const headings: HeadingInfo[] =
+      ((result.data as Record<string, unknown>)?.headings as HeadingInfo[]) || [];
 
     // タグを検証して正規化
-    const tags = Array.isArray(data.tags)
-      ? data.tags
+    const tags =
+      Array.isArray(data.tags) ?
+        data.tags
           .filter((tag): tag is string => typeof tag === 'string')
           .map((tag) => tag.trim())
           .filter((tag) => tag.length > 0)
       : [];
 
     // 日付の正規化とDate型への変換
-    let publishedAtStr = data.publishedAt;
+    let publishedAtStr = data.publishedAt as string | undefined;
     if (publishedAtStr) {
       if (typeof publishedAtStr === 'string') {
         // "2022-03-24T17:42:00" のような形式を "2022-03-24T17:42:00.000Z" に修正
@@ -122,9 +121,9 @@ export async function processMarkdown(
     } else {
       publishedAtStr = new Date().toISOString();
     }
-    const publishedAt = new Date(publishedAtStr);
+    const publishedAt = new Date(publishedAtStr as string);
 
-    let updatedAtStr = data.updatedAt || publishedAtStr;
+    let updatedAtStr = (data.updatedAt as string | undefined) || publishedAtStr;
     if (updatedAtStr && typeof updatedAtStr === 'string') {
       // 同様にupdatedAtも正規化
       if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
@@ -137,19 +136,22 @@ export async function processMarkdown(
         updatedAtStr = publishedAtStr;
       }
     }
-    const updatedAt = new Date(updatedAtStr);
+    const updatedAt = new Date(updatedAtStr as string);
 
     // メタデータの構築
     const meta: PostMeta = {
-      slug: data.slug || slug || '',
-      title: data.title,
-      description: data.description || '',
+      slug: (data.slug as string) || slug || '',
+      title: data.title as string,
+      description: (data.description as string) || '',
       publishedAt,
       updatedAt,
-      category: data.category || '',
+      category: (data.category as string) || '',
       tags,
-      coverImage: resolveCoverImage(data.coverImage, options.cloudinaryCloudName),
-      draft: data.draft || false,
+      coverImage: resolveCoverImage(
+        data.coverImage as string | undefined,
+        options.cloudinaryCloudName,
+      ),
+      draft: (data.draft as boolean) || false,
       readingTime: Math.ceil(stats.minutes),
     };
 
@@ -159,16 +161,14 @@ export async function processMarkdown(
       headings,
       hasCodeBlocks: enableSyntaxHighlight,
       hasTwitterEmbeds: enableTwitterEmbeds,
-      hasAmazonEmbeds: enableAmazonEmbeds
+      hasAmazonEmbeds: enableAmazonEmbeds,
     };
   } catch (error) {
     if (error instanceof FrontMatterError || error instanceof MarkdownParseError) {
       throw error;
     }
     const message = error instanceof Error ? error.message : String(error);
-    throw new MarkdownParseError(
-      `Markdownの処理中にエラーが発生しました: ${message}`
-    );
+    throw new MarkdownParseError(`Markdownの処理中にエラーが発生しました: ${message}`);
   }
 }
 
@@ -182,7 +182,7 @@ export async function processMarkdown(
 export async function extractMetadata(
   content: string,
   options: ProcessorOptions = {},
-  slug?: string
+  slug?: string,
 ): Promise<PostMeta> {
   try {
     // フロントマターの解析
@@ -197,15 +197,16 @@ export async function extractMetadata(
     const stats = readingTime(markdown);
 
     // タグを検証して正規化
-    const tags = Array.isArray(data.tags)
-      ? data.tags
+    const tags =
+      Array.isArray(data.tags) ?
+        data.tags
           .filter((tag): tag is string => typeof tag === 'string')
           .map((tag) => tag.trim())
           .filter((tag) => tag.length > 0)
       : [];
 
     // 日付の正規化とDate型への変換
-    let publishedAtStr = data.publishedAt;
+    let publishedAtStr = data.publishedAt as string | undefined;
     if (publishedAtStr) {
       if (typeof publishedAtStr === 'string') {
         // "2022-03-24T17:42:00" のような形式を "2022-03-24T17:42:00.000Z" に修正
@@ -225,9 +226,9 @@ export async function extractMetadata(
     } else {
       publishedAtStr = new Date().toISOString();
     }
-    const publishedAt = new Date(publishedAtStr);
+    const publishedAt = new Date(publishedAtStr as string);
 
-    let updatedAtStr = data.updatedAt || publishedAtStr;
+    let updatedAtStr = (data.updatedAt as string | undefined) || publishedAtStr;
     if (updatedAtStr && typeof updatedAtStr === 'string') {
       // 同様にupdatedAtも正規化
       if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
@@ -240,19 +241,22 @@ export async function extractMetadata(
         updatedAtStr = publishedAtStr;
       }
     }
-    const updatedAt = new Date(updatedAtStr);
+    const updatedAt = new Date(updatedAtStr as string);
 
     // メタデータの構築
     const meta: PostMeta = {
-      slug: data.slug || slug || '',
-      title: data.title,
-      description: data.description || '',
+      slug: (data.slug as string) || slug || '',
+      title: data.title as string,
+      description: (data.description as string) || '',
       publishedAt,
       updatedAt,
-      category: data.category || '',
+      category: (data.category as string) || '',
       tags,
-      coverImage: resolveCoverImage(data.coverImage, options.cloudinaryCloudName),
-      draft: data.draft || false,
+      coverImage: resolveCoverImage(
+        data.coverImage as string | undefined,
+        options.cloudinaryCloudName,
+      ),
+      draft: (data.draft as boolean) || false,
       readingTime: Math.ceil(stats.minutes),
     };
 
@@ -262,8 +266,6 @@ export async function extractMetadata(
       throw error;
     }
     const message = error instanceof Error ? error.message : String(error);
-    throw new MarkdownParseError(
-      `メタデータの抽出中にエラーが発生しました: ${message}`
-    );
+    throw new MarkdownParseError(`メタデータの抽出中にエラーが発生しました: ${message}`);
   }
 }
