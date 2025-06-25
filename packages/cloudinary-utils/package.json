@@ -21,5 +21,7 @@
   "dependencies": {
     "@cloudinary/url-gen": "^1.21.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "tsup": "^8.5.0"
+  }
 }
