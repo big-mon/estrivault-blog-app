@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@estrivault/cloudinary-utils": "workspace:^",
-    "@estrivault/content-processor": "workspace:*"
+    "@estrivault/content-processor": "workspace:^"
   },
   "devDependencies": {
     "@playwright/test": "^1.53.1",
