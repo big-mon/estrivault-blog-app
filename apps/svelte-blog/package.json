@@ -15,7 +15,6 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@estrivault/cloudinary-utils": "workspace:^",
     "@estrivault/content-processor": "workspace:^"
   },
   "devDependencies": {
