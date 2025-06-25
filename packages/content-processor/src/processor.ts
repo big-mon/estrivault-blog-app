@@ -45,7 +45,7 @@ function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''
   if (coverImage.startsWith('http') || coverImage.startsWith('data:')) return coverImage;
   // 先頭スラッシュ除去・拡張子除去
   const publicId = coverImage.replace(/^\//, '').replace(/\.[^/.]+$/, '');
-  return buildUrl(cloudinaryCloudName, publicId, { w: 800 });
+  return buildUrl(cloudinaryCloudName, publicId, { w: 1200, quality: 85 });
 }
 
 /**

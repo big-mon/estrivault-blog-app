@@ -1,7 +1,7 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
 import type { Root } from 'hast';
-import { buildUrl, type BuildUrlOptions } from '@estrivault/cloudinary-utils';
+import { buildUrl, buildSrcSet, type BuildUrlOptions } from '@estrivault/cloudinary-utils';
 
 export interface ImageTransformOptions {
   /** Cloudinaryクラウド名（必須） */
@@ -10,6 +10,8 @@ export interface ImageTransformOptions {
   width?: number;
   /** 画像のトリミングモード */
   mode?: 'fit' | 'fill';
+  /** 画像品質設定 */
+  quality?: number | 'auto' | 'eco' | 'low';
 }
 
 /**
@@ -19,7 +21,7 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
   if (!options?.cloudinaryCloudName) {
     throw new Error('cloudinaryCloudName is required in options');
   }
-  const { cloudinaryCloudName, width = 1200 } = options;
+  const { cloudinaryCloudName, width = 1200, quality = 90 } = options;
 
   return (tree: Root) => {
     visit(tree, 'element', (node) => {
@@ -53,17 +55,21 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
         const buildOptions: BuildUrlOptions = {
           w: width,
           mode,
+          quality,
         };
 
         node.properties.src = buildUrl(cloudinaryCloudName, publicId, buildOptions);
+
+        // レスポンシブ画像用のsrcsetを生成
+        node.properties.srcset = buildSrcSet(cloudinaryCloudName, publicId, buildOptions);
 
         // レスポンシブ画像用の属性を追加
         node.properties.loading = 'lazy';
         node.properties.decoding = 'async';
 
-        // サイズヒントを追加
+        // サイズヒントを追加（記事幅に最適化）
         if (!node.properties.sizes) {
-          node.properties.sizes = '(max-width: 768px) 100vw, 50vw';
+          node.properties.sizes = '(max-width: 640px) 100vw, (max-width: 768px) 90vw, 800px';
         }
       } catch (error) {
         console.error('Error transforming image URL:', error);
