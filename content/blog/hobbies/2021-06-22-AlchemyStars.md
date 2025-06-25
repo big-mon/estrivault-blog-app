@@ -5,7 +5,7 @@ slug: alchemy-stars-price-rate
 publishedAt: 2021-06-22T23:54:00
 coverImage: /Hero/alchemy-stars-title.jpg
 category: Hobbies
-tags: ['白夜極光', 'ガチャ']
+tags: ['ゲーム', '白夜極光', 'ガチャ', '課金']
 ---
 
 ## 白夜極光の換金比率を計算

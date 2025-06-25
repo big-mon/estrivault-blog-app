@@ -5,7 +5,7 @@ slug: ryse-son-of-rome-japanese-localize
 publishedAt: 2021-05-04T16:34:00
 coverImage: /Hero/ryse-sor-pic1.jpg
 category: Hobbies
-tags: ['Ryse: Son of Rome', '日本語化']
+tags: ['ゲーム', 'Ryse: Son of Rome', '日本語化']
 ---
 
 Steamにて販売されている『**Ryse: Son of Rome**』を日本語化して遊んでみました。

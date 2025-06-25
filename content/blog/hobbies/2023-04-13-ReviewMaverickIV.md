@@ -5,7 +5,7 @@ slug: vectoroptics-maverick-scrd51
 publishedAt: 2023-04-13T20:55:00
 coverImage: /Hero/reviewMaverickIV
 category: Hobbies
-tags: ['光学機器', 'ドットサイト', 'Vector Optics']
+tags: ['サバゲー', '光学機器', 'ドットサイト', 'レビュー']
 ---
 
 Vector Optics製のレッドドットサイト『[Maverick-Ⅳ 1×20 Mini SCRD-51](https://amzn.to/3mqgwxF)』を、Amazonにてつぼみストアより購入したのでレビューします。

@@ -5,7 +5,7 @@ slug: novelarms-3x-magnifier
 publishedAt: 2023-04-13T23:44:00
 coverImage: /Hero/reviewNovelArmsMagnifire3x
 category: Hobbies
-tags: ['光学機器', 'マグニファイア', 'NOVEL ARMS']
+tags: ['サバゲー', '光学機器', 'マグニファイア', 'NOVEL ARMS']
 ---
 
 NOVEL ARMS製のマグニファイア『[3X TACTICAL MAGNIFIER](https://amzn.to/3UB87UQ)』を、Amazonにて遊義海堂より購入したのでレビューします。

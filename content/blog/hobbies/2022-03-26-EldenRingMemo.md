@@ -5,7 +5,7 @@ slug: eldenring-memo
 publishedAt: 2022-03-26T15:25:00
 coverImage: /Hero/eldenring-ranni
 category: Hobbies
-tags: ['ELDEN RING']
+tags: ['ゲーム', 'ELDEN RING', 'ストーリー']
 ---
 
 『ELDEN RING』のキーワードに関する個人的な理解を整理のためにメモしておきます。

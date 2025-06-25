@@ -5,7 +5,7 @@ slug: leopold-mark-2-ims-30mm-scope-mount
 publishedAt: 2023-06-10T00:10:00
 coverImage: /Hero/leupoldMark2IMSScopeMount
 category: Hobbies
-tags: ['光学機器', 'マウント', 'LEUPOLD', '実物']
+tags: ['サバゲー', '光学機器', 'マウント', 'LEUPOLD', '実物']
 ---
 
 [LEUPOLD](https://www.leupold.com/)製のスコープマウント『LEUPOLD Mark 2 IMS』をデザートカウボーイにて購入したのでレビューします。

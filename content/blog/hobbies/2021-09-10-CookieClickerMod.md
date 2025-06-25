@@ -5,7 +5,7 @@ slug: steam-cookie-clicker-auto-click-mod
 publishedAt: 2021-09-10T02:50:00
 coverImage: /Hero/pexels-vitaly-vlasov-3095041.jpg
 category: Hobbies
-tags: ['Cookie Clicker', 'MOD']
+tags: ['ゲーム', 'Cookie Clicker', 'MOD']
 ---
 
 Steam版Cookie Clickerへ自動クリックMODを導入します。

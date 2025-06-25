@@ -5,7 +5,7 @@ slug: magpul-ctr-stock
 publishedAt: 2023-06-10T02:10:00
 coverImage: /Hero/magpulCtrStock
 category: Hobbies
-tags: ['外装パーツ', 'ストック', 'Magpul', '実物']
+tags: ['サバゲー', '外装パーツ', 'ストック', 'Magpul', '実物']
 ---
 
 MAGPUL製のストック『[Magpul CTR Carbine Stock Mil-Spec Black](https://amzn.to/3P2C6UI)』を[デザートカウボーイ](https://desertcw6.com/products/detail.php?product_id=4760)にて購入したのでレビューします。

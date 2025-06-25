@@ -5,7 +5,7 @@ slug: vtac-raze-belt-review
 publishedAt: 2024-01-10T18:10:00
 coverImage: /Hero/vtac-raze-belt
 category: Hobbies
-tags: ['装備', 'ベルト', 'Viking Tactics', '実物']
+tags: ['サバゲー', '装備', 'ベルト', 'レビュー', '実物']
 ---
 
 Viking Tactics (VTAC)製のベルト『[Raze Belt](https://www.vikingtactics.com/shop/vtac-raze-belt/)』を[レプマート](https://repmart.jp/products/vtacrzlbk.html)にて購入したのでレビューします。

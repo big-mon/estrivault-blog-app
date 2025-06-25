@@ -5,7 +5,7 @@ slug: tales-of-arise-fix-aspect
 publishedAt: 2021-09-12T01:14:00
 coverImage: /Hero/talesOfArise-title.jpg
 category: Hobbies
-tags: ['Tales of Arise', 'MOD']
+tags: ['ゲーム', 'Tales of Arise', 'MOD', 'ウルトラワイド']
 ---
 
 Tales of Ariseは記事時点でウルトラワイドモニターに対応していません。
