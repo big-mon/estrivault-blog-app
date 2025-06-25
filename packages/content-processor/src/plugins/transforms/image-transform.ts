@@ -11,7 +11,7 @@ export interface ImageTransformOptions {
   /** 画像のトリミングモード */
   mode?: 'fit' | 'fill';
   /** 画像品質設定 */
-  quality?: number | 'auto' | 'best' | 'good' | 'eco' | 'low';
+  quality?: number | 'auto' | 'eco' | 'low';
 }
 
 /**
@@ -21,7 +21,7 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
   if (!options?.cloudinaryCloudName) {
     throw new Error('cloudinaryCloudName is required in options');
   }
-  const { cloudinaryCloudName, width = 1200, quality = 'best' } = options;
+  const { cloudinaryCloudName, width = 1200, quality = 90 } = options;
 
   return (tree: Root) => {
     visit(tree, 'element', (node) => {

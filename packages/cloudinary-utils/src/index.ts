@@ -6,24 +6,24 @@ export interface BuildUrlOptions {
   w: number;
   h?: number;
   mode?: 'fill' | 'fit';
-  quality?: number | 'auto' | 'best' | 'good' | 'eco' | 'low';
+  quality?: number | 'auto' | 'eco' | 'low';
 }
 
 /**
  * 基本的な画像サイズ・品質プリセット
  */
 export const IMAGE_PRESETS = {
-  thumbnail: { w: 150, h: 150, mode: 'fill' as const, quality: 'good' as const },
-  small: { w: 300, mode: 'fit' as const, quality: 'good' as const },
-  medium: { w: 600, mode: 'fit' as const, quality: 'best' as const },
-  large: { w: 1200, mode: 'fit' as const, quality: 'best' as const },
-  xlarge: { w: 1800, mode: 'fit' as const, quality: 'best' as const },
-  social: { w: 1200, h: 630, mode: 'fill' as const, quality: 'good' as const },
+  thumbnail: { w: 150, h: 150, mode: 'fill' as const, quality: 80 as const },
+  small: { w: 300, mode: 'fit' as const, quality: 85 as const },
+  medium: { w: 600, mode: 'fit' as const, quality: 90 as const },
+  large: { w: 1200, mode: 'fit' as const, quality: 90 as const },
+  xlarge: { w: 1800, mode: 'fit' as const, quality: 90 as const },
+  social: { w: 1200, h: 630, mode: 'fill' as const, quality: 85 as const },
 
   // 記事専用プリセット
-  blogContent: { w: 1600, mode: 'fit' as const, quality: 'best' as const },
-  blogCover: { w: 1200, mode: 'fit' as const, quality: 'best' as const },
-  blogThumbnail: { w: 400, mode: 'fit' as const, quality: 'good' as const },
+  blogContent: { w: 1600, mode: 'fit' as const, quality: 90 as const },
+  blogCover: { w: 1200, mode: 'fit' as const, quality: 90 as const },
+  blogThumbnail: { w: 400, mode: 'fit' as const, quality: 85 as const },
 } as const;
 
 /**
