@@ -6,10 +6,9 @@ export const SITE_URL = 'https://estrilda.damonge.com/';
 
 export const NAVIGATION_LINKS = [
   { label: 'About', href: '/post/about' },
-  { label: 'Stocks', href: '/category/stocks/1' },
-  { label: 'Military', href: '/category/military/1' },
-  { label: 'Game', href: '/category/game/1' },
   { label: 'Tech', href: '/category/tech/1' },
+  { label: 'Finance', href: '/category/finance/1' },
+  { label: 'Hobbies', href: '/category/hobbies/1' },
   { label: 'Opinions', href: '/category/opinions/1' },
 ];
 
