@@ -2,6 +2,7 @@
 
 import { spawn } from 'child_process';
 import { existsSync } from 'fs';
+import { join } from 'path';
 
 function runCommand(command, options = {}) {
   return new Promise((resolve, reject) => {
@@ -26,7 +27,10 @@ function runCommand(command, options = {}) {
 
 async function ensurePackagesBuilt() {
   // 固定のパッケージパス（2つだけなので抽象化は不要）
-  const packages = ['packages/content-processor/dist', 'packages/cloudinary-utils/dist'];
+  const packages = [
+    join('packages', 'content-processor', 'dist'),
+    join('packages', 'cloudinary-utils', 'dist'),
+  ];
 
   const missingBuilds = packages.filter((path) => !existsSync(path));
 
