@@ -23,7 +23,7 @@ export async function GET() {
 
     for (let page = 1; page <= totalPages; page++) {
       categoryUrls.push(`<url>
-    <loc>${SITE_URL.replace(/\/$/, '')}/category/${(category as string).toLowerCase()}/${page}</loc>
+    <loc>${SITE_URL.replace(/\/$/, '')}/category/${category.toLowerCase()}/${page}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>`);
