@@ -8,6 +8,20 @@ import type { Contributor, GitHubCommit } from '$lib/types/github';
 // プリレンダリング設定（ISRは無効化）
 export const prerender = true;
 
+// プリレンダリング対象のエントリー
+export async function entries() {
+  const { getAllPostsMetaStatic } = await import('$lib/file-utils');
+  const { PUBLIC_CLOUDINARY_CLOUD_NAME } = await import('$env/static/public');
+
+  const processorOptions = {
+    cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
+  };
+
+  const allPosts = await getAllPostsMetaStatic(processorOptions);
+
+  return allPosts.map((post) => ({ slug: post.slug }));
+}
+
 async function fetchContributors(filePath: string): Promise<Contributor[]> {
   if (!GITHUB_TOKEN) {
     console.warn('GitHub token not configured, skipping contributors fetch');
