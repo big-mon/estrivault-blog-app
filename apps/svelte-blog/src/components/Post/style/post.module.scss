@@ -40,6 +40,10 @@
   // Image and figure styling
   :global(figure) {
     margin: 2rem 0;
+  }
+
+  // Image figure styling (only for figures containing images)
+  :global(figure:has(img)) {
     text-align: center;
   }
 
