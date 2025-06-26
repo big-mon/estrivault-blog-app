@@ -36,4 +36,28 @@
     font-size: 0.875em;
     font-weight: 600;
   }
+
+  // Image and figure styling
+  :global(figure) {
+    margin: 2rem 0;
+    text-align: center;
+  }
+
+  :global(figure img) {
+    border-radius: 0.5rem;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    max-width: 100%;
+    height: auto;
+  }
+
+  :global(figcaption) {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-style: italic;
+    text-align: center;
+    line-height: 1.5;
+  }
 }

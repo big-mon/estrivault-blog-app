@@ -24,12 +24,14 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
   const { cloudinaryCloudName, width = 1200, quality = 90 } = options;
 
   return (tree: Root) => {
-    visit(tree, 'element', (node) => {
-      if (node.tagName !== 'img' || !node.properties) {
+    visit(tree, 'element', (node, index, parent) => {
+      if (node.tagName !== 'img' || !node.properties || !parent || index === undefined) {
         return undefined;
       }
 
       const src = node.properties.src;
+      const title = node.properties.title;
+
       if (typeof src !== 'string' || !src) {
         return undefined;
       }
@@ -70,6 +72,31 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
         // サイズヒントを追加（記事幅に最適化）
         if (!node.properties.sizes) {
           node.properties.sizes = '(max-width: 640px) 100vw, (max-width: 768px) 90vw, 800px';
+        }
+
+        // titleがある場合、imgをfigureとfigcaptionで包む
+        if (title && typeof title === 'string') {
+          const figcaption = {
+            type: 'element' as const,
+            tagName: 'figcaption',
+            properties: {},
+            children: [{ type: 'text' as const, value: title }],
+          };
+
+          const figure = {
+            type: 'element' as const,
+            tagName: 'figure',
+            properties: {},
+            children: [node, figcaption],
+          };
+
+          // titleを削除（figcaptionに移動したため）
+          delete node.properties.title;
+
+          // 親要素内でimgをfigureに置き換え
+          if (Array.isArray(parent.children)) {
+            parent.children[index] = figure;
+          }
         }
       } catch (error) {
         console.error('Error transforming image URL:', error);
