@@ -2,22 +2,13 @@ import { getPostBySlug } from '$lib/posts';
 import { error } from '@sveltejs/kit';
 import { type PostHTML } from '@estrivault/content-processor';
 import { GITHUB_API_BASE, GITHUB_REPO_OWNER, GITHUB_REPO_NAME } from '$constants';
-import { env } from '$env/dynamic/private';
+import { GITHUB_TOKEN } from '$env/static/private';
 import type { Contributor, GitHubCommit } from '$lib/types/github';
 
-// ISR設定
-export const config = {
-  isr: {
-    // 1日キャッシュ（86400秒）
-    expiration: 86400,
-    // ソーシャルシェアやアナリティクスなどのクエリパラメータを許可
-    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref'],
-  },
-};
+// プリレンダリング設定（ISRは無効化）
+export const prerender = true;
 
 async function fetchContributors(filePath: string): Promise<Contributor[]> {
-  const GITHUB_TOKEN = env.GITHUB_TOKEN;
-
   if (!GITHUB_TOKEN) {
     console.warn('GitHub token not configured, skipping contributors fetch');
     return [];
