@@ -8,6 +8,7 @@
   export let onClose: () => void;
 
   let isLoading = true;
+  let lightboxElement: HTMLElement;
 
   function handleImageLoad() {
     isLoading = false;
@@ -35,7 +36,6 @@
     bodyElement.style.overflow = 'hidden';
 
     // フォーカスをライトボックスに移動
-    const lightboxElement = document.querySelector('[role="dialog"]') as HTMLElement;
     lightboxElement?.focus();
 
     return () => {
@@ -46,6 +46,7 @@
 </script>
 
 <div
+  bind:this={lightboxElement}
   class="fixed inset-0 z-[9999] flex cursor-zoom-out items-center justify-center bg-black/60"
   onclick={handleOverlayClick}
   onkeydown={handleKeydown}
