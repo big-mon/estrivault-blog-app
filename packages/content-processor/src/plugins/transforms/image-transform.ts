@@ -74,7 +74,10 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
           node.properties.sizes = '(max-width: 640px) 100vw, (max-width: 768px) 90vw, 800px';
         }
 
-        // titleがある場合、imgをfigureとfigcaptionで包む
+        // すべての画像をfigureで包む
+        const figureChildren = [node];
+
+        // titleがある場合、figcaptionも追加
         if (title && typeof title === 'string') {
           const figcaption = {
             type: 'element' as const,
@@ -82,21 +85,22 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
             properties: {},
             children: [{ type: 'text' as const, value: title }],
           };
-
-          const figure = {
-            type: 'element' as const,
-            tagName: 'figure',
-            properties: {},
-            children: [node, figcaption],
-          };
+          figureChildren.push(figcaption);
 
           // titleを削除（figcaptionに移動したため）
           delete node.properties.title;
+        }
 
-          // 親要素内でimgをfigureに置き換え
-          if (Array.isArray(parent.children)) {
-            parent.children[index] = figure;
-          }
+        const figure = {
+          type: 'element' as const,
+          tagName: 'figure',
+          properties: {},
+          children: figureChildren,
+        };
+
+        // 親要素内でimgをfigureに置き換え
+        if (Array.isArray(parent.children)) {
+          parent.children[index] = figure;
         }
       } catch (error) {
         console.error('Error transforming image URL:', error);
