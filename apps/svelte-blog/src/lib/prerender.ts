@@ -16,6 +16,9 @@ export async function getAllPostPaths(): Promise<string[]> {
     return allPosts.map((post) => `/post/${post.slug}`);
   } catch (err) {
     console.error('Failed to generate post paths for prerendering:', err);
-    return [];
+    // プリレンダリング時のエラーはビルドを失敗させるべきなので再スロー
+    throw new Error(
+      `Prerendering failed: Unable to generate post paths. ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
 }

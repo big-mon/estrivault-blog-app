@@ -10,16 +10,24 @@ export const prerender = true;
 
 // プリレンダリング対象のエントリー
 export async function entries() {
-  const { getAllPostsMetaStatic } = await import('$lib/file-utils');
-  const { PUBLIC_CLOUDINARY_CLOUD_NAME } = await import('$env/static/public');
+  try {
+    const { getAllPostsMetaStatic } = await import('$lib/file-utils');
+    const { PUBLIC_CLOUDINARY_CLOUD_NAME } = await import('$env/static/public');
 
-  const processorOptions = {
-    cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
-  };
+    const processorOptions = {
+      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
+    };
 
-  const allPosts = await getAllPostsMetaStatic(processorOptions);
+    const allPosts = await getAllPostsMetaStatic(processorOptions);
 
-  return allPosts.map((post) => ({ slug: post.slug }));
+    return allPosts.map((post) => ({ slug: post.slug }));
+  } catch (err) {
+    console.error('Failed to generate entries for post prerendering:', err);
+    // プリレンダリング時のエラーはビルドを失敗させるべきなので再スロー
+    throw new Error(
+      `Post entries generation failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
 }
 
 async function fetchContributors(filePath: string): Promise<Contributor[]> {
