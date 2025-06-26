@@ -51,7 +51,8 @@
         postContainer.removeEventListener('click', handleImageClick);
       };
     }
-    return () => {};
+    // postContainerが存在しない場合はundefinedを返す（クリーンアップ不要）
+    return undefined;
   });
 </script>
 
