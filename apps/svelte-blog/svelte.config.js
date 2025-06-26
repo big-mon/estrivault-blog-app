@@ -9,6 +9,9 @@ const config = {
         expiration: 60, // Cache for 60 seconds
       },
     }),
+    prerender: {
+      entries: ['*'],
+    },
     alias: {
       $components: './src/components',
       $lib: './src/lib',

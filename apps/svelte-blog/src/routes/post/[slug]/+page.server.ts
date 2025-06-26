@@ -2,22 +2,35 @@ import { getPostBySlug } from '$lib/posts';
 import { error } from '@sveltejs/kit';
 import { type PostHTML } from '@estrivault/content-processor';
 import { GITHUB_API_BASE, GITHUB_REPO_OWNER, GITHUB_REPO_NAME } from '$constants';
-import { env } from '$env/dynamic/private';
+import { GITHUB_TOKEN } from '$env/static/private';
 import type { Contributor, GitHubCommit } from '$lib/types/github';
 
-// ISR設定
-export const config = {
-  isr: {
-    // 1日キャッシュ（86400秒）
-    expiration: 86400,
-    // ソーシャルシェアやアナリティクスなどのクエリパラメータを許可
-    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref'],
-  },
-};
+// プリレンダリング設定（ISRは無効化）
+export const prerender = true;
+
+// プリレンダリング対象のエントリー
+export async function entries() {
+  try {
+    const { getAllPostsMetaStatic } = await import('$lib/file-utils');
+    const { PUBLIC_CLOUDINARY_CLOUD_NAME } = await import('$env/static/public');
+
+    const processorOptions = {
+      cloudinaryCloudName: PUBLIC_CLOUDINARY_CLOUD_NAME,
+    };
+
+    const allPosts = await getAllPostsMetaStatic(processorOptions);
+
+    return allPosts.map((post) => ({ slug: post.slug }));
+  } catch (err) {
+    console.error('Failed to generate entries for post prerendering:', err);
+    // プリレンダリング時のエラーはビルドを失敗させるべきなので再スロー
+    throw new Error(
+      `Post entries generation failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+}
 
 async function fetchContributors(filePath: string): Promise<Contributor[]> {
-  const GITHUB_TOKEN = env.GITHUB_TOKEN;
-
   if (!GITHUB_TOKEN) {
     console.warn('GitHub token not configured, skipping contributors fetch');
     return [];

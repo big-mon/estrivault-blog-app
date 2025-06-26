@@ -5,7 +5,7 @@ slug: rethinkdb-farewell
 publishedAt: 2021-03-18T02:05:00
 coverImage: /Hero/pexels-annalouise-674732_vsufe6.jpg
 category: Opinions
-tags: []
+tags: ['技術', 'Database', 'ビジネス']
 ---
 
 テック企業が持てはやされた2020年。変わって2021年ではやや株価に陰りが見られます。
