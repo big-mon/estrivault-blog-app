@@ -50,6 +50,12 @@
       0 2px 4px -1px rgba(0, 0, 0, 0.06);
     max-width: 100%;
     height: auto;
+    cursor: zoom-in;
+    transition: transform 0.2s ease-in-out;
+  }
+
+  :global(figure img:hover) {
+    transform: scale(1.02);
   }
 
   :global(figcaption) {

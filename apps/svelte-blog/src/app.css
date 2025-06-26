@@ -27,3 +27,14 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #a8a8a8;
 }
+
+/* ライトボックス表示中のスクロール無効化 */
+html.lightbox-open {
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+}
+
+html.lightbox-open body {
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+}
