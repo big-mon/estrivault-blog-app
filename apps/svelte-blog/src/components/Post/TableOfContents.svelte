@@ -126,17 +126,3 @@
     </ul>
   </nav>
 {/if}
-
-<style>
-  .table-of-contents a {
-    text-decoration: none;
-    display: block;
-    border-radius: 4px;
-    padding: 0.25rem 0.5rem;
-    margin: -0.25rem -0.5rem;
-  }
-
-  .table-of-contents a:hover {
-    background-color: rgb(243 244 246 / 0.8);
-  }
-</style>
