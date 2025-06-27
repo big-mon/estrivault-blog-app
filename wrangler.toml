@@ -1,0 +1,8 @@
+name = "estrilda"
+compatibility_date = "2025-06-27"
+
+[assets]
+directory = "apps/svelte-blog/.svelte-kit/cloudflare"
+
+[build]
+command = "pnpm -r --filter svelte-blog... run build"

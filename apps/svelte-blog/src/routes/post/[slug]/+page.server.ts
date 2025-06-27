@@ -5,7 +5,7 @@ import { GITHUB_API_BASE, GITHUB_REPO_OWNER, GITHUB_REPO_NAME } from '$constants
 import { GITHUB_TOKEN } from '$env/static/private';
 import type { Contributor, GitHubCommit } from '$lib/types/github';
 
-// プリレンダリング設定（ISRは無効化）
+// プリレンダリング設定（個別記事は静的生成）
 export const prerender = true;
 
 // プリレンダリング対象のエントリー

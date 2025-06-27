@@ -3,15 +3,26 @@ import { POSTS_PER_PAGE } from '$constants';
 import type { PageServerLoad } from './$types';
 import type { PostMeta } from '@estrivault/content-processor';
 
-// ISR設定
-export const config = {
-  isr: {
-    // 6時間キャッシュ（21600秒）
-    expiration: 21600,
-    // ソーシャルシェアやアナリティクスなどのクエリパラメータを許可
-    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref'],
-  },
-};
+// ハイブリッド設定（主要ページはプリレンダリング、その他は動的）
+export const prerender = 'auto';
+
+export async function entries() {
+  // すべての記事を取得してタグを収集
+  const allPosts = await getPosts();
+  const tags = new Set<string>();
+
+  allPosts.posts.forEach((post: PostMeta) => {
+    post.tags?.forEach((tag: string) => tags.add(tag.toLowerCase()));
+  });
+
+  // 各タグの最初のページのみプリレンダリング
+  const entries = [];
+  for (const tag of tags) {
+    entries.push({ tag, page: '1' });
+  }
+
+  return entries;
+}
 
 export const load = (async ({ params }: { params: Record<string, string> }) => {
   const { tag, page: pageParam } = params;
@@ -57,26 +68,3 @@ export const load = (async ({ params }: { params: Record<string, string> }) => {
 }) satisfies PageServerLoad;
 
 // プリレンダリングするタグとページの組み合わせを生成
-export async function entries() {
-  // すべての記事を取得してタグを収集
-  const allPosts = await getPosts();
-  const tags = new Set<string>();
-
-  allPosts.posts.forEach((post: PostMeta) => {
-    post.tags?.forEach((tag: string) => tags.add(tag.toLowerCase()));
-  });
-
-  // 各タグに対して最大5ページ分のエントリを生成
-  const entries = [];
-  for (const tag of tags) {
-    const postsForTag = await getPosts({ tag });
-    const totalPages = Math.ceil(postsForTag.total / POSTS_PER_PAGE);
-    const pages = Math.max(1, totalPages);
-
-    for (let page = 1; page <= pages; page++) {
-      entries.push({ tag, page: page.toString() });
-    }
-  }
-
-  return entries;
-}

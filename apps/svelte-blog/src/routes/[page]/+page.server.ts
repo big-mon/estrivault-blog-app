@@ -3,25 +3,8 @@ import type { PageServerLoad } from './$types';
 import { POSTS_PER_PAGE } from '../../constants';
 import { error } from '@sveltejs/kit';
 
-// ISR設定
-export const config = {
-  isr: {
-    // 1日キャッシュ（86400秒）
-    expiration: 86400,
-  },
-};
-
-export async function entries() {
-  const result = await getPosts();
-  const totalPages = result.totalPages;
-
-  const entries = [];
-  for (let page = 2; page <= totalPages; page++) {
-    entries.push({ page: page.toString() });
-  }
-
-  return entries;
-}
+// 動的レンダリング設定（ページネーションは動的）
+export const prerender = false;
 
 export const load = (async ({ params }: { params: Record<string, string> }) => {
   const pageParam = params.page;
