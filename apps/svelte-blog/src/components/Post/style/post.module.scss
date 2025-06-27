@@ -1,12 +1,13 @@
 // Post content link styling with consistent blue hover effect
 .prose {
   :global(p a) {
-    color: inherit;
-    text-decoration: underline;
-    transition: color 0.2s ease-in-out;
+    color: #2563eb; // Blue color for links
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
 
     &:hover {
-      color: #2563eb; // Same blue as text-blue-600 used in post cards
+      color: #1d4ed8; // Darker blue on hover
+      text-decoration: underline;
     }
   }
 
