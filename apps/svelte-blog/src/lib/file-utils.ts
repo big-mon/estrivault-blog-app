@@ -12,7 +12,7 @@ export interface PostWithPath {
 }
 
 /**
- * import.meta.globを使用してMarkdownファイルを静的に取得
+ * import.meta.globを使用してMarkdownファイルを静的に取得（メタデータ用）
  * @returns ファイルパスとコンテンツのマップ
  */
 function getMarkdownFiles(): Record<string, string> {
@@ -24,6 +24,36 @@ function getMarkdownFiles(): Record<string, string> {
   });
 
   return modules as Record<string, string>;
+}
+
+/**
+ * import.meta.globを使用してMarkdownファイルを静的に取得（メタデータ専用、フロントマターのみ）
+ * @returns ファイルパスとコンテンツのマップ
+ */
+function getMarkdownFilesForMetadata(): Record<string, string> {
+  // Vite alias を使用したパス（メタデータ専用の別のglob呼び出し）
+  const modules = import.meta.glob('@content/blog/**/*.{md,mdx}', {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  });
+
+  return modules as Record<string, string>;
+}
+
+/**
+ * import.meta.globを使用してMarkdownファイルを動的に取得（遅延読み込み用）
+ * @returns ファイルパスと動的インポート関数のマップ
+ */
+function getMarkdownFilesLazy(): Record<string, () => Promise<string>> {
+  // Vite alias を使用したパス（eager: false で遅延読み込み）
+  const modules = import.meta.glob('@content/blog/**/*.{md,mdx}', {
+    query: '?raw',
+    import: 'default',
+    eager: false,
+  });
+
+  return modules as Record<string, () => Promise<string>>;
 }
 
 /**
@@ -42,19 +72,26 @@ function generateSlugFromPath(filePath: string): string {
 }
 
 /**
- * 単一のMarkdownファイルからメタデータを抽出
+ * フロントマターのみを効率的に抽出してメタデータを取得
  * @param filePath ファイルパス
  * @param content ファイルコンテンツ
  * @param options 処理オプション
- * @returns ファイルパス付きのPostMeta
+ * @returns メタデータのみ
  */
-async function loadMarkdownMetaFromContent(
+async function extractFrontmatterOnly(
   filePath: string,
   content: string,
   options: ProcessorOptions = {},
 ): Promise<PostWithPath | null> {
   try {
+    // フロントマター部分のみを抽出（コンテンツ処理はスキップ）
+    const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    if (!frontmatterMatch) {
+      return null;
+    }
+
     const slug = generateSlugFromPath(filePath);
+    // extractMetadata は軽量なのでそのまま使用
     const meta = await extractMetadata(content, options, slug);
 
     // ドラフトは除外
@@ -64,23 +101,22 @@ async function loadMarkdownMetaFromContent(
 
     return { meta, filePath };
   } catch (error) {
-    // 無効なファイルはスキップ
-    console.warn(`Failed to load markdown file: ${filePath}`, error);
+    console.warn(`Failed to extract frontmatter from: ${filePath}`, error);
     return null;
   }
 }
 
 /**
- * 全Markdownファイルのメタデータを取得（静的版）
+ * 全Markdownファイルのメタデータを取得（最適化版）
  * @param options ファイル処理オプション
  * @returns PostMetaの配列（新しい順でソート済み）
  */
 export async function getAllPostsMetaStatic(options: ProcessorOptions = {}): Promise<PostMeta[]> {
-  const markdownFiles = getMarkdownFiles();
+  const markdownFiles = getMarkdownFilesForMetadata();
 
   const postsWithPath = await Promise.all(
     Object.entries(markdownFiles).map(([filePath, content]) =>
-      loadMarkdownMetaFromContent(filePath, content, options),
+      extractFrontmatterOnly(filePath, content, options),
     ),
   );
 
@@ -102,11 +138,11 @@ export async function getAllPostsMetaStatic(options: ProcessorOptions = {}): Pro
 export async function getAllPostsWithPathStatic(
   options: ProcessorOptions = {},
 ): Promise<PostWithPath[]> {
-  const markdownFiles = getMarkdownFiles();
+  const markdownFiles = getMarkdownFilesForMetadata();
 
   const postsWithPath = await Promise.all(
     Object.entries(markdownFiles).map(([filePath, content]) =>
-      loadMarkdownMetaFromContent(filePath, content, options),
+      extractFrontmatterOnly(filePath, content, options),
     ),
   );
 
@@ -115,7 +151,7 @@ export async function getAllPostsWithPathStatic(
 }
 
 /**
- * スラッグに基づいて個別の記事を取得（静的版）
+ * スラッグに基づいて個別の記事を取得（最適化版 - 遅延読み込み）
  * @param slug 記事のスラッグ
  * @param options ファイル処理オプション
  * @returns 記事のメタデータとHTMLコンテンツ
@@ -124,31 +160,37 @@ export async function getPostBySlugStatic(
   slug: string,
   options: ProcessorOptions = {},
 ): Promise<PostHTML | null> {
-  const markdownFiles = getMarkdownFiles();
+  // 1. まずメタデータからファイルパスを特定
+  const allPostsWithPath = await getAllPostsWithPathStatic(options);
+  const targetPost = allPostsWithPath.find((post) => post.meta.slug === slug);
 
-  // スラッグに一致するファイルを検索
-  for (const [filePath, content] of Object.entries(markdownFiles)) {
-    try {
-      // メタデータを抽出してスラッグを確認
-      const meta = await extractMetadata(content, options, generateSlugFromPath(filePath));
-
-      // フロントマターのslugまたはファイル名から生成されたslugが一致するかチェック
-      if (meta.slug === slug) {
-        // HTML変換して返却
-        const postHTML = await processMarkdown(content, options, slug);
-        // originalPathを設定（content/blog/から始まる相対パスに変換）
-        const relativePath = filePath.replace(/^.*\/content\/blog\//, 'content/blog/');
-        postHTML.originalPath = relativePath;
-        return postHTML;
-      }
-    } catch (error) {
-      // エラーのあるファイルはスキップ
-      console.warn(`Failed to process file ${filePath}:`, error);
-      continue;
-    }
+  if (!targetPost) {
+    return null;
   }
 
-  return null;
+  // 2. 対象ファイルのみ遅延読み込み
+  const lazyMarkdownFiles = getMarkdownFilesLazy();
+  const lazyLoader = lazyMarkdownFiles[targetPost.filePath];
+
+  if (!lazyLoader) {
+    console.warn(`Lazy loader not found for file: ${targetPost.filePath}`);
+    return null;
+  }
+
+  try {
+    // 3. 必要なファイルのみ動的読み込み
+    const content = await lazyLoader();
+
+    // HTML変換して返却
+    const postHTML = await processMarkdown(content, options, slug);
+    // originalPathを設定（content/blog/から始まる相対パスに変換）
+    const relativePath = targetPost.filePath.replace(/^.*\/content\/blog\//, 'content/blog/');
+    postHTML.originalPath = relativePath;
+    return postHTML;
+  } catch (error) {
+    console.error(`Failed to process markdown for slug: ${slug}`, error);
+    return null;
+  }
 }
 
 /**

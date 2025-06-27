@@ -51,6 +51,18 @@ function createBasePipeline(
     pipeline.use(rehypePrettyCode, {
       theme: 'github-dark',
       keepBackground: false,
+      langs: [
+        'bash',
+        'javascript',
+        'typescript',
+        'json',
+        'svelte',
+        'toml',
+        'xml',
+        'markdown',
+        'text',
+        'js',
+      ],
     });
   }
 

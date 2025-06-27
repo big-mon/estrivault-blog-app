@@ -17,10 +17,41 @@ export default defineConfig({
     rollupOptions: {
       cache: true, // Rollupキャッシュを有効化
       output: {
-        manualChunks: {
-          // 大きなライブラリを手動でチャンク分け
-          shiki: ['shiki'],
-          unified: ['unified', 'remark-parse', 'remark-rehype', 'rehype-stringify'],
+        manualChunks: (id) => {
+          // Shiki関連の依存関係
+          if (id.includes('shiki') || id.includes('@shikijs')) {
+            return 'shiki';
+          }
+
+          // unified/remark/rehypeエコシステム
+          if (
+            id.includes('unified') ||
+            id.includes('remark-') ||
+            id.includes('rehype-') ||
+            id.includes('mdast') ||
+            id.includes('hast') ||
+            id.includes('micromark')
+          ) {
+            return 'markdown-processor';
+          }
+
+          // Tailwind CSS関連
+          if (id.includes('tailwindcss') || id.includes('@tailwindcss')) {
+            return 'tailwind';
+          }
+
+          // SvelteKit/Svelte関連
+          if (id.includes('@sveltejs') || id.includes('svelte/')) {
+            return 'sveltekit';
+          }
+
+          // Node modules内の大きなライブラリ
+          if (id.includes('node_modules')) {
+            if (id.includes('gray-matter') || id.includes('reading-time')) {
+              return 'utils';
+            }
+            return 'vendor';
+          }
         },
       },
     },

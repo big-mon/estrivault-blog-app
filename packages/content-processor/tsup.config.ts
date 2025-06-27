@@ -3,9 +3,7 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: ['src/index.ts'],
   format: ['esm'], // ESM のみをサポート
-  dts: {
-    entry: './src/index.ts',
-  }, // 型定義を生成
+  dts: false, // 型定義を生成
   clean: false, // インクリメンタルビルドのためfalse
   bundle: true, // バンドルを有効化
   splitting: true, // コード分割を有効化

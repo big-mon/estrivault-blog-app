@@ -1,15 +1,26 @@
 <script lang="ts">
-  import { beforeNavigate, afterNavigate } from '$app/navigation';
+  // 動的インポートでナビゲーションモジュールを遅延読み込み
+  let beforeNavigate: ((fn: () => void) => void) | undefined;
+  let afterNavigate: ((fn: () => void) => void) | undefined;
+
+  import('$app/navigation').then((module) => {
+    beforeNavigate = module.beforeNavigate;
+    afterNavigate = module.afterNavigate;
+  });
 
   let { class: className = '' } = $props();
   let isNavigating = $state(false);
 
-  beforeNavigate(() => {
-    isNavigating = true;
-  });
+  $effect(() => {
+    if (beforeNavigate && afterNavigate) {
+      beforeNavigate(() => {
+        isNavigating = true;
+      });
 
-  afterNavigate(() => {
-    isNavigating = false;
+      afterNavigate(() => {
+        isNavigating = false;
+      });
+    }
   });
 </script>
 
