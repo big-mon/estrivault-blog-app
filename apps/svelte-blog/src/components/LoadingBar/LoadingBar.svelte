@@ -1,26 +1,16 @@
 <script lang="ts">
-  // 動的インポートでナビゲーションモジュールを遅延読み込み
-  let beforeNavigate: ((fn: () => void) => void) | undefined;
-  let afterNavigate: ((fn: () => void) => void) | undefined;
-
-  import('$app/navigation').then((module) => {
-    beforeNavigate = module.beforeNavigate;
-    afterNavigate = module.afterNavigate;
-  });
+  import { beforeNavigate, afterNavigate } from '$app/navigation';
 
   let { class: className = '' } = $props();
   let isNavigating = $state(false);
 
-  $effect(() => {
-    if (beforeNavigate && afterNavigate) {
-      beforeNavigate(() => {
-        isNavigating = true;
-      });
+  // Register navigation callbacks once using SvelteKit's built-in cleanup
+  beforeNavigate(() => {
+    isNavigating = true;
+  });
 
-      afterNavigate(() => {
-        isNavigating = false;
-      });
-    }
+  afterNavigate(() => {
+    isNavigating = false;
   });
 </script>
 
