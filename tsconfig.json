@@ -28,11 +28,20 @@
     "skipLibCheck": true,
 
     // パフォーマンス設定
-    "composite": false
+    "composite": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo-root"
   },
 
   // ワークスペース全体のファイル設定
   "include": ["apps/**/*", "packages/**/*", "scripts/**/*"],
 
-  "exclude": ["node_modules", "**/node_modules", "**/dist", "**/build", "**/.svelte-kit"]
+  "exclude": ["node_modules", "**/node_modules", "**/dist", "**/build", "**/.svelte-kit"],
+
+  // プロジェクト参照設定
+  "references": [
+    { "path": "./packages/cloudinary-utils" },
+    { "path": "./packages/content-processor" },
+    { "path": "./apps/svelte-blog" }
+  ]
 }

@@ -11,3 +11,11 @@ dist/
 
 .pnpm-store/
 .claude/
+
+# TypeScriptビルドキャッシュ
+.tsbuildinfo*
+**/.tsbuildinfo*
+
+# Viteキャッシュ
+.vite/
+**/node_modules/.vite/
