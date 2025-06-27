@@ -2,15 +2,8 @@ import { getPosts } from '$lib';
 import { POSTS_PER_PAGE } from '$constants';
 import type { PageServerLoad } from './$types';
 
-// ISR設定
-export const config = {
-  isr: {
-    // 6時間キャッシュ（21600秒）
-    expiration: 21600,
-    // ソーシャルシェアやアナリティクスなどのクエリパラメータを許可
-    allowQuery: ['utm_source', 'utm_medium', 'utm_campaign', 'ref'],
-  },
-};
+// ハイブリッド設定（主要ページはプリレンダリング、その他は動的）
+export const prerender = 'auto';
 
 export async function entries() {
   const allPosts = await getPosts();
@@ -20,13 +13,11 @@ export async function entries() {
 
   const entries = [];
   for (const category of categories) {
-    const categoryPosts = await getPosts({ category });
-    const totalPages = categoryPosts.totalPages;
-
-    for (let page = 1; page <= totalPages; page++) {
-      // Generate only lowercase URLs for consistency
-      entries.push({ category: (category as string).toLowerCase(), page: page.toString() });
-    }
+    // 最初のページのみプリレンダリング
+    entries.push({
+      category: (category as string).toLowerCase(),
+      page: '1',
+    });
   }
 
   return entries;

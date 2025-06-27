@@ -7,6 +7,8 @@ const config = {
     adapter: adapter(),
     prerender: {
       entries: ['*'],
+      handleMissingId: 'warn',
+      handleHttpError: 'warn',
     },
     alias: {
       $components: './src/components',
