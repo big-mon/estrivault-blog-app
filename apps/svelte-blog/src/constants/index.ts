@@ -15,7 +15,7 @@ export const NAVIGATION_LINKS = [
 export const SOCIAL_LINK_X = 'big_mon';
 export const SOCIAL_LINK_GITHUB = 'big-mon/estrivault-blog-app';
 
-export const POSTS_PER_PAGE = 9;
+export const POSTS_PER_PAGE = 12;
 
 // Cloudflare制限対応：ページネーション制限
 export const MAX_PAGINATION_PAGES = 10;
