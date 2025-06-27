@@ -1,7 +1,7 @@
 name = "estrilda"
 
-[site]
-bucket = "apps/svelte-blog/.svelte-kit/cloudflare"
+[assets]
+directory = "apps/svelte-blog/.svelte-kit/cloudflare"
 
 [build]
 command = "pnpm -r --filter svelte-blog... run build"
