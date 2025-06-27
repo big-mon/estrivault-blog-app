@@ -50,6 +50,9 @@ importers:
       typescript-eslint:
         specifier: ^8.35.0
         version: 8.35.0(eslint@9.29.0(jiti@2.4.2))(typescript@5.8.3)
+      wrangler:
+        specifier: ^4.22.0
+        version: 4.22.0(@cloudflare/workers-types@4.20250627.0)
 
   apps/svelte-blog:
     dependencies:
