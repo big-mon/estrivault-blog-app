@@ -1,7 +1,0 @@
-name = "estrilda"
-
-pages_build_output_dir = ".svelte-kit/cloudflare"
-
-[build]
-command = "pnpm run build"
-cwd = "apps/svelte-blog"
