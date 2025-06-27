@@ -6,9 +6,11 @@
     "rootDir": "src",
     "composite": true,
     "incremental": true,
-    "tsBuildInfoFile": "dist/.tsbuildinfo"
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "declaration": true,
+    "declarationMap": true
   },
-  "include": ["src/**/*", "src/**/*.ts"],
-  "exclude": ["node_modules", "dist"],
+  "include": ["src/**/*.ts", "src/**/*.js"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"],
   "references": [{ "path": "../cloudinary-utils" }]
 }

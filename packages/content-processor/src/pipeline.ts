@@ -46,11 +46,13 @@ function createBasePipeline(
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw);
 
-  // シンタックスハイライトを条件で追加
+  // シンタックスハイライトを条件で追加（Cloudflare Workers対応）
   if (enableSyntaxHighlight) {
     pipeline.use(rehypePrettyCode, {
       theme: 'github-dark',
       keepBackground: false,
+      // Cloudflare Workers対応：JavaScript RegExp Engineを使用
+      engine: 'javascript',
       langs: [
         'bash',
         'javascript',
