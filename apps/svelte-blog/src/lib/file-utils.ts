@@ -61,8 +61,9 @@ async function extractFrontmatterOnly(
     }
 
     const slug = generateSlugFromPath(filePath);
-    // extractMetadata は軽量なのでそのまま使用
-    const meta = await extractMetadata(content, options, slug);
+    // フロントマター部分のみを処理用に再構成
+    const frontmatterOnly = `---\n${frontmatterMatch[1]}\n---\n`;
+    const meta = await extractMetadata(frontmatterOnly, options, slug);
 
     // ドラフトは除外
     if (meta.draft) {
