@@ -47,8 +47,12 @@ export default defineConfig({
 
           // Node modules内の大きなライブラリ
           if (id.includes('node_modules')) {
-            if (id.includes('gray-matter') || id.includes('reading-time')) {
-              return 'utils';
+            if (
+              id.includes('gray-matter') ||
+              id.includes('reading-time') ||
+              id.includes('js-yaml')
+            ) {
+              return 'markdown-utils';
             }
             return 'vendor';
           }

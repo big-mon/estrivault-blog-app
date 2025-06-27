@@ -15,6 +15,7 @@ export default defineConfig({
   // Cloudflare Workers対応のため、必要最小限のみexternal
   external: [
     '@estrivault/cloudinary-utils', // workspace依存のみ外部化
+    'gray-matter', // CloudflareでのYAML問題を回避
   ],
   // Cloudflare Workers互換性のためのpolyfill設定
   esbuildOptions(options) {

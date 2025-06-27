@@ -59,6 +59,9 @@ importers:
       '@estrivault/content-processor':
         specifier: workspace:^
         version: link:../../packages/content-processor
+      gray-matter:
+        specifier: ^4.0.3
+        version: 4.0.3
     devDependencies:
       '@playwright/test':
         specifier: ^1.53.1
