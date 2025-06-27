@@ -12,7 +12,7 @@ export interface PostWithPath {
 }
 
 /**
- * import.meta.globを使用してMarkdownファイルを静的に取得
+ * import.meta.globを使用してMarkdownファイルを静的に取得（メタデータ用）
  * @returns ファイルパスとコンテンツのマップ
  */
 function getMarkdownFiles(): Record<string, string> {
@@ -42,20 +42,28 @@ function generateSlugFromPath(filePath: string): string {
 }
 
 /**
- * 単一のMarkdownファイルからメタデータを抽出
+ * フロントマターのみを効率的に抽出してメタデータを取得
  * @param filePath ファイルパス
  * @param content ファイルコンテンツ
  * @param options 処理オプション
- * @returns ファイルパス付きのPostMeta
+ * @returns メタデータのみ
  */
-async function loadMarkdownMetaFromContent(
+async function extractFrontmatterOnly(
   filePath: string,
   content: string,
   options: ProcessorOptions = {},
 ): Promise<PostWithPath | null> {
   try {
+    // フロントマター部分のみを抽出（コンテンツ処理はスキップ）
+    const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    if (!frontmatterMatch) {
+      return null;
+    }
+
     const slug = generateSlugFromPath(filePath);
-    const meta = await extractMetadata(content, options, slug);
+    // フロントマター部分のみを処理用に再構成
+    const frontmatterOnly = `---\n${frontmatterMatch[1]}\n---\n`;
+    const meta = await extractMetadata(frontmatterOnly, options, slug);
 
     // ドラフトは除外
     if (meta.draft) {
@@ -64,14 +72,13 @@ async function loadMarkdownMetaFromContent(
 
     return { meta, filePath };
   } catch (error) {
-    // 無効なファイルはスキップ
-    console.warn(`Failed to load markdown file: ${filePath}`, error);
+    console.warn(`Failed to extract frontmatter from: ${filePath}`, error);
     return null;
   }
 }
 
 /**
- * 全Markdownファイルのメタデータを取得（静的版）
+ * 全Markdownファイルのメタデータを取得（最適化版）
  * @param options ファイル処理オプション
  * @returns PostMetaの配列（新しい順でソート済み）
  */
@@ -80,7 +87,7 @@ export async function getAllPostsMetaStatic(options: ProcessorOptions = {}): Pro
 
   const postsWithPath = await Promise.all(
     Object.entries(markdownFiles).map(([filePath, content]) =>
-      loadMarkdownMetaFromContent(filePath, content, options),
+      extractFrontmatterOnly(filePath, content, options),
     ),
   );
 
@@ -106,7 +113,7 @@ export async function getAllPostsWithPathStatic(
 
   const postsWithPath = await Promise.all(
     Object.entries(markdownFiles).map(([filePath, content]) =>
-      loadMarkdownMetaFromContent(filePath, content, options),
+      extractFrontmatterOnly(filePath, content, options),
     ),
   );
 
@@ -115,7 +122,7 @@ export async function getAllPostsWithPathStatic(
 }
 
 /**
- * スラッグに基づいて個別の記事を取得（静的版）
+ * スラッグに基づいて個別の記事を取得（最適化版 - 遅延読み込み）
  * @param slug 記事のスラッグ
  * @param options ファイル処理オプション
  * @returns 記事のメタデータとHTMLコンテンツ

@@ -15,7 +15,8 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@estrivault/content-processor": "workspace:^"
+    "@estrivault/content-processor": "workspace:^",
+    "gray-matter": "^4.0.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.53.1",

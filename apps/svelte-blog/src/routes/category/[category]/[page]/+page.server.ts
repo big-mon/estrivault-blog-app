@@ -7,15 +7,25 @@ export const prerender = 'auto';
 
 export async function entries() {
   const allPosts = await getPosts();
-  const categories = [
-    ...new Set(allPosts.posts.map((post: { category: string }) => post.category)),
-  ];
+
+  // カテゴリ別の記事数を計算
+  const categoryStats = new Map<string, number>();
+  allPosts.posts.forEach((post: { category: string }) => {
+    const category = post.category;
+    categoryStats.set(category, (categoryStats.get(category) || 0) + 1);
+  });
+
+  // 記事数順でソートし、上位カテゴリのみプリレンダリング（Cloudflare制限対応）
+  const topCategories = Array.from(categoryStats.entries())
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 10) // 上位10カテゴリのみ
+    .map(([category]) => category);
 
   const entries = [];
-  for (const category of categories) {
+  for (const category of topCategories) {
     // 最初のページのみプリレンダリング
     entries.push({
-      category: (category as string).toLowerCase(),
+      category: category.toLowerCase(),
       page: '1',
     });
   }

@@ -4,6 +4,7 @@
   let { class: className = '' } = $props();
   let isNavigating = $state(false);
 
+  // Register navigation callbacks once using SvelteKit's built-in cleanup
   beforeNavigate(() => {
     isNavigating = true;
   });

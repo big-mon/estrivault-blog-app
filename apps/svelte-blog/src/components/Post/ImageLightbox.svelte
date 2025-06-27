@@ -1,6 +1,9 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
   import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
+
+  // Use standard Svelte fade transition for better reliability
+  const fadeTransition = fade;
 
   export let src: string;
   export let alt: string;
@@ -50,7 +53,7 @@
   class="fixed inset-0 z-[9999] flex cursor-zoom-out items-center justify-center bg-black/60"
   onclick={handleOverlayClick}
   onkeydown={handleKeydown}
-  transition:fade={{ duration: 200 }}
+  transition:fadeTransition={{ duration: 200 }}
   role="dialog"
   aria-modal="true"
   aria-labelledby={caption ? 'lightbox-caption' : undefined}
@@ -84,7 +87,7 @@
       <div
         id="lightbox-caption"
         class="mt-4 max-w-[80vw] text-center text-sm text-white/80"
-        transition:fade={{ delay: 200, duration: 200 }}
+        transition:fadeTransition={{ delay: 200, duration: 200 }}
       >
         {caption}
       </div>

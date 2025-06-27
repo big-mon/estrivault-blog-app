@@ -3,25 +3,22 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: ['src/index.ts'],
   format: ['esm'], // ESM のみをサポート
-  dts: true, // 型定義を生成
-  clean: true, // ビルド前に出力ディレクトリをクリーンアップ
+  dts: false, // 型定義はTypeScriptプロジェクト参照で解決
+  clean: true, // 本番ビルド用にtrue
   bundle: true, // バンドルを有効化
-  // 外部ライブラリを指定（peerDependenciesや使用するライブラリ）
+  splitting: false, // Cloudflare Workers用に無効化
+  minify: true, // 本番用に最適化
+  treeshake: true, // 未使用コード削除
+  sourcemap: false, // 本番用にfalse
+  target: 'es2022', // Cloudflare Workers対応
+  platform: 'browser', // Workers環境はbrowser扱い
+  // Cloudflare Workers対応のため、必要最小限のみexternal
   external: [
-    'unist-util-visit',
-    'remark-parse',
-    'remark-rehype',
-    'rehype-stringify',
-    'rehype-raw',
-    'rehype-sanitize',
-    'gray-matter',
-    'glob',
-    'vfile',
-    'unified',
-    'reading-time',
-    'hast-util-sanitize',
-    'mdast',
-    'remark-directive',
-    '@estrivault/cloudinary-utils',
+    '@estrivault/cloudinary-utils', // workspace依存のみ外部化
+    'gray-matter', // CloudflareでのYAML問題を回避
   ],
+  // Cloudflare Workers互換性のためのpolyfill設定
+  esbuildOptions(options) {
+    options.conditions = ['worker', 'browser'];
+  },
 });

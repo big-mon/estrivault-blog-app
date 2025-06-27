@@ -9,15 +9,24 @@ export const prerender = 'auto';
 export async function entries() {
   // すべての記事を取得してタグを収集
   const allPosts = await getPosts();
-  const tags = new Set<string>();
+  const tagStats = new Map<string, number>();
 
   allPosts.posts.forEach((post: PostMeta) => {
-    post.tags?.forEach((tag: string) => tags.add(tag.toLowerCase()));
+    post.tags?.forEach((tag: string) => {
+      const normalizedTag = tag.toLowerCase();
+      tagStats.set(normalizedTag, (tagStats.get(normalizedTag) || 0) + 1);
+    });
   });
+
+  // 使用頻度順でソートし、上位タグのみプリレンダリング（Cloudflare制限対応）
+  const topTags = Array.from(tagStats.entries())
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 20) // 上位20タグのみ
+    .map(([tag]) => tag);
 
   // 各タグの最初のページのみプリレンダリング
   const entries = [];
-  for (const tag of tags) {
+  for (const tag of topTags) {
     entries.push({ tag, page: '1' });
   }
 
