@@ -1,13 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
 
-  // 動的インポートでtransitionモジュールを遅延読み込み
-  let fadeTransition:
-    | ((node: Element, params?: { duration?: number }) => { duration: number })
-    | undefined;
-  import('svelte/transition').then((module) => {
-    fadeTransition = module.fade;
-  });
+  // Use standard Svelte fade transition for better reliability
+  const fadeTransition = fade;
 
   export let src: string;
   export let alt: string;
