@@ -4,7 +4,7 @@
   import postStyles from './style/post.module.scss';
   import twitterEmbedStyles from './style/twitter-embed.module.scss';
   import syntaxHighlightStyles from './style/syntax-highlight.module.scss';
-  import ImageLightbox from '../ImageLightbox.svelte';
+  import ImageLightbox from './ImageLightbox.svelte';
   import { onMount } from 'svelte';
 
   export let post: PostHTML;

@@ -93,7 +93,7 @@
 
         <!-- リード文 -->
         {#if meta.description}
-          <p class="description-text text-gray-700">
+          <p class="break-words text-gray-700 lg:line-clamp-3">
             {meta.description}
           </p>
         {/if}
@@ -101,21 +101,3 @@
     </div>
   </div>
 </header>
-
-<style>
-  .description-text {
-    /* タブレット以下では全文表示 */
-    word-wrap: break-word;
-  }
-
-  @media (min-width: 1024px) {
-    .description-text {
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-</style>
