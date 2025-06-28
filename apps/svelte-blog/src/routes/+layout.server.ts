@@ -1,3 +1,3 @@
-// デフォルトはISRを使用、重要なページのみ個別にプリレンダリング設定
-export const prerender = false;
+// デフォルトはプリレンダ、重要なページのみ個別にISR設定
+export const prerender = true;
 export const trailingSlash = 'never';

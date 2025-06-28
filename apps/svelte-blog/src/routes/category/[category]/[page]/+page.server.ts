@@ -2,32 +2,30 @@ import { getPosts } from '$lib';
 import { POSTS_PER_PAGE } from '$constants';
 import type { PageServerLoad } from './$types';
 
-// ハイブリッド設定（主要ページはプリレンダリング、その他は動的）
-export const prerender = 'auto';
+// 完全プリレンダリング設定（全カテゴリ・全ページを静的生成）
+export const prerender = true;
 
 export async function entries() {
   const allPosts = await getPosts();
 
-  // カテゴリ別の記事数を計算
-  const categoryStats = new Map<string, number>();
-  allPosts.posts.forEach((post: { category: string }) => {
-    const category = post.category;
-    categoryStats.set(category, (categoryStats.get(category) || 0) + 1);
-  });
-
-  // 記事数順でソートし、上位カテゴリのみプリレンダリング（Cloudflare制限対応）
-  const topCategories = Array.from(categoryStats.entries())
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 10) // 上位10カテゴリのみ
-    .map(([category]) => category);
+  // 全カテゴリを取得
+  const categories = [
+    ...new Set(allPosts.posts.map((post: { category: string }) => post.category)),
+  ];
 
   const entries = [];
-  for (const category of topCategories) {
-    // 最初のページのみプリレンダリング
-    entries.push({
-      category: category.toLowerCase(),
-      page: '1',
-    });
+  for (const category of categories) {
+    // カテゴリごとの記事数とページ数を正確に計算
+    const categoryPosts = await getPosts({ category });
+    const totalPages = Math.ceil(categoryPosts.total / POSTS_PER_PAGE);
+
+    // 全ページを生成
+    for (let page = 1; page <= totalPages; page++) {
+      entries.push({
+        category: category.toLowerCase(),
+        page: page.toString(),
+      });
+    }
   }
 
   return entries;

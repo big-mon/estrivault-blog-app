@@ -3,8 +3,19 @@ import type { PageServerLoad } from './$types';
 import { POSTS_PER_PAGE } from '../../constants';
 import { error } from '@sveltejs/kit';
 
-// 動的レンダリング設定（ページネーションは動的）
-export const prerender = false;
+// プリレンダリング設定（ページネーションを静的生成）
+export const prerender = true;
+
+export async function entries() {
+  const allPosts = await getPosts();
+  const totalPages = Math.ceil(allPosts.total / POSTS_PER_PAGE);
+
+  const entries = [];
+  for (let page = 2; page <= totalPages; page++) {
+    entries.push({ page: page.toString() });
+  }
+  return entries;
+}
 
 export const load = (async ({ params }: { params: Record<string, string> }) => {
   const pageParam = params.page;
