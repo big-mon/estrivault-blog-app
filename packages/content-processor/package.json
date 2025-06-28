@@ -18,7 +18,7 @@
     "build:types": "tsc --build",
     "build:bundle": "tsup",
     "build": "pnpm run build:types && pnpm run build:bundle",
-    "build:clean": "pnpm run clean && pnpm run build",
+    "rebuild": "pnpm run clean && pnpm run build",
     "deploy": "pnpm run build && wrangler deploy"
   },
   "dependencies": {
