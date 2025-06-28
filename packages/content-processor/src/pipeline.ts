@@ -51,20 +51,6 @@ function createBasePipeline(
     pipeline.use(rehypePrettyCode, {
       theme: 'github-dark',
       keepBackground: false,
-      // Cloudflare Workers対応：JavaScript RegExp Engineを使用
-      engine: 'javascript',
-      langs: [
-        'bash',
-        'javascript',
-        'typescript',
-        'json',
-        'svelte',
-        'toml',
-        'xml',
-        'markdown',
-        'text',
-        'js',
-      ],
     });
   }
 

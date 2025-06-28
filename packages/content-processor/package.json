@@ -14,8 +14,12 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "build:types": "tsc --build",
+    "build:bundle": "tsup",
+    "build": "pnpm run build:types && pnpm run build:bundle",
+    "rebuild": "pnpm run clean && pnpm run build",
+    "deploy": "pnpm run build && wrangler deploy"
   },
   "dependencies": {
     "@estrivault/cloudinary-utils": "workspace:^",

@@ -3,8 +3,8 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: ['src/index.ts'],
   format: ['esm'], // ESM のみをサポート
-  dts: false, // 型定義はTypeScriptプロジェクト参照で解決
-  clean: true, // 本番ビルド用にtrue
+  dts: false, // 型定義はTypeScriptのcomposite buildで生成
+  clean: false, // tscが生成する.tsbuildinfoを削除しないようにするため
   bundle: true, // バンドルを有効化
   splitting: false, // Cloudflare Workers用に無効化
   minify: true, // 本番用に最適化

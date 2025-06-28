@@ -8,9 +8,12 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "clean": "rm -rf dist"
+    "clean": "rimraf dist",
+    "build:types": "tsc --build",
+    "build:bundle": "tsup",
+    "build": "pnpm run build:types && pnpm run build:bundle",
+    "rebuild": "pnpm run clean && pnpm run build",
+    "dev": "tsup --watch"
   },
   "exports": {
     ".": {
@@ -22,6 +25,7 @@
     "@cloudinary/url-gen": "^1.21.0"
   },
   "devDependencies": {
+    "rimraf": "^6.0.1",
     "tsup": "^8.5.0"
   }
 }
