@@ -8,9 +8,12 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "build:types": "tsc --build",
+    "build:bundle": "tsup",
+    "build": "pnpm run build:types && pnpm run build:bundle",
+    "build:clean": "pnpm run clean && pnpm run build",
+    "dev": "tsup --watch"
   },
   "exports": {
     ".": {
