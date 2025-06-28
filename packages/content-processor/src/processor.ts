@@ -70,7 +70,7 @@ export async function processMarkdown(
     }
 
     // 読了時間の計算
-    const stats = readingTime(markdown);
+    const stats = readingTime(markdown, { wordsPerMinute: 600 });
 
     // マークダウンをパースしてコードブロックを自動検出
     const parseProcessor = unified().use(remarkParse).use(remarkDirective).use(remarkGfm);
@@ -194,7 +194,7 @@ export async function extractMetadata(
     }
 
     // 読了時間の計算
-    const stats = readingTime(markdown);
+    const stats = readingTime(markdown, { wordsPerMinute: 300 });
 
     // タグを検証して正規化
     const tags =
