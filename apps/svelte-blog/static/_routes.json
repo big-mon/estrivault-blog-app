@@ -10,5 +10,18 @@
     "/llms-full.txt",
     "/*"
   ],
-  "exclude": ["/post/*", "/category/*/1", "/tag/*/1", "/", "*.{js,css,svg,png,jpg,jpeg,webp,ico}"]
+  "exclude": [
+    "/post/*",
+    "/category/*/1",
+    "/tag/*/1",
+    "/",
+    "*.js",
+    "*.css",
+    "*.svg",
+    "*.png",
+    "*.jpg",
+    "*.jpeg",
+    "*.webp",
+    "*.ico"
+  ]
 }
