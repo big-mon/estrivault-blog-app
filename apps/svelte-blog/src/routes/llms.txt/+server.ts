@@ -72,7 +72,7 @@ GitHub: https://github.com/${SOCIAL_LINK_GITHUB}`.trim();
 
 export const GET: RequestHandler = async () => {
   const headers = {
-    'Content-Type': 'text/plain; charset=utf-8',
+    'Content-Type': 'text/markdown; charset=utf-8',
     'Cache-Control': 'max-age=0, s-max-age=3600',
   };
   const llmsTxt = await llmsText();
