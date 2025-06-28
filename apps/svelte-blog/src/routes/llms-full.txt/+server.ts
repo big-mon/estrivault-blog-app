@@ -61,7 +61,8 @@ GitHub: https://github.com/${SOCIAL_LINK_GITHUB}`.trim();
 
   return new Response(llmsFullTxt, {
     headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
+      'Content-Type': 'text/markdown; charset=utf-8',
+      'Cache-Control': 'max-age=0, s-max-age=3600',
     },
   });
 }
