@@ -2,6 +2,7 @@ import { getPosts } from '$lib/posts';
 import { SITE_URL, SOCIAL_LINK_X, SOCIAL_LINK_GITHUB } from '$constants';
 
 // 静的生成設定（ISRからプリレンダリングに変更）
+export const prerender = true;
 
 export async function GET() {
   const { posts } = await getPosts({ perPage: 1000 });

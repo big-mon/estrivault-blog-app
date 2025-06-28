@@ -4,6 +4,7 @@ import { POSTS_PER_PAGE } from '$constants';
 import type { PostMeta } from '@estrivault/content-processor';
 
 // 静的生成設定（ISRからプリレンダリングに変更）
+export const prerender = true;
 
 export async function GET() {
   const { posts } = await getPosts({ perPage: 1000 });
