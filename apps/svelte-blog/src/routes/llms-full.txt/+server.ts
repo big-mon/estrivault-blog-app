@@ -25,11 +25,10 @@ This site contains technical articles, investment analysis, gaming guides, and m
 
 ## Content Categories
 
-- **Tech**: Programming tutorials, hardware reviews, AI/ML experiments
-- **Stocks**: US market analysis, earnings reviews, investment strategies
-- **Gaming**: Game guides, optimization tips, hardware recommendations
-- **Military**: Tactical gear reviews, optics evaluation, setup guides
-- **Opinions**: Personal commentary on technology and market trends
+- **Tech**: Programming tutorials, hardware reviews, AI/ML experiments, web development
+- **Finance**: US market analysis, earnings reviews, investment strategies, individual stock analysis
+- **Hobbies**: Gaming guides, tactical gear reviews, workout routines, travel experiences
+- **Opinions**: Personal commentary on technology, market trends, and social issues
 
 ## All Articles (${posts.length} total)
 
@@ -37,13 +36,14 @@ ${posts.map((post: { title: string; slug: string; publishedAt: Date; category: s
 
 ## Key Topics
 
-- US equity fundamental analysis
-- SvelteKit and modern web development
-- PC hardware and audio equipment
-- Tactical equipment evaluation
-- EDGAR API integration
-- Stable Diffusion experimentation
-- Black Desert Online character optimization
+- US equity fundamental analysis and earnings reviews
+- SvelteKit and modern web development frameworks
+- PC hardware, audio equipment, and gaming peripherals
+- Tactical gear, firearms accessories, and outdoor equipment
+- Financial APIs (EDGAR) and data analysis
+- AI/ML tools including Stable Diffusion and ChatGPT
+- Gaming guides (Black Desert Online, various titles)
+- Investment strategies and market analysis
 
 ## Site Structure
 
