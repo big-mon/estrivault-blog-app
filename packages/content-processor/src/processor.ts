@@ -194,7 +194,7 @@ export async function extractMetadata(
     }
 
     // 読了時間の計算
-    const stats = readingTime(markdown, { wordsPerMinute: 300 });
+    const stats = readingTime(markdown, { wordsPerMinute: 600 });
 
     // タグを検証して正規化
     const tags =

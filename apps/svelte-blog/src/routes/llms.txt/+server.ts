@@ -1,11 +1,11 @@
+import type { RequestHandler } from '@sveltejs/kit';
 import { getPosts } from '$lib/posts';
 import { SITE_URL, SOCIAL_LINK_X, SOCIAL_LINK_GITHUB } from '$constants';
 
-// 静的生成設定（ISRからプリレンダリングに変更）
 export const prerender = true;
 
-export async function GET() {
-  const { posts } = await getPosts({ perPage: 1000 });
+const llmsText = async () => {
+  const { posts } = await getPosts({ perPage: 20 });
 
   const llmsTxt = `# Estrilda Blog
 
@@ -67,9 +67,15 @@ Author: big-mon
 Twitter: https://x.com/${SOCIAL_LINK_X}
 GitHub: https://github.com/${SOCIAL_LINK_GITHUB}`.trim();
 
-  return new Response(llmsTxt, {
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-    },
-  });
-}
+  return llmsTxt;
+};
+
+export const GET: RequestHandler = async () => {
+  const headers = {
+    'Content-Type': 'text/markdown; charset=utf-8',
+    'Cache-Control': 'max-age=0, s-max-age=3600',
+  };
+  const llmsTxt = await llmsText();
+
+  return new Response(llmsTxt, { headers });
+};
