@@ -56,6 +56,9 @@ export default defineConfig({
             }
             return 'vendor';
           }
+
+          // デフォルト: undefined を返す（自動チャンキング）
+          return undefined;
         },
       },
     },
