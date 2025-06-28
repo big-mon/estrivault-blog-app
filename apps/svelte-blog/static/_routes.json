@@ -8,7 +8,6 @@
     "/sitemap.xml",
     "/llms.txt",
     "/llms-full.txt",
-    "/[0-9]*",
     "/*"
   ],
   "exclude": [
