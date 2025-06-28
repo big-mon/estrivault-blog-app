@@ -1,6 +1,6 @@
 {
   "version": 1,
   "description": "Cloudflare Pages routing configuration for optimal static/dynamic separation",
-  "include": ["/api/*", "/category/*/*", "/tag/*/*"],
-  "exclude": ["/post/*", "/category/*/1", "/tag/*/1", "/"]
+  "include": ["/api/*", "/category/*/*", "/tag/*/*", "/*"],
+  "exclude": ["/post/*", "/category/*/1", "/tag/*/1", "/", "*.{js,css,svg,png,jpg,jpeg,webp,ico,txt,xml}"]
 }
