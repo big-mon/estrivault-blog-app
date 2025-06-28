@@ -7,7 +7,6 @@
     "build": "pnpm run build:packages:incremental && pnpm --filter svelte-blog run build",
     "build:fast": "pnpm -r --filter svelte-blog... run build",
     "build:legacy": "pnpm run build:packages && pnpm --filter svelte-blog run build",
-    "deploy": "wrangler deploy",
     "build:packages": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor run build",
     "build:packages:incremental": "tsc --build packages/cloudinary-utils packages/content-processor apps/svelte-blog",
     "dev:packages": "pnpm --filter @estrivault/cloudinary-utils run dev",
