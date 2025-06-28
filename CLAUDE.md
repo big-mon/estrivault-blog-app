@@ -32,13 +32,11 @@ This is a **monorepo blog application** built with **SvelteKit** and **TypeScrip
 pnpm install     # Installs dependencies and auto-builds packages via postinstall
 ```
 
-### Development (Improved DX)
+### Development
 
 ```bash
-pnpm dev                              # 🚀 Smart dev start with auto-validation and hot reload
-pnpm dev:safe                         # 🔍 Extra validation before starting
-pnpm dev:quick                        # ⚡ Skip validation (for experienced developers)
-pnpm validate:workspace               # 🧪 Check workspace health
+pnpm dev                              # Smart dev start with auto-validation and hot reload
+pnpm validate:workspace               # Check workspace health
 ```
 
 ### Production & Preview
@@ -48,12 +46,13 @@ pnpm --filter svelte-blog build      # Build for production
 pnpm --filter svelte-blog preview    # Preview production build
 ```
 
-### Troubleshooting
+### Build Commands
 
 ```bash
-pnpm reset                            # 🔄 Full reset: clean, install, rebuild
-pnpm clean                            # 🧹 Clean all build artifacts
-pnpm run build:packages              # 🔨 Rebuild workspace packages only
+pnpm build                            # Full production build (packages + app)
+pnpm build:packages                   # Build workspace packages only
+pnpm build:packages:incremental       # Incremental TypeScript build
+pnpm clean                            # Clean all build artifacts
 ```
 
 ### Quality Assurance
@@ -74,6 +73,19 @@ pnpm type-check                       # TypeScript check for all packages
 pnpm --filter svelte-blog test:unit  # Unit tests (Vitest)
 pnpm --filter svelte-blog test:e2e   # E2E tests (Playwright)
 pnpm --filter svelte-blog test       # Run all tests
+```
+
+### Single Test Execution
+
+```bash
+# Run specific unit test
+pnpm --filter svelte-blog test:unit -- path/to/test.test.ts
+
+# Run specific E2E test
+pnpm --filter svelte-blog test:e2e -- --grep "test name"
+
+# Watch mode for unit tests
+pnpm --filter svelte-blog test:unit -- --watch
 ```
 
 ### Package Development
@@ -124,11 +136,12 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
 
 ### SvelteKit Routing
 
-- Vercel deployment using `@sveltejs/adapter-vercel`
+- Cloudflare deployment using `@sveltejs/adapter-cloudflare`
 - File-based routing with dynamic segments:
   - `/post/[slug]` - Individual posts
   - `/category/[category]/[page]` - Category filtering with pagination
   - `/tag/[tag]/[page]` - Tag filtering with pagination
+  - `/llms.txt` and `/llms-full.txt` - LLM-readable content endpoints
 
 ### Smart Development Scripts
 
@@ -150,3 +163,37 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
 - lint-staged for automatic code formatting on commit
 - Comprehensive ESLint and Prettier configuration
 - TypeScript strict mode across all packages
+
+## Content Management
+
+### Blog Posts Structure
+
+- Markdown files in `content/blog/` organized by category folders (`tech/`, `finance/`, `hobbies/`, `opinions/`)
+- Frontmatter with title, date, category, tags, and optional description
+- Reading time calculated at 600 words per minute (configurable in processor)
+- Support for custom embeds: YouTube, Twitter, GitHub, Amazon
+
+### File Organization
+
+- **Apps**: `apps/svelte-blog/` (main SvelteKit application)
+- **Packages**: `packages/content-processor/` and `packages/cloudinary-utils/`
+- **Content**: `content/blog/` with category-based folders
+- **Scripts**: `scripts/` for development automation
+
+## Key Architecture Patterns
+
+### Package Dependencies
+
+- Development uses TypeScript path mapping for direct source imports
+- Production uses built packages from workspace
+- Auto-build via `postinstall` hook ensures packages ready after install
+- Incremental TypeScript builds for better performance
+
+### Content Processing Flow
+
+1. Markdown files parsed with gray-matter for frontmatter
+2. Unified/remark pipeline processes content with custom plugins
+3. Custom embeds transformed (YouTube, Twitter, GitHub, Amazon)
+4. Images optimized via Cloudinary integration
+5. HTML generated with rehype plugins
+6. Static site generation via SvelteKit
