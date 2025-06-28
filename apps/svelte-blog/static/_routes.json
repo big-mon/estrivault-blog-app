@@ -13,7 +13,6 @@
   "exclude": [
     "/post/*",
     "/category/*/1",
-    "/tag/*/1",
     "/",
     "*.js",
     "*.css",
