@@ -2,13 +2,13 @@
   "version": 1,
   "description": "Cloudflare Pages routing configuration for optimal static/dynamic separation",
   "include": [
-    "/api/*",
-    "/category/*/*",
-    "/tag/*/*",
     "/sitemap.xml",
     "/llms.txt",
     "/llms-full.txt",
-    "/*"
+    "/[0-9]*",
+    "/category/*/*",
+    "/tag/*/*",
+    "/api/*"
   ],
   "exclude": [
     "/post/*",
