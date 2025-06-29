@@ -134,7 +134,7 @@
 
   <!-- Schema.org JSON-LD -->
   <script type="application/ld+json">
-    {JSON.stringify(schemaData)}
+{@html JSON.stringify(schemaData)}
   </script>
 
   <!-- Google AdSense -->
