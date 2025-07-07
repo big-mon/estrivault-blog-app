@@ -5,6 +5,7 @@ import { createPipeline } from './pipeline';
 import { hasCodeBlocks } from './utils/code-detector';
 import { hasTwitterEmbeds } from './utils/twitter-detector';
 import { hasAmazonEmbeds } from './utils/amazon-detector';
+import { hasDirectiveBoxes } from './utils/directive-boxes-detector';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkDirective from 'remark-directive';
@@ -81,6 +82,7 @@ export async function processMarkdown(
     const enableSyntaxHighlight = hasCodeBlocks(parseResult);
     const enableTwitterEmbeds = hasTwitterEmbeds(parseResult);
     const enableAmazonEmbeds = hasAmazonEmbeds(parseResult);
+    const enableDirectiveBoxes = hasDirectiveBoxes(parseResult);
 
     // パイプラインでHTMLに変換
     const pipeline = createPipeline(options, enableSyntaxHighlight);
@@ -162,6 +164,7 @@ export async function processMarkdown(
       hasCodeBlocks: enableSyntaxHighlight,
       hasTwitterEmbeds: enableTwitterEmbeds,
       hasAmazonEmbeds: enableAmazonEmbeds,
+      hasDirectiveBoxes: enableDirectiveBoxes,
     };
   } catch (error) {
     if (error instanceof FrontMatterError || error instanceof MarkdownParseError) {

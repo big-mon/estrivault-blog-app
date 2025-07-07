@@ -1,0 +1,56 @@
+// 非常にシンプルなディレクティブボックススタイル
+.prose {
+  :global(.directive-box) {
+    margin: 1rem 0;
+    padding: 1rem 1rem 1rem 3rem;
+    border-radius: 0.25rem;
+    background-color: var(--directive-bg);
+    position: relative;
+
+    // 左上にアイコンを配置（本文と上部余白を合わせる）
+    &::before {
+      position: absolute;
+      left: 1rem;
+      top: 1.5rem;
+      font-size: 1.1rem;
+      opacity: 0.6;
+      line-height: 1;
+    }
+
+    // タイトルとコンテンツのマージン調整（上下に余白）
+    p:first-child {
+      margin-top: 0.25rem;
+    }
+
+    p:last-child {
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  // Info directive - 薄い緑背景
+  :global(.directive-info) {
+    --directive-bg: #f0fdf4;
+
+    &::before {
+      content: 'ⓘ';
+    }
+  }
+
+  // Alert directive - 薄い赤背景
+  :global(.directive-alert) {
+    --directive-bg: #fef2f2;
+
+    &::before {
+      content: '×';
+    }
+  }
+
+  // Warn directive - 薄い黄色背景
+  :global(.directive-warn) {
+    --directive-bg: #fefce8;
+
+    &::before {
+      content: '⚠';
+    }
+  }
+}

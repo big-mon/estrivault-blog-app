@@ -15,6 +15,7 @@ import { remarkTwitterEmbed } from './plugins/embeds/twitter-embed';
 import { remarkCommonLinkEmbed } from './plugins/embeds/common-link-embed';
 import { remarkGithubEmbed } from './plugins/embeds/github-embed';
 import { remarkAmazonEmbed } from './plugins/embeds/amazon-embed';
+import { remarkDirectiveBoxes } from './plugins/embeds/directive-boxes';
 import type { ProcessorOptions } from './types';
 
 /**
@@ -41,6 +42,7 @@ function createBasePipeline(
     .use(remarkCommonLinkEmbed)
     .use(remarkGithubEmbed)
     .use(remarkAmazonEmbed)
+    .use(remarkDirectiveBoxes)
 
     // HTML 変換
     .use(remarkRehype, { allowDangerousHtml: true })

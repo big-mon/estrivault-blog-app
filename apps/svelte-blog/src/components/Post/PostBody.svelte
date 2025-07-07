@@ -4,6 +4,7 @@
   import postStyles from './style/post.module.scss';
   import twitterEmbedStyles from './style/twitter-embed.module.scss';
   import syntaxHighlightStyles from './style/syntax-highlight.module.scss';
+  import directiveBoxesStyles from './style/directive-boxes.module.scss';
   import ImageLightbox from './ImageLightbox.svelte';
   import { onMount } from 'svelte';
 
@@ -15,11 +16,13 @@
   // コードブロックがある場合のみシンタックスハイライトスタイルを適用
   // Twitterの埋め込みがある場合のみTwitterスタイルを適用
   // Amazonの埋め込みがある場合のみAmazonスタイルを適用
+  // ディレクティブボックスがある場合のみディレクティブボックススタイルを適用
   $: proseClasses = [
     postStyles.prose,
     post.hasTwitterEmbeds ? twitterEmbedStyles.prose : '',
     post.hasAmazonEmbeds ? amazonCardStyles.prose : '',
     post.hasCodeBlocks ? syntaxHighlightStyles.prose : '',
+    post.hasDirectiveBoxes ? directiveBoxesStyles.prose : '',
     'prose max-w-none',
   ]
     .filter(Boolean)
