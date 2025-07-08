@@ -5,6 +5,7 @@ import { createPipeline } from './pipeline';
 import { hasCodeBlocks } from './utils/code-detector';
 import { hasTwitterEmbeds } from './utils/twitter-detector';
 import { hasAmazonEmbeds } from './utils/amazon-detector';
+import { hasDirectiveBoxes } from './utils/directive-boxes-detector';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkDirective from 'remark-directive';
@@ -49,11 +50,14 @@ function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''
 }
 
 /**
- * Markdownコンテンツを処理してHTMLに変換
- * @param content Markdownコンテンツ（フロントマター含む）
- * @param options 処理オプション
- * @param slug 記事のスラッグ（メタデータ構築用、省略時はファイル名から生成）
- * @returns 処理されたPostHTML
+ * Markdownコンテンツ（フロントマター付き）を解析し、HTML・メタデータ・見出し情報・各種埋め込み検出結果を返します。
+ *
+ * Markdown本文からフロントマターを抽出・検証し、HTMLへの変換、タグや日付の正規化、読了時間の算出、コードブロックや埋め込み要素（Twitter、Amazon、ディレクティブボックス）の有無を判定します。
+ *
+ * @param content - フロントマターを含むMarkdownコンテンツ
+ * @param options - Markdown処理のオプション
+ * @param slug - 記事のスラッグ（省略時は空文字列）
+ * @returns HTML本文、メタデータ、見出し情報、コードブロック・埋め込み要素の有無を含むオブジェクト
  */
 export async function processMarkdown(
   content: string,
@@ -81,6 +85,7 @@ export async function processMarkdown(
     const enableSyntaxHighlight = hasCodeBlocks(parseResult);
     const enableTwitterEmbeds = hasTwitterEmbeds(parseResult);
     const enableAmazonEmbeds = hasAmazonEmbeds(parseResult);
+    const enableDirectiveBoxes = hasDirectiveBoxes(parseResult);
 
     // パイプラインでHTMLに変換
     const pipeline = createPipeline(options, enableSyntaxHighlight);
@@ -162,6 +167,7 @@ export async function processMarkdown(
       hasCodeBlocks: enableSyntaxHighlight,
       hasTwitterEmbeds: enableTwitterEmbeds,
       hasAmazonEmbeds: enableAmazonEmbeds,
+      hasDirectiveBoxes: enableDirectiveBoxes,
     };
   } catch (error) {
     if (error instanceof FrontMatterError || error instanceof MarkdownParseError) {

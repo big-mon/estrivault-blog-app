@@ -12,7 +12,7 @@ AnthropicはClaude Codeに**Hooks**という機能拡張を行っています。
 
 https://docs.anthropic.com/en/docs/claude-code/hooks
 
-:::note alert
+:::warn
 便利な機能ではありますが、常に特定のシェルコマンドを実行するということはユーザー自身が内容を分かっていないHooksを設定することは非常に危険ということでもあります。Hooksに設定するコマンドは自分自身で意図を理解した内容に留めましょう。
 :::
 

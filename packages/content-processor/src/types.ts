@@ -42,4 +42,5 @@ export interface PostHTML {
   hasCodeBlocks?: boolean;
   hasTwitterEmbeds?: boolean;
   hasAmazonEmbeds?: boolean;
+  hasDirectiveBoxes?: boolean;
 }
