@@ -93,8 +93,8 @@ playwright-report/
 # IDE & Editor Files
 # ============================================
 
-# VS Code
-.vscode/
+# VS Code (keep essential project settings)
+.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -102,9 +102,6 @@ playwright-report/
 
 # WebStorm/IntelliJ
 .idea/
-*.swp
-*.swo
-*~
 
 # Vim
 *.swp
@@ -127,8 +124,6 @@ playwright-report/
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
-Thumbs.db
 
 # Windows
 Thumbs.db
@@ -142,7 +137,6 @@ $RECYCLE.BIN/
 *.msp
 
 # Linux
-*~
 .directory
 .fuse_hidden*
 
@@ -158,8 +152,8 @@ wrangler.toml.bak
 .vercel/
 .netlify/
 
-# CI/CD cache
-.github/
+# CI/CD cache (keep workflows and dependabot)
+.github/*
 !.github/workflows/
 !.github/dependabot.yml
 
