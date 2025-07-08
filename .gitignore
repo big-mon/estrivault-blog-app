@@ -1,21 +1,228 @@
-# テストカバレッジ
-coverage/
+# ============================================
+# Node.js & Package Management
+# ============================================
 
-# その他
-.env*
-.DS_Store
-node_modules
+# Dependencies
+node_modules/
+**/node_modules/
 
+# PNPM specific
+.pnpm-store/
+.pnpm-debug.log*
+pnpm-debug.log*
+
+# Package lock files (keep pnpm-lock.yaml, ignore others)
+package-lock.json
+yarn.lock
+
+# ============================================
+# Build Artifacts & Distribution
+# ============================================
+
+# Package build outputs
 dist/
 **/dist/
+build/
+**/build/
 
-.pnpm-store/
-.claude/
+# SvelteKit build artifacts
+.svelte-kit/
+**/.svelte-kit/
 
-# TypeScriptビルドキャッシュ
+# TypeScript build artifacts
+*.tsbuildinfo
+**/*.tsbuildinfo
 .tsbuildinfo*
 **/.tsbuildinfo*
 
-# Viteキャッシュ
+# Vite build cache
 .vite/
 **/node_modules/.vite/
+
+# ============================================
+# Testing & Coverage
+# ============================================
+
+# Test coverage
+coverage/
+**/coverage/
+.nyc_output/
+
+# Test results
+test-results/
+**/test-results/
+playwright-report/
+**/playwright-report/
+
+# Vitest cache
+.vitest/
+**/.vitest/
+
+# ============================================
+# Environment & Configuration
+# ============================================
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Local configuration overrides
+*.local
+.local
+
+# ============================================
+# Development Tools & Cache
+# ============================================
+
+# Claude Code cache (keep settings.json for team sharing)
+.claude/*
+!.claude/settings.json
+
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettier-cache
+
+# TailwindCSS cache
+.tailwindcss-cache
+
+# ============================================
+# IDE & Editor Files
+# ============================================
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# WebStorm/IntelliJ
+.idea/
+*.swp
+*.swo
+*~
+
+# Vim
+*.swp
+*.swo
+*.swn
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================
+# Operating System Files
+# ============================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Linux
+*~
+.directory
+.fuse_hidden*
+
+# ============================================
+# Deployment & CI/CD
+# ============================================
+
+# Cloudflare
+.wrangler/
+wrangler.toml.bak
+
+# Deployment artifacts
+.vercel/
+.netlify/
+
+# CI/CD cache
+.github/
+!.github/workflows/
+!.github/dependabot.yml
+
+# ============================================
+# Logs & Temporary Files
+# ============================================
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# ============================================
+# Security & Sensitive Data
+# ============================================
+
+# Certificates
+*.pem
+*.key
+*.crt
+*.cert
+
+# Secrets
+.secrets
+secrets.json
+*secret*
+*password*
+
+# ============================================
+# Project Specific
+# ============================================
+
+# Custom scripts output
+scripts/output/
+scripts/temp/
+
+# Documentation build (if applicable)
+docs/build/
+docs/dist/
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+*.7z
