@@ -1,9 +1,10 @@
 // Post content link styling with consistent blue hover effect
 .prose {
-  :global(p a) {
+  :global(a:not(.heading-anchor)) {
     color: #2563eb; // Blue color for links
     text-decoration: none;
     transition: all 0.2s ease-in-out;
+    font-weight: 400; // Override Tailwind Typography's font-weight: 500
 
     &:hover {
       color: #1d4ed8; // Darker blue on hover
