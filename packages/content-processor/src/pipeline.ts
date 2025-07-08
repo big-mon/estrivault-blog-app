@@ -19,10 +19,13 @@ import { remarkDirectiveBoxes } from './plugins/embeds/directive-boxes';
 import type { ProcessorOptions } from './types';
 
 /**
- * 共通のパイプライン基盤を構築する
- * @param options 処理オプション
- * @param enableSyntaxHighlight シンタックスハイライトを有効化するか
- * @returns ベースパイプライン
+ * MarkdownコンテンツをHTMLへ変換するための統合パイプラインを構築する。
+ *
+ * remark・rehypeエコシステムの各種プラグインを組み合わせ、埋め込みコンテンツや画像変換、リンク変換、見出し抽出、シンタックスハイライト（任意）などを一括で処理するパイプラインを生成する。
+ *
+ * @param options - Cloudinaryのクラウド名などを含む処理オプション
+ * @param enableSyntaxHighlight - シンタックスハイライトを有効化する場合はtrue
+ * @returns MarkdownからHTMLへの変換処理を行うunifiedパイプライン
  */
 function createBasePipeline(
   options: ProcessorOptions = {},

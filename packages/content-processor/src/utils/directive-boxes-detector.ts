@@ -2,9 +2,10 @@ import { visit, EXIT } from 'unist-util-visit';
 import type { Root } from 'mdast';
 
 /**
- * Markdownの構文木にディレクティブボックス（info, alert, warn）が含まれているかを検出する
- * @param tree Markdownの構文木
- * @returns ディレクティブボックスが含まれている場合はtrue
+ * Markdownの構文木に「info」「alert」「warn」いずれかのディレクティブボックスが含まれているかを判定する。
+ *
+ * @param tree - 判定対象のMarkdown構文木
+ * @returns 指定されたディレクティブボックスが1つ以上含まれていればtrue、含まれていなければfalse
  */
 export function hasDirectiveBoxes(tree: Root): boolean {
   let hasDirectives = false;
