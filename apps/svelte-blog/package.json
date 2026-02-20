@@ -31,7 +31,7 @@
     "@testing-library/svelte": "^5.2.8",
     "jsdom": "^26.1.0",
     "sass-embedded": "^1.89.2",
-    "svelte": "^5.34.7",
+    "svelte": "^5.51.5",
     "svelte-check": "^4.2.2",
     "tailwindcss": "^4.1.10",
     "vite": "^6.3.5",
