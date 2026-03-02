@@ -4,8 +4,8 @@ import type { Root } from 'hast';
 import { buildUrl, buildSrcSet, type BuildUrlOptions } from '@estrivault/cloudinary-utils';
 
 export interface ImageTransformOptions {
-  /** Cloudinaryクラウド名（必須） */
-  cloudinaryCloudName: string;
+  /** Cloudinaryクラウド名（未指定時は変換スキップ） */
+  cloudinaryCloudName?: string;
   /** 画像幅 */
   width?: number;
   /** 画像のトリミングモード */
@@ -18,10 +18,7 @@ export interface ImageTransformOptions {
  * 画像パスをCloudinary CDN URLに変換するrehypeプラグイン
  */
 export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> = (options) => {
-  if (!options?.cloudinaryCloudName) {
-    throw new Error('cloudinaryCloudName is required in options');
-  }
-  const { cloudinaryCloudName, width = 1200, quality = 90 } = options;
+  const { cloudinaryCloudName = '', width = 1200, quality = 90 } = options || {};
 
   return (tree: Root) => {
     visit(tree, 'element', (node, index, parent) => {
@@ -38,6 +35,11 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
 
       // すでに絶対URLまたはデータURLの場合はスキップ
       if (src.startsWith('http') || src.startsWith('data:')) {
+        return undefined;
+      }
+
+      // Cloudinaryが未設定なら、元の相対URLをそのまま使用する
+      if (!cloudinaryCloudName) {
         return undefined;
       }
 

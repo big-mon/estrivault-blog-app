@@ -15,5 +15,5 @@
   "svelteStrictMode": true,
   "svelteIndentScriptAndStyle": true,
   "svelteAllowShorthand": true,
-  "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"]
+  "plugins": ["prettier-plugin-svelte", "prettier-plugin-astro", "prettier-plugin-tailwindcss"]
 }

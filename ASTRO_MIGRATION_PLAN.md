@@ -1,5 +1,19 @@
 # estrivault-blog-app: Svelte 描画層を Astro に一括移行する計画（静的優先・Cloudflare継続）
 
+## Progress (2026-03-03)
+- ✅ `apps/astro-blog` を新規作成（`astro.config.mjs`, `package.json`, `tsconfig.json`, `public`, `src` 一式）
+- ✅ 主要ルートを Astro で実装（`/`, `/[page]`, `/post/[slug]`, `/category/[category]/[page]`, `/tag/[tag]/[page]`）
+- ✅ 補助エンドポイントを移植（`/sitemap.xml`, `/llms.txt`, `/llms-full.txt`）
+- ✅ ルートコマンドを `astro-blog` 向けに切替（`package.json`, `scripts/dev-helper.js`, `tsconfig.json`, `wrangler.toml`）
+- ✅ `_headers`, `robots.txt`, `icon.svg` を Astro 側 `public` へ移行
+- ✅ 依存インストール完了（`pnpm install` 実施）
+- ✅ `pnpm --filter @estrivault/content-processor build` 成功
+- ✅ `pnpm --filter astro-blog build` 成功（289 pages built）
+- ✅ `pnpm --filter astro-blog check` 成功（0 errors / 0 warnings）
+- ✅ `pnpm --filter astro-blog test:e2e` 成功（Playwright: 1 passed）
+- ✅ Cloudinary 未設定時に `content-processor` が例外終了しないよう修正（画像変換プラグインを no-op 化）
+- ℹ️ 補足: この実行環境では `astro preview` のポート待受がサンドボックス内で制限されるため、E2E 実行時は権限昇格が必要
+
 ## Summary
 - 目的は、Markdown 変換基盤（`@estrivault/content-processor`）を維持したまま、描画層を SvelteKit から Astro へ置換すること。
 - 方針は `一括置換`、`静的優先`、`URL完全互換`、`Cloudflare継続`、`apps/astro-blog を新規追加`、`純Astro/TS`。

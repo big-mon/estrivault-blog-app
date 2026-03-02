@@ -1,0 +1,15 @@
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  webServer: {
+    command: 'pnpm run build && pnpm run preview --host 127.0.0.1 --port 4173',
+    env: {
+      ASTRO_TELEMETRY_DISABLED: '1',
+      XDG_CONFIG_HOME: '/tmp/astro-config',
+    },
+    port: 4173,
+    timeout: 300_000,
+    reuseExistingServer: true,
+  },
+  testDir: 'e2e',
+});

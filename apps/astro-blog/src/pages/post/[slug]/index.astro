@@ -1,0 +1,103 @@
+---
+import BaseLayout from '$layouts/BaseLayout.astro';
+import EditOnGitHub from '$components/EditOnGitHub.astro';
+import PostBody from '$components/PostBody.astro';
+import PostHeader from '$components/PostHeader.astro';
+import TableOfContents from '$components/TableOfContents.astro';
+import { SITE_TITLE, SITE_URL, SOCIAL_LINK_X } from '$constants';
+import { getAllPostsMeta, getPostBySlug } from '$lib/content';
+
+export async function getStaticPaths() {
+  const allPosts = await getAllPostsMeta();
+  return allPosts.map((post) => ({ params: { slug: post.slug } }));
+}
+
+function getJapaneseWordCount(content: string): number {
+  const textOnly = content.replace(/<[^>]*>/g, '');
+  const cleanText = textOnly.replace(/\s+/g, '');
+  const japaneseChars = cleanText.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g);
+  return japaneseChars ? japaneseChars.length : 0;
+}
+
+const slug = Astro.params.slug;
+if (!slug) {
+  throw new Error('slug parameter is required');
+}
+
+const post = await getPostBySlug(slug);
+if (!post) {
+  throw new Error(`Post not found: ${slug}`);
+}
+
+const siteBase = SITE_URL.replace(/\/$/, '');
+const canonical = `${siteBase}/post/${post.meta.slug}`;
+const title = `${post.meta.title} | ${SITE_TITLE}`;
+const description = post.meta.description || `${post.meta.title}についての記事です。`;
+
+const schemaData = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.meta.title,
+  description,
+  image: post.meta.coverImage ? [post.meta.coverImage] : undefined,
+  author: {
+    '@type': 'Person',
+    name: 'big-mon',
+    url: `https://x.com/${SOCIAL_LINK_X}`,
+    sameAs: [`https://x.com/${SOCIAL_LINK_X}`, 'https://github.com/big-mon'],
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: SITE_TITLE,
+    url: SITE_URL,
+  },
+  datePublished: post.meta.publishedAt.toISOString(),
+  dateModified: (post.meta.updatedAt || post.meta.publishedAt).toISOString(),
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': canonical,
+  },
+  articleSection: post.meta.category,
+  keywords: [post.meta.category].concat(post.meta.tags || []).filter(Boolean).join(', '),
+  wordCount: post.html ? getJapaneseWordCount(post.html) : 0,
+  timeRequired: post.meta.readingTime ? `PT${Math.ceil(post.meta.readingTime)}M` : undefined,
+  inLanguage: 'ja-JP',
+  url: canonical,
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  ogType="article"
+  image={post.meta.coverImage}
+  jsonLd={schemaData}
+  publishedTime={post.meta.publishedAt.toISOString()}
+  modifiedTime={(post.meta.updatedAt || post.meta.publishedAt).toISOString()}
+  section={post.meta.category}
+  tags={post.meta.tags}
+>
+  <article class="container mx-auto px-2 sm:px-4 xl:max-w-6xl">
+    <PostHeader meta={post.meta} />
+    <div class="xl:flex xl:gap-8">
+      <div class="xl:max-w-4xl xl:flex-1">
+        <div class="xl:hidden">
+          <TableOfContents headings={post.headings} />
+        </div>
+
+        <PostBody post={post} />
+
+        {post.originalPath && (
+          <div class="post-footer mt-12 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-8">
+            <EditOnGitHub originalPath={post.originalPath} />
+          </div>
+        )}
+      </div>
+
+      <aside class="hidden xl:block xl:w-64 xl:flex-shrink-0">
+        <TableOfContents headings={post.headings} />
+      </aside>
+    </div>
+  </article>
+</BaseLayout>

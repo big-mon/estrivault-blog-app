@@ -1,0 +1,28 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "baseUrl": ".",
+    "composite": true,
+    "incremental": true,
+    "paths": {
+      "@content": ["../../content"],
+      "@content/*": ["../../content/*"],
+      "$components": ["src/components"],
+      "$components/*": ["src/components/*"],
+      "$constants": ["src/constants/index.ts"],
+      "$constants/*": ["src/constants/*"],
+      "$layouts": ["src/layouts"],
+      "$layouts/*": ["src/layouts/*"],
+      "$lib": ["src/lib"],
+      "$lib/*": ["src/lib/*"]
+    },
+    "tsBuildInfoFile": "./.astro/.tsbuildinfo"
+  },
+  "include": ["src/**/*", "astro.config.mjs"],
+  "references": [
+    { "path": "../../packages/cloudinary-utils" },
+    { "path": "../../packages/content-processor" }
+  ]
+}
