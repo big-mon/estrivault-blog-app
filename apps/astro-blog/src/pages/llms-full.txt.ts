@@ -4,6 +4,14 @@ import { SITE_URL, SOCIAL_LINK_X, SOCIAL_LINK_GITHUB } from '$constants';
 
 export const prerender = true;
 
+const escapeMarkdownText = (value: string): string =>
+  value
+    .replace(/\\/g, '\\\\')
+    .replace(/\r?\n+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/([\[\]\(\)])/g, '\\$1')
+    .trim();
+
 export const GET: APIRoute = async () => {
   const posts = await getAllPostsMeta();
   const siteBase = SITE_URL.replace(/\/$/, '');
@@ -36,7 +44,7 @@ This site contains technical articles, investment analysis, gaming guides, and m
 ${posts
   .map(
     (post) =>
-      `- [${post.title}](${siteBase}/post/${post.slug}) (${post.publishedAt.toISOString().split('T')[0]}) [${post.category}] - ${post.description || '記事の詳細な解説'}`,
+      `- [${escapeMarkdownText(post.title)}](${siteBase}/post/${encodeURIComponent(post.slug)}) (${post.publishedAt.toISOString().split('T')[0]}) [${escapeMarkdownText(post.category)}] - ${escapeMarkdownText(post.description || 'Detailed article description')}`,
   )
   .join('\n')}
 

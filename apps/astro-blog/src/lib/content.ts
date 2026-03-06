@@ -78,9 +78,15 @@ async function extractFrontmatterOnly(
   }
 
   try {
-    const frontmatterOnly = `---\n${frontmatterMatch[1]}\n---\n`;
+    const requiredFrontmatterFields = ['title', 'publishedAt', 'category', 'tags'] as const;
+    for (const field of requiredFrontmatterFields) {
+      if (!new RegExp(`(^|\\n)${field}\\s*:`, 'm').test(frontmatterMatch[1])) {
+        throw new Error(`Required frontmatter field "${field}" is missing: ${filePath}`);
+      }
+    }
+
     const slug = generateSlugFromPath(filePath);
-    const meta = await extractMetadata(frontmatterOnly, options, slug);
+    const meta = await extractMetadata(content, options, slug);
 
     if (meta.draft) {
       return null;
