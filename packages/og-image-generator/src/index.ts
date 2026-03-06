@@ -16,17 +16,6 @@ export interface PostOgpCardData {
 const IMAGE_WIDTH = 1200;
 const IMAGE_HEIGHT = 630;
 
-function formatPublishedDate(value: Date | string): string {
-  const date = value instanceof Date ? value : new Date(value);
-
-  return new Intl.DateTimeFormat('ja-JP', {
-    timeZone: 'Asia/Tokyo',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(date);
-}
-
 function getSiteHost(siteUrl: string): string {
   try {
     return new URL(siteUrl).hostname.replace(/^www\./, '');
@@ -57,10 +46,8 @@ function renderTitleLines(lines: string[], fontSize: number, lineHeight: number)
 
 export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8Array> {
   const titleLayout = layoutPostOgpTitle(input.title);
-  const publishedDate = formatPublishedDate(input.publishedAt);
   const category = input.category || 'Other';
   const siteTitle = input.siteTitle;
-  const slugLabel = `/${input.slug}`;
   const siteHost = getSiteHost(input.siteUrl);
 
   const markup = h(
@@ -120,7 +107,7 @@ export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8A
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             borderRadius: 32,
             border: '1px solid rgba(148,163,184,0.35)',
             backgroundColor: 'rgba(255,255,255,0.88)',
@@ -133,51 +120,9 @@ export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8A
           {
             style: {
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: 24,
-            },
-          },
-          h(
-            'div',
-            {
-              style: {
-                display: 'flex',
-                alignItems: 'center',
-                padding: '10px 16px',
-                borderRadius: 9999,
-                backgroundColor: '#0f172a',
-                color: '#f8fafc',
-                fontSize: 20,
-                letterSpacing: '0.08em',
-                fontWeight: 700,
-              },
-            },
-            siteTitle,
-          ),
-          h(
-            'div',
-            {
-              style: {
-                display: 'flex',
-                maxWidth: 420,
-                padding: '8px 14px',
-                borderRadius: 9999,
-                backgroundColor: 'rgba(15,23,42,0.06)',
-                color: '#475569',
-                fontSize: 18,
-              },
-            },
-            slugLabel,
-          ),
-        ),
-        h(
-          'div',
-          {
-            style: {
-              display: 'flex',
               flexDirection: 'column',
               gap: 22,
+              marginTop: 18,
             },
           },
           h(
@@ -222,9 +167,10 @@ export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8A
           {
             style: {
               display: 'flex',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-start',
               alignItems: 'flex-end',
               gap: 24,
+              marginTop: 42,
             },
           },
           h(
@@ -258,41 +204,6 @@ export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8A
                 },
               },
               siteHost,
-            ),
-          ),
-          h(
-            'div',
-            {
-              style: {
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-end',
-                gap: 10,
-              },
-            },
-            h(
-              'div',
-              {
-                style: {
-                  display: 'flex',
-                  fontSize: 18,
-                  color: '#64748b',
-                  letterSpacing: '0.08em',
-                },
-              },
-              'PUBLISHED',
-            ),
-            h(
-              'div',
-              {
-                style: {
-                  display: 'flex',
-                  fontSize: 30,
-                  color: '#0f172a',
-                  fontWeight: 700,
-                },
-              },
-              publishedDate,
             ),
           ),
         ),
