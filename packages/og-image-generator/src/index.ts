@@ -233,7 +233,7 @@ export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8A
               {
                 style: {
                   display: 'flex',
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: 700,
                   color: '#505050',
                   letterSpacing: '0.18em',
@@ -245,7 +245,7 @@ export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8A
             h('div', {
               style: {
                 display: 'flex',
-                width: 180,
+                width: 120,
                 height: 14,
                 backgroundColor: '#050505',
               },
