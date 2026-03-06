@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  astro-blog:
+    name: Lint, Build, and E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate workspace
+        run: pnpm run validate:workspace
+
+      - name: Lint astro-blog
+        run: pnpm --filter astro-blog lint
+
+      - name: Build astro-blog
+        run: pnpm --filter astro-blog build
+
+      - name: Install Playwright Chromium
+        run: pnpm --filter astro-blog exec playwright install --with-deps chromium
+
+      - name: Run Playwright E2E
+        run: pnpm --filter astro-blog test:e2e
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          if-no-files-found: ignore
+          path: |
+            apps/astro-blog/test-results
+            apps/astro-blog/playwright-report
