@@ -16,7 +16,7 @@ export interface PaginatedPosts {
 }
 
 const defaultProcessorOptions: ProcessorOptions = {
-  cloudinaryCloudName: import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? '',
+  cloudinaryCloudName: import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? 'damonge',
 };
 
 interface PostMetaSource {
@@ -104,10 +104,12 @@ export async function getAllPostsMeta(
   const markdownFiles = getMarkdownFiles();
 
   const postMetaSources = await Promise.all(
-    Object.entries(markdownFiles).map(async ([filePath, content]): Promise<PostMetaSource> => ({
-      filePath,
-      meta: await extractFrontmatterOnly(filePath, content, options),
-    })),
+    Object.entries(markdownFiles).map(
+      async ([filePath, content]): Promise<PostMetaSource> => ({
+        filePath,
+        meta: await extractFrontmatterOnly(filePath, content, options),
+      }),
+    ),
   );
 
   const validPostSources = postMetaSources.filter(

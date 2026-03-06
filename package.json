@@ -11,6 +11,7 @@
     "build:packages:incremental": "tsc --build packages/cloudinary-utils packages/content-processor",
     "dev:packages": "pnpm --filter @estrivault/cloudinary-utils run dev",
     "validate:workspace": "node scripts/validate-workspace.js",
+    "preinstall": "node scripts/require-pnpm.js",
     "postinstall": "pnpm run build:packages",
     "clean": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor run clean",
     "clean:ts": "find . -name '.tsbuildinfo*' -delete",
@@ -55,5 +56,6 @@
     "onlyBuiltDependencies": [
       "esbuild"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.13.1"
 }

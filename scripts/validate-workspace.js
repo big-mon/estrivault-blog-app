@@ -4,7 +4,6 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
 
-// 固定のパッケージ設定（2つだけなので共通化は不要）
 const PACKAGES = [
   {
     name: '@estrivault/content-processor',
@@ -18,10 +17,12 @@ const PACKAGES = [
   },
 ];
 
+const PNPM_VERSION = '10.13.1';
+
 function checkPackageExists(pkg) {
   const packagePath = join(process.cwd(), pkg.path, 'package.json');
   if (!existsSync(packagePath)) {
-    console.error(`❌ Package ${pkg.name} not found at ${pkg.path}`);
+    console.error(`ERROR: Package ${pkg.name} not found at ${pkg.path}`);
     return false;
   }
   return true;
@@ -30,8 +31,8 @@ function checkPackageExists(pkg) {
 function checkDistExists(pkg) {
   const distPath = join(process.cwd(), pkg.distPath);
   if (!existsSync(distPath)) {
-    console.warn(`⚠️  Build directory missing for ${pkg.name}`);
-    console.warn(`   Run: pnpm run build:packages`);
+    console.warn(`WARN: Build directory missing for ${pkg.name}`);
+    console.warn('  Run: pnpm run build:packages');
     return false;
   }
   return true;
@@ -39,51 +40,54 @@ function checkDistExists(pkg) {
 
 function checkPnpmInstalled() {
   try {
-    execSync('pnpm --version', { stdio: 'ignore' });
+    execSync('pnpm --version', { stdio: 'ignore', shell: true });
     return true;
   } catch {
-    console.error('❌ pnpm is not installed or not in PATH');
-    console.error('   Install pnpm: npm install -g pnpm');
+    console.error('ERROR: pnpm is not installed or not in PATH');
+    console.error('Install pnpm:');
+    console.error(`  npm install -g pnpm@${PNPM_VERSION}`);
+    console.error('Alternative (corepack):');
+    console.error('  corepack enable');
+    console.error(`  corepack prepare pnpm@${PNPM_VERSION} --activate`);
+    console.error('Then run: pnpm install');
     return false;
   }
 }
 
 function main() {
-  console.log('🔍 Validating workspace setup...\n');
+  console.log('Validating workspace setup...\n');
 
   let allValid = true;
 
-  // Check pnpm
   if (!checkPnpmInstalled()) {
     allValid = false;
   }
 
-  // Check packages
   for (const pkg of PACKAGES) {
     if (!checkPackageExists(pkg)) {
       allValid = false;
     } else {
-      console.log(`✅ Package ${pkg.name} found`);
+      console.log(`OK: Package ${pkg.name} found`);
     }
 
     if (!checkDistExists(pkg)) {
       allValid = false;
     } else {
-      console.log(`✅ Build artifacts for ${pkg.name} found`);
+      console.log(`OK: Build artifacts for ${pkg.name} found`);
     }
   }
 
   console.log();
 
   if (allValid) {
-    console.log('✅ Workspace validation passed!');
-    console.log('🚀 You can now run: pnpm run dev');
+    console.log('OK: Workspace validation passed');
+    console.log('You can now run: pnpm run dev');
   } else {
-    console.log('❌ Workspace validation failed!');
-    console.log('\n🔧 Quick fix commands:');
-    console.log('   pnpm install');
-    console.log('   pnpm run build:packages');
-    console.log('   pnpm run dev');
+    console.log('ERROR: Workspace validation failed');
+    console.log('\nQuick fix commands:');
+    console.log('  pnpm install');
+    console.log('  pnpm run build:packages');
+    console.log('  pnpm run dev');
     process.exit(1);
   }
 }
