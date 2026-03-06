@@ -13,7 +13,9 @@ let fontPromise: Promise<LoadedFont[]> | undefined;
 
 async function loadFontAsset(assetPath: string): Promise<ArrayBuffer> {
   const buffer = await readFile(new URL(assetPath, import.meta.url));
-  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+  const data = new Uint8Array(buffer.byteLength);
+  data.set(buffer);
+  return data.buffer;
 }
 
 export function loadPostOgpFonts(): Promise<LoadedFont[]> {
