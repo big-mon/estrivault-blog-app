@@ -21,13 +21,20 @@ const rootDir = path.resolve(process.cwd(), 'dist');
 
 const contentTypes = new Map([
   ['.css', 'text/css; charset=utf-8'],
+  ['.gif', 'image/gif'],
   ['.html', 'text/html; charset=utf-8'],
+  ['.ico', 'image/x-icon'],
   ['.js', 'application/javascript; charset=utf-8'],
+  ['.jpeg', 'image/jpeg'],
+  ['.jpg', 'image/jpeg'],
   ['.json', 'application/json; charset=utf-8'],
   ['.mjs', 'application/javascript; charset=utf-8'],
   ['.png', 'image/png'],
   ['.svg', 'image/svg+xml'],
   ['.txt', 'text/plain; charset=utf-8'],
+  ['.webp', 'image/webp'],
+  ['.woff', 'font/woff'],
+  ['.woff2', 'font/woff2'],
   ['.xml', 'application/xml; charset=utf-8'],
 ]);
 
@@ -36,7 +43,13 @@ function getContentType(filePath) {
 }
 
 function resolveRequestPath(urlPathname) {
-  const decodedPath = decodeURIComponent(urlPathname);
+  let decodedPath;
+  try {
+    decodedPath = decodeURIComponent(urlPathname);
+  } catch {
+    return null;
+  }
+
   const relativePath = path.normalize(`.${decodedPath}`).replace(/^(\.\.[/\\])+/, '.');
   const targetPath = path.resolve(rootDir, relativePath);
 
