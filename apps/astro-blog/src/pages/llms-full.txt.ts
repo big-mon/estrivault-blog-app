@@ -1,11 +1,11 @@
 import type { APIRoute } from 'astro';
-import { getPosts } from '$lib/content';
+import { getAllPostsMeta } from '$lib/content';
 import { SITE_URL, SOCIAL_LINK_X, SOCIAL_LINK_GITHUB } from '$constants';
 
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
-  const { posts } = await getPosts({ perPage: 1000 });
+  const posts = await getAllPostsMeta();
   const siteBase = SITE_URL.replace(/\/$/, '');
 
   const body = `# Estrilda Blog - Complete Article List

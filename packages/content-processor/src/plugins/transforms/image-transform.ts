@@ -4,8 +4,8 @@ import type { Root } from 'hast';
 import { buildUrl, buildSrcSet, type BuildUrlOptions } from '@estrivault/cloudinary-utils';
 
 export interface ImageTransformOptions {
-  /** Cloudinaryクラウド名（未指定時は変換スキップ） */
-  cloudinaryCloudName?: string;
+  /** Cloudinaryクラウド名（必須） */
+  cloudinaryCloudName: string;
   /** 画像幅 */
   width?: number;
   /** 画像のトリミングモード */
@@ -18,7 +18,18 @@ export interface ImageTransformOptions {
  * 画像パスをCloudinary CDN URLに変換するrehypeプラグイン
  */
 export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> = (options) => {
-  const { cloudinaryCloudName = '', width = 1200, quality = 90 } = options || {};
+  const {
+    cloudinaryCloudName,
+    width = 1200,
+    quality = 90,
+    mode: defaultMode = 'fit',
+  } = options || {};
+
+  if (!cloudinaryCloudName?.trim()) {
+    throw new Error('cloudinaryCloudName is required for rehypeImageTransform');
+  }
+
+  const normalizedCloudinaryCloudName = cloudinaryCloudName.trim();
 
   return (tree: Root) => {
     visit(tree, 'element', (node, index, parent) => {
@@ -38,11 +49,6 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
         return undefined;
       }
 
-      // Cloudinaryが未設定なら、元の相対URLをそのまま使用する
-      if (!cloudinaryCloudName) {
-        return undefined;
-      }
-
       try {
         // 拡張子を除いたパス部分を取得
         const publicId = src.replace(/^\//, '').split('.')[0];
@@ -55,17 +61,21 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
         const mode =
           (node.properties['data-mode'] as string) === 'fill' ?
             ('fill' as const)
-          : ('fit' as const);
+          : defaultMode;
         const buildOptions: BuildUrlOptions = {
           w: width,
           mode,
           quality,
         };
 
-        node.properties.src = buildUrl(cloudinaryCloudName, publicId, buildOptions);
+        node.properties.src = buildUrl(normalizedCloudinaryCloudName, publicId, buildOptions);
 
         // レスポンシブ画像用のsrcsetを生成
-        node.properties.srcset = buildSrcSet(cloudinaryCloudName, publicId, buildOptions);
+        node.properties.srcset = buildSrcSet(
+          normalizedCloudinaryCloudName,
+          publicId,
+          buildOptions,
+        );
 
         // レスポンシブ画像用の属性を追加
         node.properties.loading = 'lazy';

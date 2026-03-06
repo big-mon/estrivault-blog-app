@@ -19,6 +19,11 @@ const defaultProcessorOptions: ProcessorOptions = {
   cloudinaryCloudName: import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? '',
 };
 
+interface PostMetaSource {
+  filePath: string;
+  meta: PostMeta | null;
+}
+
 function getMarkdownFiles(): Record<string, string> {
   const modules = import.meta.glob('@content/blog/**/*.{md,mdx}', {
     query: '?raw',
@@ -39,17 +44,40 @@ function generateSlugFromPath(filePath: string): string {
   return filename.replace(/\.(md|mdx)$/, '');
 }
 
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function assertUniqueSlugs(posts: Array<{ filePath: string; meta: PostMeta }>): void {
+  const slugToPath = new Map<string, string>();
+
+  for (const { filePath, meta } of posts) {
+    if (!meta.slug) {
+      throw new Error(`Post slug is empty: ${filePath}`);
+    }
+
+    const existingPath = slugToPath.get(meta.slug);
+    if (existingPath) {
+      throw new Error(
+        `Duplicate slug "${meta.slug}" detected between ${existingPath} and ${filePath}`,
+      );
+    }
+
+    slugToPath.set(meta.slug, filePath);
+  }
+}
+
 async function extractFrontmatterOnly(
   filePath: string,
   content: string,
   options: ProcessorOptions = defaultProcessorOptions,
 ): Promise<PostMeta | null> {
-  try {
-    const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-    if (!frontmatterMatch) {
-      return null;
-    }
+  const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!frontmatterMatch) {
+    throw new Error(`Frontmatter block is missing: ${filePath}`);
+  }
 
+  try {
     const frontmatterOnly = `---\n${frontmatterMatch[1]}\n---\n`;
     const slug = generateSlugFromPath(filePath);
     const meta = await extractMetadata(frontmatterOnly, options, slug);
@@ -60,8 +88,7 @@ async function extractFrontmatterOnly(
 
     return meta;
   } catch (error) {
-    console.warn(`Failed to extract metadata from ${filePath}:`, error);
-    return null;
+    throw new Error(`Failed to extract metadata from ${filePath}: ${getErrorMessage(error)}`);
   }
 }
 
@@ -70,14 +97,21 @@ export async function getAllPostsMeta(
 ): Promise<PostMeta[]> {
   const markdownFiles = getMarkdownFiles();
 
-  const postMetaList = await Promise.all(
-    Object.entries(markdownFiles).map(([filePath, content]) =>
-      extractFrontmatterOnly(filePath, content, options),
-    ),
+  const postMetaSources = await Promise.all(
+    Object.entries(markdownFiles).map(async ([filePath, content]): Promise<PostMetaSource> => ({
+      filePath,
+      meta: await extractFrontmatterOnly(filePath, content, options),
+    })),
   );
 
-  return postMetaList
-    .filter((post): post is PostMeta => post !== null)
+  const validPostSources = postMetaSources.filter(
+    (source): source is { filePath: string; meta: PostMeta } => source.meta !== null,
+  );
+
+  assertUniqueSlugs(validPostSources);
+
+  return validPostSources
+    .map((source) => source.meta)
     .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 }
 
@@ -127,17 +161,25 @@ export async function getPostBySlug(
   const markdownFiles = getMarkdownFiles();
 
   for (const [filePath, content] of Object.entries(markdownFiles)) {
-    try {
-      const meta = await extractMetadata(content, options, generateSlugFromPath(filePath));
-      if (meta.slug !== slug || meta.draft) {
-        continue;
-      }
+    const generatedSlug = generateSlugFromPath(filePath);
+    let meta: PostMeta;
 
+    try {
+      meta = await extractMetadata(content, options, generatedSlug);
+    } catch (error) {
+      throw new Error(`Invalid markdown file ${filePath}: ${getErrorMessage(error)}`);
+    }
+
+    if (meta.slug !== slug || meta.draft) {
+      continue;
+    }
+
+    try {
       const post = await processMarkdown(content, options, slug);
       post.originalPath = filePath.replace(/^.*\/content\/blog\//, 'content/blog/');
       return post;
     } catch (error) {
-      console.warn(`Skipping invalid markdown file ${filePath}:`, error);
+      throw new Error(`Failed to process markdown file ${filePath}: ${getErrorMessage(error)}`);
     }
   }
 
@@ -154,7 +196,9 @@ export async function getAllTags(): Promise<string[]> {
   const tagSet = new Set<string>();
 
   allPosts.forEach((post) => {
-    post.tags.forEach((tag) => tagSet.add(tag));
+    post.tags.forEach((tag) => {
+      tagSet.add(tag);
+    });
   });
 
   return [...tagSet].sort((a, b) => a.localeCompare(b));

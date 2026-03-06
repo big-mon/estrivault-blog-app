@@ -7,8 +7,14 @@ interface Props {
 
 const { pathname } = Astro.props;
 
+function normalizePath(path: string): string {
+  return path.replace(/\/$/, '') || '/';
+}
+
 function isActive(href: string): boolean {
-  return pathname === href || pathname.startsWith(`${href}/`);
+  const normalizedPath = normalizePath(pathname);
+  const normalizedHref = normalizePath(href);
+  return normalizedPath === normalizedHref || normalizedPath.startsWith(`${normalizedHref}/`);
 }
 ---
 

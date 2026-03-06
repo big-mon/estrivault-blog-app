@@ -6,8 +6,9 @@ interface Props {
 }
 
 const { originalPath } = Astro.props;
-const editUrl = `${GITHUB_REPO}/edit/${MAIN_BRANCH}/${originalPath}`;
-const historyUrl = `${GITHUB_REPO}/commits/${MAIN_BRANCH}/${originalPath}`;
+const encodedPath = originalPath.split('/').map((segment) => encodeURIComponent(segment)).join('/');
+const editUrl = `${GITHUB_REPO}/edit/${MAIN_BRANCH}/${encodedPath}`;
+const historyUrl = `${GITHUB_REPO}/commits/${MAIN_BRANCH}/${encodedPath}`;
 ---
 
 <div class="flex flex-col items-center gap-3 text-center sm:items-start sm:text-left">
