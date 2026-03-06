@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-import { existsSync } from 'fs';
-import { join } from 'path';
 import { execSync } from 'child_process';
+import { existsSync, readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 const PACKAGES = [
   {
@@ -17,7 +18,26 @@ const PACKAGES = [
   },
 ];
 
-const PNPM_VERSION = '10.13.1';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function getRequiredPnpmVersion() {
+  const packageJsonPath = join(__dirname, '..', 'package.json');
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+  const packageManager = packageJson.packageManager;
+
+  if (typeof packageManager !== 'string') {
+    throw new Error('packageManager is not defined in package.json');
+  }
+
+  const match = packageManager.match(/^pnpm@(.+)$/);
+  if (!match) {
+    throw new Error(`Unexpected packageManager value: ${packageManager}`);
+  }
+
+  return match[1];
+}
+
+const PNPM_VERSION = getRequiredPnpmVersion();
 
 function checkPackageExists(pkg) {
   const packagePath = join(process.cwd(), pkg.path, 'package.json');
