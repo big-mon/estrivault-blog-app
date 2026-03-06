@@ -9,7 +9,6 @@
 **モノレポ構成:**
 
 - `apps/astro-blog/` - メインのAstroアプリケーション（静的サイト生成）
-- `apps/svelte-blog/` - 旧SvelteKit実装（移行期間中の参照用）
 - `packages/content-processor/` - Markdown処理のコアパイプライン
 - `packages/cloudinary-utils/` - 画像最適化ユーティリティ
 
