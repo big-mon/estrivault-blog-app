@@ -9,7 +9,7 @@ const escapeMarkdownText = (value: string): string =>
     .replace(/\\/g, '\\\\')
     .replace(/\r?\n+/g, ' ')
     .replace(/\s+/g, ' ')
-    .replace(/([\[\]\(\)])/g, '\\$1')
+    .replace(/\[|]|\(|\)/g, '\\$&')
     .trim();
 
 export const GET: APIRoute = async () => {

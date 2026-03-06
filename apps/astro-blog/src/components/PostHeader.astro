@@ -1,5 +1,6 @@
 ---
 import type { PostMeta } from '@estrivault/content-processor';
+import { getTagRouteSegment } from '$lib/url-segments';
 
 interface Props {
   meta: PostMeta;
@@ -18,45 +19,71 @@ const shownDateLabel = new Intl.DateTimeFormat('ja-JP', {
 <header class="bg-white pb-12 pt-8">
   <div class="container mx-auto px-4">
     <div class="flex flex-col items-start gap-8 lg:flex-row lg:items-stretch">
-      {meta.coverImage && (
-        <div class="mb-8 w-full lg:mb-0 lg:flex lg:w-1/2 lg:items-center">
-          <div class="w-full overflow-hidden rounded-lg border border-gray-200">
-            <img src={meta.coverImage} alt={meta.title} class="h-auto w-full" loading="lazy" />
+      {
+        meta.coverImage && (
+          <div class="mb-8 w-full lg:mb-0 lg:flex lg:w-1/2 lg:items-center">
+            <div class="w-full overflow-hidden rounded-lg border border-gray-200">
+              <img src={meta.coverImage} alt={meta.title} class="h-auto w-full" loading="lazy" />
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <div class="flex w-full flex-col justify-center lg:w-1/2">
         <div class="mb-4 flex flex-wrap items-center justify-between">
-          {meta.category && (
-            <div class="mb-2 sm:mb-0">
-              <a href={`/category/${encodeURIComponent(meta.category.toLowerCase())}/1`} class="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">
-                {meta.category}
-              </a>
-            </div>
-          )}
+          {
+            meta.category && (
+              <div class="mb-2 sm:mb-0">
+                <a
+                  href={`/category/${encodeURIComponent(meta.category.toLowerCase())}/1`}
+                  class="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+                >
+                  {meta.category}
+                </a>
+              </div>
+            )
+          }
 
           <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
             <div class="flex items-center text-sm text-gray-500">
-              <time datetime={shownDate.toISOString()} class="leading-relaxed">{shownDateLabel}</time>
+              <time datetime={shownDate.toISOString()} class="leading-relaxed"
+                >{shownDateLabel}</time
+              >
             </div>
-            {meta.readingTime && <div class="flex items-center text-sm text-gray-500"><span class="leading-relaxed">約{meta.readingTime}分</span></div>}
+            {
+              meta.readingTime && (
+                <div class="flex items-center text-sm text-gray-500">
+                  <span class="leading-relaxed">約{meta.readingTime}分</span>
+                </div>
+              )
+            }
           </div>
         </div>
 
-        <h1 class="mb-6 text-2xl font-bold leading-tight text-gray-900 md:text-3xl lg:text-4xl">{meta.title}</h1>
+        <h1 class="mb-6 text-2xl font-bold leading-tight text-gray-900 md:text-3xl lg:text-4xl">
+          {meta.title}
+        </h1>
 
-        {meta.tags.length > 0 && (
-          <div class="mb-6 flex flex-wrap gap-2">
-            {meta.tags.map((tag) => (
-              <a href={`/tag/${encodeURIComponent(tag.toLowerCase())}/1`} class="rounded bg-gray-100 px-2 py-1 text-xs text-gray-600 transition-colors hover:bg-gray-200">
-                {tag}
-              </a>
-            ))}
-          </div>
-        )}
+        {
+          meta.tags.length > 0 && (
+            <div class="mb-6 flex flex-wrap gap-2">
+              {meta.tags.map((tag) => (
+                <a
+                  href={`/tag/${getTagRouteSegment(tag)}/1`}
+                  class="rounded bg-gray-100 px-2 py-1 text-xs text-gray-600 transition-colors hover:bg-gray-200"
+                >
+                  {tag}
+                </a>
+              ))}
+            </div>
+          )
+        }
 
-        {meta.description && <p class="break-words text-gray-700 lg:line-clamp-3">{meta.description}</p>}
+        {
+          meta.description && (
+            <p class="break-words text-gray-700 lg:line-clamp-3">{meta.description}</p>
+          )
+        }
       </div>
     </div>
   </div>

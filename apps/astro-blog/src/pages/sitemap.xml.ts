@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import type { PostMeta } from '@estrivault/content-processor';
 import { POSTS_PER_PAGE, SITE_URL } from '$constants';
 import { getAllCategories, getAllPostsMeta, getAllTags, getPosts } from '$lib/content';
+import { getTagRouteSegment } from '$lib/url-segments';
 
 export const prerender = true;
 
@@ -43,7 +44,7 @@ export const GET: APIRoute = async () => {
 
   for (const tag of tags) {
     const tagPosts = await getPosts({ tag, perPage: POSTS_PER_PAGE });
-    const encodedTag = encodeSegment(tag);
+    const encodedTag = getTagRouteSegment(tag);
 
     for (let page = 1; page <= tagPosts.totalPages; page++) {
       tagUrls.push(`<url>
