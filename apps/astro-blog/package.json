@@ -14,6 +14,7 @@
     "test": "pnpm run test:e2e"
   },
   "dependencies": {
+    "@estrivault/og-image-generator": "workspace:^",
     "@estrivault/content-processor": "workspace:^",
     "gray-matter": "^4.0.3"
   },

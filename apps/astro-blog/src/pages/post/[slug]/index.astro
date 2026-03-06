@@ -6,6 +6,7 @@ import PostHeader from '$components/PostHeader.astro';
 import TableOfContents from '$components/TableOfContents.astro';
 import { SITE_TITLE, SITE_URL, SOCIAL_LINK_X } from '$constants';
 import { getAllPostsMeta, getPostBySlug } from '$lib/content';
+import { getPostOgpImageUrl } from '$lib/og';
 
 export async function getStaticPaths() {
   const allPosts = await getAllPostsMeta();
@@ -33,13 +34,14 @@ const siteBase = SITE_URL.replace(/\/$/, '');
 const canonical = `${siteBase}/post/${post.meta.slug}`;
 const title = `${post.meta.title} | ${SITE_TITLE}`;
 const description = post.meta.description || `${post.meta.title}についての記事です。`;
+const ogImage = getPostOgpImageUrl(post.meta.slug);
 
 const schemaData = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
   headline: post.meta.title,
   description,
-  image: post.meta.coverImage ? [post.meta.coverImage] : undefined,
+  image: [ogImage],
   author: {
     '@type': 'Person',
     name: 'big-mon',
@@ -71,7 +73,7 @@ const schemaData = {
   description={description}
   canonical={canonical}
   ogType="article"
-  image={post.meta.coverImage}
+  image={ogImage}
   jsonLd={schemaData}
   publishedTime={post.meta.publishedAt.toISOString()}
   modifiedTime={(post.meta.updatedAt || post.meta.publishedAt).toISOString()}
