@@ -16,14 +16,6 @@ export interface PostOgpCardData {
 const IMAGE_WIDTH = 1200;
 const IMAGE_HEIGHT = 630;
 
-function getSiteHost(siteUrl: string): string {
-  try {
-    return new URL(siteUrl).hostname.replace(/^www\./, '');
-  } catch {
-    return siteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
-  }
-}
-
 function renderTitleLines(lines: string[], fontSize: number, lineHeight: number) {
   return lines.map((line, index) =>
     h(
@@ -47,8 +39,6 @@ function renderTitleLines(lines: string[], fontSize: number, lineHeight: number)
 export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8Array> {
   const titleLayout = layoutPostOgpTitle(input.title);
   const category = input.category || 'Other';
-  const siteTitle = input.siteTitle;
-  const siteHost = getSiteHost(input.siteUrl);
 
   const markup = h(
     'div',
@@ -221,52 +211,13 @@ export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8A
           {
             style: {
               display: 'flex',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-end',
               alignItems: 'flex-end',
               gap: 24,
               borderTop: '2px solid #050505',
               paddingTop: 24,
             },
           },
-          h(
-            'div',
-            {
-              style: {
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                gap: 14,
-              },
-            },
-            h(
-              'div',
-              {
-                style: {
-                  display: 'flex',
-                  padding: '12px 18px',
-                  backgroundColor: '#050505',
-                  color: '#ffffff',
-                  fontSize: 24,
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                },
-              },
-              siteTitle,
-            ),
-            h(
-              'div',
-              {
-                style: {
-                  display: 'flex',
-                  fontSize: 18,
-                  color: '#505050',
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                },
-              },
-              siteHost,
-            ),
-          ),
           h(
             'div',
             {
@@ -289,7 +240,7 @@ export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8A
                   textTransform: 'uppercase',
                 },
               },
-              'Estrivault Editorial Card',
+              'Estrilda',
             ),
             h('div', {
               style: {
