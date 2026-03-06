@@ -2,23 +2,24 @@
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/big-mon/estrivault-blog-app) ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/big-mon/estrivault-blog-app?utm_source=oss&utm_medium=github&utm_campaign=big-mon%2Festrivault-blog-app&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
-**SvelteKit** と **TypeScript** で構築された**モノレポブログアプリケーション**。Markdownコンテンツを静的ブログサイトに変換し、YouTube、Twitter、GitHub、Amazonの埋め込み機能を持つアプリケーションです。
+**Astro** と **TypeScript** で構築された**モノレポブログアプリケーション**。Markdownコンテンツを静的ブログサイトに変換し、YouTube、Twitter、GitHub、Amazonの埋め込み機能を持つアプリケーションです。
 
 ## 🏗️ アーキテクチャ
 
 **モノレポ構成:**
 
-- `apps/svelte-blog/` - メインのSvelteKitアプリケーション（静的サイト生成）
+- `apps/astro-blog/` - メインのAstroアプリケーション（静的サイト生成）
+- `apps/svelte-blog/` - 旧SvelteKit実装（移行期間中の参照用）
 - `packages/content-processor/` - Markdown処理のコアパイプライン
 - `packages/cloudinary-utils/` - 画像最適化ユーティリティ
 
 **技術スタック:**
 
-- **フロントエンド**: Svelte 5.x + SvelteKit 2.x + TailwindCSS 4.x
+- **フロントエンド**: Astro 5.x + TailwindCSS 4.x
 - **コンテンツ**: Markdown + frontmatter、unified/remark/rehype パイプライン
 - **ビルド**: Vite 6.x、TypeScript、PNPMワークスペース
-- **テスト**: Vitest（ユニット）、Playwright（E2E）
-- **デプロイ**: `@sveltejs/adapter-vercel`によるVercelデプロイ
+- **テスト**: Playwright（E2E）
+- **デプロイ**: Cloudflare Assets（`wrangler.toml`）
 
 ## 🛠 初回セットアップ手順（初めてクローンした場合）
 
@@ -49,16 +50,15 @@ pnpm dev              # 開発サーバ起動（http://localhost:5173）
 
 ```bash
 # TypeScript チェック
-pnpm --filter svelte-blog check
+pnpm --filter astro-blog check
 
 # Lint & Format
-pnpm --filter svelte-blog lint
-pnpm --filter svelte-blog format
+pnpm --filter astro-blog lint
+pnpm --filter astro-blog format
 
 # テスト実行
-pnpm --filter svelte-blog test:unit  # Unit tests (Vitest)
-pnpm --filter svelte-blog test:e2e   # E2E tests (Playwright)
-pnpm --filter svelte-blog test       # All tests
+pnpm --filter astro-blog test:e2e   # E2E tests (Playwright)
+pnpm --filter astro-blog test       # All tests
 ```
 
 ## 📦 パッケージ開発
@@ -75,13 +75,13 @@ pnpm --filter @estrivault/cloudinary-utils dev
 ## 🚀 本番ビルド・デプロイ
 
 ```bash
-pnpm --filter svelte-blog build      # 本番ビルド
-pnpm --filter svelte-blog preview    # 本番ビルドのプレビュー
+pnpm --filter astro-blog build      # 本番ビルド
+pnpm --filter astro-blog preview    # 本番ビルドのプレビュー
 ```
 
 ## 💡 開発時の注意点
 
-- **Node.js >= 18** 必須（Vite と SvelteKit 推奨バージョン）
+- **Node.js >= 18** 必須（Vite と Astro 推奨バージョン）
 - **PNPM** 利用前提（npm や yarn では未サポート）
 - **モノレポ構成**: ワークスペース依存関係のため、初回や依存更新時は `pnpm run build` が必要
 - **Content Pipeline**: Markdown ファイルは `content/blog/` に配置し、カテゴリ別にフォルダ分け

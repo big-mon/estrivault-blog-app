@@ -1,0 +1,60 @@
+---
+import type { HeadingInfo } from '@estrivault/content-processor';
+
+interface Props {
+  headings: HeadingInfo[];
+}
+
+const { headings } = Astro.props;
+
+function getIndentClass(level: number): string {
+  switch (level) {
+    case 1:
+    case 2:
+      return 'ml-0';
+    case 3:
+      return 'ml-4';
+    case 4:
+      return 'ml-8';
+    case 5:
+      return 'ml-12';
+    case 6:
+      return 'ml-16';
+    default:
+      return 'ml-0';
+  }
+}
+
+function getTextSizeClass(level: number): string {
+  switch (level) {
+    case 1:
+    case 2:
+      return 'text-base font-semibold';
+    case 3:
+    case 4:
+      return 'text-sm';
+    case 5:
+    case 6:
+      return 'text-xs';
+    default:
+      return 'text-sm';
+  }
+}
+---
+
+{
+  headings.length > 0 && (
+    <nav class="table-of-contents mb-8 rounded-2xl border border-gray-200/50 bg-gradient-to-br from-white to-gray-50 p-6 xl:sticky xl:top-24 xl:mb-0 xl:mt-16 xl:max-h-[calc(100vh-16rem)] xl:overflow-y-auto xl:shadow-xl xl:shadow-gray-900/10">
+      <h2 class="mb-4 text-lg font-bold text-gray-900">目次</h2>
+      <ul class="space-y-2">
+        {headings.map((heading) => (
+          <li class={getIndentClass(heading.level)}>
+            <a href={`#${heading.id}`} class={`block py-1 text-gray-600 transition-colors duration-200 hover:text-gray-900 ${getTextSizeClass(heading.level)}`}>
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}

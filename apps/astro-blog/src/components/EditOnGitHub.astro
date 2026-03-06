@@ -1,0 +1,26 @@
+---
+import { GITHUB_REPO, MAIN_BRANCH } from '$constants';
+
+interface Props {
+  originalPath: string;
+}
+
+const { originalPath } = Astro.props;
+const encodedPath = originalPath.split('/').map((segment) => encodeURIComponent(segment)).join('/');
+const editUrl = `${GITHUB_REPO}/edit/${MAIN_BRANCH}/${encodedPath}`;
+const historyUrl = `${GITHUB_REPO}/commits/${MAIN_BRANCH}/${encodedPath}`;
+---
+
+<div class="flex flex-col items-center gap-3 text-center sm:items-start sm:text-left">
+  <a
+    href={editUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-gradient-to-br from-slate-900 to-slate-800 px-6 py-3 text-sm font-semibold text-slate-50 no-underline shadow-md transition-all duration-300 ease-out hover:-translate-y-px hover:border-slate-500 hover:from-slate-800 hover:to-slate-600 hover:shadow-xl active:translate-y-0"
+  >
+    GitHubで編集を提案する
+  </a>
+  <a href={historyUrl} target="_blank" rel="noopener noreferrer" class="text-sm text-slate-500 hover:underline">
+    このページの編集履歴を見る
+  </a>
+</div>

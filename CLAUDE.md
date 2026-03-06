@@ -4,13 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Architecture
 
-This is a **monorepo blog application** built with **SvelteKit** and **TypeScript**. The application processes Markdown content from `content/blog/` into a static blog site.
+This is a **monorepo blog application** built with **Astro** and **TypeScript**. The application processes Markdown content from `content/blog/` into a static blog site.
 
 ### Key Components
 
 **Apps:**
 
-- `apps/svelte-blog/` - Main SvelteKit application using static adapter for static site generation
+- `apps/astro-blog/` - Main Astro application for static site generation
+- `apps/svelte-blog/` - Legacy SvelteKit implementation retained temporarily for migration fallback/reference
 
 **Packages:**
 
@@ -22,7 +23,7 @@ This is a **monorepo blog application** built with **SvelteKit** and **TypeScrip
 1. Markdown files in `content/blog/` (organized by category)
 2. Content processor parses frontmatter with gray-matter and processes content through unified pipeline
 3. Custom plugins transform embeds and optimize images via Cloudinary
-4. SvelteKit generates static pages with routing for posts, categories, and tags
+4. Astro generates static pages with routing for posts, categories, and tags
 
 ## Development Commands
 
@@ -42,8 +43,8 @@ pnpm validate:workspace               # Check workspace health
 ### Production & Preview
 
 ```bash
-pnpm --filter svelte-blog build      # Build for production
-pnpm --filter svelte-blog preview    # Preview production build
+pnpm --filter astro-blog build       # Build for production
+pnpm --filter astro-blog preview     # Preview production build
 ```
 
 ### Build Commands
@@ -58,9 +59,9 @@ pnpm clean                            # Clean all build artifacts
 ### Quality Assurance
 
 ```bash
-pnpm --filter svelte-blog check      # TypeScript checking
-pnpm --filter svelte-blog lint       # ESLint + Prettier check
-pnpm --filter svelte-blog format     # Format code with Prettier
+pnpm --filter astro-blog check       # Astro + TypeScript checking
+pnpm --filter astro-blog lint        # ESLint + Prettier check
+pnpm --filter astro-blog format      # Format code with Prettier
 pnpm lint                             # Root-level ESLint check
 pnpm format                           # Root-level Prettier format
 pnpm format:check                     # Check formatting without changes
@@ -70,22 +71,15 @@ pnpm type-check                       # TypeScript check for all packages
 ### Testing
 
 ```bash
-pnpm --filter svelte-blog test:unit  # Unit tests (Vitest)
-pnpm --filter svelte-blog test:e2e   # E2E tests (Playwright)
-pnpm --filter svelte-blog test       # Run all tests
+pnpm --filter astro-blog test:e2e    # E2E tests (Playwright)
+pnpm --filter astro-blog test        # Run all tests
 ```
 
 ### Single Test Execution
 
 ```bash
-# Run specific unit test
-pnpm --filter svelte-blog test:unit -- path/to/test.test.ts
-
 # Run specific E2E test
-pnpm --filter svelte-blog test:e2e -- --grep "test name"
-
-# Watch mode for unit tests
-pnpm --filter svelte-blog test:unit -- --watch
+pnpm --filter astro-blog test:e2e -- --grep "test name"
 ```
 
 ### Package Development
@@ -104,7 +98,7 @@ pnpm --filter @estrivault/cloudinary-utils dev  # Watch mode for development
 
 - `@estrivault/content-processor@0.1.0` - Core Markdown processing with unified/remark/rehype pipeline
 - `@estrivault/cloudinary-utils@0.1.0` - Image optimization utilities using Cloudinary
-- `svelte-blog` - Main SvelteKit application
+- `astro-blog` - Main Astro application
 
 ### Key Dependencies
 
@@ -115,12 +109,12 @@ pnpm --filter @estrivault/cloudinary-utils dev  # Watch mode for development
 - gray-matter for frontmatter parsing
 - reading-time for estimated reading time calculation
 
-**SvelteKit App:**
+**Astro App:**
 
-- Svelte 5.x with SvelteKit 2.x
+- Astro 5.x
 - TailwindCSS 4.x with typography plugin
 - Vite 6.x for build tooling
-- Vitest for unit testing, Playwright for E2E testing
+- Playwright for E2E testing
 - TypeScript with strict configuration
 
 ## Important Architecture Details
@@ -134,9 +128,9 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
 - Converts to HTML with rehype, including image optimization via Cloudinary
 - Handles link transformations
 
-### SvelteKit Routing
+### Astro Routing
 
-- Cloudflare deployment using `@sveltejs/adapter-cloudflare`
+- Static output deployment via Cloudflare assets (`wrangler.toml` `assets.directory`)
 - File-based routing with dynamic segments:
   - `/post/[slug]` - Individual posts
   - `/category/[category]/[page]` - Category filtering with pagination
@@ -153,7 +147,7 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
 
 - Uses PNPM workspaces with automatic setup
 - **Development**: TypeScript path mapping enables direct source file imports with hot reload
-- **Production**: SvelteKit app uses built packages from workspace
+- **Production**: Astro app uses built packages from workspace
 - **Auto-build**: `postinstall` hook ensures packages are built after `pnpm install`
 - **Smart dev**: `pnpm dev` validates workspace and handles build dependencies automatically
 
@@ -175,7 +169,7 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
 
 ### File Organization
 
-- **Apps**: `apps/svelte-blog/` (main SvelteKit application)
+- **Apps**: `apps/astro-blog/` (main Astro application), `apps/svelte-blog/` (legacy)
 - **Packages**: `packages/content-processor/` and `packages/cloudinary-utils/`
 - **Content**: `content/blog/` with category-based folders
 - **Scripts**: `scripts/` for development automation
@@ -196,4 +190,4 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
 3. Custom embeds transformed (YouTube, Twitter, GitHub, Amazon)
 4. Images optimized via Cloudinary integration
 5. HTML generated with rehype plugins
-6. Static site generation via SvelteKit
+6. Static site generation via Astro

@@ -1,0 +1,29 @@
+---
+import type { PostHTML } from '@estrivault/content-processor';
+
+interface Props {
+  post: PostHTML;
+}
+
+const { post } = Astro.props;
+
+const proseClasses = [
+  'post-prose',
+  'prose',
+  'max-w-none',
+  post.hasTwitterEmbeds ? 'has-twitter-embeds' : '',
+  post.hasAmazonEmbeds ? 'has-amazon-embeds' : '',
+  post.hasCodeBlocks ? 'has-code-blocks' : '',
+  post.hasDirectiveBoxes ? 'has-directive-boxes' : '',
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<div class="container mx-auto px-2 py-8 sm:px-4">
+  <div class={proseClasses} set:html={post.html || 'コンテンツがありません'}></div>
+
+  <div class="mt-12 border-t border-gray-200 pt-6">
+    <a href="/" class="text-blue-600 hover:underline">← 記事一覧に戻る</a>
+  </div>
+</div>

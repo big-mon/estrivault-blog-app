@@ -42,6 +42,6 @@
   "references": [
     { "path": "./packages/cloudinary-utils" },
     { "path": "./packages/content-processor" },
-    { "path": "./apps/svelte-blog" }
+    { "path": "./apps/astro-blog" }
   ]
 }

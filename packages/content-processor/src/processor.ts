@@ -44,6 +44,9 @@ export function parseFrontmatter(content: string): {
 function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''): string {
   if (!coverImage) return '';
   if (coverImage.startsWith('http') || coverImage.startsWith('data:')) return coverImage;
+  if (!cloudinaryCloudName) {
+    return coverImage.startsWith('/') ? coverImage : `/${coverImage.replace(/^\.?\//, '')}`;
+  }
   // 先頭スラッシュ除去・拡張子除去
   const publicId = coverImage.replace(/^\//, '').replace(/\.[^/.]+$/, '');
   return buildUrl(cloudinaryCloudName, publicId, { w: 1200, quality: 85 });

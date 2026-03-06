@@ -2,7 +2,7 @@ name = "estrilda"
 compatibility_date = "2025-06-27"
 
 [assets]
-directory = "apps/svelte-blog/.svelte-kit/cloudflare"
+directory = "apps/astro-blog/dist"
 
 [build]
 command = "pnpm run build"

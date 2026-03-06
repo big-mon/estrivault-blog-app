@@ -55,7 +55,7 @@ async function startDevelopment() {
 
     // Start development with hot reload
     console.log('\n🎯 Starting dev servers...');
-    await runCommand('concurrently "pnpm run dev:packages" "pnpm --filter svelte-blog dev"');
+    await runCommand('concurrently "pnpm run dev:packages" "pnpm --filter astro-blog dev"');
   } catch (error) {
     console.error('\n❌ Development startup failed:');
     console.error(error.message);

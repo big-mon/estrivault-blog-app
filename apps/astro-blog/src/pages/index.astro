@@ -1,0 +1,25 @@
+---
+import BaseLayout from '$layouts/BaseLayout.astro';
+import Pagination from '$components/Pagination.astro';
+import PostCard from '$components/PostCard.astro';
+import { POSTS_PER_PAGE, SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '$constants';
+import { getPosts } from '$lib/content';
+
+const pageData = await getPosts({ page: 1, perPage: POSTS_PER_PAGE });
+---
+
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} canonical={SITE_URL}>
+  <h1 class="sr-only">{SITE_TITLE}</h1>
+
+  <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    {pageData.posts.map((post) => (
+      <PostCard post={post} />
+    ))}
+  </div>
+
+  {pageData.totalPages > 1 && (
+    <div class="mt-12">
+      <Pagination currentPage={pageData.page} totalPages={pageData.totalPages} baseUrl="/" />
+    </div>
+  )}
+</BaseLayout>

@@ -18,10 +18,18 @@ export interface ImageTransformOptions {
  * 画像パスをCloudinary CDN URLに変換するrehypeプラグイン
  */
 export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> = (options) => {
-  if (!options?.cloudinaryCloudName) {
-    throw new Error('cloudinaryCloudName is required in options');
+  const {
+    cloudinaryCloudName,
+    width = 1200,
+    quality = 90,
+    mode: defaultMode = 'fit',
+  } = options || {};
+
+  if (!cloudinaryCloudName?.trim()) {
+    throw new Error('cloudinaryCloudName is required for rehypeImageTransform');
   }
-  const { cloudinaryCloudName, width = 1200, quality = 90 } = options;
+
+  const normalizedCloudinaryCloudName = cloudinaryCloudName.trim();
 
   return (tree: Root) => {
     visit(tree, 'element', (node, index, parent) => {
@@ -53,17 +61,21 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
         const mode =
           (node.properties['data-mode'] as string) === 'fill' ?
             ('fill' as const)
-          : ('fit' as const);
+          : defaultMode;
         const buildOptions: BuildUrlOptions = {
           w: width,
           mode,
           quality,
         };
 
-        node.properties.src = buildUrl(cloudinaryCloudName, publicId, buildOptions);
+        node.properties.src = buildUrl(normalizedCloudinaryCloudName, publicId, buildOptions);
 
         // レスポンシブ画像用のsrcsetを生成
-        node.properties.srcset = buildSrcSet(cloudinaryCloudName, publicId, buildOptions);
+        node.properties.srcset = buildSrcSet(
+          normalizedCloudinaryCloudName,
+          publicId,
+          buildOptions,
+        );
 
         // レスポンシブ画像用の属性を追加
         node.properties.loading = 'lazy';

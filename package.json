@@ -4,11 +4,11 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev-helper.js",
-    "build": "pnpm run build:packages:incremental && pnpm --filter svelte-blog run build",
-    "build:fast": "pnpm -r --filter svelte-blog... run build",
-    "build:legacy": "pnpm run build:packages && pnpm --filter svelte-blog run build",
+    "build": "pnpm run build:packages:incremental && pnpm --filter astro-blog run build",
+    "build:fast": "pnpm -r --filter astro-blog... run build",
+    "build:legacy": "pnpm run build:packages && pnpm --filter astro-blog run build",
     "build:packages": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor run build",
-    "build:packages:incremental": "tsc --build packages/cloudinary-utils packages/content-processor apps/svelte-blog",
+    "build:packages:incremental": "tsc --build packages/cloudinary-utils packages/content-processor",
     "dev:packages": "pnpm --filter @estrivault/cloudinary-utils run dev",
     "validate:workspace": "node scripts/validate-workspace.js",
     "postinstall": "pnpm run build:packages",
@@ -18,7 +18,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "type-check": "pnpm run type-check:packages && pnpm --filter svelte-blog check",
+    "type-check": "pnpm run type-check:packages && pnpm --filter astro-blog check",
     "type-check:packages": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor exec tsc --noEmit",
     "prepare": "husky"
   },
@@ -34,6 +34,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "prettier": "^3.6.0",
+    "prettier-plugin-astro": "^0.14.0",
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.6.13",
     "textlint": "^15.2.0",
@@ -46,7 +47,7 @@
       "eslint --fix",
       "prettier --write"
     ],
-    "**/*.{json,md,css,scss}": [
+    "**/*.{json,md,css,scss,astro}": [
       "prettier --write"
     ]
   },

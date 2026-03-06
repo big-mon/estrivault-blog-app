@@ -1,0 +1,20 @@
+---
+import { SOCIAL_LINK_GITHUB, SOCIAL_LINK_X } from '$constants';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="flex flex-col items-center gap-2 py-6 text-sm text-gray-500">
+  <div class="flex gap-6">
+    <a href={`https://x.com/${SOCIAL_LINK_X}`} target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+      X
+    </a>
+    <a href={`https://github.com/${SOCIAL_LINK_GITHUB}`} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+      GitHub
+    </a>
+    <a href="/llms.txt" target="_blank" rel="noopener noreferrer" aria-label="AI向け記事一覧" title="LLM-friendly content guide">
+      LLMs
+    </a>
+  </div>
+  <p>© {year} Estrivault. All rights reserved.</p>
+</footer>

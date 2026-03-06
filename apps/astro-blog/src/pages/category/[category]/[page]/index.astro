@@ -1,0 +1,79 @@
+---
+import BaseLayout from '$layouts/BaseLayout.astro';
+import Pagination from '$components/Pagination.astro';
+import PostCard from '$components/PostCard.astro';
+import { POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
+import { getAllCategories, getPosts } from '$lib/content';
+
+interface Props {
+  category: string;
+}
+
+export async function getStaticPaths() {
+  const categories = await getAllCategories();
+  const paths = [];
+
+  for (const category of categories) {
+    const categoryPosts = await getPosts({ category, perPage: POSTS_PER_PAGE });
+
+    for (let page = 1; page <= categoryPosts.totalPages; page++) {
+      paths.push({
+        params: {
+          category: category.toLowerCase(),
+          page: String(page),
+        },
+        props: {
+          category,
+        },
+      });
+    }
+  }
+
+  return paths;
+}
+
+const { category } = Astro.props as Props;
+const currentPage = Number(Astro.params.page);
+const result = await getPosts({
+  category,
+  page: currentPage,
+  perPage: POSTS_PER_PAGE,
+});
+
+const siteBase = SITE_URL.replace(/\/$/, '');
+const pageUrl = `${siteBase}/category/${Astro.params.category}/${currentPage}`;
+const pageTitle = `${category.toUpperCase()}の記事一覧${currentPage > 1 ? ` - ページ${currentPage}` : ''} | ${SITE_TITLE}`;
+const pageDescription = `${category.toUpperCase()}カテゴリーの記事一覧${currentPage > 1 ? `（${currentPage}ページ目）` : ''}です。全${result.total}件の記事を掲載しています。`;
+
+const prevUrl = currentPage > 1 ? `${siteBase}/category/${Astro.params.category}/${currentPage > 2 ? currentPage - 1 : 1}` : undefined;
+const nextUrl = currentPage < result.totalPages ? `${siteBase}/category/${Astro.params.category}/${currentPage + 1}` : undefined;
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} canonical={pageUrl} prevUrl={prevUrl} nextUrl={nextUrl}>
+  <div class="container mx-auto px-4 py-8">
+    <div class="mb-8 text-center">
+      <h1 class="mb-2 text-3xl font-bold">{category.toUpperCase()}</h1>
+      <p class="text-gray-600">全{result.total}件の記事（{result.page} / {result.totalPages}ページ）</p>
+    </div>
+
+    {result.posts.length > 0 ? (
+      <div class="mb-8">
+        <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          {result.posts.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+
+        {result.totalPages > 1 && (
+          <div class="mt-12">
+            <Pagination currentPage={result.page} totalPages={result.totalPages} baseUrl={`/category/${Astro.params.category}`} maxVisible={5} />
+          </div>
+        )}
+      </div>
+    ) : (
+      <div class="rounded-lg bg-gray-50 p-8 text-center">
+        <p class="text-gray-500">このカテゴリーにはまだ記事がありません。</p>
+      </div>
+    )}
+  </div>
+</BaseLayout>
