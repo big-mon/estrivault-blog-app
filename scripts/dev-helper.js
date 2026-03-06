@@ -30,6 +30,7 @@ async function ensurePackagesBuilt() {
   const packages = [
     join('packages', 'content-processor', 'dist'),
     join('packages', 'cloudinary-utils', 'dist'),
+    join('packages', 'og-image-generator', 'dist'),
   ];
 
   const missingBuilds = packages.filter((path) => !existsSync(path));

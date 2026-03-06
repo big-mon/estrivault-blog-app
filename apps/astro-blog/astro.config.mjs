@@ -10,6 +10,15 @@ export default defineConfig({
     server: {
       host: true,
     },
+    ssr: {
+      external: [
+        '@estrivault/og-image-generator',
+        '@resvg/resvg-js',
+        '@resvg/resvg-js-linux-x64-gnu',
+        '@resvg/resvg-js-linux-x64-musl',
+        '@resvg/resvg-js-win32-x64-msvc',
+      ],
+    },
     resolve: {
       alias: {
         '@content': path.resolve('./../../content'),

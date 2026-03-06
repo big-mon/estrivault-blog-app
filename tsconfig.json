@@ -42,6 +42,7 @@
   "references": [
     { "path": "./packages/cloudinary-utils" },
     { "path": "./packages/content-processor" },
+    { "path": "./packages/og-image-generator" },
     { "path": "./apps/astro-blog" }
   ]
 }

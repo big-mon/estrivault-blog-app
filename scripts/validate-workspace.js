@@ -16,6 +16,11 @@ const PACKAGES = [
     path: 'packages/cloudinary-utils',
     distPath: 'packages/cloudinary-utils/dist',
   },
+  {
+    name: '@estrivault/og-image-generator',
+    path: 'packages/og-image-generator',
+    distPath: 'packages/og-image-generator/dist',
+  },
 ];
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

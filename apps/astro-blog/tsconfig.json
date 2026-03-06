@@ -23,6 +23,7 @@
   "include": ["src/**/*", "astro.config.mjs"],
   "references": [
     { "path": "../../packages/cloudinary-utils" },
-    { "path": "../../packages/content-processor" }
+    { "path": "../../packages/content-processor" },
+    { "path": "../../packages/og-image-generator" }
   ]
 }
