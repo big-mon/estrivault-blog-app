@@ -12,14 +12,14 @@ const pageData = await getPosts({ page: 1, perPage: POSTS_PER_PAGE });
   <h1 class="sr-only">{SITE_TITLE}</h1>
 
   <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-    {pageData.posts.map((post) => (
-      <PostCard post={post} />
-    ))}
+    {pageData.posts.map((post) => <PostCard post={post} />)}
   </div>
 
-  {pageData.totalPages > 1 && (
-    <div class="mt-12">
-      <Pagination currentPage={pageData.page} totalPages={pageData.totalPages} baseUrl="/" />
-    </div>
-  )}
+  {
+    pageData.totalPages > 1 && (
+      <div class="mt-12">
+        <Pagination currentPage={pageData.page} totalPages={pageData.totalPages} baseUrl="/" />
+      </div>
+    )
+  }
 </BaseLayout>

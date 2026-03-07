@@ -10,6 +10,7 @@
     "check": "astro check",
     "lint": "eslint .",
     "format": "prettier --write .",
+    "setup:e2e": "playwright install --with-deps chromium",
     "test:e2e": "playwright test",
     "test": "pnpm run test:e2e"
   },

@@ -22,7 +22,10 @@ function normalizeTitle(title: string): string {
   return title.replace(/\s+/g, ' ').trim();
 }
 
-function truncateTitle(characters: string[], maxCharacters: number): { value: string; truncated: boolean } {
+function truncateTitle(
+  characters: string[],
+  maxCharacters: number,
+): { value: string; truncated: boolean } {
   if (characters.length <= maxCharacters) {
     return { value: characters.join(''), truncated: false };
   }
@@ -47,7 +50,12 @@ function wrapTitle(title: string, maxCharsPerLine: number): string[] {
 export function layoutPostOgpTitle(title: string): TitleLayout {
   const normalizedTitle = normalizeTitle(title);
   const titleLength = Array.from(normalizedTitle).length;
-  const preset = TITLE_PRESETS[titleLength <= 24 ? 0 : titleLength <= 42 ? 1 : 2]!;
+  const preset =
+    TITLE_PRESETS[
+      titleLength <= 24 ? 0
+      : titleLength <= 42 ? 1
+      : 2
+    ]!;
   const maxCharacters = preset.maxCharsPerLine * preset.maxLines;
   const { value, truncated } = truncateTitle(Array.from(normalizedTitle), maxCharacters);
 

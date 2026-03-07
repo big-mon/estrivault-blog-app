@@ -29,7 +29,8 @@ This is a **monorepo blog application** built with **Astro** and **TypeScript**.
 ### Initial Setup (Automatic)
 
 ```bash
-pnpm install     # Installs dependencies and auto-builds packages via postinstall
+pnpm install                           # Installs dependencies and auto-builds packages
+pnpm --filter astro-blog run setup:e2e # Installs Playwright Chromium when E2E is needed
 ```
 
 ### Development
@@ -70,14 +71,16 @@ pnpm type-check                       # TypeScript check for all packages
 ### Testing
 
 ```bash
-pnpm --filter astro-blog test:e2e    # E2E tests (Playwright)
-pnpm --filter astro-blog test        # Run all tests
+pnpm --filter astro-blog run setup:e2e # Install Playwright Chromium for local E2E runs
+pnpm --filter astro-blog test:e2e      # E2E tests (Playwright)
+pnpm --filter astro-blog test          # Run all tests
 ```
 
 ### Single Test Execution
 
 ```bash
 # Run specific E2E test
+pnpm --filter astro-blog run setup:e2e
 pnpm --filter astro-blog test:e2e -- --grep "test name"
 ```
 

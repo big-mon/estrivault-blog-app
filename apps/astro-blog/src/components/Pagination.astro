@@ -43,67 +43,105 @@ const lastPageNumber = pageNumbers[pageNumbers.length - 1];
 <nav aria-label="ページネーション" class="my-8 flex justify-center">
   <ul class="flex items-center space-x-1">
     <li>
-      {currentPage > 1 ? (
-        <a
-          href={getPageUrl(currentPage - 1)}
-          class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
-          aria-label="前のページ"
-        >
-          ‹
-        </a>
-      ) : (
-        <span class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400" aria-disabled="true">
-          ‹
-        </span>
-      )}
+      {
+        currentPage > 1 ?
+          <a
+            href={getPageUrl(currentPage - 1)}
+            class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
+            aria-label="前のページ"
+          >
+            ‹
+          </a>
+        : <span
+            class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400"
+            aria-disabled="true"
+          >
+            ‹
+          </span>
+      }
     </li>
 
-    {pageNumbers[0] && pageNumbers[0] > 1 && (
-      <>
-        <li>
-          <a href={getPageUrl(1)} class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50" aria-label="1ページ目">1</a>
-        </li>
-        {pageNumbers[0] > 2 && <li><span class="flex h-10 w-10 items-center justify-center text-gray-500">...</span></li>}
-      </>
-    )}
+    {
+      pageNumbers[0] && pageNumbers[0] > 1 && (
+        <>
+          <li>
+            <a
+              href={getPageUrl(1)}
+              class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+              aria-label="1ページ目"
+            >
+              1
+            </a>
+          </li>
+          {pageNumbers[0] > 2 && (
+            <li>
+              <span class="flex h-10 w-10 items-center justify-center text-gray-500">...</span>
+            </li>
+          )}
+        </>
+      )
+    }
 
-    {pageNumbers.map((page) => (
-      <li>
-        {page === currentPage ? (
-          <span class="flex h-10 w-10 items-center justify-center rounded-md border border-blue-500 bg-blue-500 font-medium text-white" aria-current="page">{page}</span>
-        ) : (
-          <a href={getPageUrl(page)} class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50" aria-label={`${page}ページ目`}>
-            {page}
-          </a>
-        )}
-      </li>
-    ))}
-
-    {lastPageNumber && lastPageNumber < totalPages && (
-      <>
-        {lastPageNumber < totalPages - 1 && <li><span class="flex h-10 w-10 items-center justify-center text-gray-500">...</span></li>}
+    {
+      pageNumbers.map((page) => (
         <li>
-          <a href={getPageUrl(totalPages)} class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50" aria-label={`${totalPages}ページ目`}>
-            {totalPages}
-          </a>
+          {page === currentPage ?
+            <span
+              class="flex h-10 w-10 items-center justify-center rounded-md border border-blue-500 bg-blue-500 font-medium text-white"
+              aria-current="page"
+            >
+              {page}
+            </span>
+          : <a
+              href={getPageUrl(page)}
+              class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+              aria-label={`${page}ページ目`}
+            >
+              {page}
+            </a>
+          }
         </li>
-      </>
-    )}
+      ))
+    }
+
+    {
+      lastPageNumber && lastPageNumber < totalPages && (
+        <>
+          {lastPageNumber < totalPages - 1 && (
+            <li>
+              <span class="flex h-10 w-10 items-center justify-center text-gray-500">...</span>
+            </li>
+          )}
+          <li>
+            <a
+              href={getPageUrl(totalPages)}
+              class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+              aria-label={`${totalPages}ページ目`}
+            >
+              {totalPages}
+            </a>
+          </li>
+        </>
+      )
+    }
 
     <li>
-      {currentPage < totalPages ? (
-        <a
-          href={getPageUrl(currentPage + 1)}
-          class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
-          aria-label="次のページ"
-        >
-          ›
-        </a>
-      ) : (
-        <span class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400" aria-disabled="true">
-          ›
-        </span>
-      )}
+      {
+        currentPage < totalPages ?
+          <a
+            href={getPageUrl(currentPage + 1)}
+            class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
+            aria-label="次のページ"
+          >
+            ›
+          </a>
+        : <span
+            class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400"
+            aria-disabled="true"
+          >
+            ›
+          </span>
+      }
     </li>
   </ul>
 </nav>
