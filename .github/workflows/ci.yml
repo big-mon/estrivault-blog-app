@@ -44,8 +44,8 @@ jobs:
       - name: Build astro-blog
         run: pnpm --filter astro-blog build
 
-      - name: Install Playwright Chromium
-        run: pnpm --filter astro-blog exec playwright install --with-deps chromium
+      - name: Set up Playwright Chromium
+        run: pnpm --filter astro-blog run setup:e2e
 
       - name: Run Playwright E2E
         run: pnpm --filter astro-blog test:e2e

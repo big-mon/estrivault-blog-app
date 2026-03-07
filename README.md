@@ -33,6 +33,9 @@ npm install -g pnpm
 # 依存関係のインストール
 pnpm install
 
+# E2E テストを実行する場合のみ Playwright Chromium をセットアップ
+pnpm --filter astro-blog run setup:e2e
+
 # 全パッケージのビルド（モノレポ必須）
 pnpm run build
 
@@ -57,6 +60,7 @@ pnpm --filter astro-blog lint
 pnpm --filter astro-blog format
 
 # テスト実行
+pnpm --filter astro-blog run setup:e2e   # Install Playwright Chromium for local E2E runs
 pnpm --filter astro-blog test:e2e   # E2E tests (Playwright)
 pnpm --filter astro-blog test       # All tests
 ```
