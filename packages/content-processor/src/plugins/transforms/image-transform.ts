@@ -59,9 +59,7 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
 
         // Cloudinary URLを生成
         const mode =
-          (node.properties['data-mode'] as string) === 'fill' ?
-            ('fill' as const)
-          : defaultMode;
+          (node.properties['data-mode'] as string) === 'fill' ? ('fill' as const) : defaultMode;
         const buildOptions: BuildUrlOptions = {
           w: width,
           mode,
@@ -71,11 +69,7 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
         node.properties.src = buildUrl(normalizedCloudinaryCloudName, publicId, buildOptions);
 
         // レスポンシブ画像用のsrcsetを生成
-        node.properties.srcset = buildSrcSet(
-          normalizedCloudinaryCloudName,
-          publicId,
-          buildOptions,
-        );
+        node.properties.srcset = buildSrcSet(normalizedCloudinaryCloudName, publicId, buildOptions);
 
         // レスポンシブ画像用の属性を追加
         node.properties.loading = 'lazy';

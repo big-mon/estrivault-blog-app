@@ -6,7 +6,10 @@ interface Props {
 }
 
 const { originalPath } = Astro.props;
-const encodedPath = originalPath.split('/').map((segment) => encodeURIComponent(segment)).join('/');
+const encodedPath = originalPath
+  .split('/')
+  .map((segment) => encodeURIComponent(segment))
+  .join('/');
 const editUrl = `${GITHUB_REPO}/edit/${MAIN_BRANCH}/${encodedPath}`;
 const historyUrl = `${GITHUB_REPO}/commits/${MAIN_BRANCH}/${encodedPath}`;
 ---
@@ -20,7 +23,12 @@ const historyUrl = `${GITHUB_REPO}/commits/${MAIN_BRANCH}/${encodedPath}`;
   >
     GitHubで編集を提案する
   </a>
-  <a href={historyUrl} target="_blank" rel="noopener noreferrer" class="text-sm text-slate-500 hover:underline">
+  <a
+    href={historyUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="text-sm text-slate-500 hover:underline"
+  >
     このページの編集履歴を見る
   </a>
 </div>

@@ -77,19 +77,26 @@ const pathname = Astro.url.pathname;
     {section && <meta property="article:section" content={section} />}
     {tags.map((tag) => <meta property="article:tag" content={tag} />)}
 
-    <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM-friendly content guide" />
-    <link rel="alternate" type="text/markdown" href="/llms-full.txt" title="Complete content archive" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="/llms.txt"
+      title="LLM-friendly content guide"
+    />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="/llms-full.txt"
+      title="Complete content archive"
+    />
 
     <script
       is:inline
       defer
       src="https://static.cloudflareinsights.com/beacon.min.js"
-      data-cf-beacon='{"token": "f0d31da4d3c348078218b627067efa9b"}'
-    ></script>
+      data-cf-beacon='{"token": "f0d31da4d3c348078218b627067efa9b"}'></script>
 
-    {jsonLd && (
-      <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
-    )}
+    {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
   <body>
     <Header pathname={pathname} />

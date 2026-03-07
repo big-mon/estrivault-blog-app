@@ -29,7 +29,7 @@ This is a **monorepo blog application** built with **Astro** and **TypeScript**.
 ### Initial Setup (Automatic)
 
 ```bash
-pnpm install     # Installs dependencies and auto-builds packages via postinstall
+pnpm install     # Installs dependencies, auto-builds packages, and installs Playwright Chromium via postinstall
 ```
 
 ### Development

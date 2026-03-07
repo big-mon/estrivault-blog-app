@@ -94,7 +94,9 @@ async function extractFrontmatterOnly(
 
     return meta;
   } catch (error) {
-    throw new Error(`Failed to extract metadata from ${filePath}: ${getErrorMessage(error)}`);
+    throw new Error(`Failed to extract metadata from ${filePath}: ${getErrorMessage(error)}`, {
+      cause: error,
+    });
   }
 }
 
@@ -175,7 +177,9 @@ export async function getPostBySlug(
     try {
       meta = await extractMetadata(content, options, generatedSlug);
     } catch (error) {
-      throw new Error(`Invalid markdown file ${filePath}: ${getErrorMessage(error)}`);
+      throw new Error(`Invalid markdown file ${filePath}: ${getErrorMessage(error)}`, {
+        cause: error,
+      });
     }
 
     if (meta.slug !== slug || meta.draft) {
@@ -187,7 +191,9 @@ export async function getPostBySlug(
       post.originalPath = filePath.replace(/^.*\/content\/blog\//, 'content/blog/');
       return post;
     } catch (error) {
-      throw new Error(`Failed to process markdown file ${filePath}: ${getErrorMessage(error)}`);
+      throw new Error(`Failed to process markdown file ${filePath}: ${getErrorMessage(error)}`, {
+        cause: error,
+      });
     }
   }
 

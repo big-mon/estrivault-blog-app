@@ -22,19 +22,32 @@ const dateString = new Intl.DateTimeFormat('ja-JP', {
     data-testid="post-card"
   >
     <header>
-      {post.coverImage && (
-        <figure class="relative w-full overflow-hidden pt-[56.25%]">
-          <img src={post.coverImage} alt={post.title} class="absolute inset-0 h-full w-full object-cover" loading="lazy" />
-        </figure>
-      )}
+      {
+        post.coverImage && (
+          <figure class="relative w-full overflow-hidden pt-[56.25%]">
+            <img
+              src={post.coverImage}
+              alt={post.title}
+              class="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+            />
+          </figure>
+        )
+      }
 
       <div class="flex flex-col justify-between p-4 font-sans text-gray-800">
         <div class="space-y-1">
           <div class="flex items-center justify-between">
-            <p class="text-xs uppercase tracking-wide text-gray-500">{post.category}</p>
-            <time datetime={post.publishedAt.toISOString()} class="text-xs text-gray-500">{dateString}</time>
+            <p class="text-xs tracking-wide text-gray-500 uppercase">{post.category}</p>
+            <time datetime={post.publishedAt.toISOString()} class="text-xs text-gray-500"
+              >{dateString}</time
+            >
           </div>
-          <h2 class="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600">{post.title}</h2>
+          <h2
+            class="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600"
+          >
+            {post.title}
+          </h2>
         </div>
       </div>
     </header>
@@ -45,9 +58,7 @@ const dateString = new Intl.DateTimeFormat('ja-JP', {
 
     <footer class="p-4">
       <ul class="mt-2 flex shrink-0 flex-wrap gap-2 text-xs text-gray-500">
-        {post.tags.map((tag) => (
-          <li class="rounded bg-gray-100 px-2 py-0.5">{tag}</li>
-        ))}
+        {post.tags.map((tag) => <li class="rounded bg-gray-100 px-2 py-0.5">{tag}</li>)}
       </ul>
     </footer>
   </article>

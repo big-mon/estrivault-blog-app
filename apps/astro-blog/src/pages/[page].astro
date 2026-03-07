@@ -23,20 +23,27 @@ const pageTitle = `記事一覧 - ページ${currentPage} | ${SITE_TITLE}`;
 const pageDescription = `${SITE_TITLE}の記事一覧ページ${currentPage}です。技術記事やプログラミング情報を探すことができます。`;
 const siteBase = SITE_URL.replace(/\/$/, '');
 const pageUrl = `${siteBase}/${currentPage}`;
-const prevUrl = currentPage > 1 ? `${siteBase}${currentPage > 2 ? `/${currentPage - 1}` : ''}` : undefined;
+const prevUrl =
+  currentPage > 1 ? `${siteBase}${currentPage > 2 ? `/${currentPage - 1}` : ''}` : undefined;
 const nextUrl = currentPage < result.totalPages ? `${siteBase}/${currentPage + 1}` : undefined;
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription} canonical={pageUrl} prevUrl={prevUrl} nextUrl={nextUrl}>
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonical={pageUrl}
+  prevUrl={prevUrl}
+  nextUrl={nextUrl}
+>
   <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-    {result.posts.map((post) => (
-      <PostCard post={post} />
-    ))}
+    {result.posts.map((post) => <PostCard post={post} />)}
   </div>
 
-  {result.totalPages > 1 && (
-    <div class="mt-12">
-      <Pagination currentPage={result.page} totalPages={result.totalPages} baseUrl="/" />
-    </div>
-  )}
+  {
+    result.totalPages > 1 && (
+      <div class="mt-12">
+        <Pagination currentPage={result.page} totalPages={result.totalPages} baseUrl="/" />
+      </div>
+    )
+  }
 </BaseLayout>
