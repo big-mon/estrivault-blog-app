@@ -11,9 +11,5 @@
   "endOfLine": "lf",
   "quoteProps": "as-needed",
   "experimentalTernaries": true,
-  "svelteSortOrder": "options-scripts-markup-styles",
-  "svelteStrictMode": true,
-  "svelteIndentScriptAndStyle": true,
-  "svelteAllowShorthand": true,
-  "plugins": ["prettier-plugin-svelte", "prettier-plugin-astro", "prettier-plugin-tailwindcss"]
+  "plugins": ["prettier-plugin-astro", "prettier-plugin-tailwindcss"]
 }
