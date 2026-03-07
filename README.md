@@ -11,6 +11,7 @@
 - `apps/astro-blog/` - メインのAstroアプリケーション（静的サイト生成）
 - `packages/content-processor/` - Markdown処理のコアパイプライン
 - `packages/cloudinary-utils/` - 画像最適化ユーティリティ
+- `packages/og-image-generator/` - ブログ記事向け OGP 画像生成ユーティリティ
 
 **技術スタック:**
 
@@ -66,9 +67,11 @@ pnpm --filter astro-blog test       # All tests
 # 個別パッケージのビルド
 pnpm --filter @estrivault/content-processor build
 pnpm --filter @estrivault/cloudinary-utils build
+pnpm --filter @estrivault/og-image-generator build
 
 # 監視モードでの開発
 pnpm --filter @estrivault/cloudinary-utils dev
+pnpm --filter @estrivault/og-image-generator dev
 ```
 
 ## 🚀 本番ビルド・デプロイ
