@@ -60,7 +60,7 @@ pnpm --filter astro-blog lint
 pnpm --filter astro-blog format
 
 # テスト実行
-pnpm --filter astro-blog run setup:e2e   # Install Playwright Chromium for local E2E runs
+pnpm --filter astro-blog run setup:e2e   # ローカルで E2E を実行する前に Playwright Chromium を導入
 pnpm --filter astro-blog test:e2e   # E2E tests (Playwright)
 pnpm --filter astro-blog test       # All tests
 ```
