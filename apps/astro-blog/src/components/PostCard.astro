@@ -3,52 +3,59 @@ import type { PostMeta } from '@estrivault/content-processor';
 
 interface Props {
   post: PostMeta;
+  variant?: 'default' | 'featured';
 }
 
-const { post } = Astro.props;
+const { post, variant = 'default' } = Astro.props;
+const isFeatured = variant === 'featured';
 
 const dateString = new Intl.DateTimeFormat('ja-JP', {
+  timeZone: 'Asia/Tokyo',
   year: 'numeric',
   month: '2-digit',
   day: '2-digit',
 })
   .format(post.publishedAt)
   .replace(/\//g, '-');
+
+const shownTags = post.tags.slice(0, isFeatured ? 3 : 2);
 ---
 
-<a href={`/post/${post.slug}`} class="block h-full" aria-label={post.title}>
+<a href={`/post/${post.slug}`} class="post-card-link" aria-label={post.title}>
   <article
-    class="group relative flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-100 ease-out hover:scale-[1.01] hover:border-gray-300 hover:shadow-md"
+    class:list={['post-card', isFeatured ? 'post-card--featured' : 'post-card--default']}
     data-testid="post-card"
   >
-    <header>
-      {post.coverImage && (
-        <figure class="relative w-full overflow-hidden pt-[56.25%]">
-          <img src={post.coverImage} alt={post.title} class="absolute inset-0 h-full w-full object-cover" loading="lazy" />
-        </figure>
-      )}
+    <div class="post-card__body">
+      <p class="post-card__eyebrow">Entry / {post.category}</p>
 
-      <div class="flex flex-col justify-between p-4 font-sans text-gray-800">
-        <div class="space-y-1">
-          <div class="flex items-center justify-between">
-            <p class="text-xs uppercase tracking-wide text-gray-500">{post.category}</p>
-            <time datetime={post.publishedAt.toISOString()} class="text-xs text-gray-500">{dateString}</time>
-          </div>
-          <h2 class="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600">{post.title}</h2>
-        </div>
+      <div class="post-card__meta">
+        <time datetime={post.publishedAt.toISOString()}>{dateString}</time>
+        {post.readingTime && <span>約{post.readingTime}分</span>}
       </div>
-    </header>
 
-    <section class="flex-1 px-4 text-sm text-gray-700">
-      <p class="line-clamp-2">{post.description}</p>
-    </section>
+      <h2 class="post-card__title">{post.title}</h2>
 
-    <footer class="p-4">
-      <ul class="mt-2 flex shrink-0 flex-wrap gap-2 text-xs text-gray-500">
-        {post.tags.map((tag) => (
-          <li class="rounded bg-gray-100 px-2 py-0.5">{tag}</li>
-        ))}
-      </ul>
-    </footer>
+      {
+        post.description && (
+          <p class:list={['post-card__description', !isFeatured && 'line-clamp-3']}>
+            {post.description}
+          </p>
+        )
+      }
+
+      <footer class="post-card__footer">
+        {shownTags.map((tag) => <span class="post-card__tag">{tag}</span>)}
+        <span class="post-card__read">Read dossier</span>
+      </footer>
+    </div>
+
+    {
+      post.coverImage && (
+        <figure class="post-card__media">
+          <img src={post.coverImage} alt={post.title} loading="lazy" />
+        </figure>
+      )
+    }
   </article>
 </a>

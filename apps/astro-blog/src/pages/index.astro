@@ -2,24 +2,131 @@
 import BaseLayout from '$layouts/BaseLayout.astro';
 import Pagination from '$components/Pagination.astro';
 import PostCard from '$components/PostCard.astro';
-import { POSTS_PER_PAGE, SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '$constants';
+import {
+  NAVIGATION_LINKS,
+  POSTS_PER_PAGE,
+  SITE_DESCRIPTION,
+  SITE_TITLE,
+  SITE_URL,
+} from '$constants';
 import { getPosts } from '$lib/content';
 
 const pageData = await getPosts({ page: 1, perPage: POSTS_PER_PAGE });
+const [featuredPost, ...remainingPosts] = pageData.posts;
+const spotlightPosts = remainingPosts.slice(0, 2);
+const gridPosts = remainingPosts.slice(2);
+const categoryLinks = NAVIGATION_LINKS.filter(({ href }) => href.startsWith('/category'));
+const latestDate =
+  featuredPost ?
+    new Intl.DateTimeFormat('ja-JP', {
+      timeZone: 'Asia/Tokyo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+      .format(featuredPost.publishedAt)
+      .replace(/\//g, '-')
+  : '';
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} canonical={SITE_URL}>
   <h1 class="sr-only">{SITE_TITLE}</h1>
 
-  <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-    {pageData.posts.map((post) => (
-      <PostCard post={post} />
-    ))}
-  </div>
+  {
+    featuredPost ?
+      <div class="home-page">
+        <section class="home-hero">
+          <div class="home-hero__copy">
+            <p class="section-label">Signal Archive</p>
+            <h2 class="home-hero__title">
+              Markets, code, and hobbies arranged with industrial clarity.
+            </h2>
+            <p class="home-hero__lede">{SITE_DESCRIPTION}</p>
 
-  {pageData.totalPages > 1 && (
-    <div class="mt-12">
-      <Pagination currentPage={pageData.page} totalPages={pageData.totalPages} baseUrl="/" />
-    </div>
-  )}
+            <div class="home-hero__actions">
+              <a href="#latest-posts" class="hero-action hero-action--primary">
+                最新記事を見る
+              </a>
+              <a href={`/post/${featuredPost.slug}`} class="hero-action hero-action--secondary">
+                注目記事を読む
+              </a>
+            </div>
+
+            <dl class="home-hero__stats">
+              <div>
+                <dt>Archive</dt>
+                <dd>{pageData.total} entries</dd>
+              </div>
+              <div>
+                <dt>Latest drop</dt>
+                <dd>{latestDate}</dd>
+              </div>
+              <div>
+                <dt>Focus</dt>
+                <dd>{featuredPost.category}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="home-hero__feature">
+            <div>
+              <p class="section-label">Featured Entry</p>
+              <p class="home-hero__feature-note">最新の投稿をフロントに配置しています。</p>
+            </div>
+            <PostCard post={featuredPost} variant="featured" />
+          </div>
+        </section>
+
+        <section class="home-overview">
+          <div class="home-overview__panel">
+            <p class="section-label">Entry Points</p>
+            <h2 class="home-overview__title">カテゴリから読む</h2>
+            <p class="home-overview__copy">
+              テック、投資、趣味、意見の各トピックへ、都市的なUIリズムで素早く移動できます。
+            </p>
+
+            <div class="home-overview__links">
+              {categoryLinks.map(({ label, href }) => (
+                <a href={href}>
+                  <span>{label}</span>
+                  <span>→</span>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {spotlightPosts.length > 0 && (
+            <div class="home-overview__spotlights">
+              {spotlightPosts.map((post) => (
+                <PostCard post={post} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section id="latest-posts" class="home-section">
+          <div>
+            <p class="section-label">Recent Dispatches</p>
+            <h2 class="home-section__title">最新記事</h2>
+            <p class="home-section__copy">
+              新着から順に、情報密度を保ったカードで一覧できるセクションです。
+            </p>
+          </div>
+
+          <div class="post-grid">
+            {gridPosts.map((post) => (
+              <PostCard post={post} />
+            ))}
+          </div>
+        </section>
+
+        {pageData.totalPages > 1 && (
+          <Pagination currentPage={pageData.page} totalPages={pageData.totalPages} baseUrl="/" />
+        )}
+      </div>
+    : <div class="empty-state">
+        <p class="section-label">No Signal</p>
+        <p class="mt-4 text-lg font-semibold">表示できる記事がまだありません。</p>
+      </div>
+  }
 </BaseLayout>

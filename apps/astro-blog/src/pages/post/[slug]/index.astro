@@ -60,7 +60,10 @@ const schemaData = {
     '@id': canonical,
   },
   articleSection: post.meta.category,
-  keywords: [post.meta.category].concat(post.meta.tags || []).filter(Boolean).join(', '),
+  keywords: [post.meta.category]
+    .concat(post.meta.tags || [])
+    .filter(Boolean)
+    .join(', '),
   wordCount: post.html ? getJapaneseWordCount(post.html) : 0,
   timeRequired: post.meta.readingTime ? `PT${Math.ceil(post.meta.readingTime)}M` : undefined,
   inLanguage: 'ja-JP',
@@ -80,24 +83,29 @@ const schemaData = {
   section={post.meta.category}
   tags={post.meta.tags}
 >
-  <article class="container mx-auto px-2 sm:px-4 xl:max-w-6xl">
+  <article class="article-page">
     <PostHeader meta={post.meta} />
-    <div class="xl:flex xl:gap-8">
-      <div class="xl:max-w-4xl xl:flex-1">
-        <div class="xl:hidden">
+
+    <div class="article-page__layout">
+      <div class="article-page__main">
+        <div class="article-page__toc-mobile">
           <TableOfContents headings={post.headings} />
         </div>
 
         <PostBody post={post} />
 
-        {post.originalPath && (
-          <div class="post-footer mt-12 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-8">
-            <EditOnGitHub originalPath={post.originalPath} />
-          </div>
-        )}
+        {
+          post.originalPath && (
+            <div class="article-endcap">
+              <p class="section-label">Source</p>
+              <p class="article-endcap__copy">内容の修正提案や履歴確認は GitHub から行えます。</p>
+              <EditOnGitHub originalPath={post.originalPath} />
+            </div>
+          )
+        }
       </div>
 
-      <aside class="hidden xl:block xl:w-64 xl:flex-shrink-0">
+      <aside class="article-page__aside">
         <TableOfContents headings={post.headings} />
       </aside>
     </div>

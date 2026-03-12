@@ -45,6 +45,12 @@ const pathname = Astro.url.pathname;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/icon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+    />
 
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -77,27 +83,43 @@ const pathname = Astro.url.pathname;
     {section && <meta property="article:section" content={section} />}
     {tags.map((tag) => <meta property="article:tag" content={tag} />)}
 
-    <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM-friendly content guide" />
-    <link rel="alternate" type="text/markdown" href="/llms-full.txt" title="Complete content archive" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="/llms.txt"
+      title="LLM-friendly content guide"
+    />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="/llms-full.txt"
+      title="Complete content archive"
+    />
 
     <script
       is:inline
       defer
       src="https://static.cloudflareinsights.com/beacon.min.js"
-      data-cf-beacon='{"token": "f0d31da4d3c348078218b627067efa9b"}'
-    ></script>
+      data-cf-beacon='{"token": "f0d31da4d3c348078218b627067efa9b"}'></script>
 
-    {jsonLd && (
-      <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
-    )}
+    {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
-  <body>
-    <Header pathname={pathname} />
+  <body class="site-shell">
+    <div class="site-chrome" aria-hidden="true">
+      <div class="site-chrome__grid"></div>
+      <div class="site-chrome__beam site-chrome__beam--one"></div>
+      <div class="site-chrome__beam site-chrome__beam--two"></div>
+      <div class="site-chrome__grain"></div>
+    </div>
 
-    <main class="mx-auto w-full max-w-6xl px-4 py-4">
-      <slot />
-    </main>
+    <div class="site-frame">
+      <Header pathname={pathname} />
 
-    <Footer />
+      <main id="content" class="site-main">
+        <slot />
+      </main>
+
+      <Footer />
+    </div>
   </body>
 </html>
