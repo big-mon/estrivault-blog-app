@@ -3,9 +3,11 @@ import type { PostMeta } from '@estrivault/content-processor';
 
 interface Props {
   post: PostMeta;
+  variant?: 'default' | 'tactical';
 }
 
-const { post } = Astro.props;
+const { post, variant = 'default' } = Astro.props;
+const isTactical = variant === 'tactical';
 
 const dateString = new Intl.DateTimeFormat('ja-JP', {
   year: 'numeric',
@@ -18,35 +20,103 @@ const dateString = new Intl.DateTimeFormat('ja-JP', {
 
 <a href={`/post/${post.slug}`} class="block h-full" aria-label={post.title}>
   <article
-    class="group relative flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-100 ease-out hover:scale-[1.01] hover:border-gray-300 hover:shadow-md"
+    class:list={[
+      'group relative flex h-full transform flex-col overflow-hidden transition-all duration-150 ease-out',
+      isTactical
+        ? 'tactical-card border border-black/85 bg-[var(--panel-soft)] text-[var(--ink-1)] shadow-[10px_10px_0_rgba(0,0,0,0.14)] hover:-translate-y-1 hover:shadow-[14px_14px_0_rgba(0,0,0,0.18)]'
+        : 'rounded-xl border border-gray-200 bg-white shadow-sm hover:scale-[1.01] hover:border-gray-300 hover:shadow-md',
+    ]}
     data-testid="post-card"
   >
     <header>
       {post.coverImage && (
-        <figure class="relative w-full overflow-hidden pt-[56.25%]">
-          <img src={post.coverImage} alt={post.title} class="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+        <figure
+          class:list={[
+            'relative w-full overflow-hidden pt-[56.25%]',
+            isTactical && 'border-b border-black/80',
+          ]}
+        >
+          <img
+            src={post.coverImage}
+            alt={post.title}
+            class:list={[
+              'absolute inset-0 h-full w-full object-cover',
+              isTactical && 'transition duration-300 grayscale-[28%] group-hover:scale-[1.03]',
+            ]}
+            loading="lazy"
+          />
+          {
+            isTactical && (
+              <div class="absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.08)_100%)]"></div>
+            )
+          }
         </figure>
       )}
 
-      <div class="flex flex-col justify-between p-4 font-sans text-gray-800">
+      <div
+        class:list={[
+          'flex flex-col justify-between text-gray-800',
+          isTactical ? 'gap-3 p-5' : 'p-4 font-sans',
+        ]}
+      >
         <div class="space-y-1">
-          <div class="flex items-center justify-between">
-            <p class="text-xs uppercase tracking-wide text-gray-500">{post.category}</p>
-            <time datetime={post.publishedAt.toISOString()} class="text-xs text-gray-500">{dateString}</time>
+          <div class="flex items-center justify-between gap-4">
+            <p
+              class:list={[
+                'text-xs uppercase tracking-wide text-gray-500',
+                isTactical && 'font-ui tracking-[0.22em] text-black/58',
+              ]}
+            >
+              {post.category}
+            </p>
+            <time
+              datetime={post.publishedAt.toISOString()}
+              class:list={[
+                'text-xs text-gray-500',
+                isTactical && 'font-ui tracking-[0.18em] text-black/52',
+              ]}
+            >
+              {dateString}
+            </time>
           </div>
-          <h2 class="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600">{post.title}</h2>
+          <h2
+            class:list={[
+              'text-lg font-semibold text-gray-900 transition-colors',
+              isTactical ? 'leading-snug group-hover:text-black/70' : 'group-hover:text-blue-600',
+            ]}
+          >
+            {post.title}
+          </h2>
         </div>
       </div>
     </header>
 
-    <section class="flex-1 px-4 text-sm text-gray-700">
+    <section
+      class:list={[
+        'flex-1 text-sm text-gray-700',
+        isTactical ? 'px-5 pb-2 text-[0.95rem] leading-7 text-black/72' : 'px-4',
+      ]}
+    >
       <p class="line-clamp-2">{post.description}</p>
     </section>
 
-    <footer class="p-4">
-      <ul class="mt-2 flex shrink-0 flex-wrap gap-2 text-xs text-gray-500">
+    <footer class:list={[isTactical ? 'p-5 pt-4' : 'p-4']}>
+      <ul
+        class:list={[
+          'mt-2 flex shrink-0 flex-wrap gap-2 text-xs text-gray-500',
+          isTactical && 'font-ui uppercase tracking-[0.18em] text-black/55',
+        ]}
+      >
         {post.tags.map((tag) => (
-          <li class="rounded bg-gray-100 px-2 py-0.5">{tag}</li>
+          <li
+            class:list={[
+              isTactical
+                ? 'border border-black/15 bg-black/[0.045] px-2 py-1'
+                : 'rounded bg-gray-100 px-2 py-0.5',
+            ]}
+          >
+            {tag}
+          </li>
         ))}
       </ul>
     </footer>

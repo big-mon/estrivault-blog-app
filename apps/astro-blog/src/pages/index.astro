@@ -3,23 +3,161 @@ import BaseLayout from '$layouts/BaseLayout.astro';
 import Pagination from '$components/Pagination.astro';
 import PostCard from '$components/PostCard.astro';
 import { POSTS_PER_PAGE, SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '$constants';
-import { getPosts } from '$lib/content';
+import { getAllCategories, getPosts } from '$lib/content';
 
 const pageData = await getPosts({ page: 1, perPage: POSTS_PER_PAGE });
+const categories = await getAllCategories();
+const latestPublishedAt = pageData.posts[0]?.publishedAt;
+const latestPublishedLabel =
+  latestPublishedAt ?
+    new Intl.DateTimeFormat('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+      .format(latestPublishedAt)
+      .replace(/\//g, '.')
+  : 'N/A';
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} canonical={SITE_URL}>
   <h1 class="sr-only">{SITE_TITLE}</h1>
 
-  <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-    {pageData.posts.map((post) => (
-      <PostCard post={post} />
-    ))}
+  <div class="home-shell space-y-10 pb-10">
+    <section class="home-hero overflow-hidden border border-black bg-[var(--panel-strong)] text-white">
+      <div class="grid gap-6 p-6 sm:p-8 lg:grid-cols-[minmax(0,1.55fr)_minmax(18rem,0.95fr)] lg:p-10">
+        <div class="space-y-6">
+          <div class="space-y-4">
+            <p class="font-ui text-sm uppercase tracking-[0.34em] text-white/55">
+              Archive / Surface 01
+            </p>
+            <div class="space-y-4">
+              <p class="home-chip">Record Layered Notes</p>
+              <h2 class="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-4xl lg:text-5xl">
+                技術と投資と趣味の記録を、
+                <br />
+                白と黒の情報層として積み上げる。
+              </h2>
+              <p class="max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
+                空気感は無機質に、導線は明快に。落ち着いた緊張感を持つインターフェースの中へ、
+                最新の考察やメモを整理して収めています。
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <a href="#latest-posts" class="home-cta home-cta--primary">Latest Posts</a>
+            <a href="/post/about" class="home-cta home-cta--secondary">About Archive</a>
+          </div>
+        </div>
+
+        <div class="grid gap-4">
+          <section class="home-panel space-y-4">
+            <div class="flex items-center justify-between">
+              <p class="font-ui text-xs uppercase tracking-[0.28em] text-black/55">System Index</p>
+              <span class="font-ui text-xs tracking-[0.22em] text-black/45">JP</span>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="home-stat">
+                <span class="home-stat__label">Posts</span>
+                <strong class="home-stat__value">{pageData.total}</strong>
+              </div>
+              <div class="home-stat">
+                <span class="home-stat__label">Fields</span>
+                <strong class="home-stat__value">{categories.length}</strong>
+              </div>
+              <div class="home-stat">
+                <span class="home-stat__label">Shown</span>
+                <strong class="home-stat__value">{pageData.posts.length}</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="home-panel space-y-4">
+            <div class="space-y-2">
+              <p class="font-ui text-xs uppercase tracking-[0.28em] text-black/55">Signal Log</p>
+              <p class="text-sm leading-7 text-black/72">
+                新着の更新を軸に、カテゴリー別の導線と一覧性を並べて配置しています。
+              </p>
+            </div>
+            <dl class="space-y-3 border-t border-black/10 pt-4 text-sm text-black/72">
+              <div class="flex items-center justify-between gap-4">
+                <dt class="font-ui uppercase tracking-[0.18em] text-black/45">Last Update</dt>
+                <dd>{latestPublishedLabel}</dd>
+              </div>
+              <div class="flex items-center justify-between gap-4">
+                <dt class="font-ui uppercase tracking-[0.18em] text-black/45">Structure</dt>
+                <dd>Monochrome / Grid / Panel</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="home-rail border border-black/10 bg-white p-5 sm:p-6">
+      <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div class="space-y-2">
+          <p class="font-ui text-xs uppercase tracking-[0.28em] text-black/45">
+            Category Axis
+          </p>
+          <h2 class="text-2xl font-semibold tracking-[0.04em] text-black">探索導線</h2>
+        </div>
+        <p class="max-w-2xl text-sm leading-7 text-black/62">
+          カテゴリーごとに思考の断面へ直接入れるよう、コンパクトな操作パネルとして整理しています。
+        </p>
+      </div>
+
+      <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {categories.map((category, index) => (
+          <a
+            href={`/category/${encodeURIComponent(category.toLowerCase())}/1`}
+            class="home-category-panel group"
+          >
+            <span class="font-ui text-xs uppercase tracking-[0.26em] text-black/42">
+              Axis {String(index + 1).padStart(2, '0')}
+            </span>
+            <strong class="mt-3 block text-lg font-semibold tracking-[0.06em] text-black">
+              {category}
+            </strong>
+            <span class="mt-6 inline-flex items-center gap-2 font-ui text-xs uppercase tracking-[0.22em] text-black/58">
+              Open Channel
+              <span aria-hidden="true">/</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section id="latest-posts" class="space-y-6">
+      <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div class="space-y-2">
+          <p class="font-ui text-xs uppercase tracking-[0.28em] text-black/45">Latest Entries</p>
+          <h2 class="text-2xl font-semibold tracking-[0.04em] text-black sm:text-3xl">
+            最新の記事
+          </h2>
+        </div>
+        <p class="max-w-2xl text-sm leading-7 text-black/62">
+          直近の投稿をモノクロのパネルとして一覧化しています。気になる記録からそのまま奥へ進めます。
+        </p>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+        {pageData.posts.map((post) => (
+          <PostCard post={post} variant="tactical" />
+        ))}
+      </div>
+    </section>
   </div>
 
   {pageData.totalPages > 1 && (
     <div class="mt-12">
-      <Pagination currentPage={pageData.page} totalPages={pageData.totalPages} baseUrl="/" />
+      <Pagination
+        currentPage={pageData.page}
+        totalPages={pageData.totalPages}
+        baseUrl="/"
+        variant="tactical"
+      />
     </div>
   )}
 </BaseLayout>

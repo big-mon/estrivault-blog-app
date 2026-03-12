@@ -4,9 +4,11 @@ interface Props {
   totalPages: number;
   baseUrl: string;
   maxVisible?: number;
+  variant?: 'default' | 'tactical';
 }
 
-const { currentPage, totalPages, baseUrl, maxVisible = 5 } = Astro.props;
+const { currentPage, totalPages, baseUrl, maxVisible = 5, variant = 'default' } = Astro.props;
+const isTactical = variant === 'tactical';
 
 function getPageUrl(page: number): string {
   if (page === 1) {
@@ -36,24 +38,48 @@ function getPageNumbers(): number[] {
   return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 }
 
+function getPageItemClass(active = false): string {
+  if (isTactical) {
+    return active ?
+        'font-ui flex h-10 w-10 items-center justify-center border border-black bg-black text-white'
+      : 'font-ui flex h-10 w-10 items-center justify-center border border-black/70 bg-white text-black transition hover:bg-black hover:text-white';
+  }
+
+  return active ?
+      'flex h-10 w-10 items-center justify-center rounded-md border border-blue-500 bg-blue-500 font-medium text-white'
+    : 'flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 transition hover:bg-gray-50';
+}
+
+function getArrowClass(disabled = false): string {
+  if (isTactical) {
+    return disabled ?
+        'font-ui flex h-10 min-w-10 cursor-not-allowed items-center justify-center border border-black/12 bg-black/10 px-3 text-black/30'
+      : 'font-ui flex h-10 min-w-10 items-center justify-center border border-black bg-black px-3 text-white transition hover:bg-neutral-800';
+  }
+
+  return disabled ?
+      'flex h-10 min-w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 px-3 text-gray-400'
+    : 'flex h-10 min-w-10 items-center justify-center rounded-md border border-gray-300 bg-white px-3 text-gray-500 transition hover:bg-gray-50';
+}
+
 const pageNumbers = getPageNumbers();
 const lastPageNumber = pageNumbers[pageNumbers.length - 1];
 ---
 
-<nav aria-label="ページネーション" class="my-8 flex justify-center">
-  <ul class="flex items-center space-x-1">
+<nav aria-label="Pagination" class="my-8 flex justify-center">
+  <ul class:list={['flex items-center space-x-1', isTactical && 'gap-1.5']}>
     <li>
       {currentPage > 1 ? (
         <a
           href={getPageUrl(currentPage - 1)}
-          class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
-          aria-label="前のページ"
+          class={getArrowClass()}
+          aria-label="Previous page"
         >
-          ‹
+          {isTactical ? 'PRV' : '<'}
         </a>
       ) : (
-        <span class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400" aria-disabled="true">
-          ‹
+        <span class={getArrowClass(true)} aria-disabled="true">
+          {isTactical ? 'PRV' : '<'}
         </span>
       )}
     </li>
@@ -61,18 +87,28 @@ const lastPageNumber = pageNumbers[pageNumbers.length - 1];
     {pageNumbers[0] && pageNumbers[0] > 1 && (
       <>
         <li>
-          <a href={getPageUrl(1)} class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50" aria-label="1ページ目">1</a>
+          <a href={getPageUrl(1)} class={getPageItemClass()} aria-label="Page 1">
+            1
+          </a>
         </li>
-        {pageNumbers[0] > 2 && <li><span class="flex h-10 w-10 items-center justify-center text-gray-500">...</span></li>}
+        {pageNumbers[0] > 2 && (
+          <li>
+            <span class:list={['flex h-10 w-10 items-center justify-center', isTactical ? 'font-ui text-black/50' : 'text-gray-500']}>
+              ...
+            </span>
+          </li>
+        )}
       </>
     )}
 
     {pageNumbers.map((page) => (
       <li>
         {page === currentPage ? (
-          <span class="flex h-10 w-10 items-center justify-center rounded-md border border-blue-500 bg-blue-500 font-medium text-white" aria-current="page">{page}</span>
+          <span class={getPageItemClass(true)} aria-current="page">
+            {page}
+          </span>
         ) : (
-          <a href={getPageUrl(page)} class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50" aria-label={`${page}ページ目`}>
+          <a href={getPageUrl(page)} class={getPageItemClass()} aria-label={`Page ${page}`}>
             {page}
           </a>
         )}
@@ -81,9 +117,15 @@ const lastPageNumber = pageNumbers[pageNumbers.length - 1];
 
     {lastPageNumber && lastPageNumber < totalPages && (
       <>
-        {lastPageNumber < totalPages - 1 && <li><span class="flex h-10 w-10 items-center justify-center text-gray-500">...</span></li>}
+        {lastPageNumber < totalPages - 1 && (
+          <li>
+            <span class:list={['flex h-10 w-10 items-center justify-center', isTactical ? 'font-ui text-black/50' : 'text-gray-500']}>
+              ...
+            </span>
+          </li>
+        )}
         <li>
-          <a href={getPageUrl(totalPages)} class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50" aria-label={`${totalPages}ページ目`}>
+          <a href={getPageUrl(totalPages)} class={getPageItemClass()} aria-label={`Page ${totalPages}`}>
             {totalPages}
           </a>
         </li>
@@ -92,16 +134,12 @@ const lastPageNumber = pageNumbers[pageNumbers.length - 1];
 
     <li>
       {currentPage < totalPages ? (
-        <a
-          href={getPageUrl(currentPage + 1)}
-          class="flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
-          aria-label="次のページ"
-        >
-          ›
+        <a href={getPageUrl(currentPage + 1)} class={getArrowClass()} aria-label="Next page">
+          {isTactical ? 'NXT' : '>'}
         </a>
       ) : (
-        <span class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400" aria-disabled="true">
-          ›
+        <span class={getArrowClass(true)} aria-disabled="true">
+          {isTactical ? 'NXT' : '>'}
         </span>
       )}
     </li>
