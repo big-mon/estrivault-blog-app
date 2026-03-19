@@ -23,7 +23,7 @@ export interface DesignPreviewStats {
   totalPosts: number;
   categoryCount: number;
   averageReadingMinutes: number;
-  latestPublishedLabel: string;
+  leadCategoryLabel: string;
 }
 
 export interface DesignPreviewModel {
@@ -37,33 +37,33 @@ export interface DesignPreviewModel {
 export const DESIGN_PREVIEW_THEMES: Record<DesignPreviewVariant, DesignPreviewTheme> = {
   'industrial-slate': {
     variant: 'industrial-slate',
-    name: 'Essay Stack',
+    name: 'Monolith Column',
     kicker: 'Design Preview 01',
-    title: 'A quiet single-column index for slow reading.',
+    title: 'A single reading axis, stripped to category, title, and text.',
     description:
-      'A calm editorial stack that treats titles, summaries, and publishing metadata as the primary surface.',
+      'This route treats the top page like a disciplined reading surface with one dominant column and almost no decorative interruption.',
     summary:
-      'The focus is a gentle reading rhythm: one strong lead entry, restrained separators, and enough whitespace to feel like the opening spread of a literary journal.',
+      'The mood comes from proportion rather than ornament: hard rules, generous white space, and quiet category markers that organize the page without stealing focus.',
   },
   'archive-grid': {
     variant: 'archive-grid',
-    name: 'Editorial Split',
+    name: 'Monument Banner',
     kicker: 'Design Preview 02',
-    title: 'A text-led index with a narrow editorial sidebar.',
+    title: 'A bold site banner first, then a severe field of text.',
     description:
-      'A two-column composition where the article list stays central and supporting taxonomy moves into a slim companion rail.',
+      'This route gives the blog a stronger front face with a large typographic banner before dropping into a text-led article field.',
     summary:
-      'This option keeps the page airy, but improves browseability with a right-side context column for tags, categories, and site notes.',
+      'It aims to feel architectural rather than editorially soft: the site name acts like a structure, while the article list remains restrained and readable.',
   },
   'signal-frame': {
     variant: 'signal-frame',
-    name: 'Index Ledger',
+    name: 'Index Frame',
     kicker: 'Design Preview 03',
-    title: 'A ledger-like article list with structured metadata.',
+    title: 'A cold index where category leads and titles carry the weight.',
     description:
-      'A denser arrangement that reduces card styling and lets alignment, rules, and metadata columns define the experience.',
+      'This route minimizes card behavior and uses alignment, frames, and category columns to produce a sharper, more systematic landing page.',
     summary:
-      'This route leans closest to an index or bibliography while still giving each post enough summary text to feel readable.',
+      'The result should feel closest to a technical archive or mission index while still preserving enough summary text to invite reading.',
   },
 };
 
@@ -95,14 +95,6 @@ export async function getDesignPreviewModel(): Promise<DesignPreviewModel> {
     readingMinutes.length > 0 ?
       Math.round(readingMinutes.reduce((sum, value) => sum + value, 0) / readingMinutes.length)
     : 0;
-  const latestPublishedLabel =
-    featuredPost ?
-      new Intl.DateTimeFormat('ja-JP', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }).format(featuredPost.publishedAt)
-    : 'N/A';
 
   return {
     featuredPost: featuredPost ?? null,
@@ -111,7 +103,7 @@ export async function getDesignPreviewModel(): Promise<DesignPreviewModel> {
       totalPosts: total,
       categoryCount: categories.length,
       averageReadingMinutes,
-      latestPublishedLabel,
+      leadCategoryLabel: featuredPost?.category ?? 'N/A',
     },
     sampleTags,
     sampleCategories: categories.slice(0, 6),
