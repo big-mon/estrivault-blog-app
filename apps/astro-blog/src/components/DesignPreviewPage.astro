@@ -125,44 +125,44 @@ const featuredPost = model.featuredPost;
       }
     </div>
 
-    <section class="dp-support-row">
-      <div class="dp-support-block">
-        <p class="dp-kicker">Categories</p>
-        <ul class="dp-support-list" aria-label="Sample categories">
-          {
-            model.sampleCategories.map((category) => (
-              <li>
-                <a href={getCategoryHref(category)}>{category}</a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-
-      <div class="dp-support-block">
-        <p class="dp-kicker">Selected tags</p>
-        <ul class="dp-chip-list" aria-label="Sample tags">
-          {
-            model.sampleTags.slice(0, 6).map((tag) => (
-              <li>
-                <a class="dp-chip-list__item" href={`/tag/${getTagRouteSegment(tag)}/1`}>
-                  {tag}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-
-      <div class="dp-support-block">
-        <p class="dp-kicker">Pagination sample</p>
-        <nav class="dp-pagination-sample" aria-label="Pagination sample">
-          <span class="dp-pagination-sample__button" aria-hidden="true"> Prev </span>
-          <span class="dp-pagination-sample__button is-current" aria-current="page"> 1 </span>
-          <span class="dp-pagination-sample__button" aria-hidden="true"> 2 </span>
-          <span class="dp-pagination-sample__button" aria-hidden="true"> 3 </span>
-        </nav>
-      </div>
+    <section class="dp-pagination-wrap">
+      <p class="dp-kicker">Pagination sample</p>
+      <nav class="dp-pagination-sample" aria-label="Pagination sample">
+        <span class="dp-pagination-sample__button" aria-hidden="true"> Prev </span>
+        <span class="dp-pagination-sample__button is-current" aria-current="page"> 1 </span>
+        <span class="dp-pagination-sample__button" aria-hidden="true"> 2 </span>
+        <span class="dp-pagination-sample__button" aria-hidden="true"> 3 </span>
+      </nav>
     </section>
   </section>
+
+  <footer class="dp-footer-meta">
+    <section class="dp-support-block">
+      <p class="dp-kicker">Categories</p>
+      <ul class="dp-support-list" aria-label="Sample categories">
+        {
+          model.sampleCategories.map((category) => (
+            <li>
+              <a href={getCategoryHref(category)}>{category}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="dp-support-block">
+      <p class="dp-kicker">Selected tags</p>
+      <ul class="dp-chip-list" aria-label="Sample tags">
+        {
+          model.sampleTags.slice(0, 6).map((tag) => (
+            <li>
+              <a class="dp-chip-list__item" href={`/tag/${getTagRouteSegment(tag)}/1`}>
+                {tag}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </footer>
 </div>

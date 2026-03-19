@@ -59,7 +59,7 @@ export const DESIGN_PREVIEW_THEMES: Record<DesignPreviewVariant, DesignPreviewTh
       'The mood comes from pale industrial materials rather than brightness alone: matte white surfaces, cool grey rails, and sparse graphite accents keeping the layout severe.',
     swatches: ['#e4e8e8', '#c8d0d1', '#6b757d', '#1a1d25'],
     bgBase: '#e4e8e8',
-    bgDeep: '#c8d0d1',
+    bgDeep: '#d7ddde',
     bgAura: 'rgb(255 255 255 / 0.42)',
     panel: 'rgb(246 248 248 / 0.78)',
     panelAlt: 'rgb(107 117 125 / 0.09)',
