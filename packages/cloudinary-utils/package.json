@@ -9,11 +9,11 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
-    "build:types": "pnpm exec tsc --build",
-    "build:bundle": "pnpm exec tsup",
+    "build:types": "node ../../node_modules/typescript/bin/tsc --build",
+    "build:bundle": "node ./node_modules/tsup/dist/cli-default.js",
     "build": "pnpm run build:types && pnpm run build:bundle",
     "rebuild": "pnpm run clean && pnpm run build",
-    "dev": "tsup --watch"
+    "dev": "node ./node_modules/tsup/dist/cli-default.js --watch"
   },
   "exports": {
     ".": {
