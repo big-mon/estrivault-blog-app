@@ -1,0 +1,43 @@
+---
+import { NAVIGATION_LINKS, SITE_TITLE } from '$constants';
+
+interface Props {
+  pathname: string;
+}
+
+const { pathname } = Astro.props;
+
+function normalizePath(path: string): string {
+  return path.replace(/\/$/, '') || '/';
+}
+
+function isActive(href: string): boolean {
+  const normalizedPath = normalizePath(pathname);
+  const normalizedHref = normalizePath(href);
+  return normalizedPath === normalizedHref || normalizedPath.startsWith(`${normalizedHref}/`);
+}
+---
+
+<header class="tp-header">
+  <div class="tp-header__frame">
+    <a href="/" class="tp-header__brand">{SITE_TITLE}</a>
+
+    <nav aria-label="Main navigation" class="tp-header__nav">
+      <ul class="tp-header__nav-list">
+        {
+          NAVIGATION_LINKS.map(({ label, href }) => (
+            <li>
+              <a
+                href={href}
+                class={`tp-header__nav-link ${isActive(href) ? 'is-current' : ''}`}
+                aria-current={isActive(href) ? 'page' : undefined}
+              >
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>

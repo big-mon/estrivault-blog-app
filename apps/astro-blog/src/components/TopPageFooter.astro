@@ -1,0 +1,23 @@
+---
+import { SOCIAL_LINK_GITHUB, SOCIAL_LINK_X } from '$constants';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="tp-global-footer">
+  <div class="tp-global-footer__links">
+    <a href={`https://x.com/${SOCIAL_LINK_X}`} target="_blank" rel="noopener noreferrer"> X </a>
+    <a href={`https://github.com/${SOCIAL_LINK_GITHUB}`} target="_blank" rel="noopener noreferrer">
+      GitHub
+    </a>
+    <a
+      href="/llms.txt"
+      target="_blank"
+      rel="noopener noreferrer"
+      title="LLM-friendly content guide"
+    >
+      LLMs
+    </a>
+  </div>
+  <p class="tp-global-footer__copy">© {year} Estrivault. All rights reserved.</p>
+</footer>

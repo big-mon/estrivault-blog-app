@@ -1,9 +1,9 @@
 ---
-import BaseLayout from '$layouts/BaseLayout.astro';
-import Pagination from '$components/Pagination.astro';
-import PostCard from '$components/PostCard.astro';
+import TopPageIndex from '$components/TopPageIndex.astro';
 import { POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
+import TopPageLayout from '$layouts/TopPageLayout.astro';
 import { getPosts } from '$lib/content';
+import { getTopPageModel } from '$lib/top-page';
 
 export async function getStaticPaths() {
   const allPosts = await getPosts({ perPage: POSTS_PER_PAGE });
@@ -17,33 +17,23 @@ export async function getStaticPaths() {
 }
 
 const currentPage = Number(Astro.params.page);
-const result = await getPosts({ page: currentPage, perPage: POSTS_PER_PAGE });
+const model = await getTopPageModel({ page: currentPage, perPage: POSTS_PER_PAGE });
 
-const pageTitle = `記事一覧 - ページ${currentPage} | ${SITE_TITLE}`;
-const pageDescription = `${SITE_TITLE}の記事一覧ページ${currentPage}です。技術記事やプログラミング情報を探すことができます。`;
+const pageTitle = `Page ${currentPage} | ${SITE_TITLE}`;
+const pageDescription = `Browse page ${currentPage} of ${SITE_TITLE}.`;
 const siteBase = SITE_URL.replace(/\/$/, '');
 const pageUrl = `${siteBase}/${currentPage}`;
 const prevUrl =
   currentPage > 1 ? `${siteBase}${currentPage > 2 ? `/${currentPage - 1}` : ''}` : undefined;
-const nextUrl = currentPage < result.totalPages ? `${siteBase}/${currentPage + 1}` : undefined;
+const nextUrl = currentPage < model.totalPages ? `${siteBase}/${currentPage + 1}` : undefined;
 ---
 
-<BaseLayout
+<TopPageLayout
   title={pageTitle}
   description={pageDescription}
   canonical={pageUrl}
   prevUrl={prevUrl}
   nextUrl={nextUrl}
 >
-  <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-    {result.posts.map((post) => <PostCard post={post} />)}
-  </div>
-
-  {
-    result.totalPages > 1 && (
-      <div class="mt-12">
-        <Pagination currentPage={result.page} totalPages={result.totalPages} baseUrl="/" />
-      </div>
-    )
-  }
-</BaseLayout>
+  <TopPageIndex model={model} />
+</TopPageLayout>

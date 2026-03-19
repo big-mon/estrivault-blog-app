@@ -1,0 +1,130 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+  maxVisible?: number;
+}
+
+const { currentPage, totalPages, baseUrl, maxVisible = 5 } = Astro.props;
+
+function getPageUrl(page: number): string {
+  if (page === 1) {
+    return baseUrl === '/' ? '/' : `${baseUrl}/1`;
+  }
+
+  if (baseUrl === '/') {
+    return `/${page}`;
+  }
+
+  return `${baseUrl}/${page}`;
+}
+
+function getPageNumbers(): number[] {
+  if (totalPages <= maxVisible) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  const halfVisible = Math.floor(maxVisible / 2);
+  let startPage = Math.max(currentPage - halfVisible, 1);
+  let endPage = Math.min(startPage + maxVisible - 1, totalPages);
+
+  if (endPage === totalPages) {
+    startPage = Math.max(endPage - maxVisible + 1, 1);
+  }
+
+  return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+}
+
+const pageNumbers = getPageNumbers();
+const lastPageNumber = pageNumbers[pageNumbers.length - 1];
+---
+
+<nav aria-label="Pagination" class="tp-pagination">
+  <ul class="tp-pagination__list">
+    <li>
+      {
+        currentPage > 1 ?
+          <a
+            href={getPageUrl(currentPage - 1)}
+            class="tp-pagination__button"
+            aria-label="Previous page"
+          >
+            Prev
+          </a>
+        : <span class="tp-pagination__button is-disabled" aria-disabled="true">
+            Prev
+          </span>
+      }
+    </li>
+
+    {
+      pageNumbers[0] && pageNumbers[0] > 1 && (
+        <>
+          <li>
+            <a href={getPageUrl(1)} class="tp-pagination__button" aria-label="Page 1">
+              1
+            </a>
+          </li>
+          {pageNumbers[0] > 2 && (
+            <li>
+              <span class="tp-pagination__ellipsis">...</span>
+            </li>
+          )}
+        </>
+      )
+    }
+
+    {
+      pageNumbers.map((page) => (
+        <li>
+          {page === currentPage ?
+            <span class="tp-pagination__button is-current" aria-current="page">
+              {page}
+            </span>
+          : <a href={getPageUrl(page)} class="tp-pagination__button" aria-label={`Page ${page}`}>
+              {page}
+            </a>
+          }
+        </li>
+      ))
+    }
+
+    {
+      lastPageNumber && lastPageNumber < totalPages && (
+        <>
+          {lastPageNumber < totalPages - 1 && (
+            <li>
+              <span class="tp-pagination__ellipsis">...</span>
+            </li>
+          )}
+          <li>
+            <a
+              href={getPageUrl(totalPages)}
+              class="tp-pagination__button"
+              aria-label={`Page ${totalPages}`}
+            >
+              {totalPages}
+            </a>
+          </li>
+        </>
+      )
+    }
+
+    <li>
+      {
+        currentPage < totalPages ?
+          <a
+            href={getPageUrl(currentPage + 1)}
+            class="tp-pagination__button"
+            aria-label="Next page"
+          >
+            Next
+          </a>
+        : <span class="tp-pagination__button is-disabled" aria-disabled="true">
+            Next
+          </span>
+      }
+    </li>
+  </ul>
+</nav>

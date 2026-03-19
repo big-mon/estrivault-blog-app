@@ -1,0 +1,163 @@
+---
+import type { PostMeta } from '@estrivault/content-processor';
+import TopPagePagination from '$components/TopPagePagination.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '$constants';
+import type { TopPageModel } from '$lib/top-page';
+import { getTagRouteSegment } from '$lib/url-segments';
+
+interface Props {
+  model: TopPageModel;
+}
+
+const { model } = Astro.props;
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+}
+
+function getReadingTimeLabel(post: PostMeta): string {
+  const minutes = Math.max(1, Math.ceil(post.readingTime ?? 0));
+  return `${minutes} min read`;
+}
+
+function getCategoryHref(category: string): string {
+  return `/category/${encodeURIComponent(category.toLowerCase())}/1`;
+}
+
+const featuredPost = model.featuredPost;
+---
+
+<div class="top-page">
+  <section class="tp-shell">
+    <header class="tp-hero">
+      <div class="tp-hero__copy">
+        <p class="tp-kicker">White Palette</p>
+        <h1 class="tp-hero__title">{SITE_TITLE}</h1>
+        <p class="tp-hero__statement">Text-first writing, arranged on a pale mineral field.</p>
+        <p class="tp-hero__description">{SITE_DESCRIPTION}</p>
+      </div>
+
+      <aside class="tp-hero__aside">
+        <div class="tp-hero__summary">
+          <p class="tp-kicker">Index note</p>
+          <p>
+            White Palette is now the live top-page direction: pale structure, cold grey rails, and
+            one graphite anchor to keep the reading surface severe.
+          </p>
+        </div>
+
+        <dl class="tp-hero__stats" aria-label="Top page summary">
+          <div>
+            <dt>Lead category</dt>
+            <dd>{model.stats.leadCategoryLabel}</dd>
+          </div>
+          <div>
+            <dt>Categories</dt>
+            <dd>{model.stats.categoryCount}</dd>
+          </div>
+          <div>
+            <dt>Posts</dt>
+            <dd>{model.stats.totalPosts}</dd>
+          </div>
+          <div>
+            <dt>Avg read</dt>
+            <dd>{model.stats.averageReadingMinutes || '-'} min</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    {
+      featuredPost ?
+        <a href={`/post/${featuredPost.slug}`} class="tp-featured">
+          <div class="tp-row tp-row--featured">
+            <div class="tp-row__meta">
+              <p class="tp-row__category">
+                <strong>{featuredPost.category}</strong>
+              </p>
+              <div class="tp-row__secondary">
+                <span>Published {formatDate(featuredPost.publishedAt)}</span>
+                <span>Reading {getReadingTimeLabel(featuredPost)}</span>
+              </div>
+            </div>
+
+            <div class="tp-row__body">
+              <h2 class="tp-row__title">{featuredPost.title}</h2>
+              <p class="tp-row__description">{featuredPost.description}</p>
+            </div>
+          </div>
+        </a>
+      : <div class="tp-empty-state">No published posts were available.</div>
+    }
+
+    <div class="tp-list">
+      {
+        model.posts.map((post) => (
+          <a href={`/post/${post.slug}`} class="tp-entry">
+            <div class="tp-row">
+              <div class="tp-row__meta">
+                <p class="tp-row__category">
+                  <strong>{post.category}</strong>
+                </p>
+                <div class="tp-row__secondary">
+                  <span>Published {formatDate(post.publishedAt)}</span>
+                  <span>Reading {getReadingTimeLabel(post)}</span>
+                </div>
+              </div>
+
+              <div class="tp-row__body">
+                <h2 class="tp-row__title">{post.title}</h2>
+                <p class="tp-row__description">{post.description}</p>
+              </div>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+
+    {
+      model.totalPages > 1 && (
+        <section class="tp-pagination-wrap">
+          <p class="tp-kicker">Pagination</p>
+          <TopPagePagination
+            currentPage={model.currentPage}
+            totalPages={model.totalPages}
+            baseUrl="/"
+          />
+        </section>
+      )
+    }
+  </section>
+
+  <footer class="tp-meta-footer">
+    <section class="tp-meta-footer__block">
+      <p class="tp-kicker">Categories</p>
+      <ul class="tp-meta-footer__list" aria-label="Sample categories">
+        {
+          model.sampleCategories.map((category) => (
+            <li>
+              <a href={getCategoryHref(category)}>{category}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="tp-meta-footer__block">
+      <p class="tp-kicker">Selected tags</p>
+      <ul class="tp-meta-footer__chips" aria-label="Sample tags">
+        {
+          model.sampleTags.slice(0, 6).map((tag) => (
+            <li>
+              <a href={`/tag/${getTagRouteSegment(tag)}/1`}>{tag}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </footer>
+</div>
