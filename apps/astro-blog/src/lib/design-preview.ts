@@ -19,6 +19,20 @@ export interface DesignPreviewTheme {
   summary: string;
 }
 
+export interface IndexFrameTheme {
+  id: 'blue-palette' | 'luxury-01' | 'luxury-04' | 'luxury-07';
+  name: string;
+  kicker: string;
+  note: string;
+  rail: string;
+  accent: string;
+  accentSoft: string;
+  surface: string;
+  border: string;
+  text: string;
+  textSoft: string;
+}
+
 export interface DesignPreviewStats {
   totalPosts: number;
   categoryCount: number;
@@ -59,13 +73,68 @@ export const DESIGN_PREVIEW_THEMES: Record<DesignPreviewVariant, DesignPreviewTh
     variant: 'signal-frame',
     name: 'Index Frame',
     kicker: 'Design Preview 03',
-    title: 'A cold index where category leads and titles carry the weight.',
+    title: 'A cold index where category anchors the page before the title opens.',
     description:
-      'This route minimizes card behavior and uses alignment, frames, and category columns to produce a sharper, more systematic landing page.',
+      'This route minimizes card behavior and uses a left-side metadata rail, hard rules, and quiet spacing to produce a sharper, more systematic landing page.',
     summary:
       'The result should feel closest to a technical archive or mission index while still preserving enough summary text to invite reading.',
   },
 };
+
+export const INDEX_FRAME_THEMES: IndexFrameTheme[] = [
+  {
+    id: 'blue-palette',
+    name: 'Blue Palette',
+    kicker: 'Palette Study A',
+    note: 'Based on the first image: deep navy, saturated cobalt, pale mist, and dusty blue.',
+    rail: '#1f2c5d',
+    accent: '#3a539f',
+    accentSoft: '#829fb6',
+    surface: '#eef2fa',
+    border: '#c2ccdf',
+    text: '#1f2c5d',
+    textSoft: '#50617f',
+  },
+  {
+    id: 'luxury-01',
+    name: 'Theme 01',
+    kicker: 'Palette Study 01',
+    note: 'Ink navy with warm brass restraint and smoked steel neutrals.',
+    rail: '#09171f',
+    accent: '#cea17a',
+    accentSoft: '#3e4e5a',
+    surface: '#edf1f3',
+    border: '#c8d0d5',
+    text: '#101b22',
+    textSoft: '#566571',
+  },
+  {
+    id: 'luxury-04',
+    name: 'Theme 04',
+    kicker: 'Palette Study 04',
+    note: 'Blue-grey metal with a precise red signal and nearly-black shadow tone.',
+    rail: '#303d49',
+    accent: '#5d020a',
+    accentSoft: '#1a1e22',
+    surface: '#eff2f5',
+    border: '#c9d1d8',
+    text: '#192027',
+    textSoft: '#5a6672',
+  },
+  {
+    id: 'luxury-07',
+    name: 'Theme 07',
+    kicker: 'Palette Study 07',
+    note: 'Night violet, brushed silver, and muted charcoal for the coolest version.',
+    rail: '#141424',
+    accent: '#b5b5b6',
+    accentSoft: '#323240',
+    surface: '#f1f1f4',
+    border: '#d4d5dc',
+    text: '#161824',
+    textSoft: '#5c5f6f',
+  },
+];
 
 export function isDesignPreviewVariant(value: string): value is DesignPreviewVariant {
   return DESIGN_PREVIEW_VARIANTS.includes(value as DesignPreviewVariant);
