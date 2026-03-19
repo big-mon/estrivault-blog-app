@@ -8,7 +8,7 @@
     "build:fast": "pnpm -r --filter astro-blog... run build",
     "build:legacy": "pnpm run build:packages && pnpm --filter astro-blog run build",
     "build:packages": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor --filter @estrivault/og-image-generator run build",
-    "build:packages:incremental": "tsc --build packages/cloudinary-utils packages/content-processor packages/og-image-generator",
+    "build:packages:incremental": "pnpm exec tsc --build packages/cloudinary-utils packages/content-processor packages/og-image-generator",
     "dev:packages": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/og-image-generator run dev",
     "validate:workspace": "node scripts/validate-workspace.js",
     "preinstall": "node scripts/require-pnpm.js",

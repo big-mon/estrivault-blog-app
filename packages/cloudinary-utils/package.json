@@ -9,8 +9,8 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
-    "build:types": "tsc --build",
-    "build:bundle": "tsup",
+    "build:types": "pnpm exec tsc --build",
+    "build:bundle": "pnpm exec tsup",
     "build": "pnpm run build:types && pnpm run build:bundle",
     "rebuild": "pnpm run clean && pnpm run build",
     "dev": "tsup --watch"
