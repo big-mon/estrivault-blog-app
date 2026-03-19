@@ -9,6 +9,7 @@ interface Props {
 }
 
 const { model, theme } = Astro.props;
+const variant = theme.variant;
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('ja-JP', {
@@ -30,59 +31,46 @@ function getReadingTimeLabel(post: PostMeta): string {
 const featuredPost = model.featuredPost;
 ---
 
-<div class={`design-preview design-preview--${theme.variant}`}>
+<div class={`design-preview design-preview--${variant}`}>
   <section class="dp-hero-panel">
-    <div class="dp-hero-panel__lead">
+    <div class="dp-hero-panel__body">
       <p class="dp-hero-panel__eyebrow">{theme.kicker}</p>
       <h1 class="dp-hero-panel__title">{theme.title}</h1>
       <p class="dp-hero-panel__description">{theme.description}</p>
-
-      <ul class="dp-metric-list" aria-label="Concept metrics">
-        {theme.metrics.map((metric) => <li class="dp-metric-list__item">{metric}</li>)}
-      </ul>
+      <p class="dp-hero-panel__summary">{theme.summary}</p>
     </div>
 
-    <aside class="dp-status-panel" aria-label="Preview summary">
-      <p class="dp-status-panel__label">{theme.panelTitle}</p>
-      <p class="dp-status-panel__body">{theme.panelBody}</p>
-
-      <dl class="dp-stat-grid">
-        <div class="dp-stat-grid__item">
-          <dt>Posts</dt>
-          <dd>{model.stats.totalPosts}</dd>
-        </div>
-        <div class="dp-stat-grid__item">
-          <dt>Categories</dt>
-          <dd>{model.stats.categoryCount}</dd>
-        </div>
-        <div class="dp-stat-grid__item">
-          <dt>Avg read</dt>
-          <dd>{model.stats.averageReadingMinutes || '-'} min</dd>
-        </div>
-        <div class="dp-stat-grid__item">
-          <dt>Latest</dt>
-          <dd>{model.stats.latestPublishedLabel}</dd>
-        </div>
-      </dl>
-    </aside>
+    <dl class="dp-hero-meta" aria-label="Preview summary">
+      <div class="dp-hero-meta__item">
+        <dt>Posts</dt>
+        <dd>{model.stats.totalPosts}</dd>
+      </div>
+      <div class="dp-hero-meta__item">
+        <dt>Categories</dt>
+        <dd>{model.stats.categoryCount}</dd>
+      </div>
+      <div class="dp-hero-meta__item">
+        <dt>Avg read</dt>
+        <dd>{model.stats.averageReadingMinutes || '-'} min</dd>
+      </div>
+      <div class="dp-hero-meta__item">
+        <dt>Latest</dt>
+        <dd>{model.stats.latestPublishedLabel}</dd>
+      </div>
+    </dl>
   </section>
 
-  <section class="dp-content-panel">
-    <div class="dp-section-heading">
-      <p class="dp-section-heading__eyebrow">Featured surface</p>
-      <h2 class="dp-section-heading__title">Lead story card</h2>
-    </div>
-
-    {
-      featuredPost ?
-        <a href={`/post/${featuredPost.slug}`} class="dp-featured-card">
-          <div class="dp-featured-card__copy">
+  {
+    variant === 'industrial-slate' && (
+      <section class="dp-layout dp-layout--essay">
+        {featuredPost && (
+          <a href={`/post/${featuredPost.slug}`} class="dp-featured-card dp-featured-card--essay">
             <div class="dp-card-meta">
               <span>{featuredPost.category}</span>
               <span>{formatDate(featuredPost.publishedAt)}</span>
               <span>{getReadingTimeLabel(featuredPost)}</span>
             </div>
-            <h3 class="dp-featured-card__title">{featuredPost.title}</h3>
+            <h2 class="dp-featured-card__title">{featuredPost.title}</h2>
             <p class="dp-featured-card__description">{featuredPost.description}</p>
 
             <ul class="dp-chip-list" aria-label="Featured tags">
@@ -90,118 +78,229 @@ const featuredPost = model.featuredPost;
                 <li class="dp-chip-list__item">{tag}</li>
               ))}
             </ul>
-          </div>
-
-          <div class="dp-featured-card__media" aria-hidden="true">
-            {featuredPost.coverImage ?
-              <img
-                src={featuredPost.coverImage}
-                alt=""
-                class="dp-featured-card__image"
-                loading="lazy"
-              />
-            : <div class="dp-featured-card__placeholder">
-                <span>Material sample</span>
-              </div>
-            }
-          </div>
-        </a>
-      : <div class="dp-empty-state">No published posts were available for the preview.</div>
-    }
-  </section>
-
-  <section class="dp-content-panel">
-    <div class="dp-section-heading">
-      <p class="dp-section-heading__eyebrow">Index grid</p>
-      <h2 class="dp-section-heading__title">Compact article cards</h2>
-    </div>
-
-    <div class="dp-card-grid">
-      {
-        model.posts.map((post) => (
-          <a href={`/post/${post.slug}`} class="dp-post-card">
-            <div class="dp-card-meta">
-              <span>{post.category}</span>
-              <span>{formatDate(post.publishedAt)}</span>
-            </div>
-            <h3 class="dp-post-card__title">{post.title}</h3>
-            <p class="dp-post-card__description">{post.description}</p>
-
-            <div class="dp-post-card__footer">
-              <span class="dp-post-card__reading">{getReadingTimeLabel(post)}</span>
-              <ul class="dp-chip-list" aria-label={`${post.title} tags`}>
-                {post.tags.slice(0, 3).map((tag) => (
-                  <li class="dp-chip-list__item">{tag}</li>
-                ))}
-              </ul>
-            </div>
           </a>
-        ))
-      }
-    </div>
-  </section>
+        )}
 
-  <section class="dp-utility-grid">
-    <div class="dp-content-panel">
-      <div class="dp-section-heading">
-        <p class="dp-section-heading__eyebrow">Taxonomy check</p>
-        <h2 class="dp-section-heading__title">Tag and category density</h2>
-      </div>
+        <section class="dp-list-section">
+          <div class="dp-section-heading">
+            <p class="dp-section-heading__eyebrow">Recent writing</p>
+            <h2 class="dp-section-heading__title">A steady vertical reading flow</h2>
+          </div>
 
-      <div class="dp-taxonomy-columns">
-        <div>
-          <h3 class="dp-subheading">Sample tags</h3>
-          <ul class="dp-chip-list" aria-label="Sample tags">
-            {
-              model.sampleTags.map((tag) => (
-                <li>
-                  <a class="dp-chip-list__item" href={`/tag/${getTagRouteSegment(tag)}/1`}>
-                    {tag}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
+          <div class="dp-list dp-list--essay">
+            {model.posts.map((post) => (
+              <a href={`/post/${post.slug}`} class="dp-entry dp-entry--essay">
+                <div class="dp-card-meta">
+                  <span>{post.category}</span>
+                  <span>{formatDate(post.publishedAt)}</span>
+                  <span>{getReadingTimeLabel(post)}</span>
+                </div>
+                <h3 class="dp-entry__title">{post.title}</h3>
+                <p class="dp-entry__description">{post.description}</p>
+                <ul class="dp-chip-list" aria-label={`${post.title} tags`}>
+                  {post.tags.slice(0, 3).map((tag) => (
+                    <li class="dp-chip-list__item">{tag}</li>
+                  ))}
+                </ul>
+              </a>
+            ))}
+          </div>
+        </section>
 
-        <div>
-          <h3 class="dp-subheading">Sample categories</h3>
-          <ul class="dp-chip-list" aria-label="Sample categories">
-            {
-              model.sampleCategories.map((category) => (
+        <section class="dp-support-grid dp-support-grid--essay">
+          <div class="dp-support-block">
+            <p class="dp-support-block__label">Sample categories</p>
+            <ul class="dp-chip-list" aria-label="Sample categories">
+              {model.sampleCategories.map((category) => (
                 <li>
                   <a class="dp-chip-list__item" href={getCategoryHref(category)}>
                     {category}
                   </a>
                 </li>
-              ))
-            }
-          </ul>
+              ))}
+            </ul>
+          </div>
+
+          <div class="dp-support-block">
+            <p class="dp-support-block__label">Sample tags</p>
+            <ul class="dp-chip-list" aria-label="Sample tags">
+              {model.sampleTags.map((tag) => (
+                <li>
+                  <a class="dp-chip-list__item" href={`/tag/${getTagRouteSegment(tag)}/1`}>
+                    {tag}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </section>
+    )
+  }
+
+  {
+    variant === 'archive-grid' && (
+      <section class="dp-layout dp-layout--split">
+        <div class="dp-split-main">
+          {featuredPost && (
+            <a href={`/post/${featuredPost.slug}`} class="dp-featured-card dp-featured-card--split">
+              <div class="dp-card-meta">
+                <span>{featuredPost.category}</span>
+                <span>{formatDate(featuredPost.publishedAt)}</span>
+                <span>{getReadingTimeLabel(featuredPost)}</span>
+              </div>
+              <h2 class="dp-featured-card__title">{featuredPost.title}</h2>
+              <p class="dp-featured-card__description">{featuredPost.description}</p>
+            </a>
+          )}
+
+          <div class="dp-list-section">
+            <div class="dp-section-heading">
+              <p class="dp-section-heading__eyebrow">Recent writing</p>
+              <h2 class="dp-section-heading__title">
+                Main column for reading, side column for context
+              </h2>
+            </div>
+
+            <div class="dp-list dp-list--split">
+              {model.posts.map((post) => (
+                <a href={`/post/${post.slug}`} class="dp-entry dp-entry--split">
+                  <div class="dp-card-meta">
+                    <span>{post.category}</span>
+                    <span>{formatDate(post.publishedAt)}</span>
+                    <span>{getReadingTimeLabel(post)}</span>
+                  </div>
+                  <h3 class="dp-entry__title">{post.title}</h3>
+                  <p class="dp-entry__description">{post.description}</p>
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <aside class="dp-content-panel dp-content-panel--support">
-      <div class="dp-section-heading">
-        <p class="dp-section-heading__eyebrow">Support panel</p>
-        <h2 class="dp-section-heading__title">Pagination and utility block</h2>
-      </div>
+        <aside class="dp-sidebar">
+          <section class="dp-support-block">
+            <p class="dp-support-block__label">Latest note</p>
+            <p class="dp-sidebar__body">
+              A narrow companion rail keeps taxonomy and navigation visible without interrupting the
+              article titles.
+            </p>
+          </section>
 
-      <nav class="dp-pagination-sample" aria-label="Pagination sample">
-        <span class="dp-pagination-sample__button" aria-hidden="true"> Prev </span>
-        <span class="dp-pagination-sample__button is-current" aria-current="page"> 1 </span>
-        <span class="dp-pagination-sample__button" aria-hidden="true"> 2 </span>
-        <span class="dp-pagination-sample__button" aria-hidden="true"> 3 </span>
-        <span class="dp-pagination-sample__button" aria-hidden="true"> Next </span>
-      </nav>
+          <section class="dp-support-block">
+            <p class="dp-support-block__label">Categories</p>
+            <ul class="dp-sidebar-list" aria-label="Sample categories">
+              {model.sampleCategories.map((category) => (
+                <li>
+                  <a href={getCategoryHref(category)}>{category}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
 
-      <div class="dp-note-block">
-        <p class="dp-note-block__title">System note</p>
-        <p class="dp-note-block__body">
-          These routes are comparison surfaces only. The production home page, article page, and
-          shared navigation remain untouched.
-        </p>
-      </div>
-    </aside>
-  </section>
+          <section class="dp-support-block">
+            <p class="dp-support-block__label">Tags</p>
+            <ul class="dp-chip-list" aria-label="Sample tags">
+              {model.sampleTags.map((tag) => (
+                <li>
+                  <a class="dp-chip-list__item" href={`/tag/${getTagRouteSegment(tag)}/1`}>
+                    {tag}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section class="dp-support-block">
+            <p class="dp-support-block__label">Pagination sample</p>
+            <nav class="dp-pagination-sample" aria-label="Pagination sample">
+              <span class="dp-pagination-sample__button" aria-hidden="true">
+                Prev
+              </span>
+              <span class="dp-pagination-sample__button is-current" aria-current="page">
+                1
+              </span>
+              <span class="dp-pagination-sample__button" aria-hidden="true">
+                2
+              </span>
+              <span class="dp-pagination-sample__button" aria-hidden="true">
+                3
+              </span>
+            </nav>
+          </section>
+        </aside>
+      </section>
+    )
+  }
+
+  {
+    variant === 'signal-frame' && (
+      <section class="dp-layout dp-layout--ledger">
+        <div class="dp-ledger-head" aria-hidden="true">
+          <span>Entry</span>
+          <span>Category</span>
+          <span>Published</span>
+          <span>Read</span>
+        </div>
+
+        {featuredPost && (
+          <a href={`/post/${featuredPost.slug}`} class="dp-featured-card dp-featured-card--ledger">
+            <div class="dp-ledger-row">
+              <div class="dp-ledger-row__main">
+                <p class="dp-ledger-row__label">Lead entry</p>
+                <h2 class="dp-featured-card__title">{featuredPost.title}</h2>
+                <p class="dp-featured-card__description">{featuredPost.description}</p>
+              </div>
+              <div class="dp-ledger-row__meta">
+                <span>{featuredPost.category}</span>
+                <span>{formatDate(featuredPost.publishedAt)}</span>
+                <span>{getReadingTimeLabel(featuredPost)}</span>
+              </div>
+            </div>
+          </a>
+        )}
+
+        <div class="dp-ledger-list">
+          {model.posts.map((post) => (
+            <a href={`/post/${post.slug}`} class="dp-entry dp-entry--ledger">
+              <div class="dp-ledger-row">
+                <div class="dp-ledger-row__main">
+                  <h3 class="dp-entry__title">{post.title}</h3>
+                  <p class="dp-entry__description">{post.description}</p>
+                </div>
+                <div class="dp-ledger-row__meta">
+                  <span>{post.category}</span>
+                  <span>{formatDate(post.publishedAt)}</span>
+                  <span>{getReadingTimeLabel(post)}</span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div class="dp-support-grid dp-support-grid--ledger">
+          <section class="dp-support-block">
+            <p class="dp-support-block__label">Index note</p>
+            <p class="dp-sidebar__body">
+              This route minimizes card styling and lets alignment carry most of the visual
+              structure.
+            </p>
+          </section>
+
+          <section class="dp-support-block">
+            <p class="dp-support-block__label">Tags</p>
+            <ul class="dp-chip-list" aria-label="Sample tags">
+              {model.sampleTags.map((tag) => (
+                <li>
+                  <a class="dp-chip-list__item" href={`/tag/${getTagRouteSegment(tag)}/1`}>
+                    {tag}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </section>
+    )
+  }
 </div>

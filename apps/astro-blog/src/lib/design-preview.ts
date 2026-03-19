@@ -16,9 +16,7 @@ export interface DesignPreviewTheme {
   kicker: string;
   title: string;
   description: string;
-  panelTitle: string;
-  panelBody: string;
-  metrics: string[];
+  summary: string;
 }
 
 export interface DesignPreviewStats {
@@ -39,39 +37,33 @@ export interface DesignPreviewModel {
 export const DESIGN_PREVIEW_THEMES: Record<DesignPreviewVariant, DesignPreviewTheme> = {
   'industrial-slate': {
     variant: 'industrial-slate',
-    name: 'Industrial Slate',
+    name: 'Essay Stack',
     kicker: 'Design Preview 01',
-    title: 'Matte graphite panels with a quiet amber signal.',
+    title: 'A quiet single-column index for slow reading.',
     description:
-      'A denser, harder-tuned landing surface built from rigid cards, measured spacing, and restrained accent color.',
-    panelTitle: 'Direction note',
-    panelBody:
-      'This route studies a mechanical blog index: strong rails, muted materials, and enough contrast to feel precise without becoming noisy.',
-    metrics: ['Matte graphite', 'Mechanical rails', 'Amber restraint'],
+      'A calm editorial stack that treats titles, summaries, and publishing metadata as the primary surface.',
+    summary:
+      'The focus is a gentle reading rhythm: one strong lead entry, restrained separators, and enough whitespace to feel like the opening spread of a literary journal.',
   },
   'archive-grid': {
     variant: 'archive-grid',
-    name: 'Archive Grid',
+    name: 'Editorial Split',
     kicker: 'Design Preview 02',
-    title: 'Index-card order with cold, document-like clarity.',
+    title: 'A text-led index with a narrow editorial sidebar.',
     description:
-      'A lighter concept that borrows from archive shelving and filing systems, using narrow rules and cyan-tinted utility highlights.',
-    panelTitle: 'Direction note',
-    panelBody:
-      'This route focuses on legibility and sorting. It should feel editorial and systematic rather than soft or lifestyle-oriented.',
-    metrics: ['Concrete light', 'Document rails', 'Cyan utility'],
+      'A two-column composition where the article list stays central and supporting taxonomy moves into a slim companion rail.',
+    summary:
+      'This option keeps the page airy, but improves browseability with a right-side context column for tags, categories, and site notes.',
   },
   'signal-frame': {
     variant: 'signal-frame',
-    name: 'Signal Frame',
+    name: 'Index Ledger',
     kicker: 'Design Preview 03',
-    title: 'A low-glow control frame with warning-color discipline.',
+    title: 'A ledger-like article list with structured metadata.',
     description:
-      'A darker proposal that frames the content like a monitoring surface, with restrained hazard accents and layered depth.',
-    panelTitle: 'Direction note',
-    panelBody:
-      'This route is the most theatrical of the three, but it keeps the content primary by limiting glow and keeping typography crisp.',
-    metrics: ['Steel depth', 'Layered frame', 'Hazard accent'],
+      'A denser arrangement that reduces card styling and lets alignment, rules, and metadata columns define the experience.',
+    summary:
+      'This route leans closest to an index or bibliography while still giving each post enough summary text to feel readable.',
   },
 };
 
