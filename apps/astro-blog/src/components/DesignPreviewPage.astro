@@ -1,0 +1,207 @@
+---
+import type { PostMeta } from '@estrivault/content-processor';
+import type { DesignPreviewModel, DesignPreviewTheme } from '$lib/design-preview';
+import { getTagRouteSegment } from '$lib/url-segments';
+
+interface Props {
+  model: DesignPreviewModel;
+  theme: DesignPreviewTheme;
+}
+
+const { model, theme } = Astro.props;
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+}
+
+function getCategoryHref(category: string): string {
+  return `/category/${encodeURIComponent(category.toLowerCase())}/1`;
+}
+
+function getReadingTimeLabel(post: PostMeta): string {
+  const minutes = Math.max(1, Math.ceil(post.readingTime ?? 0));
+  return `${minutes} min read`;
+}
+
+const featuredPost = model.featuredPost;
+---
+
+<div class={`design-preview design-preview--${theme.variant}`}>
+  <section class="dp-hero-panel">
+    <div class="dp-hero-panel__lead">
+      <p class="dp-hero-panel__eyebrow">{theme.kicker}</p>
+      <h1 class="dp-hero-panel__title">{theme.title}</h1>
+      <p class="dp-hero-panel__description">{theme.description}</p>
+
+      <ul class="dp-metric-list" aria-label="Concept metrics">
+        {theme.metrics.map((metric) => <li class="dp-metric-list__item">{metric}</li>)}
+      </ul>
+    </div>
+
+    <aside class="dp-status-panel" aria-label="Preview summary">
+      <p class="dp-status-panel__label">{theme.panelTitle}</p>
+      <p class="dp-status-panel__body">{theme.panelBody}</p>
+
+      <dl class="dp-stat-grid">
+        <div class="dp-stat-grid__item">
+          <dt>Posts</dt>
+          <dd>{model.stats.totalPosts}</dd>
+        </div>
+        <div class="dp-stat-grid__item">
+          <dt>Categories</dt>
+          <dd>{model.stats.categoryCount}</dd>
+        </div>
+        <div class="dp-stat-grid__item">
+          <dt>Avg read</dt>
+          <dd>{model.stats.averageReadingMinutes || '-'} min</dd>
+        </div>
+        <div class="dp-stat-grid__item">
+          <dt>Latest</dt>
+          <dd>{model.stats.latestPublishedLabel}</dd>
+        </div>
+      </dl>
+    </aside>
+  </section>
+
+  <section class="dp-content-panel">
+    <div class="dp-section-heading">
+      <p class="dp-section-heading__eyebrow">Featured surface</p>
+      <h2 class="dp-section-heading__title">Lead story card</h2>
+    </div>
+
+    {
+      featuredPost ?
+        <a href={`/post/${featuredPost.slug}`} class="dp-featured-card">
+          <div class="dp-featured-card__copy">
+            <div class="dp-card-meta">
+              <span>{featuredPost.category}</span>
+              <span>{formatDate(featuredPost.publishedAt)}</span>
+              <span>{getReadingTimeLabel(featuredPost)}</span>
+            </div>
+            <h3 class="dp-featured-card__title">{featuredPost.title}</h3>
+            <p class="dp-featured-card__description">{featuredPost.description}</p>
+
+            <ul class="dp-chip-list" aria-label="Featured tags">
+              {featuredPost.tags.slice(0, 4).map((tag) => (
+                <li class="dp-chip-list__item">{tag}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="dp-featured-card__media" aria-hidden="true">
+            {featuredPost.coverImage ?
+              <img
+                src={featuredPost.coverImage}
+                alt=""
+                class="dp-featured-card__image"
+                loading="lazy"
+              />
+            : <div class="dp-featured-card__placeholder">
+                <span>Material sample</span>
+              </div>
+            }
+          </div>
+        </a>
+      : <div class="dp-empty-state">No published posts were available for the preview.</div>
+    }
+  </section>
+
+  <section class="dp-content-panel">
+    <div class="dp-section-heading">
+      <p class="dp-section-heading__eyebrow">Index grid</p>
+      <h2 class="dp-section-heading__title">Compact article cards</h2>
+    </div>
+
+    <div class="dp-card-grid">
+      {
+        model.posts.map((post) => (
+          <a href={`/post/${post.slug}`} class="dp-post-card">
+            <div class="dp-card-meta">
+              <span>{post.category}</span>
+              <span>{formatDate(post.publishedAt)}</span>
+            </div>
+            <h3 class="dp-post-card__title">{post.title}</h3>
+            <p class="dp-post-card__description">{post.description}</p>
+
+            <div class="dp-post-card__footer">
+              <span class="dp-post-card__reading">{getReadingTimeLabel(post)}</span>
+              <ul class="dp-chip-list" aria-label={`${post.title} tags`}>
+                {post.tags.slice(0, 3).map((tag) => (
+                  <li class="dp-chip-list__item">{tag}</li>
+                ))}
+              </ul>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="dp-utility-grid">
+    <div class="dp-content-panel">
+      <div class="dp-section-heading">
+        <p class="dp-section-heading__eyebrow">Taxonomy check</p>
+        <h2 class="dp-section-heading__title">Tag and category density</h2>
+      </div>
+
+      <div class="dp-taxonomy-columns">
+        <div>
+          <h3 class="dp-subheading">Sample tags</h3>
+          <ul class="dp-chip-list" aria-label="Sample tags">
+            {
+              model.sampleTags.map((tag) => (
+                <li>
+                  <a class="dp-chip-list__item" href={`/tag/${getTagRouteSegment(tag)}/1`}>
+                    {tag}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="dp-subheading">Sample categories</h3>
+          <ul class="dp-chip-list" aria-label="Sample categories">
+            {
+              model.sampleCategories.map((category) => (
+                <li>
+                  <a class="dp-chip-list__item" href={getCategoryHref(category)}>
+                    {category}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <aside class="dp-content-panel dp-content-panel--support">
+      <div class="dp-section-heading">
+        <p class="dp-section-heading__eyebrow">Support panel</p>
+        <h2 class="dp-section-heading__title">Pagination and utility block</h2>
+      </div>
+
+      <nav class="dp-pagination-sample" aria-label="Pagination sample">
+        <span class="dp-pagination-sample__button" aria-hidden="true"> Prev </span>
+        <span class="dp-pagination-sample__button is-current" aria-current="page"> 1 </span>
+        <span class="dp-pagination-sample__button" aria-hidden="true"> 2 </span>
+        <span class="dp-pagination-sample__button" aria-hidden="true"> 3 </span>
+        <span class="dp-pagination-sample__button" aria-hidden="true"> Next </span>
+      </nav>
+
+      <div class="dp-note-block">
+        <p class="dp-note-block__title">System note</p>
+        <p class="dp-note-block__body">
+          These routes are comparison surfaces only. The production home page, article page, and
+          shared navigation remain untouched.
+        </p>
+      </div>
+    </aside>
+  </section>
+</div>

@@ -1,0 +1,85 @@
+---
+import { SITE_AUTHOR, SITE_TITLE, SOCIAL_LINK_X } from '$constants';
+import {
+  DESIGN_PREVIEW_THEMES,
+  DESIGN_PREVIEW_VARIANTS,
+  getDesignPreviewHref,
+  type DesignPreviewVariant,
+} from '$lib/design-preview';
+import '../design-preview.css';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  variant: DesignPreviewVariant;
+  noIndex?: boolean;
+}
+
+const { title, description, canonical, variant, noIndex = true } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/icon.svg" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={SITE_AUTHOR} />
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={SITE_TITLE} />
+    <meta property="og:locale" content="ja_JP" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={`@${SOCIAL_LINK_X}`} />
+    <meta name="twitter:creator" content={`@${SOCIAL_LINK_X}`} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="canonical" href={canonical} />
+  </head>
+  <body class={`design-preview-shell design-preview-shell--${variant}`}>
+    <div class="dp-shell">
+      <header class="dp-switcher">
+        <div class="dp-switcher__frame">
+          <div class="dp-switcher__intro">
+            <p class="dp-switcher__eyebrow">Design sandbox</p>
+            <p class="dp-switcher__copy">Isolated routes for material and layout comparison.</p>
+          </div>
+
+          <nav aria-label="Design preview variants" class="dp-switcher__nav">
+            {
+              DESIGN_PREVIEW_VARIANTS.map((entry) => {
+                const theme = DESIGN_PREVIEW_THEMES[entry];
+                const isCurrent = entry === variant;
+
+                return (
+                  <a
+                    href={getDesignPreviewHref(entry)}
+                    class={`dp-switcher__link ${isCurrent ? 'is-current' : ''}`}
+                    aria-current={isCurrent ? 'page' : undefined}
+                  >
+                    <span class="dp-switcher__link-name">{theme.name}</span>
+                    <span class="dp-switcher__link-kicker">{theme.kicker}</span>
+                  </a>
+                );
+              })
+            }
+          </nav>
+        </div>
+      </header>
+
+      <main class="dp-main">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

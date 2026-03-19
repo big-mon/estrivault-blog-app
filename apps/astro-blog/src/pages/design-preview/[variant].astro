@@ -1,0 +1,38 @@
+---
+import DesignPreviewPage from '$components/DesignPreviewPage.astro';
+import { SITE_TITLE } from '$constants';
+import DesignPreviewLayout from '$layouts/DesignPreviewLayout.astro';
+import {
+  DESIGN_PREVIEW_THEMES,
+  DESIGN_PREVIEW_VARIANTS,
+  getDesignPreviewCanonical,
+  getDesignPreviewModel,
+  isDesignPreviewVariant,
+} from '$lib/design-preview';
+
+export function getStaticPaths() {
+  return DESIGN_PREVIEW_VARIANTS.map((variant) => ({
+    params: { variant },
+  }));
+}
+
+const variantParam = Astro.params.variant;
+
+if (!variantParam || !isDesignPreviewVariant(variantParam)) {
+  throw new Error(`Invalid design preview variant: ${variantParam}`);
+}
+
+const theme = DESIGN_PREVIEW_THEMES[variantParam];
+const model = await getDesignPreviewModel();
+const canonical = getDesignPreviewCanonical(variantParam);
+const title = `${theme.name} | Design Preview | ${SITE_TITLE}`;
+---
+
+<DesignPreviewLayout
+  title={title}
+  description={theme.description}
+  canonical={canonical}
+  variant={variantParam}
+>
+  <DesignPreviewPage model={model} theme={theme} />
+</DesignPreviewLayout>
