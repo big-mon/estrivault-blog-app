@@ -1,12 +1,7 @@
 ---
 import type { PostMeta } from '@estrivault/content-processor';
 import { SITE_TITLE } from '$constants';
-import {
-  INDEX_FRAME_THEMES,
-  type DesignPreviewModel,
-  type DesignPreviewTheme,
-  type IndexFrameTheme,
-} from '$lib/design-preview';
+import type { DesignPreviewModel, DesignPreviewTheme } from '$lib/design-preview';
 import { getTagRouteSegment } from '$lib/url-segments';
 
 interface Props {
@@ -15,7 +10,6 @@ interface Props {
 }
 
 const { model, theme } = Astro.props;
-const variant = theme.variant;
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('ja-JP', {
@@ -34,356 +28,148 @@ function getReadingTimeLabel(post: PostMeta): string {
   return `${minutes} min read`;
 }
 
-function getIndexThemeStyle(theme: IndexFrameTheme): string {
-  return [
-    `--if-rail:${theme.rail}`,
-    `--if-accent:${theme.accent}`,
-    `--if-accent-soft:${theme.accentSoft}`,
-    `--if-surface:${theme.surface}`,
-    `--if-border:${theme.border}`,
-    `--if-text:${theme.text}`,
-    `--if-text-soft:${theme.textSoft}`,
-  ].join(';');
-}
-
 const featuredPost = model.featuredPost;
-const bannerPosts = model.posts.slice(0, 3);
 ---
 
-<div class={`design-preview design-preview--${variant}`}>
-  {
-    variant !== 'signal-frame' && (
-      <section class={`dp-masthead ${variant === 'archive-grid' ? 'dp-masthead--banner' : ''}`}>
-        <div class="dp-masthead__copy">
-          <p class="dp-kicker">{theme.kicker}</p>
-          <p class="dp-masthead__statement">{theme.title}</p>
-          <h1 class="dp-masthead__site">{SITE_TITLE}</h1>
-          <p class="dp-masthead__description">{theme.description}</p>
-          <p class="dp-masthead__summary">{theme.summary}</p>
+<div class="design-preview design-preview--index">
+  <section class="dp-index-shell">
+    <header class="dp-index-header">
+      <div class="dp-index-header__copy">
+        <p class="dp-kicker">{theme.kicker}</p>
+        <h1 class="dp-index-header__title">{SITE_TITLE}</h1>
+        <p class="dp-index-header__statement">{theme.title}</p>
+        <p class="dp-index-header__description">{theme.description}</p>
+      </div>
+
+      <aside class="dp-index-header__aside">
+        <div class="dp-index-header__summary">
+          <p class="dp-kicker">Palette intent</p>
+          <p class="dp-index-header__summary-copy">{theme.summary}</p>
         </div>
 
-        <dl class="dp-masthead__stats" aria-label="Preview summary">
-          <div class="dp-masthead__stat">
+        <ul class="dp-palette" aria-label={`${theme.name} palette swatches`}>
+          {
+            theme.swatches.map((swatch) => (
+              <li class="dp-palette__item">
+                <span class="dp-palette__dot" style={`background:${swatch};`} aria-hidden="true" />
+                <span class="dp-palette__code">{swatch}</span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <dl class="dp-index-header__stats" aria-label="Preview summary">
+          <div>
             <dt>Lead category</dt>
             <dd>{model.stats.leadCategoryLabel}</dd>
           </div>
-          <div class="dp-masthead__stat">
+          <div>
             <dt>Categories</dt>
             <dd>{model.stats.categoryCount}</dd>
           </div>
-          <div class="dp-masthead__stat">
+          <div>
             <dt>Posts</dt>
             <dd>{model.stats.totalPosts}</dd>
           </div>
-          <div class="dp-masthead__stat">
+          <div>
             <dt>Avg read</dt>
             <dd>{model.stats.averageReadingMinutes || '-'} min</dd>
           </div>
         </dl>
-      </section>
-    )
-  }
+      </aside>
+    </header>
 
-  {
-    variant === 'industrial-slate' && (
-      <section class="dp-variant dp-variant--monolith">
-        {featuredPost ?
-          <a
-            href={`/post/${featuredPost.slug}`}
-            class="dp-featured-card dp-featured-card--monolith"
-          >
-            <p class="dp-entry__category">
-              <span>Category</span>
-              <strong>{featuredPost.category}</strong>
-            </p>
-            <h2 class="dp-featured-card__title">{featuredPost.title}</h2>
-            <p class="dp-featured-card__description">{featuredPost.description}</p>
-            <div class="dp-entry__secondary">
-              <span>{formatDate(featuredPost.publishedAt)}</span>
-              <span>{getReadingTimeLabel(featuredPost)}</span>
-            </div>
-          </a>
-        : <div class="dp-empty-state">No published posts were available for the preview.</div>}
+    <div class="dp-index-head" aria-hidden="true">
+      <span>Metadata</span>
+      <span>Entry</span>
+    </div>
 
-        <section class="dp-list-section">
-          <div class="dp-section-heading">
-            <p class="dp-kicker">Reading field</p>
-            <h2 class="dp-section-heading__title">A single, uninterrupted top-page rhythm</h2>
-          </div>
-
-          <div class="dp-list dp-list--monolith">
-            {model.posts.map((post) => (
-              <a href={`/post/${post.slug}`} class="dp-entry dp-entry--monolith">
-                <p class="dp-entry__category">
-                  <span>Category</span>
-                  <strong>{post.category}</strong>
-                </p>
-                <h3 class="dp-entry__title">{post.title}</h3>
-                <p class="dp-entry__description">{post.description}</p>
-                <div class="dp-entry__secondary">
-                  <span>{formatDate(post.publishedAt)}</span>
-                  <span>{getReadingTimeLabel(post)}</span>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-
-        <section class="dp-support-row">
-          <div class="dp-support-block">
-            <p class="dp-kicker">Categories</p>
-            <ul class="dp-support-list" aria-label="Sample categories">
-              {model.sampleCategories.map((category) => (
-                <li>
-                  <a href={getCategoryHref(category)}>{category}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div class="dp-support-block">
-            <p class="dp-kicker">Pagination sample</p>
-            <nav class="dp-pagination-sample" aria-label="Pagination sample">
-              <span class="dp-pagination-sample__button" aria-hidden="true">
-                Prev
-              </span>
-              <span class="dp-pagination-sample__button is-current" aria-current="page">
-                1
-              </span>
-              <span class="dp-pagination-sample__button" aria-hidden="true">
-                2
-              </span>
-              <span class="dp-pagination-sample__button" aria-hidden="true">
-                3
-              </span>
-            </nav>
-          </div>
-        </section>
-      </section>
-    )
-  }
-
-  {
-    variant === 'archive-grid' && (
-      <section class="dp-variant dp-variant--banner">
-        <div class="dp-banner-panel">
-          <p class="dp-kicker">Site face</p>
-          <p class="dp-banner-panel__lede">
-            A white, disciplined top page where category markers cut the field before the article
-            titles take over.
-          </p>
-        </div>
-
-        <div class="dp-banner-grid">
-          {featuredPost ?
-            <a
-              href={`/post/${featuredPost.slug}`}
-              class="dp-featured-card dp-featured-card--banner"
-            >
-              <p class="dp-entry__category">
-                <span>Primary category</span>
+    {
+      featuredPost ?
+        <a href={`/post/${featuredPost.slug}`} class="dp-featured-card dp-featured-card--index">
+          <div class="dp-index-row dp-index-row--featured">
+            <div class="dp-index-row__meta-rail">
+              <p class="dp-index-row__category">
+                <span>Lead category</span>
                 <strong>{featuredPost.category}</strong>
               </p>
+              <div class="dp-index-row__secondary">
+                <span>Published {formatDate(featuredPost.publishedAt)}</span>
+                <span>Reading {getReadingTimeLabel(featuredPost)}</span>
+              </div>
+            </div>
+            <div class="dp-index-row__body">
               <h2 class="dp-featured-card__title">{featuredPost.title}</h2>
               <p class="dp-featured-card__description">{featuredPost.description}</p>
-              <div class="dp-entry__secondary">
-                <span>{formatDate(featuredPost.publishedAt)}</span>
-                <span>{getReadingTimeLabel(featuredPost)}</span>
-              </div>
-            </a>
-          : <div class="dp-empty-state">No published posts were available for the preview.</div>}
+            </div>
+          </div>
+        </a>
+      : <div class="dp-empty-state">No published posts were available for the preview.</div>
+    }
 
-          <div class="dp-banner-stack">
-            {bannerPosts.map((post) => (
-              <a href={`/post/${post.slug}`} class="dp-entry dp-entry--banner">
-                <p class="dp-entry__category">
+    <div class="dp-index-list">
+      {
+        model.posts.map((post) => (
+          <a href={`/post/${post.slug}`} class="dp-entry dp-entry--index">
+            <div class="dp-index-row">
+              <div class="dp-index-row__meta-rail">
+                <p class="dp-index-row__category">
                   <span>Category</span>
                   <strong>{post.category}</strong>
                 </p>
+                <div class="dp-index-row__secondary">
+                  <span>Published {formatDate(post.publishedAt)}</span>
+                  <span>Reading {getReadingTimeLabel(post)}</span>
+                </div>
+              </div>
+              <div class="dp-index-row__body">
                 <h3 class="dp-entry__title">{post.title}</h3>
                 <p class="dp-entry__description">{post.description}</p>
-                <div class="dp-entry__secondary">
-                  <span>{formatDate(post.publishedAt)}</span>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-
-        <section class="dp-support-row dp-support-row--banner">
-          <div class="dp-support-block">
-            <p class="dp-kicker">Top categories</p>
-            <ul class="dp-support-list" aria-label="Sample categories">
-              {model.sampleCategories.map((category) => (
-                <li>
-                  <a href={getCategoryHref(category)}>{category}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div class="dp-support-block">
-            <p class="dp-kicker">Selected tags</p>
-            <ul class="dp-chip-list" aria-label="Sample tags">
-              {model.sampleTags.slice(0, 6).map((tag) => (
-                <li>
-                  <a class="dp-chip-list__item" href={`/tag/${getTagRouteSegment(tag)}/1`}>
-                    {tag}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      </section>
-    )
-  }
-
-  {
-    variant === 'signal-frame' && (
-      <section class="dp-variant dp-variant--index">
-        <div class="dp-index-shell">
-          <header class="dp-index-header">
-            <div class="dp-index-header__copy">
-              <p class="dp-kicker">Index frame</p>
-              <h2 class="dp-index-header__title">{SITE_TITLE}</h2>
-              <p class="dp-index-header__statement">{theme.title}</p>
-              <p class="dp-index-header__description">
-                Category, publication date, and reading time all sit on the left rail so the title
-                block can stay optically clean.
-              </p>
-            </div>
-
-            <div class="dp-index-header__meta">
-              <div>
-                <span>Lead category</span>
-                <strong>{model.stats.leadCategoryLabel}</strong>
-              </div>
-              <div>
-                <span>Palette studies</span>
-                <strong>{INDEX_FRAME_THEMES.length}</strong>
               </div>
             </div>
-          </header>
+          </a>
+        ))
+      }
+    </div>
 
-          <div class="dp-index-head" aria-hidden="true">
-            <span>Metadata</span>
-            <span>Entry</span>
-          </div>
+    <section class="dp-support-row">
+      <div class="dp-support-block">
+        <p class="dp-kicker">Categories</p>
+        <ul class="dp-support-list" aria-label="Sample categories">
+          {
+            model.sampleCategories.map((category) => (
+              <li>
+                <a href={getCategoryHref(category)}>{category}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
 
-          {featuredPost ?
-            <a href={`/post/${featuredPost.slug}`} class="dp-featured-card dp-featured-card--index">
-              <div class="dp-index-row dp-index-row--featured">
-                <div class="dp-index-row__meta-rail">
-                  <p class="dp-index-row__category">
-                    <span>Lead category</span>
-                    <strong>{featuredPost.category}</strong>
-                  </p>
-                  <div class="dp-index-row__secondary">
-                    <span>{formatDate(featuredPost.publishedAt)}</span>
-                    <span>{getReadingTimeLabel(featuredPost)}</span>
-                  </div>
-                </div>
-                <div class="dp-index-row__body">
-                  <h2 class="dp-featured-card__title">{featuredPost.title}</h2>
-                  <p class="dp-featured-card__description">{featuredPost.description}</p>
-                </div>
-              </div>
-            </a>
-          : <div class="dp-empty-state">No published posts were available for the preview.</div>}
+      <div class="dp-support-block">
+        <p class="dp-kicker">Selected tags</p>
+        <ul class="dp-chip-list" aria-label="Sample tags">
+          {
+            model.sampleTags.slice(0, 6).map((tag) => (
+              <li>
+                <a class="dp-chip-list__item" href={`/tag/${getTagRouteSegment(tag)}/1`}>
+                  {tag}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
 
-          <div class="dp-index-list">
-            {model.posts.map((post) => (
-              <a href={`/post/${post.slug}`} class="dp-entry dp-entry--index">
-                <div class="dp-index-row">
-                  <div class="dp-index-row__meta-rail">
-                    <p class="dp-index-row__category">
-                      <span>Category</span>
-                      <strong>{post.category}</strong>
-                    </p>
-                    <div class="dp-index-row__secondary">
-                      <span>{formatDate(post.publishedAt)}</span>
-                      <span>{getReadingTimeLabel(post)}</span>
-                    </div>
-                  </div>
-                  <div class="dp-index-row__body">
-                    <h3 class="dp-entry__title">{post.title}</h3>
-                    <p class="dp-entry__description">{post.description}</p>
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-
-        <section class="dp-theme-studies">
-          <div class="dp-section-heading">
-            <p class="dp-kicker">Palette studies</p>
-            <h2 class="dp-section-heading__title">
-              Same frame, tuned with the blue palette and themes 01, 04, 07
-            </h2>
-          </div>
-
-          <div class="dp-theme-grid">
-            {INDEX_FRAME_THEMES.map((indexTheme) => (
-              <section class="dp-theme-card" style={getIndexThemeStyle(indexTheme)}>
-                <div class="dp-theme-card__head">
-                  <div>
-                    <p class="dp-kicker">{indexTheme.kicker}</p>
-                    <h3 class="dp-theme-card__title">{indexTheme.name}</h3>
-                  </div>
-                  <div class="dp-theme-card__swatches" aria-hidden="true">
-                    <span class="dp-theme-card__swatch dp-theme-card__swatch--rail" />
-                    <span class="dp-theme-card__swatch dp-theme-card__swatch--accent" />
-                    <span class="dp-theme-card__swatch dp-theme-card__swatch--surface" />
-                  </div>
-                </div>
-
-                <p class="dp-theme-card__note">{indexTheme.note}</p>
-
-                <div class="dp-theme-preview">
-                  {featuredPost && (
-                    <div class="dp-theme-preview__lead">
-                      <div class="dp-theme-preview__meta-rail">
-                        <p class="dp-theme-preview__category">
-                          <span>Lead category</span>
-                          <strong>{featuredPost.category}</strong>
-                        </p>
-                        <div class="dp-theme-preview__secondary">
-                          <span>{formatDate(featuredPost.publishedAt)}</span>
-                          <span>{getReadingTimeLabel(featuredPost)}</span>
-                        </div>
-                      </div>
-                      <div class="dp-theme-preview__body">
-                        <h4>{featuredPost.title}</h4>
-                        <p>{featuredPost.description}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {model.posts.slice(0, 2).map((post) => (
-                    <div class="dp-theme-preview__row">
-                      <div class="dp-theme-preview__meta-rail">
-                        <p class="dp-theme-preview__category">
-                          <span>Category</span>
-                          <strong>{post.category}</strong>
-                        </p>
-                        <div class="dp-theme-preview__secondary">
-                          <span>{formatDate(post.publishedAt)}</span>
-                        </div>
-                      </div>
-                      <div class="dp-theme-preview__body">
-                        <h4>{post.title}</h4>
-                        <p>{post.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        </section>
-      </section>
-    )
-  }
+      <div class="dp-support-block">
+        <p class="dp-kicker">Pagination sample</p>
+        <nav class="dp-pagination-sample" aria-label="Pagination sample">
+          <span class="dp-pagination-sample__button" aria-hidden="true"> Prev </span>
+          <span class="dp-pagination-sample__button is-current" aria-current="page"> 1 </span>
+          <span class="dp-pagination-sample__button" aria-hidden="true"> 2 </span>
+          <span class="dp-pagination-sample__button" aria-hidden="true"> 3 </span>
+        </nav>
+      </div>
+    </section>
+  </section>
 </div>

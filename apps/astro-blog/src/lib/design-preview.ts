@@ -3,9 +3,10 @@ import { SITE_URL } from '$constants';
 import { getAllCategories, getPosts } from '$lib/content';
 
 export const DESIGN_PREVIEW_VARIANTS = [
-  'industrial-slate',
-  'archive-grid',
-  'signal-frame',
+  'blue-palette',
+  'luxury-01',
+  'luxury-04',
+  'luxury-07',
 ] as const;
 
 export type DesignPreviewVariant = (typeof DESIGN_PREVIEW_VARIANTS)[number];
@@ -17,20 +18,18 @@ export interface DesignPreviewTheme {
   title: string;
   description: string;
   summary: string;
-}
-
-export interface IndexFrameTheme {
-  id: 'blue-palette' | 'luxury-01' | 'luxury-04' | 'luxury-07';
-  name: string;
-  kicker: string;
-  note: string;
-  rail: string;
-  accent: string;
-  accentSoft: string;
-  surface: string;
-  border: string;
+  swatches: string[];
+  bgBase: string;
+  bgDeep: string;
+  bgAura: string;
+  panel: string;
+  panelAlt: string;
   text: string;
   textSoft: string;
+  border: string;
+  borderStrong: string;
+  rail: string;
+  accent: string;
 }
 
 export interface DesignPreviewStats {
@@ -49,92 +48,111 @@ export interface DesignPreviewModel {
 }
 
 export const DESIGN_PREVIEW_THEMES: Record<DesignPreviewVariant, DesignPreviewTheme> = {
-  'industrial-slate': {
-    variant: 'industrial-slate',
-    name: 'Monolith Column',
-    kicker: 'Design Preview 01',
-    title: 'A single reading axis, stripped to category, title, and text.',
+  'blue-palette': {
+    variant: 'blue-palette',
+    name: 'Blue Palette',
+    kicker: 'Palette Preview A',
+    title: 'A submerged blue archive with misted rails and cobalt lift.',
     description:
-      'This route treats the top page like a disciplined reading surface with one dominant column and almost no decorative interruption.',
+      'This route rebuilds the page around the first reference palette, using a dense navy field, pale dividers, and soft steel-blue highlights across the entire screen.',
     summary:
-      'The mood comes from proportion rather than ornament: hard rules, generous white space, and quiet category markers that organize the page without stealing focus.',
+      'The palette is the main event here: background, shell, switcher, and metadata all tune themselves to the same four blues so the page feels like one cooled surface.',
+    swatches: ['#1f2c5d', '#3a539f', '#c2ccdf', '#829fb6'],
+    bgBase: '#142a57',
+    bgDeep: '#08162d',
+    bgAura: 'rgb(58 83 159 / 0.42)',
+    panel: 'rgb(18 40 83 / 0.78)',
+    panelAlt: 'rgb(194 204 223 / 0.09)',
+    text: '#f3f6fc',
+    textSoft: '#c7d2e6',
+    border: 'rgb(194 204 223 / 0.22)',
+    borderStrong: 'rgb(194 204 223 / 0.42)',
+    rail: '#c2ccdf',
+    accent: '#829fb6',
   },
-  'archive-grid': {
-    variant: 'archive-grid',
-    name: 'Monument Banner',
-    kicker: 'Design Preview 02',
-    title: 'A bold site banner first, then a severe field of text.',
+  'luxury-01': {
+    variant: 'luxury-01',
+    name: 'Theme 01',
+    kicker: 'Palette Preview 01',
+    title: 'Ink navy, restrained brass, and smoked steel in one quiet system.',
     description:
-      'This route gives the blog a stronger front face with a large typographic banner before dropping into a text-led article field.',
+      'This route takes the 01 reference as a colder luxury palette: near-black blue, warm metallic accents, and a measured amount of brushed grey for supporting structure.',
     summary:
-      'It aims to feel architectural rather than editorially soft: the site name acts like a structure, while the article list remains restrained and readable.',
+      'Instead of a white reading surface, the page becomes a dark instrument panel where the brass category rail and subtle graphite fields carry the atmosphere.',
+    swatches: ['#09171f', '#cea17a', '#3e4e5a'],
+    bgBase: '#0c1921',
+    bgDeep: '#050c11',
+    bgAura: 'rgb(206 161 122 / 0.18)',
+    panel: 'rgb(10 23 31 / 0.84)',
+    panelAlt: 'rgb(206 161 122 / 0.07)',
+    text: '#f4eee6',
+    textSoft: '#dbc7b3',
+    border: 'rgb(206 161 122 / 0.18)',
+    borderStrong: 'rgb(206 161 122 / 0.36)',
+    rail: '#cea17a',
+    accent: '#93a2ad',
   },
-  'signal-frame': {
-    variant: 'signal-frame',
-    name: 'Index Frame',
-    kicker: 'Design Preview 03',
-    title: 'A cold index where category anchors the page before the title opens.',
+  'luxury-04': {
+    variant: 'luxury-04',
+    name: 'Theme 04',
+    kicker: 'Palette Preview 04',
+    title: 'Blue-grey metal, dark soot, and a sharp red fault line.',
     description:
-      'This route minimizes card behavior and uses a left-side metadata rail, hard rules, and quiet spacing to produce a sharper, more systematic landing page.',
+      'This route interprets 04 as an industrial control surface: cold slate structures, a darker underlayer, and a disciplined red signal used only where the page needs tension.',
     summary:
-      'The result should feel closest to a technical archive or mission index while still preserving enough summary text to invite reading.',
+      'The overall page stays calm and heavy, but the red accent gives the index a precise warning-light character that is closest to the harder Arknights-like direction.',
+    swatches: ['#303d49', '#5d020a', '#1a1e22'],
+    bgBase: '#293641',
+    bgDeep: '#11161b',
+    bgAura: 'rgb(93 2 10 / 0.24)',
+    panel: 'rgb(33 43 53 / 0.84)',
+    panelAlt: 'rgb(93 2 10 / 0.08)',
+    text: '#f2f4f7',
+    textSoft: '#cbd2da',
+    border: 'rgb(201 209 216 / 0.18)',
+    borderStrong: 'rgb(201 209 216 / 0.34)',
+    rail: '#d7dce1',
+    accent: '#8a0d18',
+  },
+  'luxury-07': {
+    variant: 'luxury-07',
+    name: 'Theme 07',
+    kicker: 'Palette Preview 07',
+    title: 'Night violet with silver rails and muted graphite pressure.',
+    description:
+      'This route uses the 07 palette to push the page toward a cooler, more nocturnal mood, where silver metadata and low-contrast violet panels carry the entire composition.',
+    summary:
+      'It is the quietest of the four palettes, relying on small changes in value more than bright accents, which makes the typography feel especially severe.',
+    swatches: ['#141424', '#b5b5b6', '#323240'],
+    bgBase: '#171828',
+    bgDeep: '#09090f',
+    bgAura: 'rgb(181 181 182 / 0.16)',
+    panel: 'rgb(20 20 36 / 0.86)',
+    panelAlt: 'rgb(181 181 182 / 0.08)',
+    text: '#f2f2f5',
+    textSoft: '#d3d4da',
+    border: 'rgb(181 181 182 / 0.18)',
+    borderStrong: 'rgb(181 181 182 / 0.34)',
+    rail: '#d9d9dc',
+    accent: '#727282',
   },
 };
 
-export const INDEX_FRAME_THEMES: IndexFrameTheme[] = [
-  {
-    id: 'blue-palette',
-    name: 'Blue Palette',
-    kicker: 'Palette Study A',
-    note: 'Based on the first image: deep navy, saturated cobalt, pale mist, and dusty blue.',
-    rail: '#1f2c5d',
-    accent: '#3a539f',
-    accentSoft: '#829fb6',
-    surface: '#eef2fa',
-    border: '#c2ccdf',
-    text: '#1f2c5d',
-    textSoft: '#50617f',
-  },
-  {
-    id: 'luxury-01',
-    name: 'Theme 01',
-    kicker: 'Palette Study 01',
-    note: 'Ink navy with warm brass restraint and smoked steel neutrals.',
-    rail: '#09171f',
-    accent: '#cea17a',
-    accentSoft: '#3e4e5a',
-    surface: '#edf1f3',
-    border: '#c8d0d5',
-    text: '#101b22',
-    textSoft: '#566571',
-  },
-  {
-    id: 'luxury-04',
-    name: 'Theme 04',
-    kicker: 'Palette Study 04',
-    note: 'Blue-grey metal with a precise red signal and nearly-black shadow tone.',
-    rail: '#303d49',
-    accent: '#5d020a',
-    accentSoft: '#1a1e22',
-    surface: '#eff2f5',
-    border: '#c9d1d8',
-    text: '#192027',
-    textSoft: '#5a6672',
-  },
-  {
-    id: 'luxury-07',
-    name: 'Theme 07',
-    kicker: 'Palette Study 07',
-    note: 'Night violet, brushed silver, and muted charcoal for the coolest version.',
-    rail: '#141424',
-    accent: '#b5b5b6',
-    accentSoft: '#323240',
-    surface: '#f1f1f4',
-    border: '#d4d5dc',
-    text: '#161824',
-    textSoft: '#5c5f6f',
-  },
-];
+export function getDesignPreviewStyle(theme: DesignPreviewTheme): string {
+  return [
+    `--dp-bg:${theme.bgBase}`,
+    `--dp-bg-deep:${theme.bgDeep}`,
+    `--dp-bg-aura:${theme.bgAura}`,
+    `--dp-panel:${theme.panel}`,
+    `--dp-panel-alt:${theme.panelAlt}`,
+    `--dp-text:${theme.text}`,
+    `--dp-text-soft:${theme.textSoft}`,
+    `--dp-border:${theme.border}`,
+    `--dp-border-strong:${theme.borderStrong}`,
+    `--dp-rail:${theme.rail}`,
+    `--dp-accent:${theme.accent}`,
+  ].join(';');
+}
 
 export function isDesignPreviewVariant(value: string): value is DesignPreviewVariant {
   return DESIGN_PREVIEW_VARIANTS.includes(value as DesignPreviewVariant);

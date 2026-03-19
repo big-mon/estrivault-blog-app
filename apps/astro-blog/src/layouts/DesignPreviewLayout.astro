@@ -3,6 +3,7 @@ import { SITE_AUTHOR, SITE_TITLE, SOCIAL_LINK_X } from '$constants';
 import {
   DESIGN_PREVIEW_THEMES,
   DESIGN_PREVIEW_VARIANTS,
+  getDesignPreviewStyle,
   getDesignPreviewHref,
   type DesignPreviewVariant,
 } from '$lib/design-preview';
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const { title, description, canonical, variant, noIndex = true } = Astro.props;
+const activeTheme = DESIGN_PREVIEW_THEMES[variant];
 ---
 
 <!doctype html>
@@ -46,16 +48,21 @@ const { title, description, canonical, variant, noIndex = true } = Astro.props;
 
     <link rel="canonical" href={canonical} />
   </head>
-  <body class={`design-preview-shell design-preview-shell--${variant}`}>
+  <body
+    class={`design-preview-shell design-preview-shell--${variant}`}
+    style={getDesignPreviewStyle(activeTheme)}
+  >
     <div class="dp-shell">
       <header class="dp-switcher">
         <div class="dp-switcher__frame">
           <div class="dp-switcher__intro">
-            <p class="dp-switcher__eyebrow">Design sandbox</p>
-            <p class="dp-switcher__copy">Top-page prototypes for a cold, text-first blog.</p>
+            <p class="dp-switcher__eyebrow">Palette sandbox</p>
+            <p class="dp-switcher__copy">
+              One index layout, four full-page color systems based on the reference palettes.
+            </p>
           </div>
 
-          <nav aria-label="Design preview variants" class="dp-switcher__nav">
+          <nav aria-label="Design preview palettes" class="dp-switcher__nav">
             {
               DESIGN_PREVIEW_VARIANTS.map((entry) => {
                 const theme = DESIGN_PREVIEW_THEMES[entry];

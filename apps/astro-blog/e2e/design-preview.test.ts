@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 const previewRoutes = [
-  '/design-preview/industrial-slate',
-  '/design-preview/archive-grid',
-  '/design-preview/signal-frame',
+  '/design-preview/blue-palette',
+  '/design-preview/luxury-01',
+  '/design-preview/luxury-04',
+  '/design-preview/luxury-07',
 ];
 
 for (const route of previewRoutes) {
@@ -15,6 +16,6 @@ for (const route of previewRoutes) {
       'noindex, nofollow',
     );
     await expect(page.locator('.dp-switcher')).toBeVisible();
-    await expect(page.locator('.dp-featured-card, .dp-empty-state').first()).toBeVisible();
+    await expect(page.locator('.dp-index-shell, .dp-empty-state').first()).toBeVisible();
   });
 }
