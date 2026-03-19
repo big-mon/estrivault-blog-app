@@ -4,7 +4,7 @@ import { getAllCategories, getPosts } from '$lib/content';
 
 export const DESIGN_PREVIEW_VARIANTS = [
   'luxury-01',
-  'blue-palette',
+  'white-palette',
   'luxury-04',
   'luxury-07',
 ] as const;
@@ -48,27 +48,27 @@ export interface DesignPreviewModel {
 }
 
 export const DESIGN_PREVIEW_THEMES: Record<DesignPreviewVariant, DesignPreviewTheme> = {
-  'blue-palette': {
-    variant: 'blue-palette',
-    name: 'Blue Palette',
-    kicker: 'Palette Preview A',
-    title: 'A submerged blue archive with misted rails and cobalt lift.',
+  'white-palette': {
+    variant: 'white-palette',
+    name: 'White Palette',
+    kicker: 'Palette Preview White',
+    title: 'A pale mineral field with cold grey rails and one near-black anchor.',
     description:
-      'This route rebuilds the page around the first reference palette, using a dense navy field, pale dividers, and soft steel-blue highlights across the entire screen.',
+      'This route replaces the blue study with the attached white palette: chalk white, frosted grey, steel slate, and one deep graphite block used to stabilize the page.',
     summary:
-      'The palette is the main event here: background, shell, switcher, and metadata all tune themselves to the same four blues so the page feels like one cooled surface.',
-    swatches: ['#1f2c5d', '#3a539f', '#c2ccdf', '#829fb6'],
-    bgBase: '#142a57',
-    bgDeep: '#08162d',
-    bgAura: 'rgb(58 83 159 / 0.42)',
-    panel: 'rgb(18 40 83 / 0.78)',
-    panelAlt: 'rgb(194 204 223 / 0.09)',
-    text: '#f3f6fc',
-    textSoft: '#c7d2e6',
-    border: 'rgb(194 204 223 / 0.22)',
-    borderStrong: 'rgb(194 204 223 / 0.42)',
-    rail: '#c2ccdf',
-    accent: '#829fb6',
+      'The mood comes from pale industrial materials rather than brightness alone: matte white surfaces, cool grey rails, and sparse graphite accents keeping the layout severe.',
+    swatches: ['#e4e8e8', '#c8d0d1', '#6b757d', '#1a1d25'],
+    bgBase: '#e4e8e8',
+    bgDeep: '#c8d0d1',
+    bgAura: 'rgb(255 255 255 / 0.42)',
+    panel: 'rgb(246 248 248 / 0.78)',
+    panelAlt: 'rgb(107 117 125 / 0.09)',
+    text: '#1a1d25',
+    textSoft: '#59626a',
+    border: 'rgb(107 117 125 / 0.22)',
+    borderStrong: 'rgb(26 29 37 / 0.22)',
+    rail: '#1a1d25',
+    accent: '#6b757d',
   },
   'luxury-01': {
     variant: 'luxury-01',

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const previewRoutes = [
-  '/design-preview/blue-palette',
+  '/design-preview/white-palette',
   '/design-preview/luxury-01',
   '/design-preview/luxury-04',
   '/design-preview/luxury-07',
