@@ -1,5 +1,5 @@
 .design-preview-shell {
-  --dp-shadow: 0 28px 80px rgb(0 0 0 / 0.28);
+  --dp-shadow: 0 18px 44px rgb(0 0 0 / 0.22);
   --dp-font-display:
     'Aptos', 'Segoe UI', 'Yu Gothic UI', 'Hiragino Sans', 'Helvetica Neue', sans-serif;
   --dp-font-body:
@@ -7,8 +7,8 @@
   --dp-font-mono: 'IBM Plex Mono', 'Cascadia Code', 'Courier New', monospace;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 14% 8%, var(--dp-bg-aura), transparent 30%),
-    radial-gradient(circle at 82% 0%, var(--dp-bg-aura), transparent 24%),
+    radial-gradient(circle at 14% 8%, var(--dp-bg-aura), transparent 24%),
+    radial-gradient(circle at 82% 0%, var(--dp-bg-aura), transparent 18%),
     linear-gradient(180deg, var(--dp-bg), var(--dp-bg-deep));
   color: var(--dp-text);
   font-family: var(--dp-font-body);
@@ -46,11 +46,10 @@
   margin: 0 auto;
   padding: 15px 18px;
   border: 1px solid var(--dp-border);
-  border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.01)), rgb(7 10 16 / 0.28);
+  border-radius: 8px;
+  background: rgb(7 10 16 / 0.34);
   box-shadow: var(--dp-shadow);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(6px);
 }
 
 .dp-switcher__intro {
@@ -86,8 +85,8 @@
   min-width: 176px;
   padding: 12px 13px;
   border: 1px solid var(--dp-border);
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent), var(--dp-panel-alt);
+  border-radius: 4px;
+  background: var(--dp-panel-alt);
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -100,9 +99,8 @@
 }
 
 .dp-switcher__link.is-current {
-  border-color: var(--dp-accent);
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.06), transparent), rgb(255 255 255 / 0.04);
+  border-color: var(--dp-rail);
+  background: rgb(255 255 255 / 0.03);
 }
 
 .dp-switcher__link-name {
@@ -133,15 +131,11 @@
   gap: 0;
   padding: 30px 30px 24px;
   border: 1px solid var(--dp-border);
-  border-radius: 28px;
+  border-radius: 8px;
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.05), transparent 20%),
-    linear-gradient(90deg, rgb(255 255 255 / 0.03) 0 1px, transparent 1px),
-    linear-gradient(180deg, var(--dp-panel), rgb(0 0 0 / 0.08));
-  background-size:
-    auto,
-    28px 28px,
-    auto;
+    linear-gradient(180deg, rgb(255 255 255 / 0.03), transparent 16%),
+    linear-gradient(180deg, var(--dp-panel), rgb(0 0 0 / 0.12));
+  background-size: auto, auto;
   box-shadow: var(--dp-shadow);
 }
 
@@ -151,7 +145,7 @@
   gap: 22px;
   padding: 0 0 26px;
   margin-bottom: 18px;
-  border-bottom: 1px solid var(--dp-border);
+  border-bottom: 1px solid var(--dp-border-strong);
 }
 
 .dp-index-header__copy {
@@ -162,10 +156,10 @@
 .dp-index-header__title {
   margin: 0;
   font-family: var(--dp-font-display);
-  font-size: clamp(2.7rem, 6vw, 5rem);
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  line-height: 0.94;
+  font-size: clamp(2.6rem, 5.4vw, 4.5rem);
+  font-weight: 780;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
   text-transform: uppercase;
 }
 
@@ -195,7 +189,7 @@
   display: grid;
   gap: 8px;
   padding: 0 0 14px;
-  border-bottom: 1px solid var(--dp-border);
+  border-bottom: 1px solid var(--dp-border-strong);
 }
 
 .dp-palette {
@@ -213,16 +207,15 @@
   min-height: 36px;
   padding: 8px 10px;
   border: 1px solid var(--dp-border);
-  border-radius: 14px;
+  border-radius: 4px;
   background: var(--dp-panel-alt);
 }
 
 .dp-palette__dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 999px;
-  border: 1px solid rgb(255 255 255 / 0.18);
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.12);
+  width: 22px;
+  height: 10px;
+  border-radius: 0;
+  border: 1px solid rgb(255 255 255 / 0.1);
 }
 
 .dp-palette__code {
@@ -241,7 +234,7 @@
 
 .dp-index-header__stats div {
   padding-top: 10px;
-  border-top: 1px solid var(--dp-border);
+  border-top: 1px solid var(--dp-border-strong);
 }
 
 .dp-index-header__stats dt {
@@ -256,18 +249,6 @@
   margin: 7px 0 0;
   font-size: 0.98rem;
   font-weight: 700;
-}
-
-.dp-index-head {
-  display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 18px;
-  padding: 0 0 12px;
-  color: var(--dp-text-soft);
-  font-family: var(--dp-font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
 }
 
 .dp-featured-card {
@@ -310,17 +291,9 @@
   margin: 0;
 }
 
-.dp-index-row__category span {
-  color: var(--dp-text-soft);
-  font-family: var(--dp-font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
 .dp-index-row__category strong {
   color: var(--dp-rail);
-  font-size: 0.96rem;
+  font-size: 1.04rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -331,8 +304,8 @@
   gap: 8px;
   color: var(--dp-text-soft);
   font-family: var(--dp-font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -345,10 +318,10 @@
 .dp-featured-card__title,
 .dp-entry__title {
   margin: 0;
-  font-size: clamp(1.24rem, 2.3vw, 1.98rem);
-  font-weight: 760;
-  letter-spacing: -0.03em;
-  line-height: 1.16;
+  font-size: clamp(1.08rem, 1.8vw, 1.48rem);
+  font-weight: 740;
+  letter-spacing: -0.02em;
+  line-height: 1.22;
 }
 
 .dp-support-row {
@@ -363,8 +336,8 @@
   gap: 12px;
   padding: 18px;
   border: 1px solid var(--dp-border);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent), var(--dp-panel-alt);
+  border-radius: 4px;
+  background: var(--dp-panel-alt);
 }
 
 .dp-support-list {
@@ -394,8 +367,8 @@
   min-height: 30px;
   padding: 0 10px;
   border: 1px solid var(--dp-border);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.05);
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.03);
   color: var(--dp-text-soft);
   font-size: 0.8rem;
 }
@@ -414,28 +387,27 @@
   min-height: 36px;
   padding: 0 12px;
   border: 1px solid var(--dp-border);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.05);
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.03);
   font-family: var(--dp-font-mono);
   font-size: 0.8rem;
 }
 
 .dp-pagination-sample__button.is-current {
-  border-color: var(--dp-accent);
+  border-color: var(--dp-rail);
   color: var(--dp-rail);
 }
 
 .dp-empty-state {
   padding: 22px;
   border: 1px dashed var(--dp-border);
-  border-radius: 18px;
+  border-radius: 4px;
   background: var(--dp-panel-alt);
   color: var(--dp-text-soft);
 }
 
 @media (max-width: 1080px) {
   .dp-index-header,
-  .dp-index-head,
   .dp-index-row,
   .dp-support-row {
     grid-template-columns: 1fr;

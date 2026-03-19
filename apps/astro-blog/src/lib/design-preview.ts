@@ -3,8 +3,8 @@ import { SITE_URL } from '$constants';
 import { getAllCategories, getPosts } from '$lib/content';
 
 export const DESIGN_PREVIEW_VARIANTS = [
-  'blue-palette',
   'luxury-01',
+  'blue-palette',
   'luxury-04',
   'luxury-07',
 ] as const;
@@ -73,12 +73,12 @@ export const DESIGN_PREVIEW_THEMES: Record<DesignPreviewVariant, DesignPreviewTh
   'luxury-01': {
     variant: 'luxury-01',
     name: 'Theme 01',
-    kicker: 'Palette Preview 01',
-    title: 'Ink navy, restrained brass, and smoked steel in one quiet system.',
+    kicker: 'Base Palette 01',
+    title: 'Ink navy, restrained brass, and smoked steel in a colder archive system.',
     description:
-      'This route takes the 01 reference as a colder luxury palette: near-black blue, warm metallic accents, and a measured amount of brushed grey for supporting structure.',
+      'This route becomes the base direction: near-black blue, restrained brass accents, and smoked steel neutrals arranged with harder rules and less decorative softness.',
     summary:
-      'Instead of a white reading surface, the page becomes a dark instrument panel where the brass category rail and subtle graphite fields carry the atmosphere.',
+      'The page should read like an austere mission ledger rather than a luxury editorial: strict rails, dry labels, and minimal effects over a dark instrument surface.',
     swatches: ['#09171f', '#cea17a', '#3e4e5a'],
     bgBase: '#0c1921',
     bgDeep: '#050c11',

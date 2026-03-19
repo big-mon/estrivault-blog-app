@@ -79,18 +79,12 @@ const featuredPost = model.featuredPost;
       </aside>
     </header>
 
-    <div class="dp-index-head" aria-hidden="true">
-      <span>Metadata</span>
-      <span>Entry</span>
-    </div>
-
     {
       featuredPost ?
         <a href={`/post/${featuredPost.slug}`} class="dp-featured-card dp-featured-card--index">
           <div class="dp-index-row dp-index-row--featured">
             <div class="dp-index-row__meta-rail">
               <p class="dp-index-row__category">
-                <span>Lead category</span>
                 <strong>{featuredPost.category}</strong>
               </p>
               <div class="dp-index-row__secondary">
@@ -114,7 +108,6 @@ const featuredPost = model.featuredPost;
             <div class="dp-index-row">
               <div class="dp-index-row__meta-rail">
                 <p class="dp-index-row__category">
-                  <span>Category</span>
                   <strong>{post.category}</strong>
                 </p>
                 <div class="dp-index-row__secondary">
