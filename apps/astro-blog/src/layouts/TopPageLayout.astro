@@ -58,12 +58,51 @@ const pathname = Astro.url.pathname;
     />
   </head>
   <body class="top-page-shell">
-    <TopPageHeader pathname={pathname} />
+    <TopPageHeader pathname={pathname} scrollReveal={true} />
 
     <main class="tp-main">
       <slot />
     </main>
 
     <TopPageFooter />
+
+    <script is:inline>
+      (() => {
+        const header = document.querySelector('[data-scroll-reveal-header]');
+        const trigger = document.querySelector('[data-header-trigger]');
+
+        if (!(header instanceof HTMLElement) || !(trigger instanceof HTMLElement)) {
+          return;
+        }
+
+        /** @param {boolean} isVisible */
+        const updateVisibility = (isVisible) => {
+          header.classList.toggle('is-visible', isVisible);
+        };
+
+        if ('IntersectionObserver' in window) {
+          const observer = new IntersectionObserver(
+            ([entry]) => {
+              updateVisibility(!entry.isIntersecting);
+            },
+            {
+              rootMargin: '-88px 0px 0px 0px',
+              threshold: 0,
+            },
+          );
+
+          observer.observe(trigger);
+          return;
+        }
+
+        const onScroll = () => {
+          const rect = trigger.getBoundingClientRect();
+          updateVisibility(rect.top <= 88);
+        };
+
+        onScroll();
+        globalThis.addEventListener('scroll', onScroll, { passive: true });
+      })();
+    </script>
   </body>
 </html>

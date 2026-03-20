@@ -3,9 +3,10 @@ import { NAVIGATION_LINKS, SITE_TITLE } from '$constants';
 
 interface Props {
   pathname: string;
+  scrollReveal?: boolean;
 }
 
-const { pathname } = Astro.props;
+const { pathname, scrollReveal = false } = Astro.props;
 
 function normalizePath(path: string): string {
   return path.replace(/\/$/, '') || '/';
@@ -18,7 +19,10 @@ function isActive(href: string): boolean {
 }
 ---
 
-<header class="tp-header">
+<header
+  class={`tp-header ${scrollReveal ? 'is-scroll-reveal' : ''}`}
+  data-scroll-reveal-header={scrollReveal ? '' : undefined}
+>
   <div class="tp-header__frame">
     <a href="/" class="tp-header__brand">{SITE_TITLE}</a>
 

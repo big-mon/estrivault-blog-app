@@ -33,7 +33,7 @@ const featuredPost = model.featuredPost;
 
 <div class="top-page">
   <section class="tp-shell">
-    <header class="tp-hero">
+    <header class="tp-hero" data-top-hero>
       <div class="tp-hero__copy">
         <p class="tp-kicker">White Palette</p>
         <h1 class="tp-hero__title">{SITE_TITLE}</h1>
@@ -70,6 +70,8 @@ const featuredPost = model.featuredPost;
         </dl>
       </aside>
     </header>
+
+    <div class="tp-header-trigger" data-header-trigger aria-hidden="true"></div>
 
     {
       featuredPost ?
