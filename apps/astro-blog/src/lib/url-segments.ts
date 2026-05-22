@@ -11,5 +11,12 @@ export function getTagRouteSegment(tag: string): string {
     return normalizedSlug;
   }
 
-  return encodeURIComponent(normalizeForTagFilter(cleaned).replace(/\s+/g, '-'));
+  return normalizeForTagFilter(cleaned)
+    .replace(/[\s/\\?#]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export function encodeRouteSegment(segment: string): string {
+  return encodeURIComponent(segment);
 }

@@ -4,7 +4,7 @@ import Pagination from '$components/Pagination.astro';
 import PostCard from '$components/PostCard.astro';
 import { POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
 import { getAllTags, getPosts } from '$lib/content';
-import { getTagRouteSegment } from '$lib/url-segments';
+import { encodeRouteSegment, getTagRouteSegment } from '$lib/url-segments';
 
 interface Props {
   tag: string;
@@ -42,17 +42,19 @@ const result = await getPosts({
 });
 
 const siteBase = SITE_URL.replace(/\/$/, '');
-const pageUrl = `${siteBase}/tag/${Astro.params.tag}/${currentPage}`;
+const tagRouteSegment = String(Astro.params.tag ?? getTagRouteSegment(tag));
+const encodedTagRouteSegment = encodeRouteSegment(tagRouteSegment);
+const pageUrl = `${siteBase}/tag/${encodedTagRouteSegment}/${currentPage}`;
 const pageTitle = `${tag}の記事一覧${currentPage > 1 ? ` - ページ${currentPage}` : ''} | ${SITE_TITLE}`;
 const pageDescription = `${tag}タグが付けられた記事一覧${currentPage > 1 ? `（${currentPage}ページ目）` : ''}です。全${result.total}件の記事を掲載しています。`;
 
 const prevUrl =
   currentPage > 1 ?
-    `${siteBase}/tag/${Astro.params.tag}/${currentPage > 2 ? currentPage - 1 : 1}`
+    `${siteBase}/tag/${encodedTagRouteSegment}/${currentPage > 2 ? currentPage - 1 : 1}`
   : undefined;
 const nextUrl =
   currentPage < result.totalPages ?
-    `${siteBase}/tag/${Astro.params.tag}/${currentPage + 1}`
+    `${siteBase}/tag/${encodedTagRouteSegment}/${currentPage + 1}`
   : undefined;
 ---
 
@@ -85,7 +87,7 @@ const nextUrl =
               <Pagination
                 currentPage={result.page}
                 totalPages={result.totalPages}
-                baseUrl={`/tag/${Astro.params.tag}`}
+                baseUrl={`/tag/${encodedTagRouteSegment}`}
                 maxVisible={5}
               />
             </div>
