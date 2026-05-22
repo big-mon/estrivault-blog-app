@@ -1,11 +1,13 @@
 ---
 import type { PostMeta } from '@estrivault/content-processor';
+import { getCategoryLabel } from '$constants';
 
 interface Props {
   post: PostMeta;
 }
 
 const { post } = Astro.props;
+const categoryLabel = getCategoryLabel(post.category);
 
 const dateString = new Intl.DateTimeFormat('ja-JP', {
   year: 'numeric',
@@ -38,7 +40,7 @@ const dateString = new Intl.DateTimeFormat('ja-JP', {
       <div class="flex flex-col justify-between p-4 font-sans text-gray-800">
         <div class="space-y-1">
           <div class="flex items-center justify-between">
-            <p class="text-xs tracking-wide text-gray-500 uppercase">{post.category}</p>
+            <p class="text-xs tracking-wide text-gray-500">{categoryLabel}</p>
             <time datetime={post.publishedAt.toISOString()} class="text-xs text-gray-500"
               >{dateString}</time
             >
