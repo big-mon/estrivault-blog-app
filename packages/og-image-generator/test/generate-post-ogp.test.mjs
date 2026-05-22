@@ -48,6 +48,14 @@ test('balances Japanese title lines to avoid orphaned kana', () => {
   assert.equal(layout.truncated, false);
 });
 
+test('consumes consecutive prohibited-start characters when adjusting line breaks', () => {
+  const layout = layoutPostOgpTitle('かてく）』?】、』】ちおおあちうせ');
+
+  assert.ok(
+    layout.lines.every((line) => !/^[、。，．・：；！？!?\])）｝」』】〉》ぁぃぅぇぉっゃゅょー…]/.test(line)),
+  );
+});
+
 test('adds an ellipsis once the title exceeds the three-line budget', () => {
   const layout = layoutPostOgpTitle(
     'これは非常に長い記事タイトルであり、三行に収まりきらないケースをテストするためにさらに文字数を増やしています。最終的には省略記号が付与される必要があります。',
