@@ -1,5 +1,6 @@
 ---
 import type { PostMeta } from '@estrivault/content-processor';
+import { getCategoryLabel } from '$constants';
 import { encodeRouteSegment, getTagRouteSegment } from '$lib/url-segments';
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 const { meta } = Astro.props;
+const categoryLabel = getCategoryLabel(meta.category);
 const shownDate = meta.updatedAt ?? meta.publishedAt;
 const shownDateLabel = new Intl.DateTimeFormat('ja-JP', {
   timeZone: 'Asia/Tokyo',
@@ -38,7 +40,7 @@ const shownDateLabel = new Intl.DateTimeFormat('ja-JP', {
                   href={`/category/${encodeURIComponent(meta.category.toLowerCase())}/1`}
                   class="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
                 >
-                  {meta.category}
+                  {categoryLabel}
                 </a>
               </div>
             )

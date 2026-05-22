@@ -24,6 +24,104 @@ This is a **monorepo blog application** built with **Astro** and **TypeScript**.
 3. Custom plugins transform embeds and optimize images via Cloudinary
 4. Astro generates static pages with routing for posts, categories, and tags
 
+## Critical File Handling and Encoding Rules
+
+Markdown files in this repository, especially under `content/blog/**/*.md`, are canonical authored content used by the Astro build. Treat them as source content, not generated artifacts.
+
+Do not rewrite, normalize, reformat, or re-encode Markdown files unless the task explicitly asks for content edits.
+
+### Safe move/copy/rename rules for Markdown
+
+When moving, copying, renaming, or reorganizing Markdown files, use byte-preserving file operations.
+
+Preferred tools:
+
+- `git mv` for tracked file renames and moves
+- `Move-Item`, `Copy-Item`, `Rename-Item` when using PowerShell strictly as file operations
+- `mv` / `cp -p` when using a POSIX shell
+- Python `shutil.move` / `shutil.copy2`
+- Node.js `fs.renameSync` / `fs.copyFileSync`
+
+Do not implement a move/copy/rename by reading Markdown as text and writing it back.
+
+Do not use these patterns for Markdown move/copy/rename operations:
+
+- `Get-Content ... | Set-Content ...`
+- `cat file.md > new-file.md`
+- `type file.md > new-file.md`
+- `Out-File` to recreate Markdown files
+- `Set-Content` to recreate Markdown files
+- `Add-Content` for reconstructing Markdown files
+- PowerShell redirection such as `>` or `>>` to recreate Markdown files
+- Any text pipeline that depends on PowerShell's default encoding
+
+Reading Markdown with `Get-Content`, `cat`, or `type` for inspection is acceptable. Redirecting or piping that output into a writer is not acceptable unless the task explicitly requires a content rewrite and the encoding is controlled.
+
+### Encoding requirements
+
+Markdown content must remain valid UTF-8.
+
+Do not rely on Windows PowerShell 5.1 default encoding for Markdown writes.
+
+If Markdown content must be edited:
+
+- Prefer the agent's native patch/edit tool for small targeted edits.
+- Prefer Python with `encoding="utf-8"` for scripted text edits.
+- Prefer Node.js `fs` APIs with explicit UTF-8 handling for scripted text edits.
+- If PowerShell is unavoidable, use PowerShell 7+ (`pwsh`) and explicitly specify UTF-8 encoding where supported.
+
+Avoid broad text rewrites that can change encoding, line endings, frontmatter formatting, or Japanese text.
+
+### Content preservation rules
+
+For files under `content/blog/**/*.md`:
+
+- Do not change body text unless explicitly requested.
+- Do not change frontmatter fields such as `title`, `date`, `category`, `tags`, or `description` unless explicitly requested.
+- Do not normalize whitespace, punctuation, line endings, or Markdown formatting unless explicitly requested.
+- Do not run broad formatters over blog Markdown content unless the task specifically asks for formatting.
+- A move-only or rename-only task must not produce body text changes.
+
+Running repository-wide formatters such as `pnpm format` may be appropriate for source code, but do not use broad formatting as a substitute for moving, copying, or renaming Markdown content files.
+
+### Required verification after Markdown file operations
+
+After moving, copying, renaming, or editing Markdown files, check the diff before reporting success.
+
+Run:
+
+```bash
+git status --short
+git diff --stat
+git diff --find-renames -- content/blog
+```
+
+For move-only or rename-only tasks, the diff should show only path changes. It must not show unexpected body, frontmatter, encoding, or line-ending changes.
+
+If Markdown content was intentionally edited, inspect the specific file diff:
+
+```bash
+git diff --word-diff -- path/to/file.md
+```
+
+When there is any risk of encoding damage, validate that Markdown files are readable as UTF-8:
+
+```bash
+python - <<'PY'
+from pathlib import Path
+
+for path in Path("content/blog").rglob("*.md"):
+    try:
+        path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        raise SystemExit(f"Invalid UTF-8: {path}: {exc}")
+
+print("All Markdown files under content/blog are valid UTF-8")
+PY
+```
+
+If unexpected Markdown body changes appear, stop and restore the affected files before continuing.
+
 ## Development Commands
 
 ### Initial Setup (Automatic)
@@ -168,6 +266,7 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
 - Frontmatter with title, date, category, tags, and optional description
 - Reading time calculated at 600 words per minute (configurable in processor)
 - Support for custom embeds: YouTube, Twitter, GitHub, Amazon
+- Treat Markdown files as published source content. Preserve encoding, frontmatter, body text, Japanese characters, and line endings unless the task explicitly asks for content changes.
 
 ### File Organization
 

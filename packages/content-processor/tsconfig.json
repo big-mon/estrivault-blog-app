@@ -4,6 +4,7 @@
     "moduleResolution": "bundler",
     "outDir": "dist",
     "rootDir": "src",
+    "types": ["node"],
     "composite": true,
     "incremental": true,
     "tsBuildInfoFile": "dist/.tsbuildinfo"

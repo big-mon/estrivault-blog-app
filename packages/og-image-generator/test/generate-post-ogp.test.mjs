@@ -41,6 +41,21 @@ test('supports long Japanese titles without exceeding three lines', async () => 
   assert.deepEqual(readPngSize(png), { width: 1200, height: 630 });
 });
 
+test('balances Japanese title lines to avoid orphaned kana', () => {
+  const layout = layoutPostOgpTitle('基本週2回しかトレーニング出来ない場合のメニュー案');
+
+  assert.deepEqual(layout.lines, ['基本週2回しかトレーニング', '出来ない場合のメニュー案']);
+  assert.equal(layout.truncated, false);
+});
+
+test('consumes consecutive prohibited-start characters when adjusting line breaks', () => {
+  const layout = layoutPostOgpTitle('かてく）』?】、』】ちおおあちうせ');
+
+  assert.ok(
+    layout.lines.every((line) => !/^[、。，．・：；！？!?\])）｝」』】〉》ぁぃぅぇぉっゃゅょー…]/.test(line)),
+  );
+});
+
 test('adds an ellipsis once the title exceeds the three-line budget', () => {
   const layout = layoutPostOgpTitle(
     'これは非常に長い記事タイトルであり、三行に収まりきらないケースをテストするためにさらに文字数を増やしています。最終的には省略記号が付与される必要があります。',
@@ -49,4 +64,7 @@ test('adds an ellipsis once the title exceeds the three-line budget', () => {
   assert.equal(layout.lines.length, 3);
   assert.equal(layout.truncated, true);
   assert.match(layout.lines.at(-1) ?? '', /…$/);
+  assert.ok(
+    layout.lines.every((line) => !/^[、。，．・：；！？!?\])）｝」』】〉》ぁぃぅぇぉっゃゅょー…]/.test(line)),
+  );
 });

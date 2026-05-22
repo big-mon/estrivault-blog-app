@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { generatePostOgpPng } from '@estrivault/og-image-generator';
-import { SITE_TITLE, SITE_URL } from '$constants';
+import { getCategoryLabel, SITE_TITLE, SITE_URL } from '$constants';
 import { getAllPostsMeta, getPostBySlug } from '$lib/content';
 
 export async function getStaticPaths() {
@@ -21,14 +21,16 @@ export const GET: APIRoute = async ({ params }) => {
 
   const png = await generatePostOgpPng({
     title: post.meta.title,
-    category: post.meta.category || 'Other',
+    category: getCategoryLabel(post.meta.category || 'meta'),
     publishedAt: post.meta.publishedAt,
     slug: post.meta.slug,
     siteTitle: SITE_TITLE,
     siteUrl: SITE_URL,
   });
 
-  return new Response(png, {
+  const body = new Uint8Array(png).buffer;
+
+  return new Response(body, {
     headers: {
       'Content-Type': 'image/png',
       'Cache-Control': 'public, max-age=31536000, immutable',

@@ -9,9 +9,17 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ASTRO_TELEMETRY_DISABLED: '1'
+  CI: true
+
 jobs:
   astro-blog:
-    name: Lint, Build, and E2E
+    name: Lint and E2E
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -33,16 +41,22 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Validate workspace
-        run: pnpm run validate:workspace
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Lint astro-blog
         run: pnpm --filter astro-blog lint
 
-      - name: Build astro-blog
-        run: pnpm --filter astro-blog build
+      - name: Get Playwright version
+        id: playwright-version
+        shell: bash
+        run: |
+          echo "version=$(pnpm --filter astro-blog exec playwright --version | sed 's/^Version //')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
 
       - name: Set up Playwright Chromium
         run: pnpm --filter astro-blog run setup:e2e

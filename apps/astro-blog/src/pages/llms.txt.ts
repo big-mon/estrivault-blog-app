@@ -26,10 +26,13 @@ This site contains technical articles, investment analysis, gaming guides, and m
 
 ## Content Categories
 
-- **Tech**: Programming tutorials, hardware reviews, AI/ML experiments, web development
-- **Finance**: US market analysis, earnings reviews, investment strategies, individual stock analysis
-- **Hobbies**: Gaming guides, tactical gear reviews, workout routines, travel experiences
-- **Opinions**: Personal commentary on technology, market trends, and social issues
+- **investing / 投資・企業分析**: US stock analysis, industry analysis, investment strategies, SEC filing research
+- **software / 開発・Web**: Web development, APIs, XBRL/EDGAR data access, blog platform work, development environments
+- **ai / AI・生成ツール**: Claude Code, ChatGPT, Stable Diffusion, generative AI workflows
+- **games / ゲーム**: Game guides, mods, translations, settings, troubleshooting
+- **gear / ギア・装備レビュー**: Airsoft gear, desk setups, audio, keyboards, physical gadgets
+- **essays / 考察・エッセイ**: Personal essays, social and business commentary, opinion pieces
+- **meta / このサイトについて**: About and site operation notes
 
 ## Featured Articles
 
