@@ -64,7 +64,7 @@ function adjustLineLength(
     adjustedLength -= 1;
   }
 
-  if (
+  while (
     adjustedLength < maxLineLength &&
     PROHIBITED_LINE_START_CHARACTERS.has(characters[start + adjustedLength] ?? '')
   ) {
