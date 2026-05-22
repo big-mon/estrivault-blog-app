@@ -1,7 +1,7 @@
 ---
 import type { PostMeta } from '@estrivault/content-processor';
 import { getCategoryLabel } from '$constants';
-import { getTagRouteSegment } from '$lib/url-segments';
+import { encodeRouteSegment, getTagRouteSegment } from '$lib/url-segments';
 
 interface Props {
   meta: PostMeta;
@@ -71,7 +71,7 @@ const shownDateLabel = new Intl.DateTimeFormat('ja-JP', {
             <div class="mb-6 flex flex-wrap gap-2">
               {meta.tags.map((tag) => (
                 <a
-                  href={`/tag/${getTagRouteSegment(tag)}/1`}
+                  href={`/tag/${encodeRouteSegment(getTagRouteSegment(tag))}/1`}
                   class="rounded bg-gray-100 px-2 py-1 text-xs text-gray-600 transition-colors hover:bg-gray-200"
                 >
                   {tag}
