@@ -28,7 +28,9 @@ export const GET: APIRoute = async ({ params }) => {
     siteUrl: SITE_URL,
   });
 
-  return new Response(png, {
+  const body = new Uint8Array(png).buffer;
+
+  return new Response(body, {
     headers: {
       'Content-Type': 'image/png',
       'Cache-Control': 'public, max-age=31536000, immutable',
