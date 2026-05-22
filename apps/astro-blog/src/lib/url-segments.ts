@@ -11,10 +11,16 @@ export function getTagRouteSegment(tag: string): string {
     return normalizedSlug;
   }
 
-  return normalizeForTagFilter(cleaned)
+  const normalizedTagSegment = normalizeForTagFilter(cleaned)
     .replace(/[\s/\\?#]+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
+
+  if (!normalizedTagSegment) {
+    throw new Error(`Tag route segment cannot be generated from tag: ${tag}`);
+  }
+
+  return normalizedTagSegment;
 }
 
 export function encodeRouteSegment(segment: string): string {
