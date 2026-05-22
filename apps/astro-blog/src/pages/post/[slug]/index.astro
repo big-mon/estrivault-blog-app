@@ -4,7 +4,7 @@ import EditOnGitHub from '$components/EditOnGitHub.astro';
 import PostBody from '$components/PostBody.astro';
 import PostHeader from '$components/PostHeader.astro';
 import TableOfContents from '$components/TableOfContents.astro';
-import { SITE_TITLE, SITE_URL, SOCIAL_LINK_X } from '$constants';
+import { getCategoryLabel, SITE_TITLE, SITE_URL, SOCIAL_LINK_X } from '$constants';
 import { getAllPostsMeta, getPostBySlug } from '$lib/content';
 import { getPostOgpImageUrl } from '$lib/og';
 
@@ -33,7 +33,8 @@ if (!post) {
 const siteBase = SITE_URL.replace(/\/$/, '');
 const canonical = `${siteBase}/post/${post.meta.slug}`;
 const title = `${post.meta.title} | ${SITE_TITLE}`;
-const description = post.meta.description || `${post.meta.title}ã«ã¤ã„ã¦ã®è¨˜äº‹ã§ã™ã€‚`;
+const description = post.meta.description || `${post.meta.title}‚É‚Â‚¢‚Ä‚Ì‹LŽ–‚Å‚·B`;
+const categoryLabel = getCategoryLabel(post.meta.category);
 const ogImage = getPostOgpImageUrl(post.meta.slug);
 
 const schemaData = {
@@ -59,8 +60,8 @@ const schemaData = {
     '@type': 'WebPage',
     '@id': canonical,
   },
-  articleSection: post.meta.category,
-  keywords: [post.meta.category]
+  articleSection: categoryLabel,
+  keywords: [categoryLabel]
     .concat(post.meta.tags || [])
     .filter(Boolean)
     .join(', '),
@@ -80,7 +81,7 @@ const schemaData = {
   jsonLd={schemaData}
   publishedTime={post.meta.publishedAt.toISOString()}
   modifiedTime={(post.meta.updatedAt || post.meta.publishedAt).toISOString()}
-  section={post.meta.category}
+  section={categoryLabel}
   tags={post.meta.tags}
 >
   <article class="container mx-auto px-2 sm:px-4 xl:max-w-6xl">

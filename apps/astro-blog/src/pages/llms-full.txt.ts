@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getAllPostsMeta } from '$lib/content';
-import { SITE_URL, SOCIAL_LINK_X, SOCIAL_LINK_GITHUB } from '$constants';
+import { getCategoryLabel, SITE_URL, SOCIAL_LINK_X, SOCIAL_LINK_GITHUB } from '$constants';
 
 export const prerender = true;
 
@@ -34,17 +34,20 @@ This site contains technical articles, investment analysis, gaming guides, and m
 
 ## Content Categories
 
-- **Tech**: Programming tutorials, hardware reviews, AI/ML experiments, web development
-- **Finance**: US market analysis, earnings reviews, investment strategies, individual stock analysis
-- **Hobbies**: Gaming guides, tactical gear reviews, workout routines, travel experiences
-- **Opinions**: Personal commentary on technology, market trends, and social issues
+- **investing / 投資・企業分析**: US stock analysis, industry analysis, investment strategies, SEC filing research
+- **software / 開発・Web**: Web development, APIs, XBRL/EDGAR data access, blog platform work, development environments
+- **ai / AI・生成ツール**: Claude Code, ChatGPT, Stable Diffusion, generative AI workflows
+- **games / ゲーム**: Game guides, mods, translations, settings, troubleshooting
+- **gear / ギア・装備レビュー**: Airsoft gear, desk setups, audio, keyboards, physical gadgets
+- **essays / 考察・エッセイ**: Personal essays, social and business commentary, opinion pieces
+- **meta / このサイトについて**: About and site operation notes
 
 ## All Articles (${posts.length} total)
 
 ${posts
   .map(
     (post) =>
-      `- [${escapeMarkdownText(post.title)}](${siteBase}/post/${encodeURIComponent(post.slug)}) (${post.publishedAt.toISOString().split('T')[0]}) [${escapeMarkdownText(post.category)}] - ${escapeMarkdownText(post.description || 'Detailed article description')}`,
+      `- [${escapeMarkdownText(post.title)}](${siteBase}/post/${encodeURIComponent(post.slug)}) (${post.publishedAt.toISOString().split('T')[0]}) [${escapeMarkdownText(getCategoryLabel(post.category))}] - ${escapeMarkdownText(post.description || 'Detailed article description')}`,
   )
   .join('\n')}
 
