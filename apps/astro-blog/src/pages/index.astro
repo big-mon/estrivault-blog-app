@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '$layouts/BaseLayout.astro';
 import {
-  NAVIGATION_LINKS,
   POSTS_PER_PAGE,
   SOCIAL_LINK_GITHUB,
   SOCIAL_LINK_X,
@@ -9,7 +8,7 @@ import {
   SITE_TITLE,
   SITE_URL,
 } from '$constants';
-import { getPosts } from '$lib/content';
+import { getAllCategories, getPosts } from '$lib/content';
 
 const pageData = await getPosts({ page: 1, perPage: POSTS_PER_PAGE });
 const featuredPost = pageData.posts[0] ?? null;
@@ -22,22 +21,22 @@ const categoryDescriptions: Record<string, string> = {
   opinions: '考察、レビュー、個人的な視点のメモ',
 };
 
-const categoryRows = NAVIGATION_LINKS.filter((link) => link.href.startsWith('/category/')).map(
-  (link, index) => {
-    const category = link.href.split('/')[2] ?? link.label.toLowerCase();
+const categories = await getAllCategories();
 
-    return {
-      id: String(index + 1).padStart(2, '0'),
-      key: category.toUpperCase(),
-      label: link.label,
-      description: categoryDescriptions[category] ?? `${link.label}カテゴリーの記事一覧`,
-      href: link.href,
-    };
-  },
-);
+const categoryRows = categories.map((category, index) => {
+  const slug = category.toLowerCase();
+
+  return {
+    id: String(index + 1).padStart(2, '0'),
+    slug,
+    label: category,
+    description: categoryDescriptions[slug] ?? `${category}カテゴリーの記事一覧`,
+    href: `/category/${slug}/1`,
+  };
+});
 
 const categoryLabelByKey = Object.fromEntries(
-  categoryRows.map((category) => [category.key.toLowerCase(), category.label]),
+  categoryRows.map((category) => [category.slug, category.label]),
 );
 
 const getPostCategoryLabel = (category: string) =>
@@ -110,7 +109,7 @@ const fmtDate = (date: Date) =>
               <span class="no">{category.id}</span>
               <span class="name">{category.label}</span>
               <span class="desc">{category.description}</span>
-              <span class="key">{category.key}</span>
+              <span class="key">{category.slug}</span>
             </a>
           ))
         }
