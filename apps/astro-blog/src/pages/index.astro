@@ -120,8 +120,10 @@ const fmtDate = (date: Date) =>
           {
             latestPosts.map((post) => (
               <a href={`/post/${post.slug}`} class="latest-item">
-                <time>{fmtDate(post.publishedAt)}</time>
-                <p class="cat">{getCategoryLabel(post.category)}</p>
+                <div class="latest-meta">
+                  <time>{fmtDate(post.publishedAt)}</time>
+                  <p class="cat">{getCategoryLabel(post.category)}</p>
+                </div>
                 <h4>{post.title}</h4>
                 <p>{post.description}</p>
               </a>
@@ -301,7 +303,7 @@ const fmtDate = (date: Date) =>
   }
   .name {
     font-family: 'Times New Roman', serif;
-    font-size: 2rem;
+    font-size: 1.45rem;
   }
   .desc {
     color: #666;
@@ -310,6 +312,7 @@ const fmtDate = (date: Date) =>
   .key {
     justify-self: end;
     color: #222;
+    text-transform: uppercase;
   }
   .latest-grid {
     display: grid;
@@ -318,7 +321,7 @@ const fmtDate = (date: Date) =>
   }
   .featured {
     display: block;
-    border: 1px solid #222;
+    border: 1px solid #d6452a;
     padding: 1rem;
     text-decoration: none;
     color: inherit;
@@ -327,7 +330,7 @@ const fmtDate = (date: Date) =>
     width: 100%;
     aspect-ratio: 16/9;
     object-fit: cover;
-    border: 1px solid #555;
+    border: 1px solid #d6452a;
   }
   .cat {
     color: #d6452a;
@@ -341,6 +344,10 @@ const fmtDate = (date: Date) =>
   .featured h4 {
     font-size: 1.9rem;
   }
+  .featured > span {
+    color: #d6452a;
+    font-style: italic;
+  }
   .latest-item h4 {
     font-size: 1.5rem;
   }
@@ -351,9 +358,18 @@ const fmtDate = (date: Date) =>
     border-top: 1px solid #aaa;
     padding: 0.8rem 0;
   }
-  .latest-item time {
+  .latest-meta {
+    display: flex;
+    gap: 0.8rem;
+    align-items: baseline;
+  }
+  .latest-meta time {
     color: #d6452a;
     font-style: italic;
+  }
+  .latest-meta .cat {
+    color: #222;
+    margin: 0;
   }
   .series-grid {
     display: grid;
