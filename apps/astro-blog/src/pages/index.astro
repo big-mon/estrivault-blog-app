@@ -223,8 +223,9 @@ const fmtDate = (date: Date) =>
     padding-top: 1rem;
   }
   .brand {
-    font-family: var(--font-meta);
+    font-family: var(--font-display);
     font-style: italic;
+    font-weight: 700;
     letter-spacing: 0.06em;
   }
   nav {
@@ -476,10 +477,15 @@ const fmtDate = (date: Date) =>
     margin-top: 1rem;
     border-top: 2px solid #202020;
     display: flex;
-    font-family: var(--font-meta);
     justify-content: space-between;
     font-style: italic;
     padding-top: 0.75rem;
+  }
+  .footer-brand {
+    font-family: var(--font-display);
+  }
+  .footer-links {
+    font-family: var(--font-meta);
   }
   .footer-brand,
   .footer-links a {
