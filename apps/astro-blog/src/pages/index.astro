@@ -3,6 +3,8 @@ import BaseLayout from '$layouts/BaseLayout.astro';
 import {
   NAVIGATION_LINKS,
   POSTS_PER_PAGE,
+  SOCIAL_LINK_GITHUB,
+  SOCIAL_LINK_X,
   SITE_DESCRIPTION,
   SITE_TITLE,
   SITE_URL,
@@ -163,7 +165,17 @@ const fmtDate = (date: Date) =>
 
     <footer class="index-footer">
       <span>Estrilda</span>
-      <span>X / GITHUB / LLMs</span>
+      <span class="footer-links">
+        <a href={`https://x.com/${SOCIAL_LINK_X}`} target="_blank" rel="noopener noreferrer">X</a>
+        <span>/</span>
+        <a
+          href={`https://github.com/${SOCIAL_LINK_GITHUB}`}
+          target="_blank"
+          rel="noopener noreferrer">GITHUB</a
+        >
+        <span>/</span>
+        <a href="/llms.txt">LLMs</a>
+      </span>
     </footer>
   </div>
 </BaseLayout>
@@ -388,6 +400,14 @@ const fmtDate = (date: Date) =>
     justify-content: space-between;
     font-style: italic;
     padding-top: 0.75rem;
+  }
+  .footer-links {
+    display: inline-flex;
+    gap: 0.45rem;
+  }
+  .footer-links a {
+    color: inherit;
+    text-decoration: none;
   }
   @media (max-width: 900px) {
     .editorial-home {
