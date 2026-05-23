@@ -54,7 +54,15 @@ const fmtDate = (date: Date) =>
     .replace(/\//g, '.');
 ---
 
-<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} canonical={SITE_URL}>
+<BaseLayout
+  title={SITE_TITLE}
+  description={SITE_DESCRIPTION}
+  canonical={SITE_URL}
+  hideHeader
+  hideFooter
+  bodyClass="editorial-page"
+  mainClass="editorial-main"
+>
   <div class="editorial-home">
     <section class="masthead">
       <div class="brand">ESTRILDA / PRIVATE RESEARCH ARCHIVE</div>
@@ -157,12 +165,34 @@ const fmtDate = (date: Date) =>
 </BaseLayout>
 
 <style>
+  :global(.editorial-page) {
+    background: #f1eee7;
+  }
+  :global(.editorial-main) {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
   .editorial-home {
+    min-height: 100vh;
     font-family: 'Inter', 'Noto Sans JP', sans-serif;
     color: #111;
-    background: #f6f4ef;
-    border: 1px solid #202020;
-    padding: 1.5rem;
+    background: #f1eee7;
+    border: 0;
+    padding: clamp(1rem, 2vw, 2rem);
+  }
+  .editorial-home::before {
+    content: '';
+    display: block;
+    border-top: 1px solid #202020;
+  }
+  .masthead,
+  .hero-grid,
+  .section-block,
+  .index-footer {
+    max-width: 1180px;
+    margin-right: auto;
+    margin-left: auto;
   }
   .masthead,
   .hero-grid,
@@ -199,13 +229,13 @@ const fmtDate = (date: Date) =>
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 1rem;
-    min-height: 360px;
+    min-height: 320px;
     border-bottom: 1px solid #222;
     padding-bottom: 1rem;
   }
   h1 {
     font-family: 'Times New Roman', serif;
-    font-size: clamp(3rem, 10vw, 7rem);
+    font-size: clamp(4.5rem, 11vw, 10rem);
     line-height: 1;
     margin: 0;
   }
@@ -339,6 +369,15 @@ const fmtDate = (date: Date) =>
     padding-top: 0.75rem;
   }
   @media (max-width: 900px) {
+    .editorial-home {
+      padding: 1rem;
+    }
+    .masthead {
+      grid-template-columns: 1fr;
+    }
+    nav {
+      flex-wrap: wrap;
+    }
     .hero-grid,
     .latest-grid {
       grid-template-columns: 1fr;
