@@ -10,10 +10,11 @@ import {
   SITE_URL,
   getCategoryLabel,
 } from '$constants';
-import { getPosts } from '$lib/content';
+import { getAllPostsMeta, getPosts } from '$lib/content';
 import { getTagRouteSegment } from '$lib/url-segments';
 
 const pageData = await getPosts({ page: 1, perPage: POSTS_PER_PAGE });
+const allPosts = await getAllPostsMeta();
 const featuredPost = pageData.posts[0] ?? null;
 const latestPosts = featuredPost ? pageData.posts.slice(1, 5) : pageData.posts.slice(0, 4);
 
@@ -26,6 +27,14 @@ const categoryRows = Object.entries(CATEGORY_META)
     description: category.description,
     href: `/category/${slug}/1`,
   }));
+
+const oldestPost = allPosts.at(-1);
+const archiveStats = {
+  notes: pageData.total,
+  categories: categoryRows.length,
+  format: 'Markdown',
+  since: oldestPost?.publishedAt.getFullYear() ?? '----',
+};
 
 const seriesCards = [
   { id: '01', title: 'EDGAR / XBRL', desc: 'SEC書類とAPIを読み解く', tag: 'EDGAR' },
@@ -84,12 +93,29 @@ const fmtDate = (date: Date) =>
         </p>
       </article>
       <aside>
-        <h3>FIELD NOTES &amp; INDEX</h3>
-        <p class="issue">ISSUE 00</p>
-        <p class="issue-sub">Design direction</p>
-        <p>
-          Not a SaaS dashboard. Not a media template. A readable index for accumulated field notes.
-        </p>
+        <h3>ARCHIVE STATUS</h3>
+        <dl class="archive-stats">
+          <div>
+            <dt>NOTES</dt>
+            <dd>{archiveStats.notes}</dd>
+          </div>
+          <div>
+            <dt>CATEGORIES</dt>
+            <dd>{archiveStats.categories}</dd>
+          </div>
+          <div>
+            <dt>FORMAT</dt>
+            <dd>{archiveStats.format}</dd>
+          </div>
+          <div>
+            <dt>SINCE</dt>
+            <dd>{archiveStats.since}</dd>
+          </div>
+        </dl>
+        <div class="archive-format">
+          <p>TEXT FIRST</p>
+          <p>IMAGE OPTIONAL</p>
+        </div>
       </aside>
     </section>
 
@@ -286,17 +312,33 @@ const fmtDate = (date: Date) =>
     font-weight: 400;
     line-height: 1.2;
   }
-  .issue {
-    font-family: var(--font-meta);
-    color: #d6452a;
+  .archive-stats {
     border-top: 1px solid #d6452a;
-    margin-top: 0.75rem;
+    margin: 0.75rem 0 0;
     padding-top: 0.75rem;
-    font-style: italic;
   }
-  .issue-sub {
+  .archive-stats div {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
     font-family: var(--font-meta);
-    font-style: italic;
+    line-height: 1.65;
+  }
+  .archive-stats dt,
+  .archive-stats dd {
+    margin: 0;
+  }
+  .archive-stats dt {
+    color: #d6452a;
+  }
+  .archive-format {
+    margin-top: 1.25rem;
+    font-family: var(--font-meta);
+    font-weight: 700;
+    line-height: 1.45;
+  }
+  .archive-format p {
+    margin: 0;
   }
   .section-block > h3 {
     font-family: var(--font-meta);
