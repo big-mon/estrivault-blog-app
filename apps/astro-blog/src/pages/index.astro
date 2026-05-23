@@ -95,7 +95,7 @@ const fmtDate = (date: Date) =>
       </aside>
     </section>
 
-    <section id="categories" class="section-block">
+    <section id="categories" class="section-block category-index">
       <h3>CATEGORY INDEX</h3>
       <div class="table-like">
         {
@@ -184,7 +184,9 @@ const fmtDate = (date: Date) =>
   .editorial-home::before {
     content: '';
     display: block;
-    border-top: 1px solid #202020;
+    max-width: 1180px;
+    margin: 0 auto;
+    border-top: 2px solid #202020;
   }
   .masthead,
   .hero-grid,
@@ -275,6 +277,16 @@ const fmtDate = (date: Date) =>
     letter-spacing: 0.05em;
     margin-bottom: 0.75rem;
   }
+  .category-index {
+    border-top: 0;
+    margin-top: 2.5rem;
+    padding-top: 0;
+  }
+  .category-index > h3 {
+    border-bottom: 1px solid #222;
+    margin-bottom: 0;
+    padding-bottom: 0.8rem;
+  }
   .table-row {
     display: grid;
     grid-template-columns: 64px 300px 1fr 120px;
@@ -325,8 +337,13 @@ const fmtDate = (date: Date) =>
   .featured h4,
   .latest-item h4 {
     font-family: 'Times New Roman', serif;
-    font-size: 2.25rem;
     line-height: 1.2;
+  }
+  .featured h4 {
+    font-size: 1.9rem;
+  }
+  .latest-item h4 {
+    font-size: 1.5rem;
   }
   .latest-item {
     display: block;
