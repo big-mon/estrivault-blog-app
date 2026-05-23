@@ -10,8 +10,8 @@ import {
 import { getPosts } from '$lib/content';
 
 const pageData = await getPosts({ page: 1, perPage: POSTS_PER_PAGE });
-const latestPosts = pageData.posts.slice(0, 4);
 const featuredPost = pageData.posts[0] ?? null;
+const latestPosts = featuredPost ? pageData.posts.slice(1, 5) : pageData.posts.slice(0, 4);
 
 const categoryDescriptions: Record<string, string> = {
   tech: '開発、AI、Web、ツール運用の記録',
