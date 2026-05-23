@@ -50,7 +50,7 @@ const fmtDate = (date: Date) =>
 >
   <div class="editorial-home">
     <section class="masthead">
-      <div class="brand">ESTRILDA / PRIVATE RESEARCH ARCHIVE</div>
+      <div class="brand"><a href="/">ESTRILDA</a> / PRIVATE RESEARCH ARCHIVE</div>
       <nav>
         <a href="#latest">ARTICLES</a>
         <a href="#categories">CATEGORIES</a>
@@ -149,7 +149,7 @@ const fmtDate = (date: Date) =>
     </section>
 
     <footer class="index-footer">
-      <span>Estrilda</span>
+      <a class="footer-brand" href="/">Estrilda</a>
       <span class="footer-links">
         <a href={`https://x.com/${SOCIAL_LINK_X}`} target="_blank" rel="noopener noreferrer">X</a>
         <span>/</span>
@@ -225,6 +225,7 @@ const fmtDate = (date: Date) =>
     font-style: italic;
     font-size: 0.95rem;
   }
+  .brand a,
   nav a {
     text-decoration: none;
     color: #222;
@@ -345,6 +346,9 @@ const fmtDate = (date: Date) =>
     margin-bottom: 0.75rem;
     padding-bottom: 0.8rem;
   }
+  .latest-notes > h3 {
+    margin-bottom: 1.5rem;
+  }
   .latest-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -400,6 +404,9 @@ const fmtDate = (date: Date) =>
   .latest-list,
   .latest-item {
     min-width: 0;
+  }
+  .latest-list {
+    border-bottom: 1px solid #aaa;
   }
   .latest-item {
     display: block;
@@ -457,13 +464,14 @@ const fmtDate = (date: Date) =>
     font-style: italic;
     padding-top: 0.75rem;
   }
-  .footer-links {
-    display: inline-flex;
-    gap: 0.45rem;
-  }
+  .footer-brand,
   .footer-links a {
     color: inherit;
     text-decoration: none;
+  }
+  .footer-links {
+    display: inline-flex;
+    gap: 0.45rem;
   }
   @media (max-width: 900px) {
     .editorial-home {
