@@ -226,27 +226,29 @@ const fmtDate = (date: Date) =>
   }
   .tagline {
     grid-column: 1/-1;
+    border-top: 1px solid #222;
     color: #666;
     margin-bottom: 1lh;
+    padding-top: 0.75rem;
   }
   .hero-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1.55fr) minmax(340px, 1fr);
+    gap: 0.75rem;
     min-height: 320px;
     border-bottom: 1px solid #222;
     padding-bottom: 1rem;
   }
   h1 {
     font-family: 'Times New Roman', serif;
-    font-size: clamp(4.5rem, 11vw, 10rem);
+    font-size: clamp(4rem, 9vw, 8.5rem);
     font-weight: 400;
     line-height: 1;
     margin: 0;
   }
   h2 {
     font-family: 'Times New Roman', serif;
-    font-size: clamp(2rem, 4vw, 3.6rem);
+    font-size: clamp(1.7rem, 3.1vw, 2.7rem);
     font-weight: 400;
     line-height: 1.25;
     margin: 0.5rem 0;
@@ -254,7 +256,7 @@ const fmtDate = (date: Date) =>
   .hero-grid p {
     font-size: 1.2rem;
     color: #555;
-    max-width: 42rem;
+    max-width: 44rem;
   }
   aside {
     border-left: 1px solid #222;
@@ -310,7 +312,7 @@ const fmtDate = (date: Date) =>
   .name {
     font-family: 'Times New Roman', serif;
     font-size: 1.45rem;
-    font-weight: 400;
+    font-weight: 700;
   }
   .desc {
     color: #666;
@@ -319,6 +321,7 @@ const fmtDate = (date: Date) =>
   .key {
     justify-self: end;
     color: #222;
+    font-weight: 700;
     text-transform: uppercase;
   }
   .latest-notes,
@@ -345,6 +348,9 @@ const fmtDate = (date: Date) =>
     padding: 1rem;
     text-decoration: none;
     color: inherit;
+  }
+  .featured > * + * {
+    margin-top: 0.75rem;
   }
   .featured img {
     width: 100%;
@@ -389,7 +395,10 @@ const fmtDate = (date: Date) =>
     text-decoration: none;
     color: inherit;
     border-top: 1px solid #aaa;
-    padding: 0.8rem 0;
+    padding: 1rem 0;
+  }
+  .latest-item > * + * {
+    margin-top: 0.55rem;
   }
   .latest-meta {
     display: flex;
@@ -428,7 +437,7 @@ const fmtDate = (date: Date) =>
   }
   .index-footer {
     margin-top: 1rem;
-    border-top: 1px solid #222;
+    border-top: 2px solid #202020;
     display: flex;
     justify-content: space-between;
     font-style: italic;
