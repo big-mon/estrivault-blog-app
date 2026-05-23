@@ -1,25 +1,361 @@
 ---
 import BaseLayout from '$layouts/BaseLayout.astro';
-import Pagination from '$components/Pagination.astro';
-import PostCard from '$components/PostCard.astro';
-import { POSTS_PER_PAGE, SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '$constants';
+import {
+  NAVIGATION_LINKS,
+  POSTS_PER_PAGE,
+  SITE_DESCRIPTION,
+  SITE_TITLE,
+  SITE_URL,
+} from '$constants';
 import { getPosts } from '$lib/content';
 
 const pageData = await getPosts({ page: 1, perPage: POSTS_PER_PAGE });
+const latestPosts = pageData.posts.slice(0, 4);
+const featuredPost = pageData.posts[0] ?? null;
+
+const categoryDescriptions: Record<string, string> = {
+  tech: '開発、AI、Web、ツール運用の記録',
+  finance: '米国株、企業分析、決算資料の読み解き',
+  hobbies: 'ゲーム、ガジェット、日々の試行錯誤',
+  opinions: '考察、レビュー、個人的な視点のメモ',
+};
+
+const categoryRows = NAVIGATION_LINKS.filter((link) => link.href.startsWith('/category/')).map(
+  (link, index) => {
+    const category = link.href.split('/')[2] ?? link.label.toLowerCase();
+
+    return {
+      id: String(index + 1).padStart(2, '0'),
+      key: category.toUpperCase(),
+      label: link.label,
+      description: categoryDescriptions[category] ?? `${link.label}カテゴリーの記事一覧`,
+      href: link.href,
+    };
+  },
+);
+
+const categoryLabelByKey = Object.fromEntries(
+  categoryRows.map((category) => [category.key.toLowerCase(), category.label]),
+);
+
+const getPostCategoryLabel = (category: string) =>
+  categoryLabelByKey[category.toLowerCase()] ?? category;
+
+const seriesCards = [
+  { id: '01', title: 'EDGAR / XBRL', desc: 'SEC書類とAPIを読み解く' },
+  { id: '02', title: 'Stable Diffusion', desc: '生成画像とモデル運用' },
+  { id: '03', title: 'Stock Analysis', desc: '個別銘柄と業界の深掘り' },
+  { id: '04', title: 'Gear Reviews', desc: '装備・機材の使用感レビュー' },
+];
+
+const fmtDate = (date: Date) =>
+  new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
+    .format(date)
+    .replace(/\//g, '.');
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} canonical={SITE_URL}>
-  <h1 class="sr-only">{SITE_TITLE}</h1>
+  <div class="editorial-home">
+    <section class="masthead">
+      <div class="brand">ESTRILDA / PRIVATE RESEARCH ARCHIVE</div>
+      <nav>
+        <a href="#latest">ARTICLES</a>
+        <a href="#categories">CATEGORIES</a>
+        <a href="/post/about">ABOUT</a>
+        <a href="https://github.com/big-mon/estrivault-blog-app" target="_blank">GITHUB</a>
+      </nav>
+      <p class="tagline">
+        株式投資・ソフトウェア・AI・ゲーム・ギアレビューを横断する個人アーカイブ
+      </p>
+    </section>
 
-  <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-    {pageData.posts.map((post) => <PostCard post={post} />)}
-  </div>
+    <section class="hero-grid">
+      <article>
+        <h1>Estrilda</h1>
+        <h2>投資、開発、AI、<br />趣味の実践ログ。</h2>
+        <p>
+          米国株の企業分析、Web開発、生成AIツール、ゲーム攻略、ギアレビューまで。調べたこと・試したこと・考えたことを蓄積する、個人のための公開ノート。
+        </p>
+      </article>
+      <aside>
+        <h3>FIELD NOTES &amp; INDEX</h3>
+        <p class="issue">ISSUE 00</p>
+        <p class="issue-sub">Design direction</p>
+        <p>
+          Not a SaaS dashboard. Not a media template. A readable index for accumulated field notes.
+        </p>
+      </aside>
+    </section>
 
-  {
-    pageData.totalPages > 1 && (
-      <div class="mt-12">
-        <Pagination currentPage={pageData.page} totalPages={pageData.totalPages} baseUrl="/" />
+    <section id="categories" class="section-block">
+      <h3>CATEGORY INDEX</h3>
+      <div class="table-like">
+        {
+          categoryRows.map((category) => (
+            <a class="table-row" href={category.href}>
+              <span class="no">{category.id}</span>
+              <span class="name">{category.label}</span>
+              <span class="desc">{category.description}</span>
+              <span class="key">{category.key}</span>
+            </a>
+          ))
+        }
       </div>
-    )
-  }
+    </section>
+
+    <section id="latest" class="section-block latest-notes">
+      <h3>LATEST NOTES</h3>
+      <div class="latest-grid">
+        {
+          featuredPost && (
+            <a href={`/post/${featuredPost.slug}`} class="featured">
+              {featuredPost.coverImage && (
+                <img src={featuredPost.coverImage} alt={featuredPost.title} loading="lazy" />
+              )}
+              <p class="cat">{getPostCategoryLabel(featuredPost.category)}</p>
+              <h4>{featuredPost.title}</h4>
+              <p>{featuredPost.description}</p>
+              <span>READ ARTICLE →</span>
+            </a>
+          )
+        }
+        <div class="latest-list">
+          {
+            latestPosts.map((post) => (
+              <a href={`/post/${post.slug}`} class="latest-item">
+                <time>{fmtDate(post.publishedAt)}</time>
+                <p class="cat">{getPostCategoryLabel(post.category)}</p>
+                <h4>{post.title}</h4>
+                <p>{post.description}</p>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <h3>DEEP DIVES / SERIES</h3>
+      <div class="series-grid">
+        {
+          seriesCards.map((card) => (
+            <article class="series-card">
+              <p>{card.id}</p>
+              <h4>{card.title}</h4>
+              <p>{card.desc}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <footer class="index-footer">
+      <span>Estrilda</span>
+      <span>X / GITHUB / LLMs</span>
+    </footer>
+  </div>
 </BaseLayout>
+
+<style>
+  .editorial-home {
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    color: #111;
+    background: #f6f4ef;
+    border: 1px solid #202020;
+    padding: 1.5rem;
+  }
+  .masthead,
+  .hero-grid,
+  .section-block {
+    border-top: 1px solid #222;
+    padding-top: 1rem;
+    margin-top: 1rem;
+  }
+  .masthead {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .brand {
+    font-style: italic;
+    letter-spacing: 0.06em;
+  }
+  nav {
+    display: flex;
+    gap: 1rem;
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+  nav a {
+    text-decoration: none;
+    color: #222;
+  }
+  .tagline {
+    grid-column: 1/-1;
+    color: #666;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+    min-height: 360px;
+    border-bottom: 1px solid #222;
+    padding-bottom: 1rem;
+  }
+  h1 {
+    font-family: 'Times New Roman', serif;
+    font-size: clamp(3rem, 10vw, 7rem);
+    line-height: 1;
+    margin: 0;
+  }
+  h2 {
+    font-family: 'Times New Roman', serif;
+    font-size: clamp(2rem, 4vw, 3.6rem);
+    line-height: 1.25;
+    margin: 0.5rem 0;
+  }
+  .hero-grid p {
+    font-size: 1.2rem;
+    color: #555;
+    max-width: 42rem;
+  }
+  aside {
+    border-left: 1px solid #222;
+    padding-left: 1rem;
+  }
+  aside h3 {
+    font-family: 'Times New Roman', serif;
+    font-size: 3rem;
+    line-height: 1.2;
+  }
+  .issue {
+    color: #d6452a;
+    border-top: 1px solid #d6452a;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    font-style: italic;
+  }
+  .issue-sub {
+    font-style: italic;
+  }
+  .section-block > h3 {
+    font-style: italic;
+    color: #d6452a;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+  }
+  .table-row {
+    display: grid;
+    grid-template-columns: 64px 300px 1fr 120px;
+    padding: 1rem 0;
+    border-top: 1px solid #aaa;
+    color: inherit;
+    text-decoration: none;
+  }
+  .no,
+  .key {
+    font-style: italic;
+    color: #d6452a;
+  }
+  .name {
+    font-family: 'Times New Roman', serif;
+    font-size: 2rem;
+  }
+  .desc {
+    color: #666;
+    align-self: center;
+  }
+  .key {
+    justify-self: end;
+    color: #222;
+  }
+  .latest-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 1.5rem;
+  }
+  .featured {
+    display: block;
+    border: 1px solid #222;
+    padding: 1rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .featured img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    border: 1px solid #555;
+  }
+  .cat {
+    color: #d6452a;
+    font-style: italic;
+  }
+  .featured h4,
+  .latest-item h4 {
+    font-family: 'Times New Roman', serif;
+    font-size: 2.25rem;
+    line-height: 1.2;
+  }
+  .latest-item {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border-top: 1px solid #aaa;
+    padding: 0.8rem 0;
+  }
+  .latest-item time {
+    color: #d6452a;
+    font-style: italic;
+  }
+  .series-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid #222;
+    border-left: 1px solid #222;
+  }
+  .series-card {
+    border-right: 1px solid #222;
+    border-bottom: 1px solid #222;
+    padding: 1rem;
+  }
+  .series-card h4 {
+    font-family: 'Times New Roman', serif;
+    font-size: 2rem;
+    line-height: 1.15;
+    margin: 0.5rem 0;
+  }
+  .series-card p:first-child {
+    color: #d6452a;
+    font-style: italic;
+  }
+  .index-footer {
+    margin-top: 1rem;
+    border-top: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    font-style: italic;
+    padding-top: 0.75rem;
+  }
+  @media (max-width: 900px) {
+    .hero-grid,
+    .latest-grid {
+      grid-template-columns: 1fr;
+    }
+    .table-row {
+      grid-template-columns: 56px 1fr;
+      gap: 0.5rem;
+    }
+    .desc,
+    .key {
+      grid-column: 2;
+    }
+    .name {
+      font-size: 1.6rem;
+    }
+    .series-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
