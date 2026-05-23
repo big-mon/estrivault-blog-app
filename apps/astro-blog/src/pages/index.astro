@@ -258,7 +258,9 @@ const fmtDate = (date: Date) =>
   }
   aside {
     border-left: 1px solid #222;
-    padding-left: 1rem;
+    margin-top: calc(-1rem - 1px);
+    margin-bottom: calc(-1rem - 1px);
+    padding: calc(1rem + 1px) 0 calc(1rem + 1px) 1rem;
   }
   aside h3 {
     font-family: 'Times New Roman', serif;
@@ -321,15 +323,24 @@ const fmtDate = (date: Date) =>
   }
   .latest-notes,
   .series-section {
+    border-top: 0;
     margin-top: 2.5rem;
+    padding-top: 0;
+  }
+  .latest-notes > h3,
+  .series-section > h3 {
+    border-bottom: 1px solid #222;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.8rem;
   }
   .latest-grid {
     display: grid;
-    grid-template-columns: 1.1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 1.5rem;
   }
   .featured {
     display: block;
+    min-width: 0;
     border: 1px solid #222;
     padding: 1rem;
     text-decoration: none;
@@ -359,6 +370,8 @@ const fmtDate = (date: Date) =>
     font-style: italic;
   }
   .note-summary {
+    display: block;
+    max-width: 100%;
     overflow: hidden;
     color: #666;
     text-overflow: ellipsis;
@@ -366,6 +379,10 @@ const fmtDate = (date: Date) =>
   }
   .latest-item h4 {
     font-size: 1.5rem;
+  }
+  .latest-list,
+  .latest-item {
+    min-width: 0;
   }
   .latest-item {
     display: block;
