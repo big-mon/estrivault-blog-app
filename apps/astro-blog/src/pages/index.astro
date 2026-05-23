@@ -11,6 +11,7 @@ import {
   getCategoryLabel,
 } from '$constants';
 import { getPosts } from '$lib/content';
+import { getTagRouteSegment } from '$lib/url-segments';
 
 const pageData = await getPosts({ page: 1, perPage: POSTS_PER_PAGE });
 const featuredPost = pageData.posts[0] ?? null;
@@ -27,11 +28,19 @@ const categoryRows = Object.entries(CATEGORY_META)
   }));
 
 const seriesCards = [
-  { id: '01', title: 'EDGAR / XBRL', desc: 'SEC書類とAPIを読み解く' },
-  { id: '02', title: 'Stable Diffusion', desc: '生成画像とモデル運用' },
-  { id: '03', title: 'Stock Analysis', desc: '個別銘柄と業界の深掘り' },
-  { id: '04', title: 'Gear Reviews', desc: '装備・機材の使用感レビュー' },
-];
+  { id: '01', title: 'EDGAR / XBRL', desc: 'SEC書類とAPIを読み解く', tag: 'EDGAR' },
+  {
+    id: '02',
+    title: 'Stable Diffusion',
+    desc: '生成画像とモデル運用',
+    tag: 'Stable Diffusion',
+  },
+  { id: '03', title: 'Stock Analysis', desc: '個別銘柄と業界の深掘り', tag: '銘柄分析' },
+  { id: '04', title: 'Gear Reviews', desc: '装備・機材の使用感レビュー', tag: 'レビュー' },
+].map((card) => ({
+  ...card,
+  href: `/tag/${getTagRouteSegment(card.tag)}/1`,
+}));
 
 const fmtDate = (date: Date) =>
   new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
@@ -138,11 +147,11 @@ const fmtDate = (date: Date) =>
       <div class="series-grid">
         {
           seriesCards.map((card) => (
-            <article class="series-card">
+            <a class="series-card" href={card.href}>
               <p>{card.id}</p>
               <h4>{card.title}</h4>
               <p>{card.desc}</p>
-            </article>
+            </a>
           ))
         }
       </div>
@@ -305,6 +314,9 @@ const fmtDate = (date: Date) =>
     margin-bottom: 0;
     padding-bottom: 0.8rem;
   }
+  .table-like {
+    border-bottom: 1px solid #222;
+  }
   .table-row {
     display: grid;
     grid-template-columns: 64px 300px 1fr 120px;
@@ -351,8 +363,8 @@ const fmtDate = (date: Date) =>
   }
   .latest-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: 2rem;
   }
   .featured {
     display: block;
@@ -442,6 +454,8 @@ const fmtDate = (date: Date) =>
     border-right: 1px solid #222;
     border-bottom: 1px solid #222;
     padding: 1rem;
+    color: inherit;
+    text-decoration: none;
   }
   .series-card h4 {
     font-family: var(--font-display);
