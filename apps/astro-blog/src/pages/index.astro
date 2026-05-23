@@ -111,7 +111,7 @@ const fmtDate = (date: Date) =>
               )}
               <p class="cat">{getCategoryLabel(featuredPost.category)}</p>
               <h4>{featuredPost.title}</h4>
-              <p>{featuredPost.description}</p>
+              <p class="note-summary">{featuredPost.description}</p>
               <span>READ ARTICLE →</span>
             </a>
           )
@@ -125,7 +125,7 @@ const fmtDate = (date: Date) =>
                   <p class="cat">{getCategoryLabel(post.category)}</p>
                 </div>
                 <h4>{post.title}</h4>
-                <p>{post.description}</p>
+                <p class="note-summary">{post.description}</p>
               </a>
             ))
           }
@@ -133,7 +133,7 @@ const fmtDate = (date: Date) =>
       </div>
     </section>
 
-    <section class="section-block">
+    <section class="section-block series-section">
       <h3>DEEP DIVES / SERIES</h3>
       <div class="series-grid">
         {
@@ -227,6 +227,7 @@ const fmtDate = (date: Date) =>
   .tagline {
     grid-column: 1/-1;
     color: #666;
+    margin-bottom: 1lh;
   }
   .hero-grid {
     display: grid;
@@ -318,6 +319,10 @@ const fmtDate = (date: Date) =>
     color: #222;
     text-transform: uppercase;
   }
+  .latest-notes,
+  .series-section {
+    margin-top: 2.5rem;
+  }
   .latest-grid {
     display: grid;
     grid-template-columns: 1.1fr 1fr;
@@ -352,6 +357,12 @@ const fmtDate = (date: Date) =>
   .featured > span {
     color: #d6452a;
     font-style: italic;
+  }
+  .note-summary {
+    overflow: hidden;
+    color: #666;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .latest-item h4 {
     font-size: 1.5rem;
