@@ -1,46 +1,30 @@
 ---
 import BaseLayout from '$layouts/BaseLayout.astro';
 import {
+  CATEGORY_META,
   POSTS_PER_PAGE,
   SOCIAL_LINK_GITHUB,
   SOCIAL_LINK_X,
   SITE_DESCRIPTION,
   SITE_TITLE,
   SITE_URL,
+  getCategoryLabel,
 } from '$constants';
-import { getAllCategories, getPosts } from '$lib/content';
+import { getPosts } from '$lib/content';
 
 const pageData = await getPosts({ page: 1, perPage: POSTS_PER_PAGE });
 const featuredPost = pageData.posts[0] ?? null;
 const latestPosts = featuredPost ? pageData.posts.slice(1, 5) : pageData.posts.slice(0, 4);
 
-const categoryDescriptions: Record<string, string> = {
-  tech: '開発、AI、Web、ツール運用の記録',
-  finance: '米国株、企業分析、決算資料の読み解き',
-  hobbies: 'ゲーム、ガジェット、日々の試行錯誤',
-  opinions: '考察、レビュー、個人的な視点のメモ',
-};
-
-const categories = await getAllCategories();
-
-const categoryRows = categories.map((category, index) => {
-  const slug = category.toLowerCase();
-
-  return {
+const categoryRows = Object.entries(CATEGORY_META)
+  .filter(([slug]) => slug !== 'meta')
+  .map(([slug, category], index) => ({
     id: String(index + 1).padStart(2, '0'),
     slug,
-    label: category,
-    description: categoryDescriptions[slug] ?? `${category}カテゴリーの記事一覧`,
+    label: category.label,
+    description: category.description,
     href: `/category/${slug}/1`,
-  };
-});
-
-const categoryLabelByKey = Object.fromEntries(
-  categoryRows.map((category) => [category.slug, category.label]),
-);
-
-const getPostCategoryLabel = (category: string) =>
-  categoryLabelByKey[category.toLowerCase()] ?? category;
+  }));
 
 const seriesCards = [
   { id: '01', title: 'EDGAR / XBRL', desc: 'SEC書類とAPIを読み解く' },
@@ -125,7 +109,7 @@ const fmtDate = (date: Date) =>
               {featuredPost.coverImage && (
                 <img src={featuredPost.coverImage} alt={featuredPost.title} loading="lazy" />
               )}
-              <p class="cat">{getPostCategoryLabel(featuredPost.category)}</p>
+              <p class="cat">{getCategoryLabel(featuredPost.category)}</p>
               <h4>{featuredPost.title}</h4>
               <p>{featuredPost.description}</p>
               <span>READ ARTICLE →</span>
@@ -137,7 +121,7 @@ const fmtDate = (date: Date) =>
             latestPosts.map((post) => (
               <a href={`/post/${post.slug}`} class="latest-item">
                 <time>{fmtDate(post.publishedAt)}</time>
-                <p class="cat">{getPostCategoryLabel(post.category)}</p>
+                <p class="cat">{getCategoryLabel(post.category)}</p>
                 <h4>{post.title}</h4>
                 <p>{post.description}</p>
               </a>
