@@ -175,8 +175,11 @@ const fmtDate = (date: Date) =>
     padding: 0;
   }
   .editorial-home {
+    --font-display: 'Times New Roman', serif;
+    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
+    --font-meta: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
     min-height: 100vh;
-    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    font-family: var(--font-body);
     color: #111;
     background: #f1eee7;
     border: 0;
@@ -211,12 +214,14 @@ const fmtDate = (date: Date) =>
     padding-top: 1rem;
   }
   .brand {
+    font-family: var(--font-meta);
     font-style: italic;
     letter-spacing: 0.06em;
   }
   nav {
     display: flex;
     gap: 1rem;
+    font-family: var(--font-meta);
     font-style: italic;
     font-size: 0.95rem;
   }
@@ -240,14 +245,14 @@ const fmtDate = (date: Date) =>
     padding-bottom: 1rem;
   }
   h1 {
-    font-family: 'Times New Roman', serif;
+    font-family: var(--font-display);
     font-size: clamp(4rem, 9vw, 8.5rem);
     font-weight: 400;
     line-height: 1;
     margin: 0;
   }
   h2 {
-    font-family: 'Times New Roman', serif;
+    font-family: var(--font-display);
     font-size: clamp(1.7rem, 3.1vw, 2.7rem);
     font-weight: 400;
     line-height: 1.25;
@@ -265,12 +270,13 @@ const fmtDate = (date: Date) =>
     padding: calc(1rem + 1px) 0 calc(1rem + 1px) 1rem;
   }
   aside h3 {
-    font-family: 'Times New Roman', serif;
+    font-family: var(--font-display);
     font-size: 3rem;
     font-weight: 400;
     line-height: 1.2;
   }
   .issue {
+    font-family: var(--font-meta);
     color: #d6452a;
     border-top: 1px solid #d6452a;
     margin-top: 0.75rem;
@@ -278,9 +284,11 @@ const fmtDate = (date: Date) =>
     font-style: italic;
   }
   .issue-sub {
+    font-family: var(--font-meta);
     font-style: italic;
   }
   .section-block > h3 {
+    font-family: var(--font-meta);
     font-style: italic;
     color: #d6452a;
     letter-spacing: 0.05em;
@@ -306,11 +314,12 @@ const fmtDate = (date: Date) =>
   }
   .no,
   .key {
+    font-family: var(--font-meta);
     font-style: italic;
     color: #d6452a;
   }
   .name {
-    font-family: 'Times New Roman', serif;
+    font-family: var(--font-display);
     font-size: 1.45rem;
     font-weight: 700;
   }
@@ -359,12 +368,13 @@ const fmtDate = (date: Date) =>
     border: 1px solid #555;
   }
   .cat {
+    font-family: var(--font-meta);
     color: #d6452a;
     font-style: italic;
   }
   .featured h4,
   .latest-item h4 {
-    font-family: 'Times New Roman', serif;
+    font-family: var(--font-display);
     font-weight: 400;
     line-height: 1.2;
   }
@@ -372,6 +382,7 @@ const fmtDate = (date: Date) =>
     font-size: 1.9rem;
   }
   .featured > span {
+    font-family: var(--font-meta);
     color: #d6452a;
     font-style: italic;
   }
@@ -406,6 +417,7 @@ const fmtDate = (date: Date) =>
     align-items: baseline;
   }
   .latest-meta time {
+    font-family: var(--font-meta);
     color: #d6452a;
     font-style: italic;
   }
@@ -425,13 +437,14 @@ const fmtDate = (date: Date) =>
     padding: 1rem;
   }
   .series-card h4 {
-    font-family: 'Times New Roman', serif;
+    font-family: var(--font-display);
     font-size: 2rem;
     font-weight: 400;
     line-height: 1.15;
     margin: 0.5rem 0;
   }
   .series-card p:first-child {
+    font-family: var(--font-meta);
     color: #d6452a;
     font-style: italic;
   }
@@ -439,6 +452,7 @@ const fmtDate = (date: Date) =>
     margin-top: 1rem;
     border-top: 2px solid #202020;
     display: flex;
+    font-family: var(--font-meta);
     justify-content: space-between;
     font-style: italic;
     padding-top: 0.75rem;
