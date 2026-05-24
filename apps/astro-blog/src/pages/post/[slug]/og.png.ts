@@ -1,7 +1,10 @@
 import type { APIRoute } from 'astro';
+import path from 'node:path';
 import { generatePostOgpPng } from '@estrivault/og-image-generator';
 import { getCategoryLabel, SITE_TITLE, SITE_URL } from '$constants';
-import { getAllPostsMeta, getPostBySlug } from '$lib/content';
+import { getAllPostsMeta } from '$lib/content';
+
+const ogpCacheDir = path.join(process.cwd(), 'node_modules', '.astro', 'og-image-cache');
 
 export async function getStaticPaths() {
   const allPosts = await getAllPostsMeta();
@@ -14,19 +17,22 @@ export const GET: APIRoute = async ({ params }) => {
     return new Response('Missing slug', { status: 400 });
   }
 
-  const post = await getPostBySlug(slug);
+  const post = (await getAllPostsMeta()).find((postMeta) => postMeta.slug === slug);
   if (!post) {
     return new Response('Not found', { status: 404 });
   }
 
-  const png = await generatePostOgpPng({
-    title: post.meta.title,
-    category: getCategoryLabel(post.meta.category || 'meta'),
-    publishedAt: post.meta.publishedAt,
-    slug: post.meta.slug,
-    siteTitle: SITE_TITLE,
-    siteUrl: SITE_URL,
-  });
+  const png = await generatePostOgpPng(
+    {
+      title: post.title,
+      category: getCategoryLabel(post.category || 'meta'),
+      publishedAt: post.publishedAt,
+      slug: post.slug,
+      siteTitle: SITE_TITLE,
+      siteUrl: SITE_URL,
+    },
+    { cacheDir: ogpCacheDir },
+  );
 
   const body = new Uint8Array(png).buffer;
 
