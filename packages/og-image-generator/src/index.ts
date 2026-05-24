@@ -1,7 +1,10 @@
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 import { Resvg } from '@resvg/resvg-js';
 import { createElement as h } from 'react';
 import satori from 'satori';
-import { loadPostOgpFonts } from './font';
+import { getPostOgpFontDigest, loadPostOgpFonts } from './font';
 import { layoutPostOgpTitle } from './title-layout';
 
 export interface PostOgpCardData {
@@ -15,6 +18,53 @@ export interface PostOgpCardData {
 
 const IMAGE_WIDTH = 1200;
 const IMAGE_HEIGHT = 630;
+const CACHE_SCHEMA_VERSION = 'post-ogp-cache-v1';
+
+export interface PostOgpCacheOptions {
+  cacheDir?: string;
+}
+
+let templateDigestPromise: Promise<string> | undefined;
+
+function normalizePublishedAt(publishedAt: Date | string): string {
+  return publishedAt instanceof Date ? publishedAt.toISOString() : publishedAt;
+}
+
+async function readFileForDigest(relativePath: string): Promise<Buffer> {
+  return readFile(new URL(relativePath, import.meta.url));
+}
+
+async function getPostOgpTemplateDigest(): Promise<string> {
+  templateDigestPromise ??= Promise.all([
+    readFileForDigest('./index.js'),
+    readFileForDigest('./title-layout.js'),
+    readFileForDigest('./font.js'),
+    getPostOgpFontDigest(),
+  ]).then((parts) => {
+    const hash = createHash('sha256');
+    hash.update(CACHE_SCHEMA_VERSION);
+    for (const part of parts) {
+      hash.update(part);
+    }
+    return hash.digest('hex');
+  });
+
+  return templateDigestPromise;
+}
+
+export async function getPostOgpCacheKey(input: PostOgpCardData): Promise<string> {
+  const hash = createHash('sha256');
+  hash.update(
+    JSON.stringify({
+      schema: CACHE_SCHEMA_VERSION,
+      template: await getPostOgpTemplateDigest(),
+      title: input.title,
+      category: input.category || 'Other',
+      publishedAt: normalizePublishedAt(input.publishedAt),
+    }),
+  );
+  return hash.digest('hex');
+}
 
 function renderTitleLines(lines: string[], fontSize: number, lineHeight: number) {
   return lines.map((line, index) =>
@@ -36,7 +86,7 @@ function renderTitleLines(lines: string[], fontSize: number, lineHeight: number)
   );
 }
 
-export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8Array> {
+async function renderPostOgpPng(input: PostOgpCardData): Promise<Uint8Array> {
   const titleLayout = layoutPostOgpTitle(input.title);
   const category = input.category || 'Other';
 
@@ -269,6 +319,35 @@ export async function generatePostOgpPng(input: PostOgpCardData): Promise<Uint8A
   }).render();
 
   return rendered.asPng();
+}
+
+export async function generatePostOgpPng(
+  input: PostOgpCardData,
+  options: PostOgpCacheOptions = {},
+): Promise<Uint8Array> {
+  if (!options.cacheDir) {
+    return renderPostOgpPng(input);
+  }
+
+  const cacheKey = await getPostOgpCacheKey(input);
+  const cachePath = path.join(options.cacheDir, `${cacheKey}.png`);
+
+  try {
+    return await readFile(cachePath);
+  } catch (error) {
+    if (!(error instanceof Error) || !('code' in error) || error.code !== 'ENOENT') {
+      throw error;
+    }
+  }
+
+  const png = await renderPostOgpPng(input);
+  await mkdir(options.cacheDir, { recursive: true });
+
+  const temporaryPath = `${cachePath}.${process.pid}.${Date.now()}.tmp`;
+  await writeFile(temporaryPath, png);
+  await rename(temporaryPath, cachePath);
+
+  return png;
 }
 
 export { layoutPostOgpTitle };

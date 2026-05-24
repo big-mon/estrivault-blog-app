@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import boldFontPath from '../assets/NotoSansJP-Bold.otf';
 import regularFontPath from '../assets/NotoSansJP-Regular.otf';
 
@@ -10,6 +11,7 @@ interface LoadedFont {
 }
 
 let fontPromise: Promise<LoadedFont[]> | undefined;
+let fontDigestPromise: Promise<string> | undefined;
 
 async function loadFontAsset(assetPath: string): Promise<ArrayBuffer> {
   const buffer = await readFile(new URL(assetPath, import.meta.url));
@@ -37,4 +39,18 @@ export function loadPostOgpFonts(): Promise<LoadedFont[]> {
   }
 
   return fontPromise;
+}
+
+export async function getPostOgpFontDigest(): Promise<string> {
+  fontDigestPromise ??= loadPostOgpFonts().then((fonts) => {
+    const hash = createHash('sha256');
+    for (const font of fonts) {
+      hash.update(font.name);
+      hash.update(String(font.weight));
+      hash.update(Buffer.from(font.data));
+    }
+    return hash.digest('hex');
+  });
+
+  return fontDigestPromise;
 }
