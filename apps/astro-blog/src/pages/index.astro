@@ -1,10 +1,10 @@
 ---
 import BaseLayout from '$layouts/BaseLayout.astro';
+import EditorialFooter from '$components/EditorialFooter.astro';
+import EditorialMasthead from '$components/EditorialMasthead.astro';
 import {
   CATEGORY_META,
   POSTS_PER_PAGE,
-  SOCIAL_LINK_GITHUB,
-  SOCIAL_LINK_X,
   SITE_DESCRIPTION,
   SITE_TITLE,
   SITE_URL,
@@ -67,23 +67,7 @@ const fmtDate = (date: Date) =>
   mainClass="editorial-main"
 >
   <div class="editorial-home">
-    <section class="masthead">
-      <div class="brand"><a href="/">ESTRILDA</a> / PRIVATE RESEARCH ARCHIVE</div>
-      <nav>
-        <a href="#latest">ARTICLES</a>
-        <a href="#categories">CATEGORIES</a>
-        <a href="/post/about">ABOUT</a>
-        <a
-          href="https://github.com/big-mon/estrivault-blog-app"
-          target="_blank"
-          rel="noopener noreferrer">GITHUB</a
-        >
-      </nav>
-      <p class="tagline">
-        <span>株式投資・ソフトウェア・AI・ゲーム・ギアレビューを横断する個人アーカイブ</span>
-        <span class="tagline-meta">TEXT FIRST / IMAGE OPTIONAL</span>
-      </p>
-    </section>
+    <EditorialMasthead homePage />
 
     <section class="hero-grid">
       <article>
@@ -180,20 +164,7 @@ const fmtDate = (date: Date) =>
       </div>
     </section>
 
-    <footer class="index-footer">
-      <a class="footer-brand" href="/">Estrilda</a>
-      <span class="footer-links">
-        <a href={`https://x.com/${SOCIAL_LINK_X}`} target="_blank" rel="noopener noreferrer">X</a>
-        <span>/</span>
-        <a
-          href={`https://github.com/${SOCIAL_LINK_GITHUB}`}
-          target="_blank"
-          rel="noopener noreferrer">GITHUB</a
-        >
-        <span>/</span>
-        <a href="/llms.txt">LLMs</a>
-      </span>
-    </footer>
+    <EditorialFooter />
   </div>
 </BaseLayout>
 
@@ -224,10 +195,8 @@ const fmtDate = (date: Date) =>
     margin: 0 auto;
     border-top: 2px solid #202020;
   }
-  .masthead,
   .hero-grid,
-  .section-block,
-  .index-footer {
+  .section-block {
     max-width: 1180px;
     margin-right: auto;
     margin-left: auto;
@@ -238,52 +207,10 @@ const fmtDate = (date: Date) =>
     padding-top: 1rem;
     margin-top: 1rem;
   }
-  .masthead {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0.75rem;
-    align-items: center;
-    padding-top: 1rem;
-  }
-  .brand {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-  }
-  nav {
-    display: flex;
-    gap: 1rem;
-    font-family: var(--font-meta);
-    font-style: italic;
-    font-size: 0.95rem;
-  }
-  .brand a,
-  nav a {
-    text-decoration: none;
-    color: #222;
-  }
-  .tagline {
-    grid-column: 1/-1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem 1rem;
-    justify-content: space-between;
-    border-top: 1px solid #222;
-    color: #666;
-    margin-bottom: 1lh;
-    padding-top: 0.75rem;
-  }
-  .tagline-meta {
-    font-family: var(--font-meta);
-    color: #d6452a;
-    font-size: 0.82rem;
-    font-style: italic;
-  }
   .hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.55fr) minmax(340px, 1fr);
-    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.85fr);
+    gap: 1rem;
     min-height: 320px;
     border-bottom: 1px solid #222;
     padding-bottom: 1rem;
@@ -345,7 +272,8 @@ const fmtDate = (date: Date) =>
   }
   .section-block > h3 {
     font-family: var(--font-meta);
-    font-style: italic;
+    font-style: normal;
+    font-weight: 700;
     color: #d6452a;
     letter-spacing: 0.05em;
     margin-bottom: 0.75rem;
@@ -371,16 +299,23 @@ const fmtDate = (date: Date) =>
     color: inherit;
     text-decoration: none;
   }
+  .table-row:hover .name,
+  .featured:hover h4,
+  .latest-item:hover h4,
+  .series-card:hover h4 {
+    color: #d6452a;
+  }
   .no,
   .key {
     font-family: var(--font-meta);
-    font-style: italic;
+    font-style: normal;
     color: #d6452a;
   }
   .name {
     font-family: var(--font-display);
     font-size: 1.45rem;
     font-weight: 700;
+    transition: color 120ms ease;
   }
   .desc {
     color: #666;
@@ -432,13 +367,14 @@ const fmtDate = (date: Date) =>
   .cat {
     font-family: var(--font-meta);
     color: #d6452a;
-    font-style: italic;
+    font-style: normal;
   }
   .featured h4,
   .latest-item h4 {
     font-family: var(--font-display);
     font-weight: 400;
     line-height: 1.2;
+    transition: color 120ms ease;
   }
   .featured h4 {
     font-size: 1.9rem;
@@ -446,7 +382,7 @@ const fmtDate = (date: Date) =>
   .featured > span {
     font-family: var(--font-meta);
     color: #d6452a;
-    font-style: italic;
+    font-style: normal;
   }
   .note-summary {
     display: block;
@@ -489,7 +425,7 @@ const fmtDate = (date: Date) =>
   .latest-meta time {
     font-family: var(--font-meta);
     color: #d6452a;
-    font-style: italic;
+    font-style: normal;
   }
   .latest-meta .cat {
     color: #222;
@@ -516,44 +452,16 @@ const fmtDate = (date: Date) =>
     font-weight: 400;
     line-height: 1.15;
     margin: 0.5rem 0;
+    transition: color 120ms ease;
   }
   .series-card p:first-child {
     font-family: var(--font-meta);
     color: #d6452a;
-    font-style: italic;
-  }
-  .index-footer {
-    margin-top: 1rem;
-    border-top: 2px solid #202020;
-    display: flex;
-    justify-content: space-between;
-    font-style: italic;
-    padding-top: 0.75rem;
-  }
-  .footer-brand {
-    font-family: var(--font-display);
-  }
-  .footer-links {
-    font-family: var(--font-meta);
-  }
-  .footer-brand,
-  .footer-links a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .footer-links {
-    display: inline-flex;
-    gap: 0.45rem;
+    font-style: normal;
   }
   @media (max-width: 900px) {
     .editorial-home {
       padding: 1rem;
-    }
-    .masthead {
-      grid-template-columns: 1fr;
-    }
-    nav {
-      flex-wrap: wrap;
     }
     .hero-grid,
     .latest-grid {
