@@ -1,0 +1,558 @@
+---
+import type { PostMeta } from '@estrivault/content-processor';
+import EditorialFooter from '$components/EditorialFooter.astro';
+import EditorialMasthead from '$components/EditorialMasthead.astro';
+import { getCategoryLabel } from '$constants';
+import { getTagRouteSegment } from '$lib/url-segments';
+
+interface ArchiveMeta {
+  label: string;
+  value: string | number;
+}
+
+interface Props {
+  archiveType: string;
+  title: string;
+  description?: string;
+  posts: PostMeta[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+  routeBase: string;
+  sideMeta: ArchiveMeta[];
+  topTags?: string[];
+  emptyMessage: string;
+}
+
+const {
+  archiveType,
+  title,
+  description,
+  posts,
+  total,
+  page,
+  perPage,
+  totalPages,
+  routeBase,
+  sideMeta,
+  topTags = [],
+  emptyMessage,
+} = Astro.props;
+
+const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+const formatDate = (date: Date) => dateFormatter.format(date).replace(/\//g, '.');
+const getPageUrl = (pageNumber: number) => `${routeBase}/${pageNumber}`;
+const startNumber = (page - 1) * perPage;
+const visibleTopTags = topTags.slice(0, 5);
+
+type PaginationItem =
+  | { type: 'page'; pageNumber: number }
+  | { type: 'ellipsis'; key: string };
+
+function getVisiblePaginationItems(currentPage: number, pageCount: number): PaginationItem[] {
+  if (pageCount <= 7) {
+    return Array.from({ length: pageCount }, (_, index) => ({
+      type: 'page',
+      pageNumber: index + 1,
+    }));
+  }
+
+  const pageNumbers = new Set([1, pageCount, currentPage - 1, currentPage, currentPage + 1]);
+
+  if (currentPage <= 4) {
+    [2, 3, 4, 5].forEach((pageNumber) => pageNumbers.add(pageNumber));
+  }
+
+  if (currentPage >= pageCount - 3) {
+    [pageCount - 4, pageCount - 3, pageCount - 2, pageCount - 1].forEach((pageNumber) =>
+      pageNumbers.add(pageNumber),
+    );
+  }
+
+  const sortedPages = [...pageNumbers]
+    .filter((pageNumber) => pageNumber >= 1 && pageNumber <= pageCount)
+    .sort((a, b) => a - b);
+
+  return sortedPages.flatMap((pageNumber, index): PaginationItem[] => {
+    const previousPage = sortedPages[index - 1];
+    const gap =
+      previousPage !== undefined && pageNumber - previousPage > 1 ?
+        [{ type: 'ellipsis' as const, key: `${previousPage}-${pageNumber}` }]
+      : [];
+
+    return [...gap, { type: 'page', pageNumber }];
+  });
+}
+
+const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
+---
+
+<div class="archive-page">
+  <EditorialMasthead />
+
+  <section class="archive-hero">
+    <div>
+      <p class="kicker">{archiveType}</p>
+      <h1>{title}</h1>
+      {description && <p class="lead">{description}</p>}
+      {
+        visibleTopTags.length > 0 && (
+          <div class="tag-variants" aria-label="上位タグ">
+            <h2>TAG VARIANT</h2>
+            <div>
+              {visibleTopTags.map((tag) => (
+                <a class="tag-link" href={`/tag/${getTagRouteSegment(tag)}/1`}>#{tag}</a>
+              ))}
+            </div>
+          </div>
+        )
+      }
+    </div>
+    <aside>
+      <h2>ARCHIVE STATUS</h2>
+      <dl>
+        {
+          sideMeta.map((item) => (
+            <div>
+              <dt>{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </aside>
+  </section>
+
+  <section class="archive-index" aria-labelledby="archive-index-title">
+    <div class="section-heading">
+      <h2 id="archive-index-title">ARTICLES MATCHING YOUR SELECTION</h2>
+      <p>{total} RESULTS</p>
+    </div>
+
+    {
+      posts.length > 0 ?
+        <ol class="post-list">
+          {posts.map((post, index) => (
+            <li>
+              <article>
+                <a href={`/post/${post.slug}`} class="post-row">
+                  <span class="post-number">{String(startNumber + index + 1).padStart(2, '0')}</span>
+                  <span class="post-copy">
+                    <span class="post-date">
+                      <time datetime={post.publishedAt.toISOString()}>
+                        {formatDate(post.publishedAt)}
+                      </time>
+                      <span>{getCategoryLabel(post.category)}</span>
+                    </span>
+                    <span class="post-title">{post.title}</span>
+                    <span class="post-description">{post.description}</span>
+                    <span class="post-tags" aria-label="タグ">
+                      {post.tags.slice(0, 4).map((tag) => (
+                        <span>#{tag}</span>
+                      ))}
+                    </span>
+                  </span>
+                  {post.coverImage && (
+                    <span class="post-image" aria-hidden="true">
+                      <img src={post.coverImage} alt="" loading="lazy" />
+                    </span>
+                  )}
+                </a>
+              </article>
+            </li>
+          ))}
+        </ol>
+      : <div class="empty-state">
+          <p>{emptyMessage}</p>
+        </div>
+    }
+  </section>
+
+  {
+    totalPages > 1 && (
+      <nav class="archive-pagination" aria-label="ページネーション">
+        <h2>PAGINATION</h2>
+        {page > 1 ?
+          <a href={getPageUrl(page - 1)} aria-label="前のページ">
+            ← PREV
+          </a>
+        : <span aria-disabled="true">← PREV</span>}
+        <div>
+          {visiblePaginationItems.map((item) =>
+            item.type === 'ellipsis' ?
+              <span class="pagination-ellipsis" aria-hidden="true">…</span>
+            : item.pageNumber === page ?
+              <span aria-current="page">{String(item.pageNumber).padStart(2, '0')}</span>
+            : <a href={getPageUrl(item.pageNumber)} aria-label={`${item.pageNumber}ページ目`}>
+                {String(item.pageNumber).padStart(2, '0')}
+              </a>,
+          )}
+        </div>
+        {page < totalPages ?
+          <a href={getPageUrl(page + 1)} aria-label="次のページ">
+            NEXT →
+          </a>
+        : <span aria-disabled="true">NEXT →</span>}
+      </nav>
+    )
+  }
+
+  <EditorialFooter />
+</div>
+
+<style>
+  :global(.archive-editorial-page) {
+    background: #f1eee7;
+  }
+  :global(.archive-editorial-main) {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
+  .archive-page {
+    --font-display: 'Times New Roman', serif;
+    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
+    --font-meta: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    min-height: 100vh;
+    color: #111;
+    background: #f1eee7;
+    font-family: var(--font-body);
+    padding: clamp(1rem, 2vw, 2rem);
+  }
+  .archive-page::before {
+    content: '';
+    display: block;
+    max-width: 1180px;
+    margin: 0 auto;
+    border-top: 2px solid #202020;
+  }
+  .archive-hero,
+  .archive-index,
+  .archive-pagination {
+    max-width: 1180px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+  .post-row {
+    color: inherit;
+    text-decoration: none;
+  }
+  .kicker,
+  .section-heading h2,
+  .section-heading p,
+  .post-number,
+  .post-date,
+  .archive-pagination,
+  dl dt,
+  dl dd {
+    font-family: var(--font-meta);
+    font-style: normal;
+  }
+  .kicker,
+  .section-heading h2,
+  .post-number,
+  .post-date time,
+  dl dt {
+    color: #d6452a;
+  }
+  .archive-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 1rem;
+    min-height: 300px;
+    border-top: 1px solid #222;
+    border-bottom: 1px solid #222;
+    margin-top: 0;
+    padding: 1rem 0;
+  }
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #222;
+    margin: 0 0 1.2rem;
+    padding: 0.34rem 0.65rem 0.28rem;
+    color: #f1eee7;
+    background: #222;
+    line-height: 1.1;
+    letter-spacing: 0.05em;
+  }
+  h1 {
+    max-width: 24ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 4vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.18;
+  }
+  .lead {
+    max-width: 42rem;
+    margin-top: 1rem;
+    color: #555;
+    font-size: 1.14rem;
+    line-height: 1.8;
+  }
+  .tag-variants {
+    margin-top: 1.25rem;
+  }
+  .tag-variants h2 {
+    margin: 0 0 0.7rem;
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 0.88rem;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .tag-variants div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+  .tag-variants .tag-link {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #222;
+    padding: 0.34rem 0.55rem 0.28rem;
+    color: inherit;
+    font-family: var(--font-meta);
+    font-size: 0.9rem;
+    font-style: normal;
+    line-height: 1.1;
+    text-decoration: none;
+    transition: color 120ms ease, border-color 120ms ease;
+  }
+  .tag-variants .tag-link:hover {
+    border-color: #d6452a;
+    color: #d6452a;
+  }
+  aside {
+    border-left: 1px solid #222;
+    margin-top: -1rem;
+    margin-bottom: -1rem;
+    padding: 1rem 0 1rem 1rem;
+  }
+  aside h2 {
+    margin: 0;
+    font-family: var(--font-meta);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 1.25rem;
+    border-top: 1px solid #d6452a;
+    margin: 1rem 0 0;
+    padding-top: 0.75rem;
+  }
+  dl div {
+    display: contents;
+  }
+  dl dt,
+  dl dd {
+    margin: 0;
+    line-height: 1.65;
+  }
+  dl dd {
+    text-align: right;
+  }
+  .archive-index {
+    margin-top: 2.5rem;
+  }
+  .section-heading {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid #222;
+    padding-bottom: 0.8rem;
+  }
+  .section-heading h2,
+  .section-heading p {
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .section-heading p {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  .post-list {
+    border-bottom: 1px solid #222;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .post-row {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) 112px;
+    gap: 1rem;
+    align-items: center;
+    min-height: 156px;
+    border-top: 1px solid #aaa;
+    padding: 1.35rem 0;
+  }
+  .post-row:hover .post-title {
+    color: #d6452a;
+  }
+  .post-date,
+  .post-copy,
+  .post-tags {
+    display: flex;
+  }
+  .post-date {
+    flex-flow: row wrap;
+    gap: 0.35rem 0.75rem;
+    color: #222;
+    font-size: 0.86rem;
+  }
+  .post-number {
+    font-size: 1rem;
+    line-height: 1.2;
+  }
+  .post-copy {
+    flex-direction: column;
+    min-width: 0;
+    gap: 0.55rem;
+  }
+  .post-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.12;
+    transition: color 120ms ease;
+  }
+  .post-description {
+    display: -webkit-box;
+    overflow: hidden;
+    color: #666;
+    line-height: 1.65;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  .post-tags {
+    flex-flow: row wrap;
+    gap: 0.45rem;
+    color: #444;
+    font-family: var(--font-meta);
+    font-size: 0.78rem;
+  }
+  .post-tags span {
+    border: 1px solid #222;
+    padding: 0.26rem 0.45rem 0.2rem;
+    line-height: 1.1;
+  }
+  .post-image {
+    grid-column: 3;
+    display: block;
+    width: 112px;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    border: 1px solid #555;
+  }
+  .post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .empty-state {
+    border-bottom: 1px solid #222;
+    padding: 3rem 0;
+    color: #666;
+    text-align: center;
+  }
+  .archive-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    align-items: center;
+    justify-content: flex-start;
+    border-top: 0;
+    border-bottom: 0;
+    margin-top: 3.5rem;
+    padding: 0;
+  }
+  .archive-pagination h2 {
+    flex-basis: 100%;
+    border-bottom: 1px solid #222;
+    margin: 0 0 0.85rem;
+    padding-bottom: 0.8rem;
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 0.88rem;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .archive-pagination > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    justify-content: flex-start;
+  }
+  .archive-pagination a,
+  .archive-pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2rem;
+    border: 1px solid #222;
+    padding: 0.34rem 0.65rem 0.28rem;
+    color: inherit;
+    line-height: 1.1;
+    text-decoration: none;
+    transition: color 120ms ease, border-color 120ms ease;
+  }
+  .archive-pagination a:hover {
+    border-color: #d6452a;
+    color: #d6452a;
+  }
+  .archive-pagination [aria-current='page'] {
+    border-color: #222;
+    color: #f1eee7;
+    background: #222;
+  }
+  .archive-pagination [aria-disabled='true'] {
+    border-color: #999;
+    color: #999;
+  }
+  @media (max-width: 900px) {
+    .archive-page {
+      padding: 1rem;
+    }
+    .archive-hero {
+      grid-template-columns: 1fr;
+    }
+    aside {
+      display: none;
+    }
+    h1 {
+      max-width: none;
+    }
+    .post-row {
+      grid-template-columns: 56px minmax(0, 1fr) 72px;
+      gap: 0.75rem;
+      min-height: 0;
+    }
+    .post-copy {
+      grid-column: 2;
+    }
+    .post-image {
+      grid-column: 3;
+      grid-row: 1 / span 3;
+      width: 72px;
+    }
+    .archive-pagination {
+      text-align: left;
+    }
+  }
+</style>

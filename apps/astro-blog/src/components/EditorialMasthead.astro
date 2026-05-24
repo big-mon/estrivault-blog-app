@@ -1,0 +1,121 @@
+---
+interface Props {
+  homePage?: boolean;
+}
+
+const { homePage = false } = Astro.props;
+const localPath = (hash: string) => (homePage ? hash : `/${hash}`);
+---
+
+<section class="editorial-masthead">
+  <div class="brand"><a href="/">Estrilda</a></div>
+  <nav>
+    <a href={localPath('#categories')}>CATEGORIES</a>
+    <a href="/post/about">ABOUT</a>
+    <a href="/llms.txt" target="_blank" aria-label="LLMs" title="LLMs" class="icon-link">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24">
+        <path
+          d="M11 2h2v3h3.5A3.5 3.5 0 0 1 20 8.5v6A3.5 3.5 0 0 1 16.5 18h-9A3.5 3.5 0 0 1 4 14.5v-6A3.5 3.5 0 0 1 7.5 5H11V2Zm-3.5 5A1.5 1.5 0 0 0 6 8.5v6A1.5 1.5 0 0 0 7.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-6A1.5 1.5 0 0 0 16.5 7h-9ZM9 11a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 9 11Zm6 0a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 15 11Zm-5.5 2.5h5v1.5h-5v-1.5ZM2 10h2v3H2v-3Zm18 0h2v3h-2v-3Z"
+        />
+      </svg>
+    </a>
+  </nav>
+  <p class="tagline">
+    <span class="tagline-copy">株式投資・ソフトウェア・AI・ゲーム・ギアレビューを横断する個人アーカイブ</span>
+    <span class="tagline-meta">TEXT FIRST / IMAGE OPTIONAL</span>
+  </p>
+</section>
+
+<style>
+  .editorial-masthead {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+    max-width: 1180px;
+    margin-right: auto;
+    margin-bottom: 2rem;
+    margin-left: auto;
+    padding-top: 1rem;
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .brand a,
+  nav a {
+    color: #222;
+    text-decoration: none;
+    transition: color 120ms ease;
+  }
+  .brand a {
+    font-family: var(--font-display);
+    font-style: normal;
+    font-weight: 700;
+  }
+  nav {
+    display: flex;
+    gap: 1rem;
+    font-family: var(--font-meta);
+    font-size: 0.95rem;
+    font-style: normal;
+  }
+  nav a:hover {
+    color: #d6452a;
+  }
+  .icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    margin-left: 0.85rem;
+  }
+  .icon-link svg {
+    width: 1.65rem;
+    height: 1.65rem;
+    fill: currentColor;
+  }
+  .tagline {
+    grid-column: 1/-1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    justify-content: space-between;
+    border-top: 1px solid #222;
+    color: #666;
+    padding-top: 0.75rem;
+  }
+  .tagline-copy {
+    font-family: var(--font-meta);
+    font-size: 0.82rem;
+    font-style: normal;
+  }
+  .tagline-meta {
+    font-family: var(--font-meta);
+    font-size: 0.82rem;
+    font-style: normal;
+  }
+  .tagline-meta {
+    color: #d6452a;
+  }
+  @media (max-width: 900px) {
+    .editorial-masthead {
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: 0.75rem;
+    }
+    nav {
+      flex-wrap: nowrap;
+      gap: 0.75rem;
+      white-space: nowrap;
+    }
+    .tagline-meta {
+      display: none;
+    }
+    .tagline {
+      display: none;
+    }
+  }
+</style>

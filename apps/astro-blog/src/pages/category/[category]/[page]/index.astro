@@ -1,20 +1,44 @@
 ---
+import type { PostMeta } from '@estrivault/content-processor';
 import BaseLayout from '$layouts/BaseLayout.astro';
-import Pagination from '$components/Pagination.astro';
-import PostCard from '$components/PostCard.astro';
+import ArchiveListing from '$components/ArchiveListing.astro';
 import { getCategoryMeta, POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
-import { getAllCategories, getPosts } from '$lib/content';
+import { filterPosts, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
 
 interface Props {
   category: string;
 }
 
+function getTopTags(posts: PostMeta[]): string[] {
+  const tagCounts = new Map<string, { tag: string; count: number }>();
+
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      const current = tagCounts.get(tag) ?? { tag, count: 0 };
+      current.count += 1;
+      tagCounts.set(tag, current);
+    }
+  }
+
+  return [...tagCounts.values()]
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
+    .slice(0, 5)
+    .map((item) => item.tag);
+}
+
+function getTagCount(posts: PostMeta[]): number {
+  return new Set(posts.flatMap((post) => post.tags)).size;
+}
+
 export async function getStaticPaths() {
-  const categories = await getAllCategories();
+  const allPosts = await getAllPostsMeta();
+  const categories = [...new Set(allPosts.map((post) => post.category))].sort((a, b) =>
+    a.localeCompare(b),
+  );
   const paths = [];
 
   for (const category of categories) {
-    const categoryPosts = await getPosts({ category, perPage: POSTS_PER_PAGE });
+    const categoryPosts = getPaginatedPosts(allPosts, { category, perPage: POSTS_PER_PAGE });
 
     for (let page = 1; page <= categoryPosts.totalPages; page++) {
       paths.push({
@@ -35,11 +59,14 @@ export async function getStaticPaths() {
 const { category } = Astro.props as Props;
 const categoryMeta = getCategoryMeta(category);
 const currentPage = Number(Astro.params.page);
-const result = await getPosts({
-  category,
+const allPosts = await getAllPostsMeta();
+const archivePosts = filterPosts(allPosts, { category });
+const result = getPaginatedPosts(archivePosts, {
   page: currentPage,
   perPage: POSTS_PER_PAGE,
 });
+const topTags = getTopTags(archivePosts);
+const tagCount = getTagCount(archivePosts);
 
 const siteBase = SITE_URL.replace(/\/$/, '');
 const pageUrl = `${siteBase}/category/${Astro.params.category}/${currentPage}`;
@@ -62,39 +89,28 @@ const nextUrl =
   canonical={pageUrl}
   prevUrl={prevUrl}
   nextUrl={nextUrl}
+  hideHeader
+  hideFooter
+  bodyClass="archive-editorial-page"
+  mainClass="archive-editorial-main"
 >
-  <div class="container mx-auto px-4 py-8">
-    <div class="mb-8 text-center">
-      <h1 class="mb-2 text-3xl font-bold">{categoryMeta.label}</h1>
-      {categoryMeta.description && <p class="mb-2 text-gray-600">{categoryMeta.description}</p>}
-      <p class="text-sm text-gray-500">
-        全{result.total}件の記事（{result.page} / {result.totalPages}ページ）
-      </p>
-    </div>
-
-    {
-      result.posts.length > 0 ?
-        <div class="mb-8">
-          <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {result.posts.map((post) => (
-              <PostCard post={post} />
-            ))}
-          </div>
-
-          {result.totalPages > 1 && (
-            <div class="mt-12">
-              <Pagination
-                currentPage={result.page}
-                totalPages={result.totalPages}
-                baseUrl={`/category/${Astro.params.category}`}
-                maxVisible={5}
-              />
-            </div>
-          )}
-        </div>
-      : <div class="rounded-lg bg-gray-50 p-8 text-center">
-          <p class="text-gray-500">このカテゴリーにはまだ記事がありません。</p>
-        </div>
-    }
-  </div>
+  <ArchiveListing
+    archiveType="CATEGORY"
+    title={categoryMeta.label}
+    description={categoryMeta.description}
+    posts={result.posts}
+    total={result.total}
+    page={result.page}
+    perPage={result.perPage}
+    totalPages={result.totalPages}
+    routeBase={`/category/${Astro.params.category}`}
+    topTags={topTags}
+    sideMeta={[
+      { label: 'TYPE', value: 'CATEGORY' },
+      { label: 'SLUG', value: (Astro.params.category ?? category).toUpperCase() },
+      { label: 'NOTES', value: result.total },
+      { label: 'TAGS', value: tagCount },
+    ]}
+    emptyMessage="このカテゴリーにはまだ記事がありません。"
+  />
 </BaseLayout>

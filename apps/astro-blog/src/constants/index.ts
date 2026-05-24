@@ -1,6 +1,6 @@
 export const SITE_TITLE = 'Estrilda';
 export const SITE_DESCRIPTION =
-  '株式投資やプログラミング情報をお届けするブログです。開発者向けの実践的な内容を発信しています。';
+  '投資分析、ソフトウェア開発、AI活用、ゲーム攻略、ギアレビュー、考察を蓄積する個人アーカイブです。';
 export const SITE_AUTHOR = 'Estrilda';
 export const SITE_URL = 'https://estrilda.damonge.com/';
 

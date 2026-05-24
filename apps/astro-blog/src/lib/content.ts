@@ -24,6 +24,8 @@ interface PostMetaSource {
   meta: PostMeta | null;
 }
 
+let allPostsMetaPromise: Promise<PostMeta[]> | undefined;
+
 function getMarkdownFiles(): Record<string, string> {
   const modules = import.meta.glob('@content/blog/**/*.{md,mdx}', {
     query: '?raw',
@@ -103,6 +105,15 @@ async function extractFrontmatterOnly(
 export async function getAllPostsMeta(
   options: ProcessorOptions = defaultProcessorOptions,
 ): Promise<PostMeta[]> {
+  if (options === defaultProcessorOptions) {
+    allPostsMetaPromise ??= loadAllPostsMeta(options);
+    return allPostsMetaPromise;
+  }
+
+  return loadAllPostsMeta(options);
+}
+
+async function loadAllPostsMeta(options: ProcessorOptions): Promise<PostMeta[]> {
   const markdownFiles = getMarkdownFiles();
 
   const postMetaSources = await Promise.all(
@@ -125,16 +136,14 @@ export async function getAllPostsMeta(
     .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 }
 
-export async function getPosts(options?: {
-  page?: number;
-  perPage?: number;
-  category?: string;
-  tag?: string;
-}): Promise<PaginatedPosts> {
-  const page = options?.page || 1;
-  const perPage = options?.perPage || 20;
-
-  let filteredPosts = await getAllPostsMeta();
+export function filterPosts(
+  posts: PostMeta[],
+  options?: {
+    category?: string;
+    tag?: string;
+  },
+): PostMeta[] {
+  let filteredPosts = posts;
 
   if (options?.category) {
     const normalizedCategory = normalizeForTagFilter(options.category);
@@ -150,18 +159,50 @@ export async function getPosts(options?: {
     );
   }
 
-  const total = filteredPosts.length;
+  return filteredPosts;
+}
+
+export function paginatePosts(
+  posts: PostMeta[],
+  options?: {
+    page?: number;
+    perPage?: number;
+  },
+): PaginatedPosts {
+  const page = options?.page || 1;
+  const perPage = options?.perPage || 20;
+  const total = posts.length;
   const totalPages = Math.ceil(total / perPage);
   const startIndex = (page - 1) * perPage;
-  const posts = filteredPosts.slice(startIndex, startIndex + perPage);
 
   return {
-    posts,
+    posts: posts.slice(startIndex, startIndex + perPage),
     total,
     page,
     perPage,
     totalPages,
   };
+}
+
+export function getPaginatedPosts(
+  posts: PostMeta[],
+  options?: {
+    page?: number;
+    perPage?: number;
+    category?: string;
+    tag?: string;
+  },
+): PaginatedPosts {
+  return paginatePosts(filterPosts(posts, options), options);
+}
+
+export async function getPosts(options?: {
+  page?: number;
+  perPage?: number;
+  category?: string;
+  tag?: string;
+}): Promise<PaginatedPosts> {
+  return getPaginatedPosts(await getAllPostsMeta(), options);
 }
 
 export async function getPostBySlug(

@@ -1,21 +1,50 @@
 ---
+import type { PostMeta } from '@estrivault/content-processor';
 import BaseLayout from '$layouts/BaseLayout.astro';
-import Pagination from '$components/Pagination.astro';
-import PostCard from '$components/PostCard.astro';
+import ArchiveListing from '$components/ArchiveListing.astro';
 import { POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
-import { getAllTags, getPosts } from '$lib/content';
+import { filterPosts, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
 import { encodeRouteSegment, getTagRouteSegment } from '$lib/url-segments';
 
 interface Props {
   tag: string;
 }
 
+function getTopTags(posts: PostMeta[], excludedTag: string): string[] {
+  const tagCounts = new Map<string, { tag: string; count: number }>();
+
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      if (tag === excludedTag) {
+        continue;
+      }
+
+      const current = tagCounts.get(tag) ?? { tag, count: 0 };
+      current.count += 1;
+      tagCounts.set(tag, current);
+    }
+  }
+
+  return [...tagCounts.values()]
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
+    .slice(0, 5)
+    .map((item) => item.tag);
+}
+
+function getTagCount(posts: PostMeta[], excludedTag: string): number {
+  return new Set(posts.flatMap((post) => post.tags).filter((postTag) => postTag !== excludedTag))
+    .size;
+}
+
 export async function getStaticPaths() {
-  const tags = await getAllTags();
+  const allPosts = await getAllPostsMeta();
+  const tags = [...new Set(allPosts.flatMap((post) => post.tags))].sort((a, b) =>
+    a.localeCompare(b),
+  );
   const paths = [];
 
   for (const tag of tags) {
-    const tagPosts = await getPosts({ tag, perPage: POSTS_PER_PAGE });
+    const tagPosts = getPaginatedPosts(allPosts, { tag, perPage: POSTS_PER_PAGE });
 
     for (let page = 1; page <= tagPosts.totalPages; page++) {
       paths.push({
@@ -35,11 +64,14 @@ export async function getStaticPaths() {
 
 const { tag } = Astro.props as Props;
 const currentPage = Number(Astro.params.page);
-const result = await getPosts({
-  tag,
+const allPosts = await getAllPostsMeta();
+const archivePosts = filterPosts(allPosts, { tag });
+const result = getPaginatedPosts(archivePosts, {
   page: currentPage,
   perPage: POSTS_PER_PAGE,
 });
+const topTags = getTopTags(archivePosts, tag);
+const tagCount = getTagCount(archivePosts, tag);
 
 const siteBase = SITE_URL.replace(/\/$/, '');
 const tagRouteSegment = String(Astro.params.tag ?? getTagRouteSegment(tag));
@@ -64,38 +96,28 @@ const nextUrl =
   canonical={pageUrl}
   prevUrl={prevUrl}
   nextUrl={nextUrl}
+  hideHeader
+  hideFooter
+  bodyClass="archive-editorial-page"
+  mainClass="archive-editorial-main"
 >
-  <div class="container mx-auto px-4 py-8">
-    <div class="mb-8 text-center">
-      <h1 class="mb-2 text-3xl font-bold">#{tag.toUpperCase()}</h1>
-      <p class="text-gray-600">
-        全{result.total}件の記事（{result.page} / {result.totalPages}ページ）
-      </p>
-    </div>
-
-    {
-      result.posts.length > 0 ?
-        <div class="mb-8">
-          <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {result.posts.map((post) => (
-              <PostCard post={post} />
-            ))}
-          </div>
-
-          {result.totalPages > 1 && (
-            <div class="mt-12">
-              <Pagination
-                currentPage={result.page}
-                totalPages={result.totalPages}
-                baseUrl={`/tag/${encodedTagRouteSegment}`}
-                maxVisible={5}
-              />
-            </div>
-          )}
-        </div>
-      : <div class="rounded-lg bg-gray-50 p-8 text-center">
-          <p class="text-gray-500">このタグにはまだ記事がありません。</p>
-        </div>
-    }
-  </div>
+  <ArchiveListing
+    archiveType="TAG"
+    title={`#${tag}`}
+    description={`${tag}タグが付けられた記事を、新しい順にまとめた一覧です。`}
+    posts={result.posts}
+    total={result.total}
+    page={result.page}
+    perPage={result.perPage}
+    totalPages={result.totalPages}
+    routeBase={`/tag/${encodedTagRouteSegment}`}
+    topTags={topTags}
+    sideMeta={[
+      { label: 'TYPE', value: 'TAG' },
+      { label: 'TAG', value: tag },
+      { label: 'NOTES', value: result.total },
+      { label: 'TAGS', value: tagCount },
+    ]}
+    emptyMessage="このタグにはまだ記事がありません。"
+  />
 </BaseLayout>

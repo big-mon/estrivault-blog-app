@@ -1,12 +1,11 @@
 ---
 import BaseLayout from '$layouts/BaseLayout.astro';
-import EditOnGitHub from '$components/EditOnGitHub.astro';
-import PostBody from '$components/PostBody.astro';
-import PostHeader from '$components/PostHeader.astro';
-import TableOfContents from '$components/TableOfContents.astro';
+import EditorialFooter from '$components/EditorialFooter.astro';
+import EditorialMasthead from '$components/EditorialMasthead.astro';
 import { getCategoryLabel, SITE_TITLE, SITE_URL, SOCIAL_LINK_X } from '$constants';
 import { getAllPostsMeta, getPostBySlug } from '$lib/content';
 import { getPostOgpImageUrl } from '$lib/og';
+import { getTagRouteSegment } from '$lib/url-segments';
 
 export async function getStaticPaths() {
   const allPosts = await getAllPostsMeta();
@@ -33,9 +32,48 @@ if (!post) {
 const siteBase = SITE_URL.replace(/\/$/, '');
 const canonical = `${siteBase}/post/${post.meta.slug}`;
 const title = `${post.meta.title} | ${SITE_TITLE}`;
-const description = post.meta.description || `${post.meta.title}�ɂ��Ă̋L���ł��B`;
+const description = post.meta.description || `${post.meta.title}についての記事です。`;
 const categoryLabel = getCategoryLabel(post.meta.category);
 const ogImage = getPostOgpImageUrl(post.meta.slug);
+const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
+  timeZone: 'Asia/Tokyo',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+const publishedDate = dateFormatter.format(post.meta.publishedAt).replace(/\//g, '.');
+const updatedDate = post.meta.updatedAt ?
+  dateFormatter.format(post.meta.updatedAt).replace(/\//g, '.')
+: undefined;
+const readingTime = post.meta.readingTime ? `${Math.ceil(post.meta.readingTime)} min` : 'FIELD NOTE';
+const articleSourcePath = post.originalPath ?? '';
+const editSourceUrl = articleSourcePath ?
+  `https://github.com/big-mon/estrivault-blog-app/edit/main/${articleSourcePath}`
+: undefined;
+const sourceHistoryUrl = articleSourcePath ?
+  `https://github.com/big-mon/estrivault-blog-app/commits/main/${articleSourcePath}`
+: undefined;
+const contributorsApiUrl = articleSourcePath ?
+  `https://api.github.com/repos/big-mon/estrivault-blog-app/commits?path=${encodeURIComponent(articleSourcePath)}&per_page=100`
+: undefined;
+const articleMeta = [
+  { label: 'PUBLISHED', value: publishedDate },
+  ...(updatedDate && updatedDate !== publishedDate ? [{ label: 'UPDATED', value: updatedDate }] : []),
+  { label: 'READING', value: readingTime },
+];
+const bodyClasses = [
+  'article-body',
+  post.hasTwitterEmbeds ? 'has-twitter-embeds' : '',
+  post.hasAmazonEmbeds ? 'has-amazon-embeds' : '',
+  post.hasCodeBlocks ? 'has-code-blocks' : '',
+  post.hasDirectiveBoxes ? 'has-directive-boxes' : '',
+]
+  .filter(Boolean)
+  .join(' ');
+const shouldShowArticleThumbnail =
+  post.meta.showArticleThumbnail !== false && Boolean(post.meta.coverImage);
+const tocHeadings =
+  post.headings.length > 10 ? post.headings.filter((heading) => heading.level === 2) : post.headings;
 
 const schemaData = {
   '@context': 'https://schema.org',
@@ -83,29 +121,971 @@ const schemaData = {
   modifiedTime={(post.meta.updatedAt || post.meta.publishedAt).toISOString()}
   section={categoryLabel}
   tags={post.meta.tags}
+  hideHeader
+  hideFooter
+  bodyClass="article-editorial-page"
+  mainClass="article-editorial-main"
 >
-  <article class="container mx-auto px-2 sm:px-4 xl:max-w-6xl">
-    <PostHeader meta={post.meta} />
-    <div class="xl:flex xl:gap-8">
-      <div class="xl:max-w-4xl xl:flex-1">
-        <div class="xl:hidden">
-          <TableOfContents headings={post.headings} />
-        </div>
+  <article class="article-page">
+    <EditorialMasthead />
 
-        <PostBody post={post} />
+    <header class="article-hero">
+      <div class="article-heading">
+        <div class="article-badges">
+          <a
+            class="article-category"
+            href={`/category/${encodeURIComponent(post.meta.category.toLowerCase())}/1`}
+          >
+            {categoryLabel}
+          </a>
+        </div>
+        <h1>{post.meta.title}</h1>
+        {post.meta.description && <p class="article-lead">{post.meta.description}</p>}
+        <div class="article-tags">
+          {post.meta.tags.slice(0, 4).map((tag) => (
+            <a href={`/tag/${getTagRouteSegment(tag)}/1`}>#{tag}</a>
+          ))}
+        </div>
+      </div>
+
+      <aside class="article-meta">
+        <h2>ARTICLE META</h2>
+        <dl>
+          {
+            articleMeta.map((item) => (
+              <div>
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        {
+          shouldShowArticleThumbnail && post.meta.coverImage && (
+            <figure class="article-thumbnail">
+              <img src={post.meta.coverImage} alt="" loading="lazy" />
+            </figure>
+          )
+        }
+      </aside>
+    </header>
+
+    <div class="article-layout">
+      <div class="article-content">
+        <div class={bodyClasses} set:html={post.html || 'コンテンツがありません'} />
+
+        <nav class="article-return" aria-label="記事ナビゲーション">
+          <a href="/">← ARTICLES INDEX</a>
+        </nav>
 
         {
-          post.originalPath && (
-            <div class="post-footer mt-12 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-8">
-              <EditOnGitHub originalPath={post.originalPath} />
-            </div>
+          articleSourcePath && editSourceUrl && sourceHistoryUrl && contributorsApiUrl && (
+            <section
+              class="article-contributors"
+              data-contributors-api={contributorsApiUrl}
+              data-edit-url={editSourceUrl}
+              data-history-url={sourceHistoryUrl}
+            >
+              <div class="contributors-heading">
+                <h2>ARTICLE CONTRIBUTORS</h2>
+              </div>
+              <div class="contributors-body">
+                <div class="contributors-list" aria-live="polite">
+                  <span>Loading contributors</span>
+                </div>
+                <div class="contributors-actions">
+                  <a
+                    class="edit-source-link"
+                    href={editSourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24">
+                      <path
+                        d="M12 2C6.48 2 2 6.58 2 12.25c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.49v-1.9c-2.78.62-3.37-1.22-3.37-1.22-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.86.09-.67.35-1.12.63-1.38-2.22-.26-4.55-1.14-4.55-5.07 0-1.12.39-2.04 1.03-2.76-.1-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.05A9.3 9.3 0 0 1 12 6.91c.85 0 1.7.12 2.5.34 1.9-1.33 2.74-1.05 2.74-1.05.55 1.41.2 2.46.1 2.72.64.72 1.03 1.64 1.03 2.76 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9v2.82c0 .27.18.59.69.49A10.08 10.08 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"
+                      />
+                    </svg>
+                    GitHubで編集を提案する
+                  </a>
+                  <a href={sourceHistoryUrl} target="_blank" rel="noopener noreferrer">
+                    VIEW HISTORY
+                  </a>
+                </div>
+              </div>
+            </section>
           )
         }
       </div>
 
-      <aside class="hidden xl:block xl:w-64 xl:flex-shrink-0">
-        <TableOfContents headings={post.headings} />
+      <aside class="article-sidebar">
+        {
+          tocHeadings.length > 0 && (
+            <nav class="article-toc" aria-label="Table of contents">
+              <h2>TABLE OF CONTENTS</h2>
+              <ol>
+                {tocHeadings.map((heading, index) => (
+                  <li class={`toc-level-${heading.level}`}>
+                    <a href={`#${heading.id}`} data-toc-index={String(index)}>
+                      {heading.text}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )
+        }
       </aside>
     </div>
+
+    <EditorialFooter />
   </article>
 </BaseLayout>
+
+<script>
+  const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-index]')];
+  const tocLevels = new Set(
+    tocLinks
+      .map((link) => link.closest('li')?.className.match(/toc-level-(\d)/)?.[1])
+      .filter((level): level is string => Boolean(level)),
+  );
+  const articleHeadings = [
+    ...document.querySelectorAll<HTMLElement>('.article-body h2, .article-body h3, .article-body h4, .article-body h5, .article-body h6'),
+  ].filter((heading) => tocLevels.has(heading.tagName.replace('H', '')));
+
+  const setActiveTocLink = (activeIndex: number) => {
+    for (const link of tocLinks) {
+      const isActive = Number(link.dataset.tocIndex) === activeIndex;
+      link.classList.toggle('is-active', isActive);
+      if (isActive) {
+        link.setAttribute('aria-current', 'location');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    }
+  };
+
+  const getCurrentHeadingIndex = () => {
+    const offset = window.innerHeight * 0.28;
+    let currentIndex = 0;
+
+    for (const [index, heading] of articleHeadings.entries()) {
+      if (heading.getBoundingClientRect().top <= offset) {
+        currentIndex = index;
+      } else {
+        break;
+      }
+    }
+
+    return currentIndex;
+  };
+
+  const updateActiveTocLink = () => {
+    setActiveTocLink(getCurrentHeadingIndex());
+  };
+
+  if (tocLinks.length > 0 && articleHeadings.length > 0) {
+    updateActiveTocLink();
+    window.addEventListener('scroll', updateActiveTocLink, { passive: true });
+    window.addEventListener('resize', updateActiveTocLink);
+  }
+
+  const contributorsSection = document.querySelector<HTMLElement>('.article-contributors');
+  const contributorsList = contributorsSection?.querySelector<HTMLElement>('.contributors-list');
+
+  if (contributorsSection && contributorsList) {
+    const apiUrl = contributorsSection.dataset.contributorsApi;
+
+    const renderFallback = () => {
+      contributorsList.innerHTML = '<span>Contributor data unavailable</span>';
+    };
+
+    const escapeHtml = (value: string) =>
+      value.replace(/[&<>"']/g, (char) => {
+        const entities: Record<string, string> = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        };
+
+        return entities[char] ?? char;
+      });
+
+    const renderContributors = async () => {
+      if (!apiUrl) {
+        renderFallback();
+        return;
+      }
+
+      try {
+        const response = await fetch(apiUrl, {
+          headers: { Accept: 'application/vnd.github+json' },
+        });
+
+        if (!response.ok) {
+          renderFallback();
+          return;
+        }
+
+        const commits = (await response.json()) as Array<{
+          author?: {
+            login?: string;
+            avatar_url?: string;
+            html_url?: string;
+          } | null;
+          commit?: {
+            author?: {
+              name?: string;
+            } | null;
+          } | null;
+        }>;
+        const contributors = new Map<
+          string,
+          { name: string; avatarUrl?: string; profileUrl?: string; count: number }
+        >();
+
+        for (const commit of commits) {
+          const key = commit.author?.login ?? commit.commit?.author?.name;
+          if (!key) {
+            continue;
+          }
+
+          const current = contributors.get(key) ?? {
+            name: key,
+            avatarUrl: commit.author?.avatar_url,
+            profileUrl: commit.author?.html_url,
+            count: 0,
+          };
+
+          current.count += 1;
+          contributors.set(key, current);
+        }
+
+        if (contributors.size === 0) {
+          renderFallback();
+          return;
+        }
+
+        contributorsList.innerHTML = [...contributors.values()]
+          .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+          .slice(0, 6)
+          .map((contributor) => {
+            const label = `${contributor.name} (${contributor.count})`;
+            const safeLabel = escapeHtml(label);
+            const safeName = escapeHtml(contributor.name);
+            const safeAvatarUrl = contributor.avatarUrl ? escapeHtml(contributor.avatarUrl) : '';
+            const safeProfileUrl = contributor.profileUrl ? escapeHtml(contributor.profileUrl) : '';
+            const image =
+              contributor.avatarUrl ?
+                `<img src="${safeAvatarUrl}" alt="${safeName}" loading="lazy" />`
+              : '<span class="contributor-initial" aria-hidden="true"></span>';
+
+            return contributor.profileUrl ?
+                `<a href="${safeProfileUrl}" target="_blank" rel="noopener noreferrer" title="${safeLabel}" aria-label="${safeLabel}">${image}</a>`
+              : `<span title="${safeLabel}" aria-label="${safeLabel}">${image}</span>`;
+          })
+          .join('');
+      } catch {
+        renderFallback();
+      }
+    };
+
+    void renderContributors();
+  }
+</script>
+
+<style>
+  :global(.article-editorial-page) {
+    background: #f1eee7;
+  }
+  :global(.article-editorial-main) {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
+  .article-page {
+    --font-display: 'Times New Roman', serif;
+    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
+    --font-meta: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    min-height: 100vh;
+    padding: clamp(1rem, 2vw, 2rem);
+    color: #111;
+    background: #f1eee7;
+    font-family: var(--font-body);
+  }
+  .article-page::before {
+    content: '';
+    display: block;
+    max-width: 1180px;
+    margin: 0 auto;
+    border-top: 2px solid #202020;
+  }
+  .article-hero,
+  .article-layout {
+    max-width: 1180px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+  .article-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 1rem;
+    min-height: 330px;
+    margin-top: 0;
+    border-top: 1px solid #222;
+    border-bottom: 2px solid #222;
+  }
+  .article-heading {
+    padding: 1rem 2rem 1.4rem 0;
+  }
+  .article-badges,
+  .article-tags,
+  .article-meta,
+  .article-toc,
+  .article-return {
+    font-family: var(--font-meta);
+    font-style: normal;
+  }
+  .article-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .article-badges a,
+  .article-tags a {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #222;
+    padding: 0.34rem 0.55rem 0.28rem;
+    color: #111;
+    font-size: 0.86rem;
+    line-height: 1.1;
+    text-decoration: none;
+    transition:
+      color 120ms ease,
+      border-color 120ms ease;
+  }
+  .article-badges .article-category {
+    color: #f1eee7;
+    background: #222;
+  }
+  .article-badges .article-category:hover {
+    border-color: #d6452a;
+    color: #f1eee7;
+    background: #d6452a;
+  }
+  .article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 0.75rem;
+    margin-top: 1.25rem;
+  }
+  .article-tags a:hover {
+    border-color: #d6452a;
+    color: #d6452a;
+  }
+  h1 {
+    max-width: 22ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.6rem);
+    font-weight: 700;
+    line-height: 1.14;
+    letter-spacing: 0;
+  }
+  .article-lead {
+    max-width: 46rem;
+    margin: 1.25rem 0 0;
+    color: #666;
+    font-size: 1.08rem;
+    line-height: 1.85;
+  }
+  .article-meta {
+    border-left: 1px solid #222;
+    padding: 1.55rem 0 1.4rem 1.35rem;
+  }
+  .article-meta h2,
+  .article-toc h2 {
+    margin: 0;
+    color: #d6452a;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .article-meta h2 {
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+  }
+  .article-meta dl {
+    margin: 0.7rem 0 0;
+  }
+  .article-thumbnail {
+    margin: 1.5rem 0 0;
+    padding: 1.2rem 2rem 0;
+  }
+  .article-thumbnail img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border: 1px solid #222;
+    object-fit: cover;
+    background: #ddd6c8;
+  }
+  .article-meta div {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 1rem;
+    border-top: 1px solid #b9b2a4;
+    padding: 0.95rem 0;
+  }
+  .article-meta div:last-child {
+    border-bottom: 1px solid #b9b2a4;
+  }
+  .article-meta dt {
+    color: #d6452a;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .article-meta dd {
+    margin: 0;
+    color: #222;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.45;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  .article-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 1rem;
+    padding-top: 3rem;
+  }
+  .article-content {
+    min-width: 0;
+    padding-right: 2rem;
+  }
+  .article-sidebar {
+    min-width: 0;
+    border-left: 1px solid #222;
+    padding-left: 1.35rem;
+  }
+  .article-toc {
+    position: sticky;
+    top: 1.5rem;
+  }
+  .article-toc h2 {
+    border-bottom: 2px solid #222;
+    padding-bottom: 0.9rem;
+  }
+  .article-toc ol {
+    display: grid;
+    gap: 0;
+    margin: 0.6rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .article-toc li {
+    border-bottom: 1px solid #b9b2a4;
+  }
+  .article-toc a {
+    display: block;
+    padding: 0.8rem 0.55rem;
+    color: #333;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.45;
+    text-decoration: none;
+    transition:
+      color 120ms ease,
+      background-color 120ms ease;
+  }
+  .article-toc a:hover {
+    color: #d6452a;
+  }
+  :global(.article-toc a.is-active) {
+    color: #d6452a !important;
+    background: transparent;
+  }
+  .article-toc .toc-level-2 a {
+    padding-left: 0;
+  }
+  .article-toc .toc-level-3 a {
+    padding-left: 1.55rem;
+  }
+  .article-toc .toc-level-4 a,
+  .article-toc .toc-level-5 a,
+  .article-toc .toc-level-6 a {
+    padding-left: 2.55rem;
+    font-size: 0.78rem;
+  }
+  .article-return {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 3rem;
+    border-top: 2px solid #222;
+    padding-top: 1rem;
+  }
+  .article-return a {
+    border: 1px solid #222;
+    padding: 0.45rem 0.65rem 0.38rem;
+    color: #111;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition:
+      color 120ms ease,
+      border-color 120ms ease;
+  }
+  .article-return a:hover {
+    border-color: #d6452a;
+    color: #d6452a;
+  }
+  .article-contributors {
+    margin-top: 5rem;
+    padding: 0 0 1.25rem;
+    font-family: var(--font-meta);
+    font-style: normal;
+  }
+  .contributors-heading {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid #222;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.75rem;
+  }
+  .contributors-heading h2 {
+    margin: 0;
+    color: #d6452a;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .contributors-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    align-items: center;
+    color: #666;
+    font-size: 0.78rem;
+  }
+  .contributors-body {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+  :global(.contributors-list a),
+  :global(.contributors-list > span) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0;
+    color: #111;
+    text-decoration: none;
+    transition:
+      color 120ms ease,
+      opacity 120ms ease;
+  }
+  :global(.contributors-list a:hover) {
+    opacity: 0.72;
+  }
+  :global(.contributors-list img),
+  :global(.contributor-initial) {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+  }
+  :global(.contributors-list img) {
+    object-fit: cover;
+  }
+  .contributors-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+  .contributors-actions a {
+    border: 1px solid #222;
+    padding: 0.34rem 0.55rem 0.28rem;
+    color: #111;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.1;
+    text-align: center;
+    text-decoration: none;
+    transition:
+      color 120ms ease,
+      border-color 120ms ease;
+  }
+  .contributors-actions .edit-source-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #f1eee7;
+    background: #222;
+  }
+  .contributors-actions .edit-source-link svg {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+  }
+  .contributors-actions .edit-source-link:hover {
+    border-color: #d6452a;
+    color: #f1eee7;
+    background: #d6452a;
+  }
+  .contributors-actions a:hover {
+    border-color: #d6452a;
+    color: #d6452a;
+  }
+  :global(.article-body) {
+    counter-reset: article-section;
+    color: #222;
+    font-family: var(--font-body);
+    font-size: 1.03rem;
+    line-height: 2.05;
+    overflow-wrap: anywhere;
+  }
+  :global(.article-body > *:first-child) {
+    margin-top: 0;
+  }
+  :global(.article-body h2) {
+    display: grid;
+    grid-template-columns: 2.8rem minmax(0, 1fr);
+    gap: 0.35rem;
+    align-items: baseline;
+    margin: 4rem 0 1.35rem;
+    border-bottom: 1px solid #222;
+    padding-bottom: 0.95rem;
+    color: #111;
+    font-family: var(--font-display);
+    font-size: clamp(1.55rem, 2.4vw, 2.05rem);
+    line-height: 1.22;
+  }
+  :global(.article-body h2::before) {
+    content: counter(article-section, decimal-leading-zero);
+    counter-increment: article-section;
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+    font-weight: 700;
+    font-style: normal;
+    line-height: 1;
+  }
+  :global(.article-body h3) {
+    margin: 3rem 0 1.1rem;
+    border-bottom: 1px solid #8f897e;
+    padding-bottom: 0.55rem;
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 700;
+  }
+  :global(.article-body p) {
+    margin: 1.35rem 0;
+  }
+  :global(.article-body h2 + p),
+  :global(.article-body h3 + p) {
+    margin-top: 1rem;
+  }
+  :global(.article-body a:not(.heading-anchor)) {
+    color: #111;
+    text-decoration: none;
+    text-decoration-color: currentColor;
+    text-underline-offset: 0.18em;
+    transition: color 120ms ease;
+  }
+  :global(.article-body a:not(.heading-anchor):hover) {
+    color: #d6452a;
+    text-decoration: underline;
+  }
+  :global(.article-body .heading-anchor) {
+    display: none;
+  }
+  :global(.article-body ul),
+  :global(.article-body ol) {
+    margin: 1.6rem 0;
+    padding-left: 1.7rem;
+  }
+  :global(.article-body ul) {
+    list-style: none;
+  }
+  :global(.article-body ol) {
+    list-style: none;
+    counter-reset: note-list;
+  }
+  :global(.article-body ul > li) {
+    position: relative;
+  }
+  :global(.article-body ol > li) {
+    position: relative;
+  }
+  :global(.article-body ul > li::before) {
+    content: '';
+    position: absolute;
+    top: 0.78em;
+    left: -1.25rem;
+    width: 0.42rem;
+    height: 0.42rem;
+    border: 1px solid #222;
+    background: #222;
+  }
+  :global(.article-body ul ul > li::before) {
+    top: 0.9em;
+    width: 0.65rem;
+    height: 1px;
+    border: 0;
+    background: #8f897e;
+  }
+  :global(.article-body ol > li::before) {
+    content: counter(note-list, decimal-leading-zero);
+    counter-increment: note-list;
+    position: absolute;
+    top: 0.95em;
+    left: -1.75rem;
+    transform: translateY(-50%);
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  :global(.article-body li) {
+    padding-left: 0.25rem;
+    line-height: 1.9;
+  }
+  :global(.article-body li + li) {
+    margin-top: 0.65rem;
+  }
+  :global(.article-body li > ul),
+  :global(.article-body li > ol) {
+    margin: 0.65rem 0 0.2rem;
+  }
+  :global(.article-body blockquote) {
+    margin: 2.4rem 0;
+    border-left: 2px solid #d6452a;
+    padding: 0.9rem 0 0.9rem 1.3rem;
+    color: #555;
+    line-height: 1.95;
+  }
+  :global(.article-body blockquote p) {
+    margin: 0.75rem 0;
+  }
+  :global(.article-body table) {
+    width: 100%;
+    margin: 2.4rem 0;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+  :global(.article-body th),
+  :global(.article-body td) {
+    border-bottom: 1px solid #b9b2a4;
+    padding: 0.85rem 0.65rem;
+    text-align: left;
+  }
+  :global(.article-body th) {
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 0.86rem;
+  }
+  :global(.article-body :not(pre) > code) {
+    border: 1px solid #222;
+    padding: 0.12rem 0.35rem;
+    background: transparent;
+    color: #111;
+    font-family: var(--font-meta);
+    font-size: 0.88em;
+  }
+  :global(.article-body pre) {
+    overflow-x: auto;
+    margin: 2.4rem 0;
+    padding: 1.25rem;
+    background: #161616;
+    color: #f1eee7;
+    font-family: var(--font-meta);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  :global(.article-body figure) {
+    margin: 2.4rem 0;
+  }
+  :global(.article-body img) {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #222;
+  }
+  :global(.article-body figcaption) {
+    margin-top: 0.55rem;
+    color: #666;
+    font-family: var(--font-meta);
+    font-size: 0.78rem;
+    font-style: normal;
+    text-align: left;
+  }
+  :global(.article-body .directive-box) {
+    margin: 2.4rem 0;
+    border: 1px solid #d6452a;
+    padding: 1.1rem 1.25rem;
+    background: transparent;
+    line-height: 1.9;
+  }
+  :global(.article-body .amazon-card) {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 1.2rem;
+    align-items: center;
+    margin: 2.8rem 0;
+    border-top: 1px solid #222;
+    border-right: 0;
+    border-bottom: 1px solid #222;
+    border-left: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background:
+      repeating-linear-gradient(
+        135deg,
+        rgba(34, 34, 34, 0.12) 0,
+        rgba(34, 34, 34, 0.12) 1px,
+        transparent 1px,
+        transparent 9px
+      ),
+      transparent;
+    padding: 1rem 0;
+  }
+  :global(.article-body .amazon-card__image) {
+    display: block;
+    padding: 0;
+    background: transparent;
+  }
+  :global(.article-body .amazon-card__image img) {
+    display: block;
+    width: 100%;
+    max-height: 120px;
+    border: 1px solid #222;
+    border-radius: 0;
+    box-shadow: none;
+    object-fit: contain;
+    background: #f1eee7;
+    transition: opacity 120ms ease;
+  }
+  :global(.article-body .amazon-card__image img:hover) {
+    transform: none;
+    box-shadow: none;
+    opacity: 0.82;
+  }
+  :global(.article-body .amazon-card__content) {
+    gap: 0.8rem;
+  }
+  :global(.article-body .amazon-card__title) {
+    margin: 0;
+    color: #111;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.7;
+    text-decoration: none;
+    transition: color 120ms ease;
+  }
+  :global(.article-body .amazon-card__title:hover) {
+    color: #d6452a;
+    text-decoration: none;
+  }
+  :global(.article-body .amazon-card__cta) {
+    width: fit-content;
+    border: 1px solid #b7791f;
+    border-radius: 0;
+    padding: 0.36rem 0.6rem 0.3rem;
+    background: #f3a847;
+    color: #111;
+    font-family: var(--font-meta);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.1;
+    text-decoration: none;
+    transition:
+      background-color 120ms ease,
+      border-color 120ms ease;
+  }
+  :global(.article-body .amazon-card__cta:hover) {
+    transform: none;
+    border-color: #9c5f12;
+    background: #e99632;
+    color: #111;
+  }
+
+  @media (max-width: 900px) {
+    .article-hero,
+    .article-layout {
+      grid-template-columns: 1fr;
+    }
+    .article-heading {
+      padding-right: 0;
+    }
+    h1 {
+      max-width: none;
+    }
+    .article-meta {
+      border-top: 1px solid #222;
+      border-left: 0;
+      padding: 1.25rem 0;
+    }
+    .article-content {
+      padding-right: 0;
+      order: 2;
+    }
+    .article-sidebar {
+      border-top: 1px solid #222;
+      border-left: 0;
+      order: 1;
+      padding-left: 0;
+      padding-top: 2rem;
+      padding-bottom: 3rem;
+    }
+    .article-toc {
+      position: static;
+    }
+    .contributors-body {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .contributors-actions {
+      justify-content: flex-start;
+    }
+    :global(.article-body .amazon-card) {
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 1rem;
+    }
+    :global(.article-body .amazon-card__image img) {
+      max-height: 96px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .article-page {
+      padding: 1rem;
+    }
+    h1 {
+      max-width: none;
+      font-size: 2rem;
+    }
+    :global(.article-body h2) {
+      grid-template-columns: 2.35rem minmax(0, 1fr);
+      font-size: 1.55rem;
+    }
+  }
+</style>

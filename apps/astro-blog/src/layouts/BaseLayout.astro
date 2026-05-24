@@ -18,6 +18,10 @@ interface Props {
   modifiedTime?: string;
   section?: string;
   tags?: string[];
+  hideHeader?: boolean;
+  hideFooter?: boolean;
+  bodyClass?: string;
+  mainClass?: string;
 }
 
 const {
@@ -34,6 +38,10 @@ const {
   modifiedTime,
   section,
   tags = [],
+  hideHeader = false,
+  hideFooter = false,
+  bodyClass = '',
+  mainClass = 'mx-auto w-full max-w-6xl px-4 py-4',
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
@@ -98,13 +106,13 @@ const pathname = Astro.url.pathname;
 
     {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
-  <body>
-    <Header pathname={pathname} />
+  <body class={bodyClass}>
+    {!hideHeader && <Header pathname={pathname} />}
 
-    <main class="mx-auto w-full max-w-6xl px-4 py-4">
+    <main class={mainClass}>
       <slot />
     </main>
 
-    <Footer />
+    {!hideFooter && <Footer />}
   </body>
 </html>
