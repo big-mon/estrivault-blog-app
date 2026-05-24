@@ -1,7 +1,7 @@
 ---
 import Header from '$components/Header.astro';
 import Footer from '$components/Footer.astro';
-import { SITE_AUTHOR, SITE_TITLE, SOCIAL_LINK_X } from '$constants';
+import { GOOGLE_ADSENSE_CLIENT, SITE_AUTHOR, SITE_TITLE, SOCIAL_LINK_X } from '$constants';
 import '../app.css';
 
 interface Props {
@@ -22,6 +22,7 @@ interface Props {
   hideFooter?: boolean;
   bodyClass?: string;
   mainClass?: string;
+  enableAdsense?: boolean;
 }
 
 const {
@@ -42,9 +43,11 @@ const {
   hideFooter = false,
   bodyClass = '',
   mainClass = 'mx-auto w-full max-w-6xl px-4 py-4',
+  enableAdsense = false,
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
+const adsenseClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT || GOOGLE_ADSENSE_CLIENT;
 ---
 
 <!doctype html>
@@ -103,6 +106,17 @@ const pathname = Astro.url.pathname;
       defer
       src="https://static.cloudflareinsights.com/beacon.min.js"
       data-cf-beacon='{"token": "f0d31da4d3c348078218b627067efa9b"}'></script>
+
+    {
+      enableAdsense && adsenseClient && (
+        <script
+          is:inline
+          async
+          crossorigin="anonymous"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+        />
+      )
+    }
 
     {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
