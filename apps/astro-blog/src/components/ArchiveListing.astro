@@ -90,8 +90,8 @@ const visibleTopTags = topTags.slice(0, 5);
 
   <section class="archive-index" aria-labelledby="archive-index-title">
     <div class="section-heading">
-      <h2 id="archive-index-title">INDEX / {total} ENTRIES</h2>
-      <p>{page} / {totalPages} PAGE</p>
+      <h2 id="archive-index-title">ARTICLES MATCHING YOUR SELECTION</h2>
+      <p>{total} RESULTS</p>
     </div>
 
     {
@@ -227,7 +227,14 @@ const visibleTopTags = topTags.slice(0, 5);
     padding: 1rem 0;
   }
   .kicker {
-    margin: 0 0 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #222;
+    margin: 0 0 1.2rem;
+    padding: 0.34rem 0.65rem 0.28rem;
+    color: #f1eee7;
+    background: #222;
+    line-height: 1.1;
     letter-spacing: 0.05em;
   }
   h1 {
