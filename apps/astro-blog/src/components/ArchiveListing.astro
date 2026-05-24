@@ -50,6 +50,47 @@ const formatDate = (date: Date) => dateFormatter.format(date).replace(/\//g, '.'
 const getPageUrl = (pageNumber: number) => `${routeBase}/${pageNumber}`;
 const startNumber = (page - 1) * perPage;
 const visibleTopTags = topTags.slice(0, 5);
+
+type PaginationItem =
+  | { type: 'page'; pageNumber: number }
+  | { type: 'ellipsis'; key: string };
+
+function getVisiblePaginationItems(currentPage: number, pageCount: number): PaginationItem[] {
+  if (pageCount <= 7) {
+    return Array.from({ length: pageCount }, (_, index) => ({
+      type: 'page',
+      pageNumber: index + 1,
+    }));
+  }
+
+  const pageNumbers = new Set([1, pageCount, currentPage - 1, currentPage, currentPage + 1]);
+
+  if (currentPage <= 4) {
+    [2, 3, 4, 5].forEach((pageNumber) => pageNumbers.add(pageNumber));
+  }
+
+  if (currentPage >= pageCount - 3) {
+    [pageCount - 4, pageCount - 3, pageCount - 2, pageCount - 1].forEach((pageNumber) =>
+      pageNumbers.add(pageNumber),
+    );
+  }
+
+  const sortedPages = [...pageNumbers]
+    .filter((pageNumber) => pageNumber >= 1 && pageNumber <= pageCount)
+    .sort((a, b) => a - b);
+
+  return sortedPages.flatMap((pageNumber, index): PaginationItem[] => {
+    const previousPage = sortedPages[index - 1];
+    const gap =
+      previousPage !== undefined && pageNumber - previousPage > 1 ?
+        [{ type: 'ellipsis' as const, key: `${previousPage}-${pageNumber}` }]
+      : [];
+
+    return [...gap, { type: 'page', pageNumber }];
+  });
+}
+
+const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
 ---
 
 <div class="archive-page">
@@ -141,11 +182,13 @@ const visibleTopTags = topTags.slice(0, 5);
           </a>
         : <span aria-disabled="true">← PREV</span>}
         <div>
-          {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) =>
-            pageNumber === page ?
-              <span aria-current="page">{String(pageNumber).padStart(2, '0')}</span>
-            : <a href={getPageUrl(pageNumber)} aria-label={`${pageNumber}ページ目`}>
-                {String(pageNumber).padStart(2, '0')}
+          {visiblePaginationItems.map((item) =>
+            item.type === 'ellipsis' ?
+              <span class="pagination-ellipsis" aria-hidden="true">…</span>
+            : item.pageNumber === page ?
+              <span aria-current="page">{String(item.pageNumber).padStart(2, '0')}</span>
+            : <a href={getPageUrl(item.pageNumber)} aria-label={`${item.pageNumber}ページ目`}>
+                {String(item.pageNumber).padStart(2, '0')}
               </a>,
           )}
         </div>
@@ -218,12 +261,12 @@ const visibleTopTags = topTags.slice(0, 5);
   }
   .archive-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.85fr);
+    grid-template-columns: minmax(0, 1fr) 360px;
     gap: 1rem;
     min-height: 300px;
     border-top: 1px solid #222;
     border-bottom: 1px solid #222;
-    margin-top: 1rem;
+    margin-top: 0;
     padding: 1rem 0;
   }
   .kicker {
@@ -294,9 +337,10 @@ const visibleTopTags = topTags.slice(0, 5);
   }
   aside h2 {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(1.35rem, 2.2vw, 2rem);
-    font-weight: 400;
+    font-family: var(--font-meta);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
     line-height: 1.2;
     white-space: nowrap;
   }

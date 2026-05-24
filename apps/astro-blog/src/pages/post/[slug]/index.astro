@@ -1,12 +1,11 @@
 ---
 import BaseLayout from '$layouts/BaseLayout.astro';
-import EditOnGitHub from '$components/EditOnGitHub.astro';
-import PostBody from '$components/PostBody.astro';
-import PostHeader from '$components/PostHeader.astro';
-import TableOfContents from '$components/TableOfContents.astro';
+import EditorialFooter from '$components/EditorialFooter.astro';
+import EditorialMasthead from '$components/EditorialMasthead.astro';
 import { getCategoryLabel, SITE_TITLE, SITE_URL, SOCIAL_LINK_X } from '$constants';
 import { getAllPostsMeta, getPostBySlug } from '$lib/content';
 import { getPostOgpImageUrl } from '$lib/og';
+import { getTagRouteSegment } from '$lib/url-segments';
 
 export async function getStaticPaths() {
   const allPosts = await getAllPostsMeta();
@@ -33,9 +32,39 @@ if (!post) {
 const siteBase = SITE_URL.replace(/\/$/, '');
 const canonical = `${siteBase}/post/${post.meta.slug}`;
 const title = `${post.meta.title} | ${SITE_TITLE}`;
-const description = post.meta.description || `${post.meta.title}�ɂ��Ă̋L���ł��B`;
+const description = post.meta.description || `${post.meta.title}についての記事です。`;
 const categoryLabel = getCategoryLabel(post.meta.category);
 const ogImage = getPostOgpImageUrl(post.meta.slug);
+const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
+  timeZone: 'Asia/Tokyo',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+const publishedDate = dateFormatter.format(post.meta.publishedAt).replace(/\//g, '.');
+const updatedDate = post.meta.updatedAt ?
+  dateFormatter.format(post.meta.updatedAt).replace(/\//g, '.')
+: undefined;
+const readingTime = post.meta.readingTime ? `${Math.ceil(post.meta.readingTime)} min` : 'FIELD NOTE';
+const articleMeta = [
+  { label: 'PUBLISHED', value: publishedDate },
+  ...(updatedDate && updatedDate !== publishedDate ? [{ label: 'UPDATED', value: updatedDate }] : []),
+  { label: 'CATEGORY', value: categoryLabel },
+  { label: 'READING', value: readingTime },
+];
+const bodyClasses = [
+  'article-body',
+  post.hasTwitterEmbeds ? 'has-twitter-embeds' : '',
+  post.hasAmazonEmbeds ? 'has-amazon-embeds' : '',
+  post.hasCodeBlocks ? 'has-code-blocks' : '',
+  post.hasDirectiveBoxes ? 'has-directive-boxes' : '',
+]
+  .filter(Boolean)
+  .join(' ');
+const shouldShowArticleThumbnail =
+  post.meta.showArticleThumbnail !== false && Boolean(post.meta.coverImage);
+const tocHeadings =
+  post.headings.length > 10 ? post.headings.filter((heading) => heading.level === 2) : post.headings;
 
 const schemaData = {
   '@context': 'https://schema.org',
@@ -83,29 +112,638 @@ const schemaData = {
   modifiedTime={(post.meta.updatedAt || post.meta.publishedAt).toISOString()}
   section={categoryLabel}
   tags={post.meta.tags}
+  hideHeader
+  hideFooter
+  bodyClass="article-editorial-page"
+  mainClass="article-editorial-main"
 >
-  <article class="container mx-auto px-2 sm:px-4 xl:max-w-6xl">
-    <PostHeader meta={post.meta} />
-    <div class="xl:flex xl:gap-8">
-      <div class="xl:max-w-4xl xl:flex-1">
-        <div class="xl:hidden">
-          <TableOfContents headings={post.headings} />
+  <article class="article-page">
+    <EditorialMasthead />
+
+    <header class="article-hero">
+      <div class="article-heading">
+        <div class="article-badges">
+          <a
+            class="article-category"
+            href={`/category/${encodeURIComponent(post.meta.category.toLowerCase())}/1`}
+          >
+            {categoryLabel}
+          </a>
         </div>
-
-        <PostBody post={post} />
-
-        {
-          post.originalPath && (
-            <div class="post-footer mt-12 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-8">
-              <EditOnGitHub originalPath={post.originalPath} />
-            </div>
-          )
-        }
+        <h1>{post.meta.title}</h1>
+        {post.meta.description && <p class="article-lead">{post.meta.description}</p>}
+        <div class="article-tags">
+          {post.meta.tags.slice(0, 4).map((tag) => (
+            <a href={`/tag/${getTagRouteSegment(tag)}/1`}>#{tag}</a>
+          ))}
+        </div>
       </div>
 
-      <aside class="hidden xl:block xl:w-64 xl:flex-shrink-0">
-        <TableOfContents headings={post.headings} />
+      <aside class="article-meta">
+        <h2>ARTICLE META</h2>
+        <dl>
+          {
+            articleMeta.map((item) => (
+              <div>
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        {
+          shouldShowArticleThumbnail && post.meta.coverImage && (
+            <figure class="article-thumbnail">
+              <img src={post.meta.coverImage} alt="" loading="lazy" />
+            </figure>
+          )
+        }
+      </aside>
+    </header>
+
+    <div class="article-layout">
+      <div class="article-content">
+        <div class={bodyClasses} set:html={post.html || 'コンテンツがありません'} />
+
+        <nav class="article-return" aria-label="記事ナビゲーション">
+          <a href="/">← ARTICLES INDEX</a>
+          {post.originalPath && (
+            <a
+              href={`https://github.com/big-mon/estrivault-blog-app/edit/main/${post.originalPath}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              EDIT SOURCE
+            </a>
+          )}
+        </nav>
+      </div>
+
+      <aside class="article-sidebar">
+        {
+          tocHeadings.length > 0 && (
+            <nav class="article-toc" aria-label="Table of contents">
+              <h2>TABLE OF CONTENTS</h2>
+              <ol>
+                {tocHeadings.map((heading) => (
+                  <li class={`toc-level-${heading.level}`}>
+                    <a href={`#${heading.id}`} data-toc-link={heading.id}>
+                      {heading.text}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )
+        }
       </aside>
     </div>
+
+    <EditorialFooter />
   </article>
 </BaseLayout>
+
+<script>
+  const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+  const articleHeadings = tocLinks
+    .map((link) => {
+      const headingId = link.dataset.tocLink;
+      return headingId ? document.getElementById(headingId) : null;
+    })
+    .filter((heading): heading is HTMLElement => heading !== null);
+
+  const setActiveTocLink = (headingId: string) => {
+    for (const link of tocLinks) {
+      const isActive = link.dataset.tocLink === headingId;
+      link.classList.toggle('is-active', isActive);
+      if (isActive) {
+        link.setAttribute('aria-current', 'location');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    }
+  };
+
+  const getCurrentHeadingId = () => {
+    const offset = window.innerHeight * 0.28;
+    let currentHeading = articleHeadings[0];
+
+    for (const heading of articleHeadings) {
+      if (heading.getBoundingClientRect().top <= offset) {
+        currentHeading = heading;
+      } else {
+        break;
+      }
+    }
+
+    return currentHeading?.id;
+  };
+
+  const updateActiveTocLink = () => {
+    const currentHeadingId = getCurrentHeadingId();
+    if (currentHeadingId) {
+      setActiveTocLink(currentHeadingId);
+    }
+  };
+
+  if (tocLinks.length > 0 && articleHeadings.length > 0) {
+    updateActiveTocLink();
+    window.addEventListener('scroll', updateActiveTocLink, { passive: true });
+    window.addEventListener('resize', updateActiveTocLink);
+  }
+</script>
+
+<style>
+  :global(.article-editorial-page) {
+    background: #f1eee7;
+  }
+  :global(.article-editorial-main) {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
+  .article-page {
+    --font-display: 'Times New Roman', serif;
+    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
+    --font-meta: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    min-height: 100vh;
+    padding: clamp(1rem, 2vw, 2rem);
+    color: #111;
+    background: #f1eee7;
+    font-family: var(--font-body);
+  }
+  .article-page::before {
+    content: '';
+    display: block;
+    max-width: 1180px;
+    margin: 0 auto;
+    border-top: 2px solid #202020;
+  }
+  .article-hero,
+  .article-layout {
+    max-width: 1180px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+  .article-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 1rem;
+    min-height: 330px;
+    margin-top: 0;
+    border-top: 1px solid #222;
+    border-bottom: 2px solid #222;
+  }
+  .article-heading {
+    padding: 1rem 2rem 1.4rem 0;
+  }
+  .article-badges,
+  .article-tags,
+  .article-meta,
+  .article-toc,
+  .article-return {
+    font-family: var(--font-meta);
+    font-style: normal;
+  }
+  .article-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .article-badges a,
+  .article-tags a {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #222;
+    padding: 0.34rem 0.55rem 0.28rem;
+    color: #111;
+    font-size: 0.86rem;
+    line-height: 1.1;
+    text-decoration: none;
+    transition:
+      color 120ms ease,
+      border-color 120ms ease;
+  }
+  .article-badges .article-category {
+    color: #f1eee7;
+    background: #222;
+  }
+  .article-badges .article-category:hover {
+    border-color: #d6452a;
+    color: #f1eee7;
+    background: #d6452a;
+  }
+  .article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 0.75rem;
+    margin-top: 1.25rem;
+  }
+  .article-tags a:hover {
+    border-color: #d6452a;
+    color: #d6452a;
+  }
+  h1 {
+    max-width: 22ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.6rem);
+    font-weight: 700;
+    line-height: 1.14;
+    letter-spacing: 0;
+  }
+  .article-lead {
+    max-width: 46rem;
+    margin: 1.25rem 0 0;
+    color: #666;
+    font-size: 1.08rem;
+    line-height: 1.85;
+  }
+  .article-meta {
+    border-left: 1px solid #222;
+    padding: 1.55rem 0 1.4rem 1.35rem;
+  }
+  .article-meta h2,
+  .article-toc h2 {
+    margin: 0;
+    color: #d6452a;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .article-meta h2 {
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+  }
+  .article-meta dl {
+    margin: 0.7rem 0 0;
+  }
+  .article-thumbnail {
+    margin: 1.5rem 0 0;
+    border-top: 1px solid #222;
+    padding: 1.2rem 2rem 0;
+  }
+  .article-thumbnail img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border: 1px solid #222;
+    object-fit: cover;
+    background: #ddd6c8;
+  }
+  .article-meta div {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 1rem;
+    border-top: 1px solid #b9b2a4;
+    padding: 0.95rem 0;
+  }
+  .article-meta div:last-child {
+    border-bottom: 1px solid #b9b2a4;
+  }
+  .article-meta dt {
+    color: #d6452a;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .article-meta dd {
+    margin: 0;
+    color: #222;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.45;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  .article-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 1rem;
+    padding-top: 3rem;
+  }
+  .article-content {
+    min-width: 0;
+    padding-right: 2rem;
+  }
+  .article-sidebar {
+    min-width: 0;
+    border-left: 1px solid #222;
+    padding-left: 1.35rem;
+  }
+  .article-toc {
+    position: sticky;
+    top: 1.5rem;
+  }
+  .article-toc h2 {
+    border-bottom: 2px solid #222;
+    padding-bottom: 0.9rem;
+  }
+  .article-toc ol {
+    display: grid;
+    gap: 0;
+    margin: 0.6rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .article-toc li {
+    border-bottom: 1px solid #b9b2a4;
+  }
+  .article-toc a {
+    display: block;
+    padding: 0.8rem 0.55rem;
+    color: #333;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.45;
+    text-decoration: none;
+    transition:
+      color 120ms ease,
+      background-color 120ms ease;
+  }
+  .article-toc a:hover {
+    color: #d6452a;
+  }
+  :global(.article-toc a.is-active) {
+    color: #d6452a !important;
+    background: transparent;
+  }
+  .article-toc .toc-level-2 a {
+    padding-left: 0;
+  }
+  .article-toc .toc-level-3 a {
+    padding-left: 1.55rem;
+  }
+  .article-toc .toc-level-4 a,
+  .article-toc .toc-level-5 a,
+  .article-toc .toc-level-6 a {
+    padding-left: 2.55rem;
+    font-size: 0.78rem;
+  }
+  .article-return {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 3rem;
+    border-top: 2px solid #222;
+    padding-top: 1rem;
+  }
+  .article-return a {
+    border: 1px solid #222;
+    padding: 0.45rem 0.65rem 0.38rem;
+    color: #111;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition:
+      color 120ms ease,
+      border-color 120ms ease;
+  }
+  .article-return a:hover {
+    border-color: #d6452a;
+    color: #d6452a;
+  }
+  :global(.article-body) {
+    counter-reset: article-section;
+    color: #222;
+    font-family: var(--font-body);
+    font-size: 1.03rem;
+    line-height: 2.05;
+    overflow-wrap: anywhere;
+  }
+  :global(.article-body > *:first-child) {
+    margin-top: 0;
+  }
+  :global(.article-body h2) {
+    display: grid;
+    grid-template-columns: 2.8rem minmax(0, 1fr);
+    gap: 0.35rem;
+    align-items: baseline;
+    margin: 4rem 0 1.35rem;
+    border-bottom: 1px solid #222;
+    padding-bottom: 0.95rem;
+    color: #111;
+    font-family: var(--font-display);
+    font-size: clamp(1.55rem, 2.4vw, 2.05rem);
+    line-height: 1.22;
+  }
+  :global(.article-body h2::before) {
+    content: counter(article-section, decimal-leading-zero);
+    counter-increment: article-section;
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+    font-weight: 700;
+    font-style: normal;
+    line-height: 1;
+  }
+  :global(.article-body h3) {
+    margin: 3rem 0 1.1rem;
+    border-bottom: 1px solid #8f897e;
+    padding-bottom: 0.55rem;
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 700;
+  }
+  :global(.article-body p) {
+    margin: 1.35rem 0;
+  }
+  :global(.article-body h2 + p),
+  :global(.article-body h3 + p) {
+    margin-top: 1rem;
+  }
+  :global(.article-body a:not(.heading-anchor)) {
+    color: #111;
+    text-decoration: underline;
+    text-decoration-color: #d6452a;
+    text-underline-offset: 0.18em;
+    transition: color 120ms ease;
+  }
+  :global(.article-body a:not(.heading-anchor):hover) {
+    color: #d6452a;
+  }
+  :global(.article-body .heading-anchor) {
+    display: none;
+  }
+  :global(.article-body ul),
+  :global(.article-body ol) {
+    margin: 1.6rem 0;
+    padding-left: 1.7rem;
+  }
+  :global(.article-body ul) {
+    list-style: none;
+  }
+  :global(.article-body ol) {
+    list-style: none;
+    counter-reset: note-list;
+  }
+  :global(.article-body ul > li) {
+    position: relative;
+  }
+  :global(.article-body ol > li) {
+    position: relative;
+  }
+  :global(.article-body ul > li::before) {
+    content: '';
+    position: absolute;
+    top: 0.78em;
+    left: -1.25rem;
+    width: 0.42rem;
+    height: 0.42rem;
+    border: 1px solid #222;
+    background: #222;
+  }
+  :global(.article-body ul ul > li::before) {
+    top: 0.9em;
+    width: 0.65rem;
+    height: 1px;
+    border: 0;
+    background: #8f897e;
+  }
+  :global(.article-body ol > li::before) {
+    content: counter(note-list, decimal-leading-zero);
+    counter-increment: note-list;
+    position: absolute;
+    top: 0.95em;
+    left: -1.75rem;
+    transform: translateY(-50%);
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  :global(.article-body li) {
+    padding-left: 0.25rem;
+    line-height: 1.9;
+  }
+  :global(.article-body li + li) {
+    margin-top: 0.65rem;
+  }
+  :global(.article-body li > ul),
+  :global(.article-body li > ol) {
+    margin: 0.65rem 0 0.2rem;
+  }
+  :global(.article-body blockquote) {
+    margin: 2.4rem 0;
+    border-left: 2px solid #d6452a;
+    padding: 0.9rem 0 0.9rem 1.3rem;
+    color: #555;
+    line-height: 1.95;
+  }
+  :global(.article-body blockquote p) {
+    margin: 0.75rem 0;
+  }
+  :global(.article-body table) {
+    width: 100%;
+    margin: 2.4rem 0;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+  :global(.article-body th),
+  :global(.article-body td) {
+    border-bottom: 1px solid #b9b2a4;
+    padding: 0.85rem 0.65rem;
+    text-align: left;
+  }
+  :global(.article-body th) {
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 0.86rem;
+  }
+  :global(.article-body :not(pre) > code) {
+    border: 1px solid #222;
+    padding: 0.12rem 0.35rem;
+    background: transparent;
+    color: #111;
+    font-family: var(--font-meta);
+    font-size: 0.88em;
+  }
+  :global(.article-body pre) {
+    overflow-x: auto;
+    margin: 2.4rem 0;
+    padding: 1.25rem;
+    background: #161616;
+    color: #f1eee7;
+    font-family: var(--font-meta);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  :global(.article-body figure) {
+    margin: 2.4rem 0;
+  }
+  :global(.article-body img) {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #222;
+  }
+  :global(.article-body figcaption) {
+    margin-top: 0.55rem;
+    color: #666;
+    font-family: var(--font-meta);
+    font-size: 0.78rem;
+    font-style: normal;
+    text-align: left;
+  }
+  :global(.article-body .directive-box) {
+    margin: 2.4rem 0;
+    border: 1px solid #d6452a;
+    padding: 1.1rem 1.25rem;
+    background: transparent;
+    line-height: 1.9;
+  }
+  :global(.article-body .amazon-card) {
+    border: 1px solid #222;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  @media (max-width: 900px) {
+    .article-hero,
+    .article-layout {
+      grid-template-columns: 1fr;
+    }
+    .article-heading {
+      padding-right: 0;
+    }
+    .article-meta {
+      border-top: 1px solid #222;
+      border-left: 0;
+      padding: 1.25rem 0;
+    }
+    .article-content {
+      padding-right: 0;
+    }
+    .article-sidebar {
+      border-top: 1px solid #222;
+      border-left: 0;
+      padding-left: 0;
+      padding-top: 2rem;
+    }
+    .article-toc {
+      position: static;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .article-page {
+      padding: 1rem;
+    }
+    h1 {
+      font-size: 2rem;
+    }
+    :global(.article-body h2) {
+      grid-template-columns: 2.35rem minmax(0, 1fr);
+      font-size: 1.55rem;
+    }
+  }
+</style>

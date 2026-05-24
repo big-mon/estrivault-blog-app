@@ -22,6 +22,7 @@ export interface PostMeta {
   category: string;
   tags: string[];
   coverImage?: string;
+  showArticleThumbnail?: boolean;
   draft?: boolean;
   readingTime?: number;
 }

@@ -159,6 +159,7 @@ export async function processMarkdown(
         data.coverImage as string | undefined,
         options.cloudinaryCloudName,
       ),
+      showArticleThumbnail: data.showArticleThumbnail !== false,
       draft: (data.draft as boolean) || false,
       readingTime: Math.ceil(stats.minutes),
     };
@@ -265,6 +266,7 @@ export async function extractMetadata(
         data.coverImage as string | undefined,
         options.cloudinaryCloudName,
       ),
+      showArticleThumbnail: data.showArticleThumbnail !== false,
       draft: (data.draft as boolean) || false,
       readingTime: Math.ceil(stats.minutes),
     };

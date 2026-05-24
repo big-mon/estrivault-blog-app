@@ -3,7 +3,7 @@ import type { PostMeta } from '@estrivault/content-processor';
 import BaseLayout from '$layouts/BaseLayout.astro';
 import ArchiveListing from '$components/ArchiveListing.astro';
 import { getCategoryMeta, POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
-import { getAllCategories, getPosts } from '$lib/content';
+import { filterPosts, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
 
 interface Props {
   category: string;
@@ -31,11 +31,14 @@ function getTagCount(posts: PostMeta[]): number {
 }
 
 export async function getStaticPaths() {
-  const categories = await getAllCategories();
+  const allPosts = await getAllPostsMeta();
+  const categories = [...new Set(allPosts.map((post) => post.category))].sort((a, b) =>
+    a.localeCompare(b),
+  );
   const paths = [];
 
   for (const category of categories) {
-    const categoryPosts = await getPosts({ category, perPage: POSTS_PER_PAGE });
+    const categoryPosts = getPaginatedPosts(allPosts, { category, perPage: POSTS_PER_PAGE });
 
     for (let page = 1; page <= categoryPosts.totalPages; page++) {
       paths.push({
@@ -56,18 +59,14 @@ export async function getStaticPaths() {
 const { category } = Astro.props as Props;
 const categoryMeta = getCategoryMeta(category);
 const currentPage = Number(Astro.params.page);
-const result = await getPosts({
-  category,
+const allPosts = await getAllPostsMeta();
+const archivePosts = filterPosts(allPosts, { category });
+const result = getPaginatedPosts(archivePosts, {
   page: currentPage,
   perPage: POSTS_PER_PAGE,
 });
-const archivePosts = await getPosts({
-  category,
-  page: 1,
-  perPage: Number.MAX_SAFE_INTEGER,
-});
-const topTags = getTopTags(archivePosts.posts);
-const tagCount = getTagCount(archivePosts.posts);
+const topTags = getTopTags(archivePosts);
+const tagCount = getTagCount(archivePosts);
 
 const siteBase = SITE_URL.replace(/\/$/, '');
 const pageUrl = `${siteBase}/category/${Astro.params.category}/${currentPage}`;
