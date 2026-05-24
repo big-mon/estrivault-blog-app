@@ -223,9 +223,9 @@ const schemaData = {
             <nav class="article-toc" aria-label="Table of contents">
               <h2>TABLE OF CONTENTS</h2>
               <ol>
-                {tocHeadings.map((heading) => (
+                {tocHeadings.map((heading, index) => (
                   <li class={`toc-level-${heading.level}`}>
-                    <a href={`#${heading.id}`} data-toc-link={heading.id}>
+                    <a href={`#${heading.id}`} data-toc-index={String(index)}>
                       {heading.text}
                     </a>
                   </li>
@@ -242,17 +242,19 @@ const schemaData = {
 </BaseLayout>
 
 <script>
-  const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
-  const articleHeadings = tocLinks
-    .map((link) => {
-      const headingId = link.dataset.tocLink;
-      return headingId ? document.getElementById(headingId) : null;
-    })
-    .filter((heading): heading is HTMLElement => heading !== null);
+  const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-index]')];
+  const tocLevels = new Set(
+    tocLinks
+      .map((link) => link.closest('li')?.className.match(/toc-level-(\d)/)?.[1])
+      .filter((level): level is string => Boolean(level)),
+  );
+  const articleHeadings = [
+    ...document.querySelectorAll<HTMLElement>('.article-body h2, .article-body h3, .article-body h4, .article-body h5, .article-body h6'),
+  ].filter((heading) => tocLevels.has(heading.tagName.replace('H', '')));
 
-  const setActiveTocLink = (headingId: string) => {
+  const setActiveTocLink = (activeIndex: number) => {
     for (const link of tocLinks) {
-      const isActive = link.dataset.tocLink === headingId;
+      const isActive = Number(link.dataset.tocIndex) === activeIndex;
       link.classList.toggle('is-active', isActive);
       if (isActive) {
         link.setAttribute('aria-current', 'location');
@@ -262,26 +264,23 @@ const schemaData = {
     }
   };
 
-  const getCurrentHeadingId = () => {
+  const getCurrentHeadingIndex = () => {
     const offset = window.innerHeight * 0.28;
-    let currentHeading = articleHeadings[0];
+    let currentIndex = 0;
 
-    for (const heading of articleHeadings) {
+    for (const [index, heading] of articleHeadings.entries()) {
       if (heading.getBoundingClientRect().top <= offset) {
-        currentHeading = heading;
+        currentIndex = index;
       } else {
         break;
       }
     }
 
-    return currentHeading?.id;
+    return currentIndex;
   };
 
   const updateActiveTocLink = () => {
-    const currentHeadingId = getCurrentHeadingId();
-    if (currentHeadingId) {
-      setActiveTocLink(currentHeadingId);
-    }
+    setActiveTocLink(getCurrentHeadingIndex());
   };
 
   if (tocLinks.length > 0 && articleHeadings.length > 0) {
