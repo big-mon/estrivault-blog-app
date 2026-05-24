@@ -1,9 +1,5 @@
 import { normalizeForSlug, normalizeForTagFilter } from '@estrivault/content-processor';
 
-function encodePathDelimiters(segment: string): string {
-  return segment.replace(/[/%?#\\]/g, (char) => encodeURIComponent(char));
-}
-
 export function getTagRouteSegment(tag: string): string {
   const cleaned = tag.trim();
   if (!cleaned) {
@@ -15,5 +11,18 @@ export function getTagRouteSegment(tag: string): string {
     return normalizedSlug;
   }
 
-  return encodePathDelimiters(normalizeForTagFilter(cleaned).replace(/\s+/g, '-'));
+  const normalizedTagSegment = normalizeForTagFilter(cleaned)
+    .replace(/[\s/\\?#]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  if (!normalizedTagSegment) {
+    throw new Error(`Tag route segment cannot be generated from tag: ${tag}`);
+  }
+
+  return normalizedTagSegment;
+}
+
+export function encodeRouteSegment(segment: string): string {
+  return encodeURIComponent(segment);
 }

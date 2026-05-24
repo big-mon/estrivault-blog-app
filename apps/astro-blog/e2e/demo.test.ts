@@ -5,6 +5,13 @@ test('home page has expected h1', async ({ page }) => {
   await expect(page.locator('h1')).toBeVisible();
 });
 
+test('Japanese tag pages render with unencoded route segments', async ({ page }) => {
+  await page.goto('/tag/プログラミング/1');
+
+  await expect(page.locator('h1')).toContainText('プログラミング');
+  await expect(page.locator('article').first()).toBeVisible();
+});
+
 test('post pages expose generated OGP images', async ({ page, request }) => {
   await page.goto('/post/about');
 
