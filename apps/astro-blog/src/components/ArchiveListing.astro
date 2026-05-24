@@ -140,29 +140,31 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
         <ol class="post-list">
           {posts.map((post, index) => (
             <li>
-              <a href={`/post/${post.slug}`} class="post-row">
-                <span class="post-number">{String(startNumber + index + 1).padStart(2, '0')}</span>
-                <span class="post-copy">
-                  <span class="post-date">
-                    <time datetime={post.publishedAt.toISOString()}>
-                      {formatDate(post.publishedAt)}
-                    </time>
-                    <span>{getCategoryLabel(post.category)}</span>
+              <article>
+                <a href={`/post/${post.slug}`} class="post-row">
+                  <span class="post-number">{String(startNumber + index + 1).padStart(2, '0')}</span>
+                  <span class="post-copy">
+                    <span class="post-date">
+                      <time datetime={post.publishedAt.toISOString()}>
+                        {formatDate(post.publishedAt)}
+                      </time>
+                      <span>{getCategoryLabel(post.category)}</span>
+                    </span>
+                    <span class="post-title">{post.title}</span>
+                    <span class="post-description">{post.description}</span>
+                    <span class="post-tags" aria-label="タグ">
+                      {post.tags.slice(0, 4).map((tag) => (
+                        <span>#{tag}</span>
+                      ))}
+                    </span>
                   </span>
-                  <span class="post-title">{post.title}</span>
-                  <span class="post-description">{post.description}</span>
-                  <span class="post-tags" aria-label="タグ">
-                    {post.tags.slice(0, 4).map((tag) => (
-                      <span>#{tag}</span>
-                    ))}
-                  </span>
-                </span>
-                {post.coverImage && (
-                  <span class="post-image" aria-hidden="true">
-                    <img src={post.coverImage} alt="" loading="lazy" />
-                  </span>
-                )}
-              </a>
+                  {post.coverImage && (
+                    <span class="post-image" aria-hidden="true">
+                      <img src={post.coverImage} alt="" loading="lazy" />
+                    </span>
+                  )}
+                </a>
+              </article>
             </li>
           ))}
         </ol>
