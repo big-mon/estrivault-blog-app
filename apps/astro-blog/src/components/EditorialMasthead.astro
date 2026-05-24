@@ -103,10 +103,19 @@ const localPath = (hash: string) => (homePage ? hash : `/${hash}`);
   }
   @media (max-width: 900px) {
     .editorial-masthead {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: 0.75rem;
     }
     nav {
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      gap: 0.75rem;
+      white-space: nowrap;
+    }
+    .tagline-meta {
+      display: none;
+    }
+    .tagline {
+      display: none;
     }
   }
 </style>

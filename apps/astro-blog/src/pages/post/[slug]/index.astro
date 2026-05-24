@@ -46,10 +46,19 @@ const updatedDate = post.meta.updatedAt ?
   dateFormatter.format(post.meta.updatedAt).replace(/\//g, '.')
 : undefined;
 const readingTime = post.meta.readingTime ? `${Math.ceil(post.meta.readingTime)} min` : 'FIELD NOTE';
+const articleSourcePath = post.originalPath ?? '';
+const editSourceUrl = articleSourcePath ?
+  `https://github.com/big-mon/estrivault-blog-app/edit/main/${articleSourcePath}`
+: undefined;
+const sourceHistoryUrl = articleSourcePath ?
+  `https://github.com/big-mon/estrivault-blog-app/commits/main/${articleSourcePath}`
+: undefined;
+const contributorsApiUrl = articleSourcePath ?
+  `https://api.github.com/repos/big-mon/estrivault-blog-app/commits?path=${encodeURIComponent(articleSourcePath)}&per_page=100`
+: undefined;
 const articleMeta = [
   { label: 'PUBLISHED', value: publishedDate },
   ...(updatedDate && updatedDate !== publishedDate ? [{ label: 'UPDATED', value: updatedDate }] : []),
-  { label: 'CATEGORY', value: categoryLabel },
   { label: 'READING', value: readingTime },
 ];
 const bodyClasses = [
@@ -167,16 +176,45 @@ const schemaData = {
 
         <nav class="article-return" aria-label="記事ナビゲーション">
           <a href="/">← ARTICLES INDEX</a>
-          {post.originalPath && (
-            <a
-              href={`https://github.com/big-mon/estrivault-blog-app/edit/main/${post.originalPath}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              EDIT SOURCE
-            </a>
-          )}
         </nav>
+
+        {
+          articleSourcePath && editSourceUrl && sourceHistoryUrl && contributorsApiUrl && (
+            <section
+              class="article-contributors"
+              data-contributors-api={contributorsApiUrl}
+              data-edit-url={editSourceUrl}
+              data-history-url={sourceHistoryUrl}
+            >
+              <div class="contributors-heading">
+                <h2>ARTICLE CONTRIBUTORS</h2>
+              </div>
+              <div class="contributors-body">
+                <div class="contributors-list" aria-live="polite">
+                  <span>Loading contributors</span>
+                </div>
+                <div class="contributors-actions">
+                  <a
+                    class="edit-source-link"
+                    href={editSourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24">
+                      <path
+                        d="M12 2C6.48 2 2 6.58 2 12.25c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.49v-1.9c-2.78.62-3.37-1.22-3.37-1.22-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.86.09-.67.35-1.12.63-1.38-2.22-.26-4.55-1.14-4.55-5.07 0-1.12.39-2.04 1.03-2.76-.1-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.05A9.3 9.3 0 0 1 12 6.91c.85 0 1.7.12 2.5.34 1.9-1.33 2.74-1.05 2.74-1.05.55 1.41.2 2.46.1 2.72.64.72 1.03 1.64 1.03 2.76 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9v2.82c0 .27.18.59.69.49A10.08 10.08 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"
+                      />
+                    </svg>
+                    GitHubで編集を提案する
+                  </a>
+                  <a href={sourceHistoryUrl} target="_blank" rel="noopener noreferrer">
+                    VIEW HISTORY
+                  </a>
+                </div>
+              </div>
+            </section>
+          )
+        }
       </div>
 
       <aside class="article-sidebar">
@@ -250,6 +288,111 @@ const schemaData = {
     updateActiveTocLink();
     window.addEventListener('scroll', updateActiveTocLink, { passive: true });
     window.addEventListener('resize', updateActiveTocLink);
+  }
+
+  const contributorsSection = document.querySelector<HTMLElement>('.article-contributors');
+  const contributorsList = contributorsSection?.querySelector<HTMLElement>('.contributors-list');
+
+  if (contributorsSection && contributorsList) {
+    const apiUrl = contributorsSection.dataset.contributorsApi;
+
+    const renderFallback = () => {
+      contributorsList.innerHTML = '<span>Contributor data unavailable</span>';
+    };
+
+    const escapeHtml = (value: string) =>
+      value.replace(/[&<>"']/g, (char) => {
+        const entities: Record<string, string> = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        };
+
+        return entities[char] ?? char;
+      });
+
+    const renderContributors = async () => {
+      if (!apiUrl) {
+        renderFallback();
+        return;
+      }
+
+      try {
+        const response = await fetch(apiUrl, {
+          headers: { Accept: 'application/vnd.github+json' },
+        });
+
+        if (!response.ok) {
+          renderFallback();
+          return;
+        }
+
+        const commits = (await response.json()) as Array<{
+          author?: {
+            login?: string;
+            avatar_url?: string;
+            html_url?: string;
+          } | null;
+          commit?: {
+            author?: {
+              name?: string;
+            } | null;
+          } | null;
+        }>;
+        const contributors = new Map<
+          string,
+          { name: string; avatarUrl?: string; profileUrl?: string; count: number }
+        >();
+
+        for (const commit of commits) {
+          const key = commit.author?.login ?? commit.commit?.author?.name;
+          if (!key) {
+            continue;
+          }
+
+          const current = contributors.get(key) ?? {
+            name: key,
+            avatarUrl: commit.author?.avatar_url,
+            profileUrl: commit.author?.html_url,
+            count: 0,
+          };
+
+          current.count += 1;
+          contributors.set(key, current);
+        }
+
+        if (contributors.size === 0) {
+          renderFallback();
+          return;
+        }
+
+        contributorsList.innerHTML = [...contributors.values()]
+          .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+          .slice(0, 6)
+          .map((contributor) => {
+            const label = `${contributor.name} (${contributor.count})`;
+            const safeLabel = escapeHtml(label);
+            const safeName = escapeHtml(contributor.name);
+            const safeAvatarUrl = contributor.avatarUrl ? escapeHtml(contributor.avatarUrl) : '';
+            const safeProfileUrl = contributor.profileUrl ? escapeHtml(contributor.profileUrl) : '';
+            const image =
+              contributor.avatarUrl ?
+                `<img src="${safeAvatarUrl}" alt="${safeName}" loading="lazy" />`
+              : '<span class="contributor-initial" aria-hidden="true"></span>';
+
+            return contributor.profileUrl ?
+                `<a href="${safeProfileUrl}" target="_blank" rel="noopener noreferrer" title="${safeLabel}" aria-label="${safeLabel}">${image}</a>`
+              : `<span title="${safeLabel}" aria-label="${safeLabel}">${image}</span>`;
+          })
+          .join('');
+      } catch {
+        renderFallback();
+      }
+    };
+
+    void renderContributors();
   }
 </script>
 
@@ -385,7 +528,6 @@ const schemaData = {
   }
   .article-thumbnail {
     margin: 1.5rem 0 0;
-    border-top: 1px solid #222;
     padding: 1.2rem 2rem 0;
   }
   .article-thumbnail img {
@@ -508,6 +650,108 @@ const schemaData = {
     border-color: #d6452a;
     color: #d6452a;
   }
+  .article-contributors {
+    margin-top: 5rem;
+    padding: 0 0 1.25rem;
+    font-family: var(--font-meta);
+    font-style: normal;
+  }
+  .contributors-heading {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid #222;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.75rem;
+  }
+  .contributors-heading h2 {
+    margin: 0;
+    color: #d6452a;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .contributors-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    align-items: center;
+    color: #666;
+    font-size: 0.78rem;
+  }
+  .contributors-body {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+  :global(.contributors-list a),
+  :global(.contributors-list > span) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0;
+    color: #111;
+    text-decoration: none;
+    transition:
+      color 120ms ease,
+      opacity 120ms ease;
+  }
+  :global(.contributors-list a:hover) {
+    opacity: 0.72;
+  }
+  :global(.contributors-list img),
+  :global(.contributor-initial) {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+  }
+  :global(.contributors-list img) {
+    object-fit: cover;
+  }
+  .contributors-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+  .contributors-actions a {
+    border: 1px solid #222;
+    padding: 0.34rem 0.55rem 0.28rem;
+    color: #111;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.1;
+    text-align: center;
+    text-decoration: none;
+    transition:
+      color 120ms ease,
+      border-color 120ms ease;
+  }
+  .contributors-actions .edit-source-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #f1eee7;
+    background: #222;
+  }
+  .contributors-actions .edit-source-link svg {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+  }
+  .contributors-actions .edit-source-link:hover {
+    border-color: #d6452a;
+    color: #f1eee7;
+    background: #d6452a;
+  }
+  .contributors-actions a:hover {
+    border-color: #d6452a;
+    color: #d6452a;
+  }
   :global(.article-body) {
     counter-reset: article-section;
     color: #222;
@@ -561,13 +805,14 @@ const schemaData = {
   }
   :global(.article-body a:not(.heading-anchor)) {
     color: #111;
-    text-decoration: underline;
-    text-decoration-color: #d6452a;
+    text-decoration: none;
+    text-decoration-color: currentColor;
     text-underline-offset: 0.18em;
     transition: color 120ms ease;
   }
   :global(.article-body a:not(.heading-anchor):hover) {
     color: #d6452a;
+    text-decoration: underline;
   }
   :global(.article-body .heading-anchor) {
     display: none;
@@ -701,10 +946,87 @@ const schemaData = {
     line-height: 1.9;
   }
   :global(.article-body .amazon-card) {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 1.2rem;
+    align-items: center;
+    margin: 2.8rem 0;
+    border-top: 1px solid #222;
+    border-right: 0;
+    border-bottom: 1px solid #222;
+    border-left: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background:
+      repeating-linear-gradient(
+        135deg,
+        rgba(34, 34, 34, 0.12) 0,
+        rgba(34, 34, 34, 0.12) 1px,
+        transparent 1px,
+        transparent 9px
+      ),
+      transparent;
+    padding: 1rem 0;
+  }
+  :global(.article-body .amazon-card__image) {
+    display: block;
+    padding: 0;
+    background: transparent;
+  }
+  :global(.article-body .amazon-card__image img) {
+    display: block;
+    width: 100%;
+    max-height: 120px;
     border: 1px solid #222;
     border-radius: 0;
     box-shadow: none;
-    background: transparent;
+    object-fit: contain;
+    background: #f1eee7;
+    transition: opacity 120ms ease;
+  }
+  :global(.article-body .amazon-card__image img:hover) {
+    transform: none;
+    box-shadow: none;
+    opacity: 0.82;
+  }
+  :global(.article-body .amazon-card__content) {
+    gap: 0.8rem;
+  }
+  :global(.article-body .amazon-card__title) {
+    margin: 0;
+    color: #111;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.7;
+    text-decoration: none;
+    transition: color 120ms ease;
+  }
+  :global(.article-body .amazon-card__title:hover) {
+    color: #d6452a;
+    text-decoration: none;
+  }
+  :global(.article-body .amazon-card__cta) {
+    width: fit-content;
+    border: 1px solid #b7791f;
+    border-radius: 0;
+    padding: 0.36rem 0.6rem 0.3rem;
+    background: #f3a847;
+    color: #111;
+    font-family: var(--font-meta);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.1;
+    text-decoration: none;
+    transition:
+      background-color 120ms ease,
+      border-color 120ms ease;
+  }
+  :global(.article-body .amazon-card__cta:hover) {
+    transform: none;
+    border-color: #9c5f12;
+    background: #e99632;
+    color: #111;
   }
 
   @media (max-width: 900px) {
@@ -715,6 +1037,9 @@ const schemaData = {
     .article-heading {
       padding-right: 0;
     }
+    h1 {
+      max-width: none;
+    }
     .article-meta {
       border-top: 1px solid #222;
       border-left: 0;
@@ -722,15 +1047,32 @@ const schemaData = {
     }
     .article-content {
       padding-right: 0;
+      order: 2;
     }
     .article-sidebar {
       border-top: 1px solid #222;
       border-left: 0;
+      order: 1;
       padding-left: 0;
       padding-top: 2rem;
+      padding-bottom: 3rem;
     }
     .article-toc {
       position: static;
+    }
+    .contributors-body {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .contributors-actions {
+      justify-content: flex-start;
+    }
+    :global(.article-body .amazon-card) {
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 1rem;
+    }
+    :global(.article-body .amazon-card__image img) {
+      max-height: 96px;
     }
   }
 
@@ -739,6 +1081,7 @@ const schemaData = {
       padding: 1rem;
     }
     h1 {
+      max-width: none;
       font-size: 2rem;
     }
     :global(.article-body h2) {
