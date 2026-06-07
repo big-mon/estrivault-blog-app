@@ -94,7 +94,7 @@ mule-app-repository/
 
 細かいテンプレートや記載例はGitHub側に置く想定です。この記事では、どういう思想で分けたのかだけに絞ります。
 
-https://github.com/your-org/mulesoft-api-design-template
+https://github.com/big-mon/mulesoft-ai-first-docs-structure-template
 
 ## README.md
 
