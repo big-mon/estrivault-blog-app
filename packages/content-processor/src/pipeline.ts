@@ -10,6 +10,7 @@ import { rehypeImageTransform } from './plugins/transforms/image-transform';
 import { rehypeLinkTransform } from './plugins/transforms/link-transform';
 import { rehypeHeadingAnchor } from './plugins/transforms/heading-anchor';
 import { rehypeHeadingExtractor } from './plugins/transforms/heading-extractor';
+import { rehypeTableClass } from './plugins/transforms/table-class';
 import { remarkYoutubeEmbed } from './plugins/embeds/youtube-embed';
 import { remarkTwitterEmbed } from './plugins/embeds/twitter-embed';
 import { remarkCommonLinkEmbed } from './plugins/embeds/common-link-embed';
@@ -70,6 +71,9 @@ function createBasePipeline(
 
       // リンク変換
       .use(rehypeLinkTransform)
+
+      // tableタグに広告・アノテーション除外用クラスを追加
+      .use(rehypeTableClass)
 
       // 見出しアンカー追加
       .use(rehypeHeadingAnchor)
