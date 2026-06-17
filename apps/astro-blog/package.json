@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "pnpm run generate:redirects && astro build",
+    "generate:redirects": "node scripts/generate-redirects.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "lint": "eslint .",
