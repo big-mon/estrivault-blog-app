@@ -6,7 +6,7 @@ test('home page has expected h1', async ({ page }) => {
 });
 
 test('Japanese tag pages render with unencoded route segments', async ({ page }) => {
-  await page.goto('/tag/プログラミング/1');
+  await page.goto('/tag/プログラミング/');
 
   await expect(page.locator('h1')).toContainText('プログラミング');
   await expect(page.locator('article').first()).toBeVisible();

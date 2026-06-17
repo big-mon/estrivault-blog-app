@@ -4,7 +4,7 @@ import path from 'node:path';
 
 export default defineConfig({
   output: 'static',
-  trailingSlash: 'never',
+  trailingSlash: 'ignore',
   vite: {
     plugins: [tailwindcss()],
     server: {

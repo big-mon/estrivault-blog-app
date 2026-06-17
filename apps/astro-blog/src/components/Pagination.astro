@@ -1,4 +1,6 @@
 ---
+import { getArchivePagePath } from '$lib/url-segments';
+
 interface Props {
   currentPage: number;
   totalPages: number;
@@ -9,15 +11,7 @@ interface Props {
 const { currentPage, totalPages, baseUrl, maxVisible = 5 } = Astro.props;
 
 function getPageUrl(page: number): string {
-  if (page === 1) {
-    return baseUrl === '/' ? '/' : `${baseUrl}/1`;
-  }
-
-  if (baseUrl === '/') {
-    return `/${page}`;
-  }
-
-  return `${baseUrl}/${page}`;
+  return getArchivePagePath(baseUrl, page);
 }
 
 function getPageNumbers(): number[] {

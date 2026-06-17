@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import type { PostMeta } from '@estrivault/content-processor';
 import { POSTS_PER_PAGE, SITE_URL } from '$constants';
 import { getAllCategories, getAllPostsMeta, getAllTags, getPosts } from '$lib/content';
-import { encodeRouteSegment, getTagRouteSegment } from '$lib/url-segments';
+import { encodeRouteSegment, getArchivePageUrl, getTagRouteSegment } from '$lib/url-segments';
 
 export const prerender = true;
 
@@ -22,6 +22,16 @@ function xmlEscape(value: string): string {
 export const GET: APIRoute = async () => {
   const siteBase = SITE_URL.replace(/\/$/, '');
   const posts = await getAllPostsMeta();
+  const indexPages = await getPosts({ perPage: POSTS_PER_PAGE });
+  const indexPageUrls: string[] = [];
+
+  for (let page = 2; page <= indexPages.totalPages; page++) {
+    indexPageUrls.push(`<url>
+    <loc>${xmlEscape(getArchivePageUrl(siteBase, '/', page))}</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>`);
+  }
 
   const categories = await getAllCategories();
   const categoryUrls: string[] = [];
@@ -32,7 +42,7 @@ export const GET: APIRoute = async () => {
 
     for (let page = 1; page <= categoryPosts.totalPages; page++) {
       categoryUrls.push(`<url>
-    <loc>${xmlEscape(`${siteBase}/category/${encodedCategory}/${page}`)}</loc>
+    <loc>${xmlEscape(getArchivePageUrl(siteBase, `/category/${encodedCategory}`, page))}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>`);
@@ -48,7 +58,7 @@ export const GET: APIRoute = async () => {
 
     for (let page = 1; page <= tagPosts.totalPages; page++) {
       tagUrls.push(`<url>
-    <loc>${xmlEscape(`${siteBase}/tag/${encodedTag}/${page}`)}</loc>
+    <loc>${xmlEscape(getArchivePageUrl(siteBase, `/tag/${encodedTag}`, page))}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>`);
@@ -83,6 +93,7 @@ export const GET: APIRoute = async () => {
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
+  ${indexPageUrls.join('')}
   ${postUrls}
   ${categoryUrls.join('')}
   ${tagUrls.join('')}

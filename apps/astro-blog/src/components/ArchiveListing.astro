@@ -3,7 +3,7 @@ import type { PostMeta } from '@estrivault/content-processor';
 import EditorialFooter from '$components/EditorialFooter.astro';
 import EditorialMasthead from '$components/EditorialMasthead.astro';
 import { getCategoryLabel } from '$constants';
-import { getTagRouteSegment } from '$lib/url-segments';
+import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments';
 
 interface ArchiveMeta {
   label: string;
@@ -107,7 +107,15 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
             <h2>TAG VARIANT</h2>
             <div>
               {visibleTopTags.map((tag) => (
-                <a class="tag-link" href={`/tag/${getTagRouteSegment(tag)}/1`}>#{tag}</a>
+                <a
+                  class="tag-link"
+                  href={getArchivePagePath(
+                    `/tag/${encodeRouteSegment(getTagRouteSegment(tag))}`,
+                    1,
+                  )}
+                >
+                  #{tag}
+                </a>
               ))}
             </div>
           </div>

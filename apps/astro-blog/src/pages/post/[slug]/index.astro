@@ -5,7 +5,7 @@ import EditorialMasthead from '$components/EditorialMasthead.astro';
 import { getCategoryLabel, SITE_TITLE, SITE_URL, SOCIAL_LINK_X } from '$constants';
 import { getAllPostsMeta, getPostBySlug } from '$lib/content';
 import { getPostOgpImageUrl } from '$lib/og';
-import { getTagRouteSegment } from '$lib/url-segments';
+import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments';
 
 export async function getStaticPaths() {
   const allPosts = await getAllPostsMeta();
@@ -135,7 +135,10 @@ const schemaData = {
         <div class="article-badges">
           <a
             class="article-category"
-            href={`/category/${encodeURIComponent(post.meta.category.toLowerCase())}/1`}
+            href={getArchivePagePath(
+              `/category/${encodeURIComponent(post.meta.category.toLowerCase())}`,
+              1,
+            )}
           >
             {categoryLabel}
           </a>
@@ -144,7 +147,9 @@ const schemaData = {
         {post.meta.description && <p class="article-lead">{post.meta.description}</p>}
         <div class="article-tags">
           {post.meta.tags.slice(0, 4).map((tag) => (
-            <a href={`/tag/${getTagRouteSegment(tag)}/1`}>#{tag}</a>
+            <a href={getArchivePagePath(`/tag/${encodeRouteSegment(getTagRouteSegment(tag))}`, 1)}>
+              #{tag}
+            </a>
           ))}
         </div>
       </div>
