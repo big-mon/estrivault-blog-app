@@ -190,9 +190,14 @@ for (const [tag, count] of [...tagCounts.entries()].sort(([a], [b]) => a.localeC
 }
 
 lines.push('', '# Article pages are document resources and omit a trailing slash.');
+lines.push(
+  '# Cloudflare serves generated post index.html files at trailing-slash URLs by default.',
+  '# Proxy canonical post URLs to those files so the browser URL stays slashless.',
+);
 
 for (const post of posts.sort((a, b) => a.slug.localeCompare(b.slug))) {
   const encodedSlug = encodeURIComponent(post.slug);
+  lines.push(`/post/${encodedSlug} /post/${encodedSlug}/ 200`);
   lines.push(`/post/${encodedSlug}/ /post/${encodedSlug} 301`);
 }
 
