@@ -22,10 +22,10 @@ function xmlEscape(value: string): string {
 export const GET: APIRoute = async () => {
   const siteBase = SITE_URL.replace(/\/$/, '');
   const posts = await getAllPostsMeta();
-  const indexPages = await getPosts({ perPage: POSTS_PER_PAGE });
+  const indexTotalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
   const indexPageUrls: string[] = [];
 
-  for (let page = 2; page <= indexPages.totalPages; page++) {
+  for (let page = 2; page <= indexTotalPages; page++) {
     indexPageUrls.push(`<url>
     <loc>${xmlEscape(getArchivePageUrl(siteBase, '/', page))}</loc>
     <changefreq>daily</changefreq>

@@ -47,7 +47,6 @@ const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
 });
 
 const formatDate = (date: Date) => dateFormatter.format(date).replace(/\//g, '.');
-const getPageUrl = (pageNumber: number) => `${routeBase}/${pageNumber}`;
 const startNumber = (page - 1) * perPage;
 const visibleTopTags = topTags.slice(0, 5);
 
@@ -187,7 +186,7 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
       <nav class="archive-pagination" aria-label="ページネーション">
         <h2>PAGINATION</h2>
         {page > 1 ?
-          <a href={getPageUrl(page - 1)} aria-label="前のページ">
+          <a href={getArchivePagePath(routeBase, page - 1)} aria-label="前のページ">
             ← PREV
           </a>
         : <span aria-disabled="true">← PREV</span>}
@@ -197,13 +196,16 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
               <span class="pagination-ellipsis" aria-hidden="true">…</span>
             : item.pageNumber === page ?
               <span aria-current="page">{String(item.pageNumber).padStart(2, '0')}</span>
-            : <a href={getPageUrl(item.pageNumber)} aria-label={`${item.pageNumber}ページ目`}>
+            : <a
+                href={getArchivePagePath(routeBase, item.pageNumber)}
+                aria-label={`${item.pageNumber}ページ目`}
+              >
                 {String(item.pageNumber).padStart(2, '0')}
               </a>,
           )}
         </div>
         {page < totalPages ?
-          <a href={getPageUrl(page + 1)} aria-label="次のページ">
+          <a href={getArchivePagePath(routeBase, page + 1)} aria-label="次のページ">
             NEXT →
           </a>
         : <span aria-disabled="true">NEXT →</span>}
