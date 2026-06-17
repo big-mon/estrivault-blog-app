@@ -1,12 +1,17 @@
 import type { APIRoute } from 'astro';
 import { POSTS_PER_PAGE } from '$constants';
-import { getPosts } from '$lib/content';
+import { getAllPostsMeta, getPosts } from '$lib/content';
 
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
   const indexPages = await getPosts({ perPage: POSTS_PER_PAGE });
+  const posts = await getAllPostsMeta();
   const pageRedirects: string[] = ['/1 / 301', '/1/ / 301'];
+  const postRedirects = posts.map((post) => {
+    const encodedSlug = encodeURIComponent(post.slug);
+    return `/post/${encodedSlug}/ /post/${encodedSlug} 301`;
+  });
 
   for (let page = 2; page <= indexPages.totalPages; page++) {
     pageRedirects.push(`/${page} /${page}/ 301`);
@@ -29,7 +34,7 @@ export const GET: APIRoute = async () => {
     '/tag/:tag/:page /tag/:tag/:page/ 301',
     '',
     '# Article pages are document resources and omit a trailing slash.',
-    '/post/:slug/ /post/:slug 301',
+    ...postRedirects,
   ];
 
   return new Response(`${redirects.join('\n')}\n`, {
