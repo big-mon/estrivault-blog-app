@@ -11,7 +11,7 @@ import {
   getCategoryLabel,
 } from '$constants';
 import { getAllPostsMeta, getPaginatedPosts } from '$lib/content';
-import { getTagRouteSegment } from '$lib/url-segments';
+import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments';
 
 const allPosts = await getAllPostsMeta();
 const pageData = getPaginatedPosts(allPosts, { page: 1, perPage: POSTS_PER_PAGE });
@@ -25,7 +25,7 @@ const categoryRows = Object.entries(CATEGORY_META)
     slug,
     label: category.label,
     description: category.description,
-    href: `/category/${slug}/1`,
+    href: getArchivePagePath(`/category/${slug}`, 1),
   }));
 
 const oldestPost = allPosts.at(-1);
@@ -48,7 +48,7 @@ const seriesCards = [
   { id: '04', title: 'Gear Reviews', desc: '装備・機材の使用感レビュー', tag: 'レビュー' },
 ].map((card) => ({
   ...card,
-  href: `/tag/${getTagRouteSegment(card.tag)}/1`,
+  href: getArchivePagePath(`/tag/${encodeRouteSegment(getTagRouteSegment(card.tag))}`, 1),
 }));
 
 const fmtDate = (date: Date) =>

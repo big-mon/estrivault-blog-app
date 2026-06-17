@@ -52,12 +52,12 @@ export function getCategoryLabel(category: string): string {
 
 export const NAVIGATION_LINKS = [
   { label: 'About', href: '/post/about' },
-  { label: CATEGORY_META.investing.label, href: '/category/investing/1' },
-  { label: CATEGORY_META.software.label, href: '/category/software/1' },
-  { label: CATEGORY_META.ai.label, href: '/category/ai/1' },
-  { label: CATEGORY_META.games.label, href: '/category/games/1' },
-  { label: CATEGORY_META.gear.label, href: '/category/gear/1' },
-  { label: CATEGORY_META.essays.label, href: '/category/essays/1' },
+  { label: CATEGORY_META.investing.label, href: '/category/investing/' },
+  { label: CATEGORY_META.software.label, href: '/category/software/' },
+  { label: CATEGORY_META.ai.label, href: '/category/ai/' },
+  { label: CATEGORY_META.games.label, href: '/category/games/' },
+  { label: CATEGORY_META.gear.label, href: '/category/gear/' },
+  { label: CATEGORY_META.essays.label, href: '/category/essays/' },
 ];
 
 export const SOCIAL_LINK_X = 'big_mon';

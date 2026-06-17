@@ -4,7 +4,7 @@ import BaseLayout from '$layouts/BaseLayout.astro';
 import ArchiveListing from '$components/ArchiveListing.astro';
 import { POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
 import { filterPosts, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
-import { encodeRouteSegment, getTagRouteSegment } from '$lib/url-segments';
+import { encodeRouteSegment, getArchivePageUrl, getTagRouteSegment } from '$lib/url-segments';
 
 interface Props {
   tag: string;
@@ -50,7 +50,7 @@ export async function getStaticPaths() {
       paths.push({
         params: {
           tag: getTagRouteSegment(tag),
-          page: String(page),
+          page: page === 1 ? undefined : String(page),
         },
         props: {
           tag,
@@ -63,7 +63,7 @@ export async function getStaticPaths() {
 }
 
 const { tag } = Astro.props as Props;
-const currentPage = Number(Astro.params.page);
+const currentPage = Number(Astro.params.page ?? '1');
 const allPosts = await getAllPostsMeta();
 const archivePosts = filterPosts(allPosts, { tag });
 const result = getPaginatedPosts(archivePosts, {
@@ -76,17 +76,18 @@ const tagCount = getTagCount(archivePosts, tag);
 const siteBase = SITE_URL.replace(/\/$/, '');
 const tagRouteSegment = String(Astro.params.tag ?? getTagRouteSegment(tag));
 const encodedTagRouteSegment = encodeRouteSegment(tagRouteSegment);
-const pageUrl = `${siteBase}/tag/${encodedTagRouteSegment}/${currentPage}`;
+const routeBase = `/tag/${encodedTagRouteSegment}`;
+const pageUrl = getArchivePageUrl(siteBase, routeBase, currentPage);
 const pageTitle = `${tag}の記事一覧${currentPage > 1 ? ` - ページ${currentPage}` : ''} | ${SITE_TITLE}`;
 const pageDescription = `${tag}タグが付けられた記事一覧${currentPage > 1 ? `（${currentPage}ページ目）` : ''}です。全${result.total}件の記事を掲載しています。`;
 
 const prevUrl =
   currentPage > 1 ?
-    `${siteBase}/tag/${encodedTagRouteSegment}/${currentPage > 2 ? currentPage - 1 : 1}`
+    getArchivePageUrl(siteBase, routeBase, currentPage - 1)
   : undefined;
 const nextUrl =
   currentPage < result.totalPages ?
-    `${siteBase}/tag/${encodedTagRouteSegment}/${currentPage + 1}`
+    getArchivePageUrl(siteBase, routeBase, currentPage + 1)
   : undefined;
 ---
 
@@ -110,7 +111,7 @@ const nextUrl =
     page={result.page}
     perPage={result.perPage}
     totalPages={result.totalPages}
-    routeBase={`/tag/${encodedTagRouteSegment}`}
+    routeBase={routeBase}
     topTags={topTags}
     sideMeta={[
       { label: 'TYPE', value: 'TAG' },

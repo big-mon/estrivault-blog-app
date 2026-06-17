@@ -50,8 +50,8 @@ ${posts
 
 - Home: ${SITE_URL}
 - Posts: ${siteBase}/post/[slug]
-- Categories: ${siteBase}/category/[category]/[page]
-- Tags: ${siteBase}/tag/[tag]/[page]
+- Categories: ${siteBase}/category/[category]/ and ${siteBase}/category/[category]/[page]/
+- Tags: ${siteBase}/tag/[tag]/ and ${siteBase}/tag/[tag]/[page]/
 
 ## Contact
 

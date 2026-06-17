@@ -4,6 +4,7 @@ import BaseLayout from '$layouts/BaseLayout.astro';
 import ArchiveListing from '$components/ArchiveListing.astro';
 import { getCategoryMeta, POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
 import { filterPosts, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
+import { getArchivePageUrl } from '$lib/url-segments';
 
 interface Props {
   category: string;
@@ -44,7 +45,7 @@ export async function getStaticPaths() {
       paths.push({
         params: {
           category: category.toLowerCase(),
-          page: String(page),
+          page: page === 1 ? undefined : String(page),
         },
         props: {
           category,
@@ -58,7 +59,7 @@ export async function getStaticPaths() {
 
 const { category } = Astro.props as Props;
 const categoryMeta = getCategoryMeta(category);
-const currentPage = Number(Astro.params.page);
+const currentPage = Number(Astro.params.page ?? '1');
 const allPosts = await getAllPostsMeta();
 const archivePosts = filterPosts(allPosts, { category });
 const result = getPaginatedPosts(archivePosts, {
@@ -69,17 +70,18 @@ const topTags = getTopTags(archivePosts);
 const tagCount = getTagCount(archivePosts);
 
 const siteBase = SITE_URL.replace(/\/$/, '');
-const pageUrl = `${siteBase}/category/${Astro.params.category}/${currentPage}`;
+const routeBase = `/category/${Astro.params.category}`;
+const pageUrl = getArchivePageUrl(siteBase, routeBase, currentPage);
 const pageTitle = `${categoryMeta.label}の記事一覧${currentPage > 1 ? ` - ページ${currentPage}` : ''} | ${SITE_TITLE}`;
 const pageDescription = `${categoryMeta.label}カテゴリーの記事一覧です。${categoryMeta.description}。全${result.total}件の記事を掲載しています。`;
 
 const prevUrl =
   currentPage > 1 ?
-    `${siteBase}/category/${Astro.params.category}/${currentPage > 2 ? currentPage - 1 : 1}`
+    getArchivePageUrl(siteBase, routeBase, currentPage - 1)
   : undefined;
 const nextUrl =
   currentPage < result.totalPages ?
-    `${siteBase}/category/${Astro.params.category}/${currentPage + 1}`
+    getArchivePageUrl(siteBase, routeBase, currentPage + 1)
   : undefined;
 ---
 
@@ -103,7 +105,7 @@ const nextUrl =
     page={result.page}
     perPage={result.perPage}
     totalPages={result.totalPages}
-    routeBase={`/category/${Astro.params.category}`}
+    routeBase={routeBase}
     topTags={topTags}
     sideMeta={[
       { label: 'TYPE', value: 'CATEGORY' },

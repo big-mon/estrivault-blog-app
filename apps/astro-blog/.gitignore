@@ -4,6 +4,7 @@ test-results
 # Output
 dist
 .astro
+public/_redirects
 
 # Platform
 .vercel
