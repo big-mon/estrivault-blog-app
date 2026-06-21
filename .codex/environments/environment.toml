@@ -3,4 +3,4 @@ version = 1
 name = "estrivault-blog-app"
 
 [setup]
-script = "git pull && pnpm install --frozen-lockfile && pnpm run build:packages && pnpm validate:workspace"
+script = "pnpm install --frozen-lockfile && pnpm run build:packages && pnpm validate:workspace"
