@@ -87,8 +87,12 @@ function createExcerpt(markdown: string, maxLength = 120): string {
   return text.length > maxLength ? `${text.slice(0, maxLength).trim()}...` : text;
 }
 
-function normalizeDate(value: unknown): Date {
+function normalizeDate(value: unknown, filePath: string, fieldName = 'publishedAt'): Date {
   if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) {
+      throw new Error(`Required frontmatter field "${fieldName}" is invalid: ${filePath}`);
+    }
+
     return value;
   }
 
@@ -99,7 +103,7 @@ function normalizeDate(value: unknown): Date {
     }
   }
 
-  return new Date();
+  throw new Error(`Required frontmatter field "${fieldName}" is invalid: ${filePath}`);
 }
 
 function normalizeTags(value: unknown): string[] {
@@ -163,7 +167,7 @@ function extractNoteMeta(filePath: string, content: string): NoteMeta | null {
     throw new Error(`Required frontmatter field "tags" is missing: ${filePath}`);
   }
 
-  const publishedAt = normalizeDate(data.publishedAt);
+  const publishedAt = normalizeDate(data.publishedAt, filePath);
 
   const meta: NoteMeta = {
     slug: (data.slug as string) || generateSlugFromPath(filePath),
@@ -304,7 +308,40 @@ export async function getAllNotes(
   options: ProcessorOptions = defaultProcessorOptions,
 ): Promise<NoteHTML[]> {
   const noteMeta = await getAllNotesMeta();
-  const notes = await Promise.all(noteMeta.map((note) => getNoteBySlug(note.slug, options)));
+  const markdownFiles = getNoteMarkdownFiles();
+  const slugToSource = new Map<string, { filePath: string; content: string }>();
+
+  for (const [filePath, content] of Object.entries(markdownFiles)) {
+    const meta = extractNoteMeta(filePath, content);
+    if (meta) {
+      slugToSource.set(meta.slug, { filePath, content });
+    }
+  }
+
+  const notes: Array<NoteHTML | null> = await Promise.all(
+    noteMeta.map(async (note) => {
+      const source = slugToSource.get(note.slug);
+      if (!source) {
+        return null;
+      }
+
+      try {
+        const processed = await processMarkdown(source.content, options, note.slug);
+        return {
+          meta: note,
+          html: processed.html,
+          originalPath: source.filePath.replace(/^.*\/content\/notes\//, 'content/notes/'),
+        } satisfies NoteHTML;
+      } catch (error) {
+        throw new Error(
+          `Failed to process note markdown file ${source.filePath}: ${getErrorMessage(error)}`,
+          {
+            cause: error,
+          },
+        );
+      }
+    }),
+  );
 
   return notes.filter((note): note is NoteHTML => note !== null);
 }

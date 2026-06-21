@@ -117,7 +117,8 @@ const noteMetas = notes.map((note) => note.meta);
 
     if (focus) {
       requestAnimationFrame(() => {
-        modalPanel.focus();
+        const firstElement = getFocusableElements()[0];
+        (firstElement || modalPanel).focus();
       });
     }
 
@@ -227,7 +228,13 @@ const noteMetas = notes.map((note) => note.meta);
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
-    if (event.shiftKey && document.activeElement === firstElement) {
+    if (event.shiftKey && document.activeElement === modalPanel) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === modalPanel) {
+      event.preventDefault();
+      firstElement.focus();
+    } else if (event.shiftKey && document.activeElement === firstElement) {
       event.preventDefault();
       lastElement.focus();
     } else if (!event.shiftKey && document.activeElement === lastElement) {

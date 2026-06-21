@@ -96,7 +96,7 @@ html {
 .note-body a:not(.heading-anchor) {
   color: #111;
   text-decoration: none;
-  text-decoration-color: currentColor;
+  text-decoration-color: currentcolor;
   text-underline-offset: 0.18em;
   transition: color 120ms ease;
 }
