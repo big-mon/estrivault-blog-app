@@ -1,7 +1,13 @@
 import type { APIRoute } from 'astro';
 import type { PostMeta } from '@estrivault/content-processor';
 import { POSTS_PER_PAGE, SITE_URL } from '$constants';
-import { getAllCategories, getAllPostsMeta, getAllTags, getPosts } from '$lib/content';
+import {
+  getAllCategories,
+  getAllNotesMeta,
+  getAllPostsMeta,
+  getAllTags,
+  getPosts,
+} from '$lib/content';
 import { encodeRouteSegment, getArchivePageUrl, getTagRouteSegment } from '$lib/url-segments';
 
 export const prerender = true;
@@ -22,6 +28,7 @@ function xmlEscape(value: string): string {
 export const GET: APIRoute = async () => {
   const siteBase = SITE_URL.replace(/\/$/, '');
   const posts = await getAllPostsMeta();
+  const notes = await getAllNotesMeta();
   const indexTotalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
   const indexPageUrls: string[] = [];
 
@@ -76,6 +83,17 @@ export const GET: APIRoute = async () => {
     )
     .join('');
 
+  const noteUrls = notes
+    .map(
+      (note) => `<url>
+    <loc>${xmlEscape(`${siteBase}/notes/${encodeURIComponent(note.slug)}`)}</loc>
+    <lastmod>${note.publishedAt.toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>`,
+    )
+    .join('');
+
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -93,8 +111,14 @@ export const GET: APIRoute = async () => {
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>${xmlEscape(`${siteBase}/notes/`)}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
   ${indexPageUrls.join('')}
   ${postUrls}
+  ${noteUrls}
   ${categoryUrls.join('')}
   ${tagUrls.join('')}
 </urlset>`.trim();

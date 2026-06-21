@@ -1,0 +1,249 @@
+---
+import type { NoteHTML, NoteMeta } from '$lib/content';
+
+interface Props {
+  note: NoteHTML;
+  relatedNotes?: NoteMeta[];
+  variant?: 'page' | 'modal';
+}
+
+const { note, relatedNotes = [], variant = 'page' } = Astro.props;
+const dateString = new Intl.DateTimeFormat('ja-JP', {
+  timeZone: 'Asia/Tokyo',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+  .format(note.meta.publishedAt)
+  .replace(/\//g, '.');
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat('ja-JP', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+    .format(date)
+    .replace(/\//g, '.');
+const titleId = `note-title-${note.meta.slug.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+const pageUrl = `/notes/${encodeURIComponent(note.meta.slug)}`;
+---
+
+<article class:list={['note-detail', variant === 'modal' && 'note-detail--modal']}>
+  <header class="note-detail-header">
+    <p class="note-kicker">Note</p>
+    <div class="note-detail-meta">
+      <time datetime={note.meta.publishedAt.toISOString()}>{dateString}</time>
+    </div>
+    <h1 id={titleId}>
+      {
+        variant === 'modal' ?
+          <a href={pageUrl} data-note-page-link>
+            {note.meta.title}
+          </a>
+        : note.meta.title
+      }
+    </h1>
+  </header>
+
+  <div class="note-body" set:html={note.html} />
+
+  {
+    note.meta.tags.length > 0 && (
+      <ul class="note-detail-tags" aria-label="Tags">
+        {note.meta.tags.map((tag) => (
+          <li>#{tag}</li>
+        ))}
+      </ul>
+    )
+  }
+
+  {
+    relatedNotes.length > 0 && (
+      <section class="related-notes" aria-labelledby={`related-${titleId}`}>
+        <h2 id={`related-${titleId}`}>Related Notes</h2>
+        <div>
+          {relatedNotes.map((related) => (
+            <a href={`/notes/${encodeURIComponent(related.slug)}`}>
+              <span>{formatDate(related.publishedAt)}</span>
+              <strong>{related.title}</strong>
+            </a>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    variant === 'page' && (
+      <nav class="note-detail-actions" aria-label="Note navigation">
+        <a href="/notes/">← NOTES INDEX</a>
+      </nav>
+    )
+  }
+</article>
+
+<style>
+  .note-detail {
+    --font-display: 'Times New Roman', serif;
+    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
+    --font-meta: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    color: #111;
+    font-family: var(--font-body);
+  }
+
+  .note-kicker,
+  .note-detail-meta,
+  .note-detail-tags,
+  .related-notes h2,
+  .related-notes span,
+  .note-detail-actions {
+    font-family: var(--font-meta);
+    font-style: normal;
+  }
+
+  .note-kicker {
+    margin: 0;
+    color: #d6452a;
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .note-detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem 1rem;
+    align-items: baseline;
+    margin-top: 1.1rem;
+    color: #d6452a;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .note-detail-meta time {
+    color: #222;
+  }
+
+  h1 {
+    margin: 1rem 0 0;
+    color: #111;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: 0;
+  }
+
+  .note-detail--modal h1 {
+    font-size: clamp(1.8rem, 4vw, 2.65rem);
+  }
+
+  h1 a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.16em;
+  }
+
+  h1 a:hover,
+  h1 a:focus-visible {
+    color: #d6452a;
+  }
+
+  h1 a:focus-visible {
+    outline: 2px solid #d6452a;
+    outline-offset: 0.12em;
+  }
+
+  .note-body {
+    margin-top: 2rem;
+  }
+
+  .note-detail-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 0.75rem;
+    margin: 2rem 0 0;
+    padding: 0;
+    color: #555;
+    font-size: 0.8rem;
+    list-style: none;
+  }
+
+  .related-notes {
+    margin-top: 2.6rem;
+    border-top: 1px solid #222;
+    padding-top: 1rem;
+  }
+
+  .related-notes h2 {
+    margin: 0 0 0.75rem;
+    color: #d6452a;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .related-notes div {
+    display: grid;
+    gap: 0;
+    border-bottom: 1px solid #b9b2a4;
+  }
+
+  .related-notes a {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: 1rem;
+    border-top: 1px solid #b9b2a4;
+    padding: 0.75rem 0;
+    color: #111;
+    text-decoration: none;
+  }
+
+  .related-notes span {
+    color: #d6452a;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .related-notes strong {
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .related-notes a:hover strong {
+    color: #d6452a;
+  }
+
+  .note-detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+    border-top: 1px solid #222;
+    padding-top: 1rem;
+  }
+
+  .note-detail-actions a {
+    border: 1px solid #222;
+    padding: 0.45rem 0.65rem 0.38rem;
+    color: #111;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .note-detail-actions a:hover {
+    border-color: #d6452a;
+    color: #d6452a;
+  }
+
+  @media (max-width: 640px) {
+    .related-notes a {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+  }
+</style>

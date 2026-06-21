@@ -82,9 +82,7 @@ const pageTitle = `${tag}の記事一覧${currentPage > 1 ? ` - ページ${curre
 const pageDescription = `${tag}タグが付けられた記事一覧${currentPage > 1 ? `（${currentPage}ページ目）` : ''}です。全${result.total}件の記事を掲載しています。`;
 
 const prevUrl =
-  currentPage > 1 ?
-    getArchivePageUrl(siteBase, routeBase, currentPage - 1)
-  : undefined;
+  currentPage > 1 ? getArchivePageUrl(siteBase, routeBase, currentPage - 1) : undefined;
 const nextUrl =
   currentPage < result.totalPages ?
     getArchivePageUrl(siteBase, routeBase, currentPage + 1)
@@ -116,7 +114,7 @@ const nextUrl =
     sideMeta={[
       { label: 'TYPE', value: 'TAG' },
       { label: 'TAG', value: tag },
-      { label: 'NOTES', value: result.total },
+      { label: 'ARTICLES', value: result.total },
       { label: 'TAGS', value: tagCount },
     ]}
     emptyMessage="このタグにはまだ記事がありません。"

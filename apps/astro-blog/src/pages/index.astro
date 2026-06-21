@@ -2,6 +2,8 @@
 import BaseLayout from '$layouts/BaseLayout.astro';
 import EditorialFooter from '$components/EditorialFooter.astro';
 import EditorialMasthead from '$components/EditorialMasthead.astro';
+import NoteCard from '$components/NoteCard.astro';
+import NoteModal from '$components/NoteModal.astro';
 import {
   CATEGORY_META,
   POSTS_PER_PAGE,
@@ -10,10 +12,13 @@ import {
   SITE_URL,
   getCategoryLabel,
 } from '$constants';
-import { getAllPostsMeta, getPaginatedPosts } from '$lib/content';
+import { getAllNotes, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
 import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments';
 
 const allPosts = await getAllPostsMeta();
+const allNotes = await getAllNotes();
+const recentNoteDetails = allNotes.slice(0, 4);
+const recentNotes = recentNoteDetails.map((note) => note.meta);
 const pageData = getPaginatedPosts(allPosts, { page: 1, perPage: POSTS_PER_PAGE });
 const featuredPost = pageData.posts[0] ?? null;
 const latestPosts = featuredPost ? pageData.posts.slice(1, 5) : pageData.posts.slice(0, 4);
@@ -28,12 +33,17 @@ const categoryRows = Object.entries(CATEGORY_META)
     href: getArchivePagePath(`/category/${slug}`, 1),
   }));
 
+const fmtDate = (date: Date) =>
+  new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
+    .format(date)
+    .replace(/\//g, '.');
+
 const oldestPost = allPosts.at(-1);
 const archiveStats = {
-  notes: pageData.total,
+  articles: allPosts.length,
   categories: categoryRows.length,
-  format: 'Markdown',
-  since: oldestPost?.publishedAt.getFullYear() ?? '----',
+  notes: allNotes.length,
+  since: oldestPost ? fmtDate(oldestPost.publishedAt) : '----',
 };
 
 const seriesCards = [
@@ -50,11 +60,6 @@ const seriesCards = [
   ...card,
   href: getArchivePagePath(`/tag/${encodeRouteSegment(getTagRouteSegment(card.tag))}`, 1),
 }));
-
-const fmtDate = (date: Date) =>
-  new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
-    .format(date)
-    .replace(/\//g, '.');
 ---
 
 <BaseLayout
@@ -69,35 +74,36 @@ const fmtDate = (date: Date) =>
   <div class="editorial-home">
     <EditorialMasthead homePage />
 
-    <section class="hero-grid">
-      <article>
-        <h1>Estrilda</h1>
-        <h2>投資、開発、AI、趣味の実践ログ。</h2>
+    <section class="home-hero">
+      <article class="hero-copy">
+        <h1>投資、開発、AI、趣味の実践ログ。</h1>
         <p>
-          米国株の企業分析、Web開発、生成AIツール、ゲーム攻略、ギアレビューまで。調べたこと・試したこと・考えたことを蓄積する、個人のための公開ノート。
+          米国株の企業分析、Web開発、生成AIツール、ゲーム攻略、ギアレビューまで。
+          調べたこと・試したこと・考えたことを蓄積する、個人のための公開ノート。
         </p>
       </article>
-      <aside>
-        <h3>ARCHIVE STATUS</h3>
-        <dl class="archive-stats">
-          <div>
-            <dt>NOTES</dt>
-            <dd>{archiveStats.notes}</dd>
-          </div>
-          <div>
-            <dt>CATEGORIES</dt>
-            <dd>{archiveStats.categories}</dd>
-          </div>
-          <div>
-            <dt>FORMAT</dt>
-            <dd>{archiveStats.format}</dd>
-          </div>
-          <div>
-            <dt>SINCE</dt>
-            <dd>{archiveStats.since}</dd>
-          </div>
-        </dl>
-      </aside>
+    </section>
+
+    <section class="archive-status" aria-labelledby="archive-status-heading">
+      <h2 id="archive-status-heading">ARCHIVE STATUS</h2>
+      <dl>
+        <div>
+          <dt>ARTICLES</dt>
+          <dd>{archiveStats.articles}</dd>
+        </div>
+        <div>
+          <dt>CATEGORIES</dt>
+          <dd>{archiveStats.categories}</dd>
+        </div>
+        <div>
+          <dt>NOTES</dt>
+          <dd>{archiveStats.notes}</dd>
+        </div>
+        <div>
+          <dt>SINCE</dt>
+          <dd>{archiveStats.since}</dd>
+        </div>
+      </dl>
     </section>
 
     <section id="categories" class="section-block category-index">
@@ -109,15 +115,14 @@ const fmtDate = (date: Date) =>
               <span class="no">{category.id}</span>
               <span class="name">{category.label}</span>
               <span class="desc">{category.description}</span>
-              <span class="key">{category.slug}</span>
             </a>
           ))
         }
       </div>
     </section>
 
-    <section id="latest" class="section-block latest-notes">
-      <h3>LATEST NOTES</h3>
+    <section id="latest" class="section-block latest-articles">
+      <h3>LATEST ARTICLES</h3>
       <div class="latest-grid">
         {
           featuredPost && (
@@ -149,6 +154,22 @@ const fmtDate = (date: Date) =>
       </div>
     </section>
 
+    {
+      recentNotes.length > 0 && (
+        <section id="recent-notes" class="section-block recent-notes">
+          <div class="section-heading-row">
+            <h3>RECENT NOTES</h3>
+            <a href="/notes/">VIEW NOTES</a>
+          </div>
+          <div class="recent-notes-grid">
+            {recentNotes.map((note) => (
+              <NoteCard note={note} compact />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
     <section class="section-block series-section">
       <h3>DEEP DIVES / SERIES</h3>
       <div class="series-grid">
@@ -166,6 +187,8 @@ const fmtDate = (date: Date) =>
 
     <EditorialFooter />
   </div>
+
+  <NoteModal notes={recentNoteDetails} basePath="/" />
 </BaseLayout>
 
 <style>
@@ -189,90 +212,87 @@ const fmtDate = (date: Date) =>
     padding: clamp(1rem, 2vw, 2rem);
   }
   .editorial-home::before {
-    content: '';
-    display: block;
-    max-width: 1180px;
-    margin: 0 auto;
-    border-top: 2px solid #202020;
+    display: none;
   }
-  .hero-grid,
+  .home-hero,
+  .archive-status,
   .section-block {
     max-width: 1180px;
     margin-right: auto;
     margin-left: auto;
   }
-  .hero-grid,
+  .home-hero {
+    border-bottom: 1px solid #b9b2a4;
+    padding: 1.05rem 0 1.25rem;
+  }
+  .hero-copy h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.15rem, 3.35vw, 3.35rem);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+  .hero-copy p {
+    margin: 1rem 0 0;
+    color: #555;
+    font-size: 1.02rem;
+    line-height: 1.9;
+  }
+  .archive-status {
+    display: grid;
+    grid-template-columns: 1.05fr 4fr;
+    align-items: stretch;
+    border-bottom: 1px solid #b9b2a4;
+    padding: 0;
+  }
+  .archive-status h2 {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 1.25rem 1rem 1.1rem 0;
+    color: #222;
+    font-family: var(--font-meta);
+    font-size: 0.9rem;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+  .archive-status dl {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 0;
+  }
+  .archive-status div {
+    display: grid;
+    place-items: center;
+    border-left: 1px solid #b9b2a4;
+    padding: 0.95rem 1rem;
+    text-align: center;
+  }
+  .archive-status dt,
+  .archive-status dd {
+    margin: 0;
+  }
+  .archive-status dt {
+    color: #6f665d;
+    font-family: var(--font-meta);
+    font-size: 0.72rem;
+    font-style: normal;
+    letter-spacing: 0.04em;
+  }
+  .archive-status dd {
+    margin-top: 0.25rem;
+    color: #222;
+    font-family: var(--font-display);
+    font-size: 1.08rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
   .section-block {
     border-top: 1px solid #222;
     padding-top: 1rem;
     margin-top: 1rem;
-  }
-  .hero-grid {
-    margin-top: 0;
-  }
-  .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 1rem;
-    min-height: 320px;
-    border-bottom: 1px solid #222;
-    padding-bottom: 1rem;
-  }
-  h1 {
-    font-family: var(--font-display);
-    font-size: clamp(4rem, 8vw, 6.8rem);
-    font-weight: 400;
-    line-height: 1;
-    margin: 0;
-  }
-  h2 {
-    font-family: var(--font-display);
-    font-size: clamp(1.7rem, 3.1vw, 2.7rem);
-    font-weight: 400;
-    line-height: 1.25;
-    margin: 0.5rem 0;
-  }
-  .hero-grid p {
-    font-size: 1.2rem;
-    color: #555;
-    max-width: 44rem;
-  }
-  aside {
-    border-left: 1px solid #222;
-    margin-top: calc(-1rem - 1px);
-    margin-bottom: calc(-1rem - 1px);
-    padding: calc(1rem + 1px) 0 calc(1rem + 1px) 1rem;
-  }
-  aside h3 {
-    font-family: var(--font-meta);
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    line-height: 1.2;
-  }
-  .archive-stats {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    column-gap: 1.25rem;
-    width: 100%;
-    border-top: 1px solid #d6452a;
-    margin: 0.75rem 0 0;
-    padding-top: 0.75rem;
-  }
-  .archive-stats div {
-    display: contents;
-  }
-  .archive-stats dt,
-  .archive-stats dd {
-    margin: 0;
-    font-family: var(--font-meta);
-    line-height: 1.65;
-  }
-  .archive-stats dt {
-    color: #d6452a;
-  }
-  .archive-stats dd {
-    text-align: right;
   }
   .section-block > h3 {
     font-family: var(--font-meta);
@@ -293,15 +313,26 @@ const fmtDate = (date: Date) =>
     padding-bottom: 0.8rem;
   }
   .table-like {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     border-bottom: 1px solid #222;
   }
   .table-row {
     display: grid;
-    grid-template-columns: 64px 300px 1fr 120px;
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 0.35rem 1rem;
+    align-content: start;
     padding: 1rem 0;
     border-top: 1px solid #aaa;
     color: inherit;
     text-decoration: none;
+  }
+  .table-row:nth-child(odd) {
+    border-right: 1px solid #aaa;
+    padding-right: 1.25rem;
+  }
+  .table-row:nth-child(even) {
+    padding-left: 1.25rem;
   }
   .table-row:hover .name,
   .featured:hover h4,
@@ -309,8 +340,7 @@ const fmtDate = (date: Date) =>
   .series-card:hover h4 {
     color: #d6452a;
   }
-  .no,
-  .key {
+  .no {
     font-family: var(--font-meta);
     font-style: normal;
     color: #d6452a;
@@ -322,29 +352,53 @@ const fmtDate = (date: Date) =>
     transition: color 120ms ease;
   }
   .desc {
+    grid-column: 2 / -1;
     color: #666;
-    align-self: center;
+    line-height: 1.65;
   }
-  .key {
-    justify-self: end;
-    color: #222;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  .latest-notes,
+  .latest-articles,
+  .recent-notes,
   .series-section {
     border-top: 0;
     margin-top: 2.5rem;
     padding-top: 0;
   }
-  .latest-notes > h3,
+  .latest-articles > h3,
+  .section-heading-row,
   .series-section > h3 {
     border-bottom: 1px solid #222;
     margin-bottom: 0.75rem;
     padding-bottom: 0.8rem;
   }
-  .latest-notes > h3 {
+  .latest-articles > h3 {
     margin-bottom: 1.5rem;
+  }
+  .section-heading-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .section-heading-row h3 {
+    margin: 0;
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .section-heading-row a {
+    color: #222;
+    font-family: var(--font-meta);
+    font-size: 0.82rem;
+    font-style: normal;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .section-heading-row a:hover {
+    color: #d6452a;
   }
   .latest-grid {
     display: grid;
@@ -437,6 +491,11 @@ const fmtDate = (date: Date) =>
     line-height: inherit;
     margin: 0;
   }
+  .recent-notes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
   .series-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -467,19 +526,46 @@ const fmtDate = (date: Date) =>
     .editorial-home {
       padding: 1rem;
     }
-    .hero-grid {
-      display: none;
+    .home-hero {
+      padding-top: 1.45rem;
     }
-    .hero-grid,
+    .hero-copy h1 {
+      max-width: none;
+      font-size: clamp(2rem, 9vw, 3rem);
+    }
+    .archive-status {
+      grid-template-columns: 1fr;
+    }
+    .archive-status h2 {
+      border-bottom: 1px solid #b9b2a4;
+      padding: 1rem 0 0.85rem;
+    }
+    .archive-status dl {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .archive-status div:nth-child(odd) {
+      border-left: 0;
+    }
+    .archive-status div:nth-child(n + 3) {
+      border-top: 1px solid #b9b2a4;
+    }
     .latest-grid {
+      grid-template-columns: 1fr;
+    }
+    .table-like {
       grid-template-columns: 1fr;
     }
     .table-row {
       grid-template-columns: 56px 1fr;
       gap: 0.5rem;
     }
-    .desc,
-    .key {
+    .table-row:nth-child(odd),
+    .table-row:nth-child(even) {
+      border-right: 0;
+      padding-right: 0;
+      padding-left: 0;
+    }
+    .desc {
       grid-column: 2;
     }
     .name {
@@ -487,6 +573,9 @@ const fmtDate = (date: Date) =>
     }
     .series-grid {
       grid-template-columns: 1fr 1fr;
+    }
+    .recent-notes-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>

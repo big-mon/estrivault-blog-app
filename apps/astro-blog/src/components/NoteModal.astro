@@ -1,0 +1,337 @@
+---
+import NoteDetail from '$components/NoteDetail.astro';
+import { getRelatedNotes, type NoteHTML } from '$lib/content';
+
+interface Props {
+  notes: NoteHTML[];
+  basePath?: string;
+}
+
+const { notes, basePath = '/notes/' } = Astro.props;
+const noteMetas = notes.map((note) => note.meta);
+---
+
+<div class="note-modal-root" data-note-modal-root data-note-modal-base={basePath} hidden>
+  <div class="note-modal-backdrop" data-note-modal-close></div>
+  <section
+    class="note-modal-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="note-modal-title"
+    tabindex="-1"
+    data-note-modal-panel
+  >
+    <button class="note-modal-close" type="button" data-note-modal-close aria-label="Close note">
+      CLOSE
+    </button>
+    <div class="note-modal-content" data-note-modal-content></div>
+  </section>
+</div>
+
+<div hidden aria-hidden="true">
+  {
+    notes.map((note) => (
+      <template data-note-template={note.meta.slug}>
+        <NoteDetail
+          note={note}
+          relatedNotes={getRelatedNotes(note.meta, noteMetas)}
+          variant="modal"
+        />
+      </template>
+    ))
+  }
+</div>
+
+<script>
+  const modalRoot = document.querySelector<HTMLElement>('[data-note-modal-root]');
+  const modalPanel = modalRoot?.querySelector<HTMLElement>('[data-note-modal-panel]');
+  const modalContent = modalRoot?.querySelector<HTMLElement>('[data-note-modal-content]');
+  const basePath = modalRoot?.dataset.noteModalBase || '/notes/';
+  let lastFocusedElement: HTMLElement | null = null;
+  let activeSlug = '';
+  let modalReturnUrl = basePath;
+
+  const focusableSelector = [
+    'a[href]',
+    'button:not([disabled])',
+    'textarea:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(',');
+
+  const getSlugFromPath = (pathname: string) => {
+    const match = pathname.match(/^\/notes\/([^/]+)\/?$/);
+    return match ? decodeURIComponent(match[1]) : '';
+  };
+
+  const getCleanReturnUrl = () => `${window.location.pathname}${window.location.hash}`;
+
+  const getTemplate = (slug: string) =>
+    document.querySelector<HTMLTemplateElement>(
+      `template[data-note-template="${CSS.escape(slug)}"]`,
+    );
+
+  const getFocusableElements = () =>
+    modalPanel ? [...modalPanel.querySelectorAll<HTMLElement>(focusableSelector)] : [];
+
+  const restoreFocus = () => {
+    if (lastFocusedElement?.isConnected) {
+      lastFocusedElement.focus();
+    }
+    lastFocusedElement = null;
+  };
+
+  const hideModal = (restore = true) => {
+    if (!modalRoot || !modalContent) {
+      return;
+    }
+
+    modalRoot.hidden = true;
+    modalContent.replaceChildren();
+    activeSlug = '';
+    document.documentElement.classList.remove('note-modal-open');
+    document.body.classList.remove('note-modal-open');
+
+    if (restore) {
+      restoreFocus();
+    }
+  };
+
+  const openModal = (slug: string, focus = true) => {
+    const template = getTemplate(slug);
+    if (!modalRoot || !modalPanel || !modalContent || !template) {
+      return false;
+    }
+
+    modalContent.replaceChildren(template.content.cloneNode(true));
+    const title = modalContent.querySelector<HTMLElement>('h1[id]');
+    if (title) {
+      title.id = 'note-modal-title';
+    }
+
+    modalRoot.hidden = false;
+    activeSlug = slug;
+    document.documentElement.classList.add('note-modal-open');
+    document.body.classList.add('note-modal-open');
+
+    if (focus) {
+      requestAnimationFrame(() => {
+        modalPanel.focus();
+      });
+    }
+
+    return true;
+  };
+
+  const closeModal = () => {
+    if (history.state?.noteModal) {
+      history.back();
+      return;
+    }
+
+    history.replaceState({}, '', modalReturnUrl || basePath);
+    hideModal();
+  };
+
+  const handleRouteState = () => {
+    const slug = getSlugFromPath(window.location.pathname);
+    if (slug && history.state?.noteModal && getTemplate(slug)) {
+      openModal(slug, false);
+      return;
+    }
+
+    if (activeSlug) {
+      hideModal();
+    }
+  };
+
+  document.addEventListener('click', (event) => {
+    const pageLink = (event.target as Element | null)?.closest<HTMLAnchorElement>(
+      'a[data-note-page-link]',
+    );
+
+    if (pageLink && pageLink.closest('[data-note-modal-root]')) {
+      const url = new URL(pageLink.href);
+      if (url.origin === window.location.origin) {
+        event.preventDefault();
+        history.replaceState({}, '', url.pathname);
+        window.location.reload();
+      }
+      return;
+    }
+
+    const link = (event.target as Element | null)?.closest<HTMLAnchorElement>(
+      'a[data-note-card-link]',
+    );
+
+    if (!link) {
+      return;
+    }
+
+    if (
+      event.defaultPrevented ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    const url = new URL(link.href);
+    if (url.origin !== window.location.origin) {
+      return;
+    }
+
+    const slug = getSlugFromPath(url.pathname);
+    if (!slug || !getTemplate(slug)) {
+      return;
+    }
+
+    event.preventDefault();
+    lastFocusedElement = link;
+    modalReturnUrl = getCleanReturnUrl();
+
+    if (openModal(slug)) {
+      history.replaceState({}, '', modalReturnUrl);
+      history.pushState({ noteModal: true, slug, modalReturnUrl }, '', url.pathname);
+    }
+  });
+
+  modalRoot?.addEventListener('click', (event) => {
+    const target = event.target;
+    if (target instanceof Element && target.hasAttribute('data-note-modal-close')) {
+      closeModal();
+    }
+  });
+
+  modalRoot?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeModal();
+      return;
+    }
+
+    if (event.key !== 'Tab') {
+      return;
+    }
+
+    const focusableElements = getFocusableElements();
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      modalPanel?.focus();
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  });
+
+  window.addEventListener('popstate', handleRouteState);
+</script>
+
+<style>
+  :global(html.note-modal-open),
+  :global(body.note-modal-open) {
+    overflow: hidden;
+  }
+
+  .note-modal-root {
+    position: fixed;
+    z-index: 80;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: clamp(0.75rem, 3vw, 2rem);
+  }
+
+  .note-modal-root[hidden] {
+    display: none;
+  }
+
+  .note-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(16, 14, 12, 0.34);
+    backdrop-filter: blur(2px);
+  }
+
+  .note-modal-panel {
+    position: relative;
+    width: min(100%, 740px);
+    max-height: min(90vh, 860px);
+    overflow-y: auto;
+    border: 1px solid #222;
+    background: #f8f5ee;
+    box-shadow: 0 22px 70px rgba(17, 17, 17, 0.2);
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .note-modal-panel:focus {
+    outline: none;
+  }
+
+  .note-modal-close {
+    position: absolute;
+    top: clamp(1.25rem, 3vw, 2rem);
+    right: clamp(1.25rem, 3vw, 2rem);
+    z-index: 1;
+    display: block;
+    margin: 0;
+    border: 1px solid #222;
+    padding: 0.42rem 0.6rem 0.36rem;
+    color: #111;
+    background: #f8f5ee;
+    font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .note-modal-content {
+    padding-right: 5rem;
+  }
+
+  .note-modal-close:hover,
+  .note-modal-close:focus-visible {
+    border-color: #d6452a;
+    color: #d6452a;
+  }
+
+  .note-modal-close:focus-visible {
+    outline: 2px solid #d6452a;
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .note-modal-root {
+      align-items: stretch;
+      padding: 0.7rem;
+    }
+
+    .note-modal-panel {
+      width: 100%;
+      max-height: calc(100vh - 1.4rem);
+      padding: 1rem;
+    }
+
+    .note-modal-close {
+      top: 1rem;
+      right: 1rem;
+    }
+
+    .note-modal-content {
+      padding-right: 4.4rem;
+    }
+  }
+</style>

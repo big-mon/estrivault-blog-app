@@ -6,6 +6,7 @@ const POSTS_PER_PAGE = 12;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(__dirname, '..');
 const contentRoot = path.resolve(appRoot, '../../content/blog');
+const notesContentRoot = path.resolve(appRoot, '../../content/notes');
 const outputPath = path.resolve(appRoot, 'public/_redirects');
 
 async function getMarkdownFiles(directory) {
@@ -145,7 +146,9 @@ function getArchiveRedirects(basePath, totalPages) {
 }
 
 const files = await getMarkdownFiles(contentRoot);
+const noteFiles = await getMarkdownFiles(notesContentRoot);
 const posts = [];
+const notes = [];
 const categoryCounts = new Map();
 const tagCounts = new Map();
 
@@ -165,6 +168,17 @@ for (const filePath of files) {
   }
 }
 
+for (const filePath of noteFiles) {
+  const content = await readFile(filePath, 'utf8');
+  const meta = extractRedirectMeta(content, filePath);
+
+  if (meta.draft) {
+    continue;
+  }
+
+  notes.push(meta);
+}
+
 const lines = [
   '# Canonical URL redirects',
   '',
@@ -178,6 +192,7 @@ for (let page = 2; page <= getTotalPages(posts.length); page++) {
 }
 
 lines.push('', '# Archive pages are collection resources and keep a trailing slash.');
+lines.push('/notes /notes/ 301');
 
 for (const [category, count] of [...categoryCounts.entries()].sort(([a], [b]) =>
   a.localeCompare(b),
@@ -199,6 +214,12 @@ for (const post of posts.sort((a, b) => a.slug.localeCompare(b.slug))) {
   const encodedSlug = encodeURIComponent(post.slug);
   lines.push(`/post/${encodedSlug} /post/${encodedSlug}/ 200`);
   lines.push(`/post/${encodedSlug}/ /post/${encodedSlug} 301`);
+}
+
+for (const note of notes.sort((a, b) => a.slug.localeCompare(b.slug))) {
+  const encodedSlug = encodeURIComponent(note.slug);
+  lines.push(`/notes/${encodedSlug} /notes/${encodedSlug}/ 200`);
+  lines.push(`/notes/${encodedSlug}/ /notes/${encodedSlug} 301`);
 }
 
 await mkdir(path.dirname(outputPath), { recursive: true });

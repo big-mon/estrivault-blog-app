@@ -50,9 +50,7 @@ const formatDate = (date: Date) => dateFormatter.format(date).replace(/\//g, '.'
 const startNumber = (page - 1) * perPage;
 const visibleTopTags = topTags.slice(0, 5);
 
-type PaginationItem =
-  | { type: 'page'; pageNumber: number }
-  | { type: 'ellipsis'; key: string };
+type PaginationItem = { type: 'page'; pageNumber: number } | { type: 'ellipsis'; key: string };
 
 function getVisiblePaginationItems(currentPage: number, pageCount: number): PaginationItem[] {
   if (pageCount <= 7) {
@@ -149,7 +147,9 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
             <li>
               <article>
                 <a href={`/post/${post.slug}`} class="post-row">
-                  <span class="post-number">{String(startNumber + index + 1).padStart(2, '0')}</span>
+                  <span class="post-number">
+                    {String(startNumber + index + 1).padStart(2, '0')}
+                  </span>
                   <span class="post-copy">
                     <span class="post-date">
                       <time datetime={post.publishedAt.toISOString()}>
@@ -193,7 +193,9 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
         <div>
           {visiblePaginationItems.map((item) =>
             item.type === 'ellipsis' ?
-              <span class="pagination-ellipsis" aria-hidden="true">…</span>
+              <span class="pagination-ellipsis" aria-hidden="true">
+                …
+              </span>
             : item.pageNumber === page ?
               <span aria-current="page">{String(item.pageNumber).padStart(2, '0')}</span>
             : <a
@@ -235,13 +237,6 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
     font-family: var(--font-body);
     padding: clamp(1rem, 2vw, 2rem);
   }
-  .archive-page::before {
-    content: '';
-    display: block;
-    max-width: 1180px;
-    margin: 0 auto;
-    border-top: 2px solid #202020;
-  }
   .archive-hero,
   .archive-index,
   .archive-pagination {
@@ -276,7 +271,6 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
     grid-template-columns: minmax(0, 1fr) 360px;
     gap: 1rem;
     min-height: 300px;
-    border-top: 1px solid #222;
     border-bottom: 1px solid #222;
     margin-top: 0;
     padding: 1rem 0;
@@ -335,7 +329,9 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
     font-style: normal;
     line-height: 1.1;
     text-decoration: none;
-    transition: color 120ms ease, border-color 120ms ease;
+    transition:
+      color 120ms ease,
+      border-color 120ms ease;
   }
   .tag-variants .tag-link:hover {
     border-color: #d6452a;
@@ -520,7 +516,9 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
     color: inherit;
     line-height: 1.1;
     text-decoration: none;
-    transition: color 120ms ease, border-color 120ms ease;
+    transition:
+      color 120ms ease,
+      border-color 120ms ease;
   }
   .archive-pagination a:hover {
     border-color: #d6452a;

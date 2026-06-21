@@ -1,0 +1,169 @@
+---
+import type { NoteMeta } from '$lib/content';
+
+interface Props {
+  note: NoteMeta;
+  compact?: boolean;
+}
+
+const { note, compact = false } = Astro.props;
+const dateString = new Intl.DateTimeFormat('ja-JP', {
+  timeZone: 'Asia/Tokyo',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+  .format(note.publishedAt)
+  .replace(/\//g, '.');
+const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
+const tagList = note.tags.join(' ');
+---
+
+<a
+  class:list={['note-card', compact && 'note-card--compact']}
+  href={noteUrl}
+  data-note-card-link
+  data-note-slug={note.slug}
+  data-note-tags={tagList}
+  data-note-title={note.title}
+  data-note-excerpt={note.excerpt}
+>
+  <article>
+    <header class="note-card-header">
+      <span>Note</span>
+      <time datetime={note.publishedAt.toISOString()}>{dateString}</time>
+    </header>
+
+    <h3>{note.title}</h3>
+    <p class="note-card-excerpt">{note.excerpt}</p>
+
+    {
+      note.tags.length > 0 && (
+        <ul class="note-card-tags" aria-label="Tags">
+          {note.tags.slice(0, compact ? 3 : 5).map((tag) => (
+            <li>#{tag}</li>
+          ))}
+        </ul>
+      )
+    }
+
+    <span class="note-card-more">READ MORE →</span>
+  </article>
+</a>
+
+<style>
+  .note-card {
+    display: flex;
+    min-width: 0;
+    height: 100%;
+    flex-direction: column;
+    border: 1px solid #222;
+    color: inherit;
+    background: #f8f5ee;
+    text-decoration: none;
+    transition:
+      border-color 140ms ease,
+      transform 140ms ease,
+      background-color 140ms ease;
+  }
+
+  .note-card:hover,
+  .note-card:focus-visible {
+    border-color: #d6452a;
+    background: #fffdf8;
+  }
+
+  .note-card:focus-visible {
+    outline: 2px solid #d6452a;
+    outline-offset: 3px;
+  }
+
+  .note-card-more,
+  .note-card-header,
+  .note-card-tags {
+    font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-style: normal;
+  }
+
+  article {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .note-card-header {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    justify-content: space-between;
+    color: #d6452a;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .note-card-header time {
+    color: #222;
+    white-space: nowrap;
+  }
+
+  h3 {
+    margin: 1rem 0 0;
+    color: #111;
+    font-family: 'Times New Roman', serif;
+    font-size: 1.55rem;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0;
+    transition: color 140ms ease;
+  }
+
+  .note-card:hover h3,
+  .note-card:focus-visible h3 {
+    color: #d6452a;
+  }
+
+  .note-card-excerpt {
+    display: -webkit-box;
+    min-height: 3.2em;
+    margin: 0.75rem 0 0;
+    overflow: hidden;
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .note-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.6rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    color: #555;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    list-style: none;
+  }
+
+  .note-card-more {
+    display: inline-block;
+    width: fit-content;
+    margin-top: auto;
+    padding-top: 1rem;
+    color: #d6452a;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .note-card--compact h3 {
+    font-size: 1.35rem;
+  }
+
+  .note-card--compact .note-card-excerpt {
+    min-height: 0;
+  }
+</style>
