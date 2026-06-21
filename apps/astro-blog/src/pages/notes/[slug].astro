@@ -71,7 +71,7 @@ const jsonLd = {
   bodyClass="note-page"
   mainClass="note-main"
 >
-  <div class="note-page-shell">
+  <div class="note-page-shell" data-note-path={notePath}>
     <EditorialMasthead />
     <main class="note-page-content">
       <NoteDetail note={note} relatedNotes={relatedNotes} variant="page" />
@@ -80,13 +80,16 @@ const jsonLd = {
   </div>
 </BaseLayout>
 
-<script define:vars={{ notePath }}>
-  const normalizeNotePath = (path) =>
+<script>
+  const notePageShell = document.querySelector<HTMLElement>('[data-note-path]');
+  const notePath = notePageShell?.dataset.notePath;
+
+  const normalizeNotePath = (path: string) =>
     path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path;
-  const expectedNotePath = normalizeNotePath(notePath);
+  const expectedNotePath = notePath ? normalizeNotePath(notePath) : null;
 
   const reloadIfStaleNoteDocument = () => {
-    if (normalizeNotePath(window.location.pathname) !== expectedNotePath) {
+    if (expectedNotePath && normalizeNotePath(window.location.pathname) !== expectedNotePath) {
       window.location.reload();
     }
   };
