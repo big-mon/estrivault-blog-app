@@ -1,5 +1,6 @@
 import {
   extractMetadata,
+  parseFrontmatter,
   normalizeForTagFilter,
   processMarkdown,
   type PostHTML,
@@ -15,6 +16,20 @@ export interface PaginatedPosts {
   totalPages: number;
 }
 
+export interface NoteMeta {
+  slug: string;
+  title: string;
+  excerpt: string;
+  publishedAt: Date;
+  tags: string[];
+}
+
+export interface NoteHTML {
+  meta: NoteMeta;
+  html: string;
+  originalPath?: string;
+}
+
 const defaultProcessorOptions: ProcessorOptions = {
   cloudinaryCloudName: import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? 'damonge',
 };
@@ -25,9 +40,20 @@ interface PostMetaSource {
 }
 
 let allPostsMetaPromise: Promise<PostMeta[]> | undefined;
+let allNotesMetaPromise: Promise<NoteMeta[]> | undefined;
 
 function getMarkdownFiles(): Record<string, string> {
   const modules = import.meta.glob('@content/blog/**/*.{md,mdx}', {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  });
+
+  return modules as Record<string, string>;
+}
+
+function getNoteMarkdownFiles(): Record<string, string> {
+  const modules = import.meta.glob('@content/notes/**/*.{md,mdx}', {
     query: '?raw',
     import: 'default',
     eager: true,
@@ -44,6 +70,46 @@ function generateSlugFromPath(filePath: string): string {
   }
 
   return filename.replace(/\.(md|mdx)$/, '');
+}
+
+function stripMarkdown(value: string): string {
+  return value
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/!\[[^\]]*]\([^)]*\)/g, '')
+    .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
+    .replace(/[#>*_`~-]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function createExcerpt(markdown: string, maxLength = 120): string {
+  const text = stripMarkdown(markdown);
+  return text.length > maxLength ? `${text.slice(0, maxLength).trim()}...` : text;
+}
+
+function normalizeDate(value: unknown, filePath: string, fieldName = 'publishedAt'): Date {
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) {
+      throw new Error(`Required frontmatter field "${fieldName}" is invalid: ${filePath}`);
+    }
+
+    return value;
+  }
+
+  if (typeof value === 'string' || typeof value === 'number') {
+    const date = new Date(value);
+    if (!Number.isNaN(date.getTime())) {
+      return date;
+    }
+  }
+
+  throw new Error(`Required frontmatter field "${fieldName}" is invalid: ${filePath}`);
+}
+
+function normalizeTags(value: unknown): string[] {
+  return Array.isArray(value) ?
+      value.filter((tag): tag is string => typeof tag === 'string').map((tag) => tag.trim())
+    : [];
 }
 
 function getErrorMessage(error: unknown): string {
@@ -67,6 +133,51 @@ function assertUniqueSlugs(posts: Array<{ filePath: string; meta: PostMeta }>): 
 
     slugToPath.set(meta.slug, filePath);
   }
+}
+
+function assertUniqueNoteSlugs(notes: Array<{ filePath: string; meta: NoteMeta }>): void {
+  const slugToPath = new Map<string, string>();
+
+  for (const { filePath, meta } of notes) {
+    if (!meta.slug) {
+      throw new Error(`Note slug is empty: ${filePath}`);
+    }
+
+    const existingPath = slugToPath.get(meta.slug);
+    if (existingPath) {
+      throw new Error(
+        `Duplicate note slug "${meta.slug}" detected between ${existingPath} and ${filePath}`,
+      );
+    }
+
+    slugToPath.set(meta.slug, filePath);
+  }
+}
+
+function extractNoteMeta(filePath: string, content: string): NoteMeta | null {
+  const { data, content: markdown } = parseFrontmatter(content);
+
+  if (!data.title) {
+    throw new Error(`Required frontmatter field "title" is missing: ${filePath}`);
+  }
+  if (!data.publishedAt) {
+    throw new Error(`Required frontmatter field "publishedAt" is missing: ${filePath}`);
+  }
+  if (!Array.isArray(data.tags)) {
+    throw new Error(`Required frontmatter field "tags" is missing: ${filePath}`);
+  }
+
+  const publishedAt = normalizeDate(data.publishedAt, filePath);
+
+  const meta: NoteMeta = {
+    slug: (data.slug as string) || generateSlugFromPath(filePath),
+    title: data.title as string,
+    excerpt: createExcerpt(markdown, 150),
+    publishedAt,
+    tags: normalizeTags(data.tags),
+  };
+
+  return meta;
 }
 
 async function extractFrontmatterOnly(
@@ -134,6 +245,122 @@ async function loadAllPostsMeta(options: ProcessorOptions): Promise<PostMeta[]> 
   return validPostSources
     .map((source) => source.meta)
     .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+}
+
+export async function getAllNotesMeta(): Promise<NoteMeta[]> {
+  allNotesMetaPromise ??= loadAllNotesMeta();
+  return allNotesMetaPromise;
+}
+
+async function loadAllNotesMeta(): Promise<NoteMeta[]> {
+  const markdownFiles = getNoteMarkdownFiles();
+
+  const noteMetaSources = Object.entries(markdownFiles).map(([filePath, content]) => ({
+    filePath,
+    meta: extractNoteMeta(filePath, content),
+  }));
+
+  const validNoteSources = noteMetaSources.filter(
+    (source): source is { filePath: string; meta: NoteMeta } => source.meta !== null,
+  );
+
+  assertUniqueNoteSlugs(validNoteSources);
+
+  return validNoteSources
+    .map((source) => source.meta)
+    .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+}
+
+export async function getNoteBySlug(
+  slug: string,
+  options: ProcessorOptions = defaultProcessorOptions,
+): Promise<NoteHTML | null> {
+  const markdownFiles = getNoteMarkdownFiles();
+
+  for (const [filePath, content] of Object.entries(markdownFiles)) {
+    const meta = extractNoteMeta(filePath, content);
+
+    if (!meta || meta.slug !== slug) {
+      continue;
+    }
+
+    try {
+      const processed = await processMarkdown(content, options, slug);
+      return {
+        meta,
+        html: processed.html,
+        originalPath: filePath.replace(/^.*\/content\/notes\//, 'content/notes/'),
+      };
+    } catch (error) {
+      throw new Error(
+        `Failed to process note markdown file ${filePath}: ${getErrorMessage(error)}`,
+        {
+          cause: error,
+        },
+      );
+    }
+  }
+
+  return null;
+}
+
+export async function getAllNotes(
+  options: ProcessorOptions = defaultProcessorOptions,
+): Promise<NoteHTML[]> {
+  const noteMeta = await getAllNotesMeta();
+  const markdownFiles = getNoteMarkdownFiles();
+  const slugToSource = new Map<string, { filePath: string; content: string }>();
+
+  for (const [filePath, content] of Object.entries(markdownFiles)) {
+    const meta = extractNoteMeta(filePath, content);
+    if (meta) {
+      slugToSource.set(meta.slug, { filePath, content });
+    }
+  }
+
+  const notes: Array<NoteHTML | null> = await Promise.all(
+    noteMeta.map(async (note) => {
+      const source = slugToSource.get(note.slug);
+      if (!source) {
+        return null;
+      }
+
+      try {
+        const processed = await processMarkdown(source.content, options, note.slug);
+        return {
+          meta: note,
+          html: processed.html,
+          originalPath: source.filePath.replace(/^.*\/content\/notes\//, 'content/notes/'),
+        } satisfies NoteHTML;
+      } catch (error) {
+        throw new Error(
+          `Failed to process note markdown file ${source.filePath}: ${getErrorMessage(error)}`,
+          {
+            cause: error,
+          },
+        );
+      }
+    }),
+  );
+
+  return notes.filter((note): note is NoteHTML => note !== null);
+}
+
+export function getRelatedNotes(current: NoteMeta, notes: NoteMeta[], limit = 3): NoteMeta[] {
+  const currentTags = new Set(current.tags.map((tag) => normalizeForTagFilter(tag)));
+
+  return notes
+    .filter((note) => note.slug !== current.slug)
+    .map((note) => {
+      const sharedTags = note.tags.filter((tag) => currentTags.has(normalizeForTagFilter(tag)));
+      return { note, score: sharedTags.length };
+    })
+    .filter((item) => item.score > 0)
+    .sort(
+      (a, b) => b.score - a.score || b.note.publishedAt.getTime() - a.note.publishedAt.getTime(),
+    )
+    .slice(0, limit)
+    .map((item) => item.note);
 }
 
 export function filterPosts(

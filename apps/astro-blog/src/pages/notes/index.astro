@@ -1,0 +1,86 @@
+---
+import BaseLayout from '$layouts/BaseLayout.astro';
+import EditorialFooter from '$components/EditorialFooter.astro';
+import EditorialMasthead from '$components/EditorialMasthead.astro';
+import NoteCard from '$components/NoteCard.astro';
+import NoteModal from '$components/NoteModal.astro';
+import { SITE_TITLE, SITE_URL } from '$constants';
+import { getAllNotes } from '$lib/content';
+
+const notes = await getAllNotes();
+const noteMetas = notes.map((note) => note.meta);
+const siteBase = SITE_URL.replace(/\/$/, '');
+const title = `Notes | ${SITE_TITLE}`;
+const description =
+  'Estrildaの短文アーカイブ。映画、読書、ギア、AIツール、ゲーム、小さな考察を独立したミニ記事として収録しています。';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={`${siteBase}/notes/`}
+  hideHeader
+  hideFooter
+  bodyClass="notes-archive-page"
+  mainClass="notes-archive-main"
+>
+  <div class="notes-shell">
+    <EditorialMasthead />
+
+    <section class="notes-grid" aria-label="Notes" data-notes-grid>
+      {noteMetas.map((note) => <NoteCard note={note} />)}
+    </section>
+
+    <EditorialFooter />
+  </div>
+
+  <NoteModal notes={notes} basePath="/notes/" />
+</BaseLayout>
+
+<style>
+  :global(.notes-archive-page) {
+    background: #f1eee7;
+  }
+
+  :global(.notes-archive-main) {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
+
+  .notes-shell {
+    --font-display: 'Times New Roman', serif;
+    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
+    --font-meta: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    min-height: 100vh;
+    padding: clamp(1rem, 2vw, 2rem);
+    color: #111;
+    background: #f1eee7;
+    font-family: var(--font-body);
+  }
+
+  .notes-grid {
+    max-width: 1180px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 2.5rem;
+  }
+
+  @media (min-width: 1280px) {
+    .notes-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .notes-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

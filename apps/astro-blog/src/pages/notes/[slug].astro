@@ -1,0 +1,135 @@
+---
+import BaseLayout from '$layouts/BaseLayout.astro';
+import EditorialFooter from '$components/EditorialFooter.astro';
+import EditorialMasthead from '$components/EditorialMasthead.astro';
+import NoteDetail from '$components/NoteDetail.astro';
+import { SITE_TITLE, SITE_URL, SOCIAL_LINK_X } from '$constants';
+import { getAllNotesMeta, getNoteBySlug, getRelatedNotes } from '$lib/content';
+
+export async function getStaticPaths() {
+  const notes = await getAllNotesMeta();
+  return notes.map((note) => ({ params: { slug: note.slug } }));
+}
+
+const slug = Astro.params.slug;
+if (!slug) {
+  throw new Error('slug parameter is required');
+}
+
+const note = await getNoteBySlug(slug);
+if (!note) {
+  throw new Error(`Note not found: ${slug}`);
+}
+
+const allNotes = await getAllNotesMeta();
+const relatedNotes = getRelatedNotes(note.meta, allNotes);
+const siteBase = SITE_URL.replace(/\/$/, '');
+const notePath = `/notes/${encodeURIComponent(note.meta.slug)}`;
+const canonical = `${siteBase}/notes/${encodeURIComponent(note.meta.slug)}`;
+const title = `${note.meta.title} | Notes | ${SITE_TITLE}`;
+const description = note.meta.excerpt || `${note.meta.title}の短文Noteです。`;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: note.meta.title,
+  description,
+  author: {
+    '@type': 'Person',
+    name: 'big-mon',
+    url: `https://x.com/${SOCIAL_LINK_X}`,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: SITE_TITLE,
+    url: SITE_URL,
+  },
+  datePublished: note.meta.publishedAt.toISOString(),
+  dateModified: note.meta.publishedAt.toISOString(),
+  articleSection: 'Note',
+  keywords: note.meta.tags.join(', '),
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': canonical,
+  },
+  inLanguage: 'ja-JP',
+  url: canonical,
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  ogType="article"
+  jsonLd={jsonLd}
+  publishedTime={note.meta.publishedAt.toISOString()}
+  modifiedTime={note.meta.publishedAt.toISOString()}
+  section="Note"
+  tags={note.meta.tags}
+  hideHeader
+  hideFooter
+  bodyClass="note-page"
+  mainClass="note-main"
+>
+  <div class="note-page-shell" data-note-path={notePath}>
+    <EditorialMasthead />
+    <main class="note-page-content">
+      <NoteDetail note={note} relatedNotes={relatedNotes} variant="page" />
+    </main>
+    <EditorialFooter />
+  </div>
+</BaseLayout>
+
+<script>
+  const notePageShell = document.querySelector<HTMLElement>('[data-note-path]');
+  const notePath = notePageShell?.dataset.notePath;
+
+  const normalizeNotePath = (path: string) =>
+    path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path;
+  const expectedNotePath = notePath ? normalizeNotePath(notePath) : null;
+
+  const reloadIfStaleNoteDocument = () => {
+    if (expectedNotePath && normalizeNotePath(window.location.pathname) !== expectedNotePath) {
+      window.location.reload();
+    }
+  };
+
+  window.addEventListener('popstate', () => {
+    requestAnimationFrame(reloadIfStaleNoteDocument);
+  });
+
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+      reloadIfStaleNoteDocument();
+    }
+  });
+</script>
+
+<style>
+  :global(.note-page) {
+    background: #f1eee7;
+  }
+
+  :global(.note-main) {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
+
+  .note-page-shell {
+    --font-display: 'Times New Roman', serif;
+    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
+    --font-meta: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    min-height: 100vh;
+    padding: clamp(1rem, 2vw, 2rem);
+    color: #111;
+    background: #f1eee7;
+    font-family: var(--font-body);
+  }
+
+  .note-page-content {
+    max-width: 760px;
+    margin: 0 auto;
+    padding-top: 1.5rem;
+  }
+</style>

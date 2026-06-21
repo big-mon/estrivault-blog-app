@@ -52,6 +52,7 @@ export function getCategoryLabel(category: string): string {
 
 export const NAVIGATION_LINKS = [
   { label: 'About', href: '/post/about' },
+  { label: 'Notes', href: '/notes/' },
   { label: CATEGORY_META.investing.label, href: '/category/investing/' },
   { label: CATEGORY_META.software.label, href: '/category/software/' },
   { label: CATEGORY_META.ai.label, href: '/category/ai/' },
