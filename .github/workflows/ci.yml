@@ -2,9 +2,6 @@ name: CI
 
 on:
   pull_request:
-  push:
-    branches:
-      - main
 
 permissions:
   contents: read
@@ -45,6 +42,9 @@ jobs:
 
       - name: Lint astro-blog
         run: pnpm --filter astro-blog lint
+
+      - name: Check astro-blog
+        run: pnpm --filter astro-blog check
 
       - name: Get Playwright version
         id: playwright-version
