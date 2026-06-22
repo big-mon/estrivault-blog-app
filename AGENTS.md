@@ -205,7 +205,7 @@ pnpm --filter @estrivault/cloudinary-utils dev  # Watch mode for development
 **Content Processing:**
 
 - unified, remark-parse, remark-directive, remark-gfm for Markdown parsing
-- rehype-raw, rehype-sanitize, rehype-stringify for HTML processing
+- rehype-raw, rehype-stringify for HTML processing
 - gray-matter for frontmatter parsing
 - reading-time for estimated reading time calculation
 
@@ -231,6 +231,8 @@ The `@estrivault/content-processor` uses a unified pipeline (`packages/content-p
 Article and note Markdown should use the same `processMarkdown()` pipeline. If rendered Markdown differs between posts and notes, first check the consuming component/CSS before changing the processor.
 
 Blog and note bodies are trusted, repository-authored Markdown. `rehypeRaw` is intentionally enabled so raw HTML and custom embeds survive processing; Astro renders the processed output with `set:html`. Do not remove `rehypeRaw` or add sanitization unless the content trust model changes.
+
+The package currently does not run `rehype-sanitize` and `ProcessorOptions` should not expose a sanitize schema option unless sanitization is added to the pipeline with tests. Keep this trust-boundary rationale in `AGENTS.md`; keep README package docs short and human-scannable.
 
 Shared Markdown body presentation belongs in `apps/astro-blog/src/app.css` and should target both `.article-body` and `.note-body`. Avoid keeping article-only body styles inside `apps/astro-blog/src/pages/post/[slug]/index.astro` when the same Markdown constructs can appear in notes.
 
