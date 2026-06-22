@@ -9,7 +9,6 @@ export interface ProcessorOptions {
   embeds?: EmbedOptions;
   cloudinaryCloudName?: string;
   imageBase?: string;
-  sanitizeSchema?: import('hast-util-sanitize').Schema;
 }
 
 /** 投稿のメタ情報 */

@@ -2,6 +2,14 @@
 
 Markdownファイルを処理してHTMLに変換するコアパッケージです。unified/remark/rehype パイプラインを使用し、YouTube、Twitter、GitHub、Amazonのカスタム埋め込み機能を提供します。
 
+## Trust Boundary
+
+This package is used for repository-authored Markdown under this blog's content directories. It does not process external user-generated Markdown.
+
+Raw HTML is intentionally enabled with `remarkRehype({ allowDangerousHtml: true })` and `rehypeRaw` so authored Markdown and custom embed plugins can produce the HTML needed by the Astro app. The Astro app renders that processed HTML with `set:html` because the content has already passed through this trusted Markdown pipeline.
+
+`ProcessorOptions.sanitizeSchema` was removed because the pipeline does not run `rehype-sanitize`. If this package ever needs to process untrusted Markdown, add `rehype-sanitize` explicitly to the pipeline and expose a tested schema option at the same time.
+
 ## 特徴
 
 - **統合パイプライン**: unified/remark/rehype エコシステムを使用
@@ -117,8 +125,7 @@ const normalizedTag = normalizeForTagFilter('タグ名');
 4. **カスタムプラグイン**: 埋め込み変換・変換処理
 5. **remark-rehype**: MarkdownからHTMLへの変換
 6. **rehype-raw**: HTMLのローデータ処理
-7. **rehype-sanitize**: HTMLのサニタイゼーション
-8. **rehype-stringify**: HTMLの文字列化
+7. **rehype-stringify**: HTMLの文字列化
 
 ### ファイル構成
 
@@ -165,7 +172,6 @@ pnpm dev
 - **remark-directive**: カスタムディレクティブサポート
 - **remark-gfm**: GitHub Flavored Markdownサポート
 - **rehype-raw**: HTML処理
-- **rehype-sanitize**: HTMLサニタイゼーション
 - **gray-matter**: フロントマターパーサー
 - **reading-time**: 読み取り時間算出
 - **@estrivault/cloudinary-utils**: 画像最適化

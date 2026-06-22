@@ -50,6 +50,8 @@ function createBasePipeline(
 
     // HTML 変換
     .use(remarkRehype, { allowDangerousHtml: true })
+    // Blog and note bodies are trusted, repository-authored Markdown.
+    // Raw HTML supports custom embeds; Astro renders the processed output with set:html.
     .use(rehypeRaw);
 
   // シンタックスハイライトを条件で追加（Cloudflare Workers対応）
