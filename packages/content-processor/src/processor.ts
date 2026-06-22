@@ -52,6 +52,85 @@ function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''
   return buildUrl(cloudinaryCloudName, publicId, { w: 1200, quality: 85 });
 }
 
+function normalizeDateField(
+  value: unknown,
+  invalidFallback: unknown,
+  invalidMessage: string,
+): unknown {
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  let dateValue = value;
+  if (dateValue.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
+    dateValue = dateValue + '.000Z';
+  } else if (dateValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    dateValue = dateValue + 'T00:00:00.000Z';
+  }
+
+  if (isNaN(Date.parse(dateValue))) {
+    console.warn(invalidMessage);
+    return invalidFallback;
+  }
+
+  return dateValue;
+}
+
+function normalizePostMeta(
+  data: Record<string, unknown>,
+  markdown: string,
+  options: ProcessorOptions = {},
+  slug?: string,
+): PostMeta {
+  if (!data.title) {
+    throw new FrontMatterError('Front-matterにtitleが含まれていません');
+  }
+
+  const stats = readingTime(markdown, { wordsPerMinute: 600 });
+  const tags =
+    Array.isArray(data.tags) ?
+      data.tags
+        .filter((tag): tag is string => typeof tag === 'string')
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0)
+    : [];
+
+  const publishedAtValue =
+    data.publishedAt ?
+      normalizeDateField(
+        data.publishedAt,
+        new Date().toISOString(),
+        `Invalid publishedAt format: ${data.publishedAt}, using current date`,
+      )
+    : new Date().toISOString();
+  const publishedAt = new Date(publishedAtValue as string);
+
+  const updatedAtSource = data.updatedAt || publishedAtValue;
+  const updatedAtValue = normalizeDateField(
+    updatedAtSource,
+    publishedAtValue,
+    `Invalid updatedAt format: ${data.updatedAt}, using publishedAt`,
+  );
+  const updatedAt = new Date(updatedAtValue as string);
+
+  return {
+    slug: (data.slug as string) || slug || '',
+    title: data.title as string,
+    description: (data.description as string) || '',
+    publishedAt,
+    updatedAt,
+    category: (data.category as string) || '',
+    tags,
+    coverImage: resolveCoverImage(
+      data.coverImage as string | undefined,
+      options.cloudinaryCloudName,
+    ),
+    showArticleThumbnail: data.showArticleThumbnail !== false,
+    draft: (data.draft as boolean) || false,
+    readingTime: Math.ceil(stats.minutes),
+  };
+}
+
 /**
  * Markdownコンテンツ（フロントマター付き）を解析し、HTML・メタデータ・見出し情報・各種埋め込み検出結果を返します。
  *
@@ -70,14 +149,7 @@ export async function processMarkdown(
   try {
     // フロントマターの解析
     const { data, content: markdown } = parseFrontmatter(content);
-
-    // 必須フィールドの検証
-    if (!data.title) {
-      throw new FrontMatterError('Front-matterにtitleが含まれていません');
-    }
-
-    // 読了時間の計算
-    const stats = readingTime(markdown, { wordsPerMinute: 600 });
+    const meta = normalizePostMeta(data, markdown, options, slug);
 
     // マークダウンをパースしてコードブロックを自動検出
     const parseProcessor = unified().use(remarkParse).use(remarkDirective).use(remarkGfm);
@@ -98,71 +170,6 @@ export async function processMarkdown(
     // 見出し情報を取得（heading-extractorプラグインで抽出されたもの）
     const headings: HeadingInfo[] =
       ((result.data as Record<string, unknown>)?.headings as HeadingInfo[]) || [];
-
-    // タグを検証して正規化
-    const tags =
-      Array.isArray(data.tags) ?
-        data.tags
-          .filter((tag): tag is string => typeof tag === 'string')
-          .map((tag) => tag.trim())
-          .filter((tag) => tag.length > 0)
-      : [];
-
-    // 日付の正規化とDate型への変換
-    let publishedAtStr = data.publishedAt as string | undefined;
-    if (publishedAtStr) {
-      if (typeof publishedAtStr === 'string') {
-        // "2022-03-24T17:42:00" のような形式を "2022-03-24T17:42:00.000Z" に修正
-        if (publishedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
-          publishedAtStr = publishedAtStr + '.000Z';
-        }
-        // "2022-03-24" のような形式を "2022-03-24T00:00:00.000Z" に修正
-        else if (publishedAtStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          publishedAtStr = publishedAtStr + 'T00:00:00.000Z';
-        }
-        // 無効な日付の場合は現在日時を使用
-        if (isNaN(Date.parse(publishedAtStr))) {
-          console.warn(`Invalid publishedAt format: ${data.publishedAt}, using current date`);
-          publishedAtStr = new Date().toISOString();
-        }
-      }
-    } else {
-      publishedAtStr = new Date().toISOString();
-    }
-    const publishedAt = new Date(publishedAtStr as string);
-
-    let updatedAtStr = (data.updatedAt as string | undefined) || publishedAtStr;
-    if (updatedAtStr && typeof updatedAtStr === 'string') {
-      // 同様にupdatedAtも正規化
-      if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
-        updatedAtStr = updatedAtStr + '.000Z';
-      } else if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        updatedAtStr = updatedAtStr + 'T00:00:00.000Z';
-      }
-      if (isNaN(Date.parse(updatedAtStr))) {
-        console.warn(`Invalid updatedAt format: ${data.updatedAt}, using publishedAt`);
-        updatedAtStr = publishedAtStr;
-      }
-    }
-    const updatedAt = new Date(updatedAtStr as string);
-
-    // メタデータの構築
-    const meta: PostMeta = {
-      slug: (data.slug as string) || slug || '',
-      title: data.title as string,
-      description: (data.description as string) || '',
-      publishedAt,
-      updatedAt,
-      category: (data.category as string) || '',
-      tags,
-      coverImage: resolveCoverImage(
-        data.coverImage as string | undefined,
-        options.cloudinaryCloudName,
-      ),
-      showArticleThumbnail: data.showArticleThumbnail !== false,
-      draft: (data.draft as boolean) || false,
-      readingTime: Math.ceil(stats.minutes),
-    };
 
     return {
       meta,
@@ -198,80 +205,7 @@ export async function extractMetadata(
     // フロントマターの解析
     const { data, content: markdown } = parseFrontmatter(content);
 
-    // 必須フィールドの検証
-    if (!data.title) {
-      throw new FrontMatterError('Front-matterにtitleが含まれていません');
-    }
-
-    // 読了時間の計算
-    const stats = readingTime(markdown, { wordsPerMinute: 600 });
-
-    // タグを検証して正規化
-    const tags =
-      Array.isArray(data.tags) ?
-        data.tags
-          .filter((tag): tag is string => typeof tag === 'string')
-          .map((tag) => tag.trim())
-          .filter((tag) => tag.length > 0)
-      : [];
-
-    // 日付の正規化とDate型への変換
-    let publishedAtStr = data.publishedAt as string | undefined;
-    if (publishedAtStr) {
-      if (typeof publishedAtStr === 'string') {
-        // "2022-03-24T17:42:00" のような形式を "2022-03-24T17:42:00.000Z" に修正
-        if (publishedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
-          publishedAtStr = publishedAtStr + '.000Z';
-        }
-        // "2022-03-24" のような形式を "2022-03-24T00:00:00.000Z" に修正
-        else if (publishedAtStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          publishedAtStr = publishedAtStr + 'T00:00:00.000Z';
-        }
-        // 無効な日付の場合は現在日時を使用
-        if (isNaN(Date.parse(publishedAtStr))) {
-          console.warn(`Invalid publishedAt format: ${data.publishedAt}, using current date`);
-          publishedAtStr = new Date().toISOString();
-        }
-      }
-    } else {
-      publishedAtStr = new Date().toISOString();
-    }
-    const publishedAt = new Date(publishedAtStr as string);
-
-    let updatedAtStr = (data.updatedAt as string | undefined) || publishedAtStr;
-    if (updatedAtStr && typeof updatedAtStr === 'string') {
-      // 同様にupdatedAtも正規化
-      if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
-        updatedAtStr = updatedAtStr + '.000Z';
-      } else if (updatedAtStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        updatedAtStr = updatedAtStr + 'T00:00:00.000Z';
-      }
-      if (isNaN(Date.parse(updatedAtStr))) {
-        console.warn(`Invalid updatedAt format: ${data.updatedAt}, using publishedAt`);
-        updatedAtStr = publishedAtStr;
-      }
-    }
-    const updatedAt = new Date(updatedAtStr as string);
-
-    // メタデータの構築
-    const meta: PostMeta = {
-      slug: (data.slug as string) || slug || '',
-      title: data.title as string,
-      description: (data.description as string) || '',
-      publishedAt,
-      updatedAt,
-      category: (data.category as string) || '',
-      tags,
-      coverImage: resolveCoverImage(
-        data.coverImage as string | undefined,
-        options.cloudinaryCloudName,
-      ),
-      showArticleThumbnail: data.showArticleThumbnail !== false,
-      draft: (data.draft as boolean) || false,
-      readingTime: Math.ceil(stats.minutes),
-    };
-
-    return meta;
+    return normalizePostMeta(data, markdown, options, slug);
   } catch (error) {
     if (error instanceof FrontMatterError || error instanceof MarkdownParseError) {
       throw error;

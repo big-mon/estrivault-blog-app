@@ -34,13 +34,21 @@ const defaultProcessorOptions: ProcessorOptions = {
   cloudinaryCloudName: import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? 'damonge',
 };
 
-interface PostMetaSource {
+interface ContentSource<TMeta extends { slug: string }> {
   filePath: string;
-  meta: PostMeta | null;
+  content: string;
+  meta: TMeta;
+  originalPath: string;
 }
 
-let allPostsMetaPromise: Promise<PostMeta[]> | undefined;
-let allNotesMetaPromise: Promise<NoteMeta[]> | undefined;
+interface ContentIndex<TMeta extends { slug: string }> {
+  sources: Array<ContentSource<TMeta>>;
+  meta: TMeta[];
+  bySlug: Map<string, ContentSource<TMeta>>;
+}
+
+let postIndexPromise: Promise<ContentIndex<PostMeta>> | undefined;
+let noteIndexPromise: Promise<ContentIndex<NoteMeta>> | undefined;
 
 function getMarkdownFiles(): Record<string, string> {
   const modules = import.meta.glob('@content/blog/**/*.{md,mdx}', {
@@ -116,18 +124,32 @@ function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function assertUniqueSlugs(posts: Array<{ filePath: string; meta: PostMeta }>): void {
+function toOriginalPath(filePath: string, contentRoot: string): string {
+  const normalizedPath = filePath.replace(/\\/g, '/');
+  const rootIndex = normalizedPath.lastIndexOf(contentRoot);
+
+  return rootIndex >= 0 ? normalizedPath.slice(rootIndex) : normalizedPath;
+}
+
+function assertUniqueSlugs<TMeta extends { slug: string }>(
+  sources: Array<{ filePath: string; meta: TMeta }>,
+  options: {
+    emptySubject: string;
+    duplicateSubject?: string;
+  },
+): void {
   const slugToPath = new Map<string, string>();
 
-  for (const { filePath, meta } of posts) {
+  for (const { filePath, meta } of sources) {
     if (!meta.slug) {
-      throw new Error(`Post slug is empty: ${filePath}`);
+      throw new Error(`${options.emptySubject} slug is empty: ${filePath}`);
     }
 
     const existingPath = slugToPath.get(meta.slug);
     if (existingPath) {
+      const duplicateSubject = options.duplicateSubject ? `${options.duplicateSubject} ` : '';
       throw new Error(
-        `Duplicate slug "${meta.slug}" detected between ${existingPath} and ${filePath}`,
+        `Duplicate ${duplicateSubject}slug "${meta.slug}" detected between ${existingPath} and ${filePath}`,
       );
     }
 
@@ -135,23 +157,44 @@ function assertUniqueSlugs(posts: Array<{ filePath: string; meta: PostMeta }>): 
   }
 }
 
-function assertUniqueNoteSlugs(notes: Array<{ filePath: string; meta: NoteMeta }>): void {
-  const slugToPath = new Map<string, string>();
+async function createContentIndex<TMeta extends { slug: string }>(options: {
+  markdownFiles: Record<string, string>;
+  contentRoot: string;
+  emptySlugSubject: string;
+  duplicateSlugSubject?: string;
+  extractMeta: (filePath: string, content: string) => TMeta | null | Promise<TMeta | null>;
+  sortMeta: (a: TMeta, b: TMeta) => number;
+}): Promise<ContentIndex<TMeta>> {
+  const sources = (
+    await Promise.all(
+      Object.entries(options.markdownFiles).map(async ([filePath, content]) => {
+        const meta = await options.extractMeta(filePath, content);
+        if (!meta) {
+          return null;
+        }
 
-  for (const { filePath, meta } of notes) {
-    if (!meta.slug) {
-      throw new Error(`Note slug is empty: ${filePath}`);
-    }
+        return {
+          filePath,
+          content,
+          meta,
+          originalPath: toOriginalPath(filePath, options.contentRoot),
+        } satisfies ContentSource<TMeta>;
+      }),
+    )
+  ).filter((source): source is ContentSource<TMeta> => source !== null);
 
-    const existingPath = slugToPath.get(meta.slug);
-    if (existingPath) {
-      throw new Error(
-        `Duplicate note slug "${meta.slug}" detected between ${existingPath} and ${filePath}`,
-      );
-    }
+  assertUniqueSlugs(sources, {
+    emptySubject: options.emptySlugSubject,
+    duplicateSubject: options.duplicateSlugSubject,
+  });
 
-    slugToPath.set(meta.slug, filePath);
-  }
+  sources.sort((a, b) => options.sortMeta(a.meta, b.meta));
+
+  return {
+    sources,
+    meta: sources.map((source) => source.meta),
+    bySlug: new Map(sources.map((source) => [source.meta.slug, source])),
+  };
 }
 
 function extractNoteMeta(filePath: string, content: string): NoteMeta | null {
@@ -216,134 +259,91 @@ async function extractFrontmatterOnly(
 export async function getAllPostsMeta(
   options: ProcessorOptions = defaultProcessorOptions,
 ): Promise<PostMeta[]> {
-  if (options === defaultProcessorOptions) {
-    allPostsMetaPromise ??= loadAllPostsMeta(options);
-    return allPostsMetaPromise;
-  }
-
-  return loadAllPostsMeta(options);
+  return (await getPostIndex(options)).meta;
 }
 
-async function loadAllPostsMeta(options: ProcessorOptions): Promise<PostMeta[]> {
-  const markdownFiles = getMarkdownFiles();
+async function getPostIndex(
+  options: ProcessorOptions = defaultProcessorOptions,
+): Promise<ContentIndex<PostMeta>> {
+  if (options === defaultProcessorOptions) {
+    postIndexPromise ??= loadPostIndex(options);
+    return postIndexPromise;
+  }
 
-  const postMetaSources = await Promise.all(
-    Object.entries(markdownFiles).map(
-      async ([filePath, content]): Promise<PostMetaSource> => ({
-        filePath,
-        meta: await extractFrontmatterOnly(filePath, content, options),
-      }),
-    ),
-  );
+  return loadPostIndex(options);
+}
 
-  const validPostSources = postMetaSources.filter(
-    (source): source is { filePath: string; meta: PostMeta } => source.meta !== null,
-  );
-
-  assertUniqueSlugs(validPostSources);
-
-  return validPostSources
-    .map((source) => source.meta)
-    .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+async function loadPostIndex(options: ProcessorOptions): Promise<ContentIndex<PostMeta>> {
+  return createContentIndex({
+    markdownFiles: getMarkdownFiles(),
+    contentRoot: 'content/blog/',
+    emptySlugSubject: 'Post',
+    extractMeta: (filePath, content) => extractFrontmatterOnly(filePath, content, options),
+    sortMeta: (a, b) => b.publishedAt.getTime() - a.publishedAt.getTime(),
+  });
 }
 
 export async function getAllNotesMeta(): Promise<NoteMeta[]> {
-  allNotesMetaPromise ??= loadAllNotesMeta();
-  return allNotesMetaPromise;
+  return (await getNoteIndex()).meta;
 }
 
-async function loadAllNotesMeta(): Promise<NoteMeta[]> {
-  const markdownFiles = getNoteMarkdownFiles();
+async function getNoteIndex(): Promise<ContentIndex<NoteMeta>> {
+  noteIndexPromise ??= loadNoteIndex();
+  return noteIndexPromise;
+}
 
-  const noteMetaSources = Object.entries(markdownFiles).map(([filePath, content]) => ({
-    filePath,
-    meta: extractNoteMeta(filePath, content),
-  }));
-
-  const validNoteSources = noteMetaSources.filter(
-    (source): source is { filePath: string; meta: NoteMeta } => source.meta !== null,
-  );
-
-  assertUniqueNoteSlugs(validNoteSources);
-
-  return validNoteSources
-    .map((source) => source.meta)
-    .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+async function loadNoteIndex(): Promise<ContentIndex<NoteMeta>> {
+  return createContentIndex({
+    markdownFiles: getNoteMarkdownFiles(),
+    contentRoot: 'content/notes/',
+    emptySlugSubject: 'Note',
+    duplicateSlugSubject: 'note',
+    extractMeta: extractNoteMeta,
+    sortMeta: (a, b) => b.publishedAt.getTime() - a.publishedAt.getTime(),
+  });
 }
 
 export async function getNoteBySlug(
   slug: string,
   options: ProcessorOptions = defaultProcessorOptions,
 ): Promise<NoteHTML | null> {
-  const markdownFiles = getNoteMarkdownFiles();
+  const noteIndex = await getNoteIndex();
+  const source = noteIndex.bySlug.get(slug);
 
-  for (const [filePath, content] of Object.entries(markdownFiles)) {
-    const meta = extractNoteMeta(filePath, content);
-
-    if (!meta || meta.slug !== slug) {
-      continue;
-    }
-
-    try {
-      const processed = await processMarkdown(content, options, slug);
-      return {
-        meta,
-        html: processed.html,
-        originalPath: filePath.replace(/^.*\/content\/notes\//, 'content/notes/'),
-      };
-    } catch (error) {
-      throw new Error(
-        `Failed to process note markdown file ${filePath}: ${getErrorMessage(error)}`,
-        {
-          cause: error,
-        },
-      );
-    }
+  if (!source) {
+    return null;
   }
 
-  return null;
+  return processNoteSource(source, options);
 }
 
 export async function getAllNotes(
   options: ProcessorOptions = defaultProcessorOptions,
 ): Promise<NoteHTML[]> {
-  const noteMeta = await getAllNotesMeta();
-  const markdownFiles = getNoteMarkdownFiles();
-  const slugToSource = new Map<string, { filePath: string; content: string }>();
+  const noteIndex = await getNoteIndex();
 
-  for (const [filePath, content] of Object.entries(markdownFiles)) {
-    const meta = extractNoteMeta(filePath, content);
-    if (meta) {
-      slugToSource.set(meta.slug, { filePath, content });
-    }
+  return Promise.all(noteIndex.sources.map((source) => processNoteSource(source, options)));
+}
+
+async function processNoteSource(
+  source: ContentSource<NoteMeta>,
+  options: ProcessorOptions,
+): Promise<NoteHTML> {
+  try {
+    const processed = await processMarkdown(source.content, options, source.meta.slug);
+    return {
+      meta: source.meta,
+      html: processed.html,
+      originalPath: source.originalPath,
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to process note markdown file ${source.filePath}: ${getErrorMessage(error)}`,
+      {
+        cause: error,
+      },
+    );
   }
-
-  const notes: Array<NoteHTML | null> = await Promise.all(
-    noteMeta.map(async (note) => {
-      const source = slugToSource.get(note.slug);
-      if (!source) {
-        return null;
-      }
-
-      try {
-        const processed = await processMarkdown(source.content, options, note.slug);
-        return {
-          meta: note,
-          html: processed.html,
-          originalPath: source.filePath.replace(/^.*\/content\/notes\//, 'content/notes/'),
-        } satisfies NoteHTML;
-      } catch (error) {
-        throw new Error(
-          `Failed to process note markdown file ${source.filePath}: ${getErrorMessage(error)}`,
-          {
-            cause: error,
-          },
-        );
-      }
-    }),
-  );
-
-  return notes.filter((note): note is NoteHTML => note !== null);
 }
 
 export function getRelatedNotes(current: NoteMeta, notes: NoteMeta[], limit = 3): NoteMeta[] {
@@ -436,36 +436,25 @@ export async function getPostBySlug(
   slug: string,
   options: ProcessorOptions = defaultProcessorOptions,
 ): Promise<PostHTML | null> {
-  const markdownFiles = getMarkdownFiles();
+  const postIndex = await getPostIndex(options);
+  const source = postIndex.bySlug.get(slug);
 
-  for (const [filePath, content] of Object.entries(markdownFiles)) {
-    const generatedSlug = generateSlugFromPath(filePath);
-    let meta: PostMeta;
-
-    try {
-      meta = await extractMetadata(content, options, generatedSlug);
-    } catch (error) {
-      throw new Error(`Invalid markdown file ${filePath}: ${getErrorMessage(error)}`, {
-        cause: error,
-      });
-    }
-
-    if (meta.slug !== slug || meta.draft) {
-      continue;
-    }
-
-    try {
-      const post = await processMarkdown(content, options, slug);
-      post.originalPath = filePath.replace(/^.*\/content\/blog\//, 'content/blog/');
-      return post;
-    } catch (error) {
-      throw new Error(`Failed to process markdown file ${filePath}: ${getErrorMessage(error)}`, {
-        cause: error,
-      });
-    }
+  if (!source) {
+    return null;
   }
 
-  return null;
+  try {
+    const post = await processMarkdown(source.content, options, source.meta.slug);
+    post.originalPath = source.originalPath;
+    return post;
+  } catch (error) {
+    throw new Error(
+      `Failed to process markdown file ${source.filePath}: ${getErrorMessage(error)}`,
+      {
+        cause: error,
+      },
+    );
+  }
 }
 
 export async function getAllCategories(): Promise<string[]> {
