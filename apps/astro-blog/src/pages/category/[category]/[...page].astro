@@ -4,7 +4,7 @@ import BaseLayout from '$layouts/BaseLayout.astro';
 import ArchiveListing from '$components/ArchiveListing.astro';
 import { getCategoryMeta, POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
 import { filterPosts, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
-import { getArchivePageUrl } from '$lib/url-segments';
+import { getArchivePageUrl, getCategoryRouteSegment } from '$lib/url-segments';
 
 interface Props {
   category: string;
@@ -44,7 +44,7 @@ export async function getStaticPaths() {
     for (let page = 1; page <= categoryPosts.totalPages; page++) {
       paths.push({
         params: {
-          category: category.toLowerCase(),
+          category: getCategoryRouteSegment(category),
           page: page === 1 ? undefined : String(page),
         },
         props: {
