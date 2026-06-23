@@ -8,13 +8,14 @@ import {
   getAllTags,
   getPosts,
 } from '$lib/content';
-import { encodeRouteSegment, getArchivePageUrl, getTagRouteSegment } from '$lib/url-segments';
+import {
+  encodeRouteSegment,
+  getArchivePageUrl,
+  getCategoryRouteSegment,
+  getTagRouteSegment,
+} from '$lib/url-segments';
 
 export const prerender = true;
-
-function encodeSegment(segment: string): string {
-  return encodeURIComponent(segment.toLowerCase());
-}
 
 function xmlEscape(value: string): string {
   return value
@@ -45,7 +46,7 @@ export const GET: APIRoute = async () => {
 
   for (const category of categories) {
     const categoryPosts = await getPosts({ category, perPage: POSTS_PER_PAGE });
-    const encodedCategory = encodeSegment(category);
+    const encodedCategory = encodeRouteSegment(getCategoryRouteSegment(category));
 
     for (let page = 1; page <= categoryPosts.totalPages; page++) {
       categoryUrls.push(`<url>

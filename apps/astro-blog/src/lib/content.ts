@@ -7,6 +7,7 @@ import {
   type PostMeta,
   type ProcessorOptions,
 } from '@estrivault/content-processor';
+import { getSlugFromMarkdownPath } from './url-segments';
 
 export interface PaginatedPosts {
   posts: PostMeta[];
@@ -68,16 +69,6 @@ function getNoteMarkdownFiles(): Record<string, string> {
   });
 
   return modules as Record<string, string>;
-}
-
-function generateSlugFromPath(filePath: string): string {
-  const pathParts = filePath.split('/');
-  const filename = pathParts[pathParts.length - 1];
-  if (!filename) {
-    return '';
-  }
-
-  return filename.replace(/\.(md|mdx)$/, '');
 }
 
 function stripMarkdown(value: string): string {
@@ -213,7 +204,7 @@ function extractNoteMeta(filePath: string, content: string): NoteMeta | null {
   const publishedAt = normalizeDate(data.publishedAt, filePath);
 
   const meta: NoteMeta = {
-    slug: (data.slug as string) || generateSlugFromPath(filePath),
+    slug: (data.slug as string) || getSlugFromMarkdownPath(filePath),
     title: data.title as string,
     excerpt: createExcerpt(markdown, 150),
     publishedAt,
@@ -241,7 +232,7 @@ async function extractFrontmatterOnly(
       }
     }
 
-    const slug = generateSlugFromPath(filePath);
+    const slug = getSlugFromMarkdownPath(filePath);
     const meta = await extractMetadata(content, options, slug);
 
     if (meta.draft) {
