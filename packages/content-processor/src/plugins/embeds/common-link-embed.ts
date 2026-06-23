@@ -3,6 +3,7 @@ import type { Plugin } from 'unified';
 import type { Node } from 'unist';
 import type { Paragraph, Link } from 'mdast';
 import { fetchOgpMetadata, shouldFetchOgp, type OgpMetadata } from '../../utils/ogp-fetcher';
+import type { OgpOptions } from '../../types';
 
 // Constants for styling and configuration
 const STYLE_CONSTANTS = {
@@ -32,7 +33,11 @@ const STYLE_CONSTANTS = {
  * プレーンテキストのURLを自動的に埋め込みカードに変換するremarkプラグイン
  * GitHub URL以外の一般的なWebサイトのOGP情報を取得して表示します
  */
-export const remarkCommonLinkEmbed: Plugin = () => {
+interface CommonLinkEmbedOptions {
+  ogp?: OgpOptions;
+}
+
+export const remarkCommonLinkEmbed: Plugin<[CommonLinkEmbedOptions?]> = (options = {}) => {
   return async (tree) => {
     const tasks: Promise<void>[] = [];
 
@@ -47,8 +52,8 @@ export const remarkCommonLinkEmbed: Plugin = () => {
           const paragraphNode = parent as Paragraph;
           if (paragraphNode.children.length === 1) {
             // OGP処理対象かチェック
-            if (shouldFetchOgp(url)) {
-              const task = processLinkEmbed(paragraphNode, index, url);
+            if (shouldFetchOgp(url, options.ogp)) {
+              const task = processLinkEmbed(paragraphNode, index, url, options.ogp);
               tasks.push(task);
             }
           }
@@ -69,10 +74,11 @@ async function processLinkEmbed(
   parent: Paragraph,
   index: number | undefined,
   url: string,
+  ogpOptions?: OgpOptions,
 ): Promise<void> {
   try {
     // OGPメタデータを取得
-    const ogpData = await fetchOgpMetadata(url);
+    const ogpData = await fetchOgpMetadata(url, ogpOptions);
 
     if (ogpData && (ogpData.title || ogpData.description)) {
       // OGP埋め込みカードを作成

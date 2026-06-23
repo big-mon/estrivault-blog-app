@@ -43,7 +43,7 @@ function createBasePipeline(
     // 埋め込みコンテンツ
     .use(remarkYoutubeEmbed)
     .use(remarkTwitterEmbed)
-    .use(remarkCommonLinkEmbed)
+    .use(remarkCommonLinkEmbed, { ogp: options.ogp })
     .use(remarkGithubEmbed)
     .use(remarkAmazonEmbed)
     .use(remarkDirectiveBoxes)

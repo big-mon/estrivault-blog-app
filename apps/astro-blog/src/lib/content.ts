@@ -3,6 +3,8 @@ import {
   parseFrontmatter,
   normalizeForTagFilter,
   processMarkdown,
+  type OgpMetadataStore,
+  type OgpMode,
   type PostHTML,
   type PostMeta,
   type ProcessorOptions,
@@ -31,8 +33,42 @@ export interface NoteHTML {
   originalPath?: string;
 }
 
+function getOgpMetadataStore(): OgpMetadataStore {
+  const modules = import.meta.glob('@content/ogp-metadata.json', {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  }) as Record<string, string>;
+
+  const metadataContent = Object.values(modules)[0];
+  if (!metadataContent) {
+    return { version: 1, entries: {} };
+  }
+
+  try {
+    return JSON.parse(metadataContent) as OgpMetadataStore;
+  } catch (error) {
+    throw new Error(`Failed to parse OGP metadata store: ${getErrorMessage(error)}`, {
+      cause: error,
+    });
+  }
+}
+
+function getOgpMode(): OgpMode {
+  const mode = import.meta.env.OGP_MODE;
+  if (mode === 'fetch' || mode === 'cache-only' || mode === 'disabled') {
+    return mode;
+  }
+
+  return 'cache-only';
+}
+
 const defaultProcessorOptions: ProcessorOptions = {
   cloudinaryCloudName: import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? 'damonge',
+  ogp: {
+    mode: getOgpMode(),
+    metadataStore: getOgpMetadataStore(),
+  },
 };
 
 interface ContentSource<TMeta extends { slug: string }> {

@@ -3,6 +3,8 @@
  * Fetches and parses OGP metadata from web pages
  */
 
+import type { OgpOptions } from '../types';
+
 export interface OgpMetadata {
   title?: string;
   description?: string;
@@ -10,6 +12,12 @@ export interface OgpMetadata {
   url?: string;
   siteName?: string;
   type?: string;
+}
+
+export interface OgpFetchResult {
+  metadata: OgpMetadata;
+  status: 'ok' | 'fallback';
+  error?: string;
 }
 
 // Simple in-memory cache for build-time optimization
@@ -20,7 +28,7 @@ const ogpCache = new Map<string, OgpMetadata | null>();
  * @param url The URL to create fallback metadata for
  * @returns Basic metadata with domain and title
  */
-function createFallbackMetadata(url: string): OgpMetadata {
+export function createFallbackMetadata(url: string): OgpMetadata {
   try {
     const parsedUrl = new URL(url);
     const hostname = parsedUrl.hostname.replace(/^www\./, '');
@@ -45,6 +53,24 @@ function createFallbackMetadata(url: string): OgpMetadata {
       siteName: 'Unknown',
     };
   }
+}
+
+function getStoredMetadata(url: string, options: OgpOptions = {}): OgpMetadata | null {
+  const entry = options.metadataStore?.entries?.[url];
+  if (!entry) {
+    return null;
+  }
+
+  const metadata: OgpMetadata = {
+    title: entry.title,
+    description: entry.description,
+    image: entry.image,
+    url: entry.url || url,
+    siteName: entry.siteName,
+    type: entry.type,
+  };
+
+  return metadata.title || metadata.description || metadata.image ? metadata : null;
 }
 
 /**
@@ -203,17 +229,11 @@ async function fetchWithStrategy(
  * @param url URL to fetch metadata from
  * @returns Promise resolving to OGP metadata or null if failed
  */
-export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null> {
-  // Check cache first
-  if (ogpCache.has(url)) {
-    return ogpCache.get(url) || null;
-  }
-
+export async function fetchFreshOgpMetadata(url: string): Promise<OgpFetchResult | null> {
   try {
     // Validate URL
     const parsedUrl = new URL(url);
     if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-      ogpCache.set(url, null);
       return null;
     }
 
@@ -263,8 +283,10 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
               );
             }
 
-            ogpCache.set(url, metadata);
-            return metadata;
+            return {
+              metadata,
+              status: 'ok',
+            };
           } else {
             if (process.env.NODE_ENV === 'development' || process.env.OGP_VERBOSE === 'true') {
               console.log(`⚠️ Non-HTML content for ${parsedUrl.hostname}: ${contentType}`);
@@ -290,8 +312,11 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
     }
 
     const fallbackMetadata = createFallbackMetadata(url);
-    ogpCache.set(url, fallbackMetadata);
-    return fallbackMetadata;
+    return {
+      metadata: fallbackMetadata,
+      status: 'fallback',
+      error: lastError,
+    };
   } catch (error) {
     // Only log timeouts and unexpected errors in development or verbose mode
     if (process.env.NODE_ENV === 'development' || process.env.OGP_VERBOSE === 'true') {
@@ -306,9 +331,47 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
 
     // Use fallback metadata instead of null for better user experience
     const fallbackMetadata = createFallbackMetadata(url);
-    ogpCache.set(url, fallbackMetadata);
-    return fallbackMetadata;
+    return {
+      metadata: fallbackMetadata,
+      status: 'fallback',
+      error: (error as Error).message,
+    };
   }
+}
+
+/**
+ * Fetch OGP metadata from a URL with cache/store strategy.
+ * @param url URL to fetch metadata from
+ * @returns Promise resolving to OGP metadata or null if disabled/invalid
+ */
+export async function fetchOgpMetadata(
+  url: string,
+  options: OgpOptions = {},
+): Promise<OgpMetadata | null> {
+  const mode = options.mode || 'fetch';
+
+  if (mode === 'disabled') {
+    return null;
+  }
+
+  const storedMetadata = getStoredMetadata(url, options);
+  if (storedMetadata && (mode === 'cache-only' || !options.forceRefresh)) {
+    return storedMetadata;
+  }
+
+  if (mode === 'cache-only') {
+    return createFallbackMetadata(url);
+  }
+
+  if (ogpCache.has(url) && !options.forceRefresh) {
+    return ogpCache.get(url) || null;
+  }
+
+  const result = await fetchFreshOgpMetadata(url);
+  const metadata = result?.metadata || null;
+  ogpCache.set(url, metadata);
+
+  return metadata;
 }
 
 /**
@@ -316,7 +379,11 @@ export async function fetchOgpMetadata(url: string): Promise<OgpMetadata | null>
  * @param url URL to check
  * @returns true if URL should be processed
  */
-export function shouldFetchOgp(url: string): boolean {
+export function shouldFetchOgp(url: string, options: OgpOptions = {}): boolean {
+  if (options.mode === 'disabled') {
+    return false;
+  }
+
   try {
     const parsedUrl = new URL(url);
 

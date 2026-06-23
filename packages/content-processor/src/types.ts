@@ -5,10 +5,43 @@ export interface EmbedOptions {
   amazon?: boolean;
 }
 
+export type OgpMode = 'cache-only' | 'fetch' | 'disabled';
+
+export type OgpMetadataSource = 'fetch' | 'manual' | 'fallback';
+
+export type OgpMetadataStatus = 'ok' | 'fallback' | 'error';
+
+export interface OgpMetadataStoreEntry {
+  title?: string;
+  description?: string;
+  image?: string;
+  url?: string;
+  siteName?: string;
+  type?: string;
+  fetchedAt?: string;
+  expiresAt?: string;
+  lastAttemptAt?: string;
+  lastError?: string;
+  source?: OgpMetadataSource;
+  status?: OgpMetadataStatus;
+}
+
+export interface OgpMetadataStore {
+  version?: number;
+  entries?: Record<string, OgpMetadataStoreEntry>;
+}
+
+export interface OgpOptions {
+  mode?: OgpMode;
+  metadataStore?: OgpMetadataStore;
+  forceRefresh?: boolean;
+}
+
 export interface ProcessorOptions {
   embeds?: EmbedOptions;
   cloudinaryCloudName?: string;
   imageBase?: string;
+  ogp?: OgpOptions;
 }
 
 /** 投稿のメタ情報 */
