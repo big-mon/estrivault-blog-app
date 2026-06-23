@@ -1,0 +1,123 @@
+name: Refresh OGP Metadata
+
+on:
+  schedule:
+    - cron: '17 18 * * 0'
+  workflow_dispatch:
+    inputs:
+      ttl-days:
+        description: Days until refreshed OGP metadata expires
+        required: false
+        default: '30'
+      concurrency:
+        description: Number of concurrent OGP fetches
+        required: false
+        default: '3'
+      refresh-all:
+        description: Refresh every discovered URL except manual entries
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: refresh-ogp-metadata
+  cancel-in-progress: false
+
+env:
+  ASTRO_TELEMETRY_DISABLED: '1'
+  CI: true
+  UPDATE_BRANCH: codex/refresh-ogp-metadata
+
+jobs:
+  refresh:
+    name: Refresh OGP metadata store
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Build content processor
+        run: pnpm --filter @estrivault/content-processor build
+
+      - name: Refresh OGP metadata
+        env:
+          OGP_TTL_DAYS: ${{ inputs['ttl-days'] || '30' }}
+          OGP_CONCURRENCY: ${{ inputs.concurrency || '3' }}
+          OGP_REFRESH_ALL: ${{ inputs['refresh-all'] || 'false' }}
+        shell: bash
+        run: |
+          args=(
+            "--ttl-days=${OGP_TTL_DAYS}"
+            "--concurrency=${OGP_CONCURRENCY}"
+          )
+
+          if [[ "${OGP_REFRESH_ALL}" == "true" ]]; then
+            args+=("--all")
+          fi
+
+          pnpm ogp:refresh -- "${args[@]}"
+
+      - name: Stop if metadata did not change
+        id: metadata-diff
+        shell: bash
+        run: |
+          if git diff --quiet -- content/ogp-metadata.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit metadata changes
+        if: steps.metadata-diff.outputs.changed == 'true'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$UPDATE_BRANCH"
+          git add content/ogp-metadata.json
+          git commit -m "chore: refresh OGP metadata"
+          git push --force-with-lease origin "$UPDATE_BRANCH"
+
+      - name: Open pull request
+        if: steps.metadata-diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if gh pr view "$UPDATE_BRANCH" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh pr edit "$UPDATE_BRANCH" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "chore: refresh OGP metadata" \
+              --body "Automated refresh of content/ogp-metadata.json."
+          else
+            gh pr create \
+              --repo "$GITHUB_REPOSITORY" \
+              --base main \
+              --head "$UPDATE_BRANCH" \
+              --title "chore: refresh OGP metadata" \
+              --body "Automated refresh of content/ogp-metadata.json."
+          fi
