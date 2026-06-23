@@ -4,6 +4,7 @@ import {
   normalizeForTagFilter,
   processMarkdown,
   type OgpMetadataStore,
+  type OgpMode,
   type PostHTML,
   type PostMeta,
   type ProcessorOptions,
@@ -53,10 +54,19 @@ function getOgpMetadataStore(): OgpMetadataStore {
   }
 }
 
+function getOgpMode(): OgpMode {
+  const mode = import.meta.env.OGP_MODE;
+  if (mode === 'fetch' || mode === 'cache-only' || mode === 'disabled') {
+    return mode;
+  }
+
+  return 'cache-only';
+}
+
 const defaultProcessorOptions: ProcessorOptions = {
   cloudinaryCloudName: import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? 'damonge',
   ogp: {
-    mode: import.meta.env.OGP_MODE === 'fetch' ? 'fetch' : 'cache-only',
+    mode: getOgpMode(),
     metadataStore: getOgpMetadataStore(),
   },
 };
