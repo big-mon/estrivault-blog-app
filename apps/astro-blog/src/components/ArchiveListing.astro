@@ -1,8 +1,9 @@
 ---
 import type { PostMeta } from '@estrivault/content-processor';
+import ArchivePagination from '$components/ArchivePagination.astro';
+import ArchivePostRow from '$components/ArchivePostRow.astro';
 import EditorialFooter from '$components/EditorialFooter.astro';
 import EditorialMasthead from '$components/EditorialMasthead.astro';
-import { getCategoryLabel } from '$constants';
 import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments';
 
 interface ArchiveMeta {
@@ -40,54 +41,8 @@ const {
   emptyMessage,
 } = Astro.props;
 
-const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-});
-
-const formatDate = (date: Date) => dateFormatter.format(date).replace(/\//g, '.');
 const startNumber = (page - 1) * perPage;
 const visibleTopTags = topTags.slice(0, 5);
-
-type PaginationItem = { type: 'page'; pageNumber: number } | { type: 'ellipsis'; key: string };
-
-function getVisiblePaginationItems(currentPage: number, pageCount: number): PaginationItem[] {
-  if (pageCount <= 7) {
-    return Array.from({ length: pageCount }, (_, index) => ({
-      type: 'page',
-      pageNumber: index + 1,
-    }));
-  }
-
-  const pageNumbers = new Set([1, pageCount, currentPage - 1, currentPage, currentPage + 1]);
-
-  if (currentPage <= 4) {
-    [2, 3, 4, 5].forEach((pageNumber) => pageNumbers.add(pageNumber));
-  }
-
-  if (currentPage >= pageCount - 3) {
-    [pageCount - 4, pageCount - 3, pageCount - 2, pageCount - 1].forEach((pageNumber) =>
-      pageNumbers.add(pageNumber),
-    );
-  }
-
-  const sortedPages = [...pageNumbers]
-    .filter((pageNumber) => pageNumber >= 1 && pageNumber <= pageCount)
-    .sort((a, b) => a - b);
-
-  return sortedPages.flatMap((pageNumber, index): PaginationItem[] => {
-    const previousPage = sortedPages[index - 1];
-    const gap =
-      previousPage !== undefined && pageNumber - previousPage > 1 ?
-        [{ type: 'ellipsis' as const, key: `${previousPage}-${pageNumber}` }]
-      : [];
-
-    return [...gap, { type: 'page', pageNumber }];
-  });
-}
-
-const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
 ---
 
 <div class="archive-page">
@@ -145,33 +100,7 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
         <ol class="post-list">
           {posts.map((post, index) => (
             <li>
-              <article>
-                <a href={`/post/${post.slug}`} class="post-row">
-                  <span class="post-number">
-                    {String(startNumber + index + 1).padStart(2, '0')}
-                  </span>
-                  <span class="post-copy">
-                    <span class="post-date">
-                      <time datetime={post.publishedAt.toISOString()}>
-                        {formatDate(post.publishedAt)}
-                      </time>
-                      <span>{getCategoryLabel(post.category)}</span>
-                    </span>
-                    <span class="post-title">{post.title}</span>
-                    <span class="post-description">{post.description}</span>
-                    <span class="post-tags" aria-label="タグ">
-                      {post.tags.slice(0, 4).map((tag) => (
-                        <span>#{tag}</span>
-                      ))}
-                    </span>
-                  </span>
-                  {post.coverImage && (
-                    <span class="post-image" aria-hidden="true">
-                      <img src={post.coverImage} alt="" loading="lazy" />
-                    </span>
-                  )}
-                </a>
-              </article>
+              <ArchivePostRow post={post} displayNumber={startNumber + index + 1} />
             </li>
           ))}
         </ol>
@@ -181,39 +110,7 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
     }
   </section>
 
-  {
-    totalPages > 1 && (
-      <nav class="archive-pagination" aria-label="ページネーション">
-        <h2>PAGINATION</h2>
-        {page > 1 ?
-          <a href={getArchivePagePath(routeBase, page - 1)} aria-label="前のページ">
-            ← PREV
-          </a>
-        : <span aria-disabled="true">← PREV</span>}
-        <div>
-          {visiblePaginationItems.map((item) =>
-            item.type === 'ellipsis' ?
-              <span class="pagination-ellipsis" aria-hidden="true">
-                …
-              </span>
-            : item.pageNumber === page ?
-              <span aria-current="page">{String(item.pageNumber).padStart(2, '0')}</span>
-            : <a
-                href={getArchivePagePath(routeBase, item.pageNumber)}
-                aria-label={`${item.pageNumber}ページ目`}
-              >
-                {String(item.pageNumber).padStart(2, '0')}
-              </a>,
-          )}
-        </div>
-        {page < totalPages ?
-          <a href={getArchivePagePath(routeBase, page + 1)} aria-label="次のページ">
-            NEXT →
-          </a>
-        : <span aria-disabled="true">NEXT →</span>}
-      </nav>
-    )
-  }
+  <ArchivePagination page={page} totalPages={totalPages} routeBase={routeBase} />
 
   <EditorialFooter />
 </div>
@@ -238,22 +135,14 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
     padding: clamp(1rem, 2vw, 2rem);
   }
   .archive-hero,
-  .archive-index,
-  .archive-pagination {
+  .archive-index {
     max-width: 1180px;
     margin-right: auto;
     margin-left: auto;
   }
-  .post-row {
-    color: inherit;
-    text-decoration: none;
-  }
   .kicker,
   .section-heading h2,
   .section-heading p,
-  .post-number,
-  .post-date,
-  .archive-pagination,
   dl dt,
   dl dd {
     font-family: var(--font-meta);
@@ -261,8 +150,6 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
   }
   .kicker,
   .section-heading h2,
-  .post-number,
-  .post-date time,
   dl dt {
     color: #d6452a;
   }
@@ -398,140 +285,11 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
     margin: 0;
     padding: 0;
   }
-  .post-row {
-    display: grid;
-    grid-template-columns: 64px minmax(0, 1fr) 112px;
-    gap: 1rem;
-    align-items: center;
-    min-height: 156px;
-    border-top: 1px solid #aaa;
-    padding: 1.35rem 0;
-  }
-  .post-row:hover .post-title {
-    color: #d6452a;
-  }
-  .post-date,
-  .post-copy,
-  .post-tags {
-    display: flex;
-  }
-  .post-date {
-    flex-flow: row wrap;
-    gap: 0.35rem 0.75rem;
-    color: #222;
-    font-size: 0.86rem;
-  }
-  .post-number {
-    font-size: 1rem;
-    line-height: 1.2;
-  }
-  .post-copy {
-    flex-direction: column;
-    min-width: 0;
-    gap: 0.55rem;
-  }
-  .post-title {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 700;
-    line-height: 1.12;
-    transition: color 120ms ease;
-  }
-  .post-description {
-    display: -webkit-box;
-    overflow: hidden;
-    color: #666;
-    line-height: 1.65;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-  .post-tags {
-    flex-flow: row wrap;
-    gap: 0.45rem;
-    color: #444;
-    font-family: var(--font-meta);
-    font-size: 0.78rem;
-  }
-  .post-tags span {
-    border: 1px solid #222;
-    padding: 0.26rem 0.45rem 0.2rem;
-    line-height: 1.1;
-  }
-  .post-image {
-    grid-column: 3;
-    display: block;
-    width: 112px;
-    aspect-ratio: 4/3;
-    overflow: hidden;
-    border: 1px solid #555;
-  }
-  .post-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
   .empty-state {
     border-bottom: 1px solid #222;
     padding: 3rem 0;
     color: #666;
     text-align: center;
-  }
-  .archive-pagination {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem;
-    align-items: center;
-    justify-content: flex-start;
-    border-top: 0;
-    border-bottom: 0;
-    margin-top: 3.5rem;
-    padding: 0;
-  }
-  .archive-pagination h2 {
-    flex-basis: 100%;
-    border-bottom: 1px solid #222;
-    margin: 0 0 0.85rem;
-    padding-bottom: 0.8rem;
-    color: #d6452a;
-    font-family: var(--font-meta);
-    font-size: 0.88rem;
-    font-style: normal;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .archive-pagination > div {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-    justify-content: flex-start;
-  }
-  .archive-pagination a,
-  .archive-pagination span {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 2rem;
-    border: 1px solid #222;
-    padding: 0.34rem 0.65rem 0.28rem;
-    color: inherit;
-    line-height: 1.1;
-    text-decoration: none;
-    transition:
-      color 120ms ease,
-      border-color 120ms ease;
-  }
-  .archive-pagination a:hover {
-    border-color: #d6452a;
-    color: #d6452a;
-  }
-  .archive-pagination [aria-current='page'] {
-    border-color: #222;
-    color: #f1eee7;
-    background: #222;
-  }
-  .archive-pagination [aria-disabled='true'] {
-    border-color: #999;
-    color: #999;
   }
   @media (max-width: 900px) {
     .archive-page {
@@ -545,22 +303,6 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
     }
     h1 {
       max-width: none;
-    }
-    .post-row {
-      grid-template-columns: 56px minmax(0, 1fr) 72px;
-      gap: 0.75rem;
-      min-height: 0;
-    }
-    .post-copy {
-      grid-column: 2;
-    }
-    .post-image {
-      grid-column: 3;
-      grid-row: 1 / span 3;
-      width: 72px;
-    }
-    .archive-pagination {
-      text-align: left;
     }
   }
 </style>
