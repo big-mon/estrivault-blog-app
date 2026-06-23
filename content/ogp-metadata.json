@@ -222,6 +222,19 @@
       "source": "fetch",
       "status": "ok"
     },
+    "https://shop.vtg.jp/products/vtg-ma-sbb01a?variant=45101340688665": {
+      "title": "Split Bar Buckle [4pcs]",
+      "description": "This buckle can be attached and removed from closed loops.Please use it when using various COREs as a chest rig or when using SIDE WING.■ 4 pieces per pack",
+      "image": "http://shop.vtg.jp/cdn/shop/products/VTG-MA-SBB01A_main01.jpg?v=1682660969",
+      "url": "https://shop.vtg.jp/en/products/vtg-ma-sbb01a",
+      "siteName": "VOLK TACTICAL GEAR",
+      "type": "product",
+      "fetchedAt": "2026-06-23T12:09:32.510Z",
+      "expiresAt": "2026-07-23T12:09:32.510Z",
+      "lastAttemptAt": "2026-06-23T12:09:32.510Z",
+      "source": "fetch",
+      "status": "ok"
+    },
     "https://shop.vtg.jp/products/vtg-ve-vbs137?variant=45101373161753": {
       "title": "\"Volk Tactical Gear – Japanese Tactical Apparel & Gear\"",
       "description": "\"High-performance tactical gear using US materials & exclusive JSDF camo. Designed for modern warriors. Ships worldwide.\"",
@@ -231,6 +244,18 @@
       "fetchedAt": "2026-06-23T06:55:12.166Z",
       "expiresAt": "2026-07-23T06:55:12.166Z",
       "lastAttemptAt": "2026-06-23T06:55:12.166Z",
+      "source": "fetch",
+      "status": "ok"
+    },
+    "https://shop.vtg.jp/products/vtg-ve-vbs80a?variant=45101304578329": {
+      "title": "\"Volk Tactical Gear – Japanese Tactical Apparel & Gear\"",
+      "description": "\"High-performance tactical gear using US materials & exclusive JSDF camo. Designed for modern warriors. Ships worldwide.\"",
+      "url": "https://shop.vtg.jp/en",
+      "siteName": "VOLK TACTICAL GEAR",
+      "type": "website",
+      "fetchedAt": "2026-06-23T12:09:32.483Z",
+      "expiresAt": "2026-07-23T12:09:32.483Z",
+      "lastAttemptAt": "2026-06-23T12:09:32.483Z",
       "source": "fetch",
       "status": "ok"
     },

@@ -107,10 +107,51 @@ function extractStandaloneUrlFromLine(line) {
     return bareUrlMatch[1];
   }
 
-  const markdownLinkMatch = value.match(
-    /^\[[^\]]+\]\((https?:\/\/[^)\s]+)(?:\s+["'][^"']*["'])?\)$/,
-  );
-  return markdownLinkMatch?.[1] ?? null;
+  return extractMarkdownLinkDestination(value);
+}
+
+function extractMarkdownLinkDestination(value) {
+  if (!value.startsWith('[')) {
+    return null;
+  }
+
+  const labelEnd = findClosingBracket(value, 0);
+  if (labelEnd === -1 || value[labelEnd + 1] !== '(' || !value.endsWith(')')) {
+    return null;
+  }
+
+  const target = value.slice(labelEnd + 2, -1).trim();
+  const angleDestinationMatch = target.match(/^<(https?:\/\/[^<>\s]+)>(?:\s+["'][^"']*["'])?$/);
+  if (angleDestinationMatch) {
+    return angleDestinationMatch[1];
+  }
+
+  const destinationMatch = target.match(/^(https?:\/\/[^\s)]+)(?:\s+["'][^"']*["'])?$/);
+  return destinationMatch?.[1] ?? null;
+}
+
+function findClosingBracket(value, openIndex) {
+  let depth = 0;
+
+  for (let index = openIndex; index < value.length; index += 1) {
+    const character = value[index];
+
+    if (character === '\\') {
+      index += 1;
+      continue;
+    }
+
+    if (character === '[') {
+      depth += 1;
+    } else if (character === ']') {
+      depth -= 1;
+      if (depth === 0) {
+        return index;
+      }
+    }
+  }
+
+  return -1;
 }
 
 function stripMarkdownContainerMarkers(line) {
