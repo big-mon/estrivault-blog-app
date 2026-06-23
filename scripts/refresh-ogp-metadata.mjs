@@ -91,13 +91,46 @@ function extractStandaloneUrls(markdown) {
   const urls = new Set();
 
   for (const line of markdown.split(/\r?\n/)) {
-    const trimmedLine = line.trim();
-    if (/^https?:\/\/[^\s<>()]+$/.test(trimmedLine)) {
-      urls.add(trimmedLine);
+    const url = extractStandaloneUrlFromLine(line);
+    if (url) {
+      urls.add(url);
     }
   }
 
   return urls;
+}
+
+function extractStandaloneUrlFromLine(line) {
+  const value = stripMarkdownContainerMarkers(line);
+  const bareUrlMatch = value.match(/^<?(https?:\/\/[^\s<>()]+)>?$/);
+  if (bareUrlMatch) {
+    return bareUrlMatch[1];
+  }
+
+  const markdownLinkMatch = value.match(
+    /^\[[^\]]+\]\((https?:\/\/[^)\s]+)(?:\s+["'][^"']*["'])?\)$/,
+  );
+  return markdownLinkMatch?.[1] ?? null;
+}
+
+function stripMarkdownContainerMarkers(line) {
+  let value = line.trim();
+
+  while (value.length > 0) {
+    const next = value
+      .replace(/^>\s*/, '')
+      .replace(/^[-*+]\s+/, '')
+      .replace(/^\d+[.)]\s+/, '')
+      .trim();
+
+    if (next === value) {
+      return value;
+    }
+
+    value = next;
+  }
+
+  return value;
 }
 
 async function discoverUrls() {
