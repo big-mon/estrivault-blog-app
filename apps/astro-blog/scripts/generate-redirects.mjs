@@ -35,7 +35,7 @@ async function isPublishedPost(content, filePath) {
   const slug = getSlugFromMarkdownPath(filePath);
   const meta = await extractMetadata(content, undefined, slug);
 
-  return meta.draft !== true;
+  return !meta.draft;
 }
 
 const files = await getMarkdownFiles(contentRoot);
