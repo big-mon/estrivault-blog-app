@@ -9,6 +9,7 @@
     "build:legacy": "pnpm run build:packages && pnpm --filter astro-blog run build",
     "build:packages": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor --filter @estrivault/og-image-generator run build",
     "build:packages:incremental": "tsc --build packages/cloudinary-utils packages/content-processor packages/og-image-generator && pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor --filter @estrivault/og-image-generator run build:bundle",
+    "preogp:refresh": "pnpm --filter @estrivault/content-processor build",
     "ogp:refresh": "node scripts/refresh-ogp-metadata.mjs",
     "dev:packages": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/og-image-generator run dev",
     "validate:workspace": "node scripts/validate-workspace.js",

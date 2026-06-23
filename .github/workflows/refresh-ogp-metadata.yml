@@ -13,6 +13,10 @@ on:
         description: Number of concurrent OGP fetches
         required: false
         default: '3'
+      failure-ttl-days:
+        description: Days until failed OGP refresh attempts are retried
+        required: false
+        default: '7'
       refresh-all:
         description: Refresh every discovered URL except manual entries
         required: false
@@ -40,18 +44,19 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa
         with:
           version: 10.13.1
           run_install: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22.x
           cache: pnpm
@@ -60,18 +65,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
 
-      - name: Build content processor
-        run: pnpm --filter @estrivault/content-processor build
-
       - name: Refresh OGP metadata
         env:
           OGP_TTL_DAYS: ${{ inputs['ttl-days'] || '30' }}
+          OGP_FAILURE_TTL_DAYS: ${{ inputs['failure-ttl-days'] || '7' }}
           OGP_CONCURRENCY: ${{ inputs.concurrency || '3' }}
           OGP_REFRESH_ALL: ${{ inputs['refresh-all'] || 'false' }}
         shell: bash
         run: |
           args=(
             "--ttl-days=${OGP_TTL_DAYS}"
+            "--failure-ttl-days=${OGP_FAILURE_TTL_DAYS}"
             "--concurrency=${OGP_CONCURRENCY}"
           )
 
@@ -93,6 +97,8 @@ jobs:
 
       - name: Commit metadata changes
         if: steps.metadata-diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -100,7 +106,7 @@ jobs:
           git checkout -B "$UPDATE_BRANCH"
           git add content/ogp-metadata.json
           git commit -m "chore: refresh OGP metadata"
-          git push --force-with-lease origin "$UPDATE_BRANCH"
+          git push --force-with-lease "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$UPDATE_BRANCH"
 
       - name: Open pull request
         if: steps.metadata-diff.outputs.changed == 'true'

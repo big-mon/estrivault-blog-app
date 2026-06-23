@@ -8,6 +8,7 @@ import {
 } from '../packages/content-processor/dist/index.js';
 
 const DEFAULT_TTL_DAYS = 30;
+const DEFAULT_FAILURE_TTL_DAYS = 7;
 const DEFAULT_CONCURRENCY = 3;
 const STORE_PATH = path.resolve('content', 'ogp-metadata.json');
 const CONTENT_ROOTS = [path.resolve('content', 'blog'), path.resolve('content', 'notes')];
@@ -17,6 +18,7 @@ function parseArgs(argv) {
     all: false,
     dryRun: false,
     ttlDays: DEFAULT_TTL_DAYS,
+    failureTtlDays: DEFAULT_FAILURE_TTL_DAYS,
     concurrency: DEFAULT_CONCURRENCY,
     urls: [],
   };
@@ -30,6 +32,8 @@ function parseArgs(argv) {
       options.dryRun = true;
     } else if (arg.startsWith('--ttl-days=')) {
       options.ttlDays = Number(arg.slice('--ttl-days='.length));
+    } else if (arg.startsWith('--failure-ttl-days=')) {
+      options.failureTtlDays = Number(arg.slice('--failure-ttl-days='.length));
     } else if (arg.startsWith('--concurrency=')) {
       options.concurrency = Number(arg.slice('--concurrency='.length));
     } else if (arg.startsWith('--url=')) {
@@ -41,6 +45,9 @@ function parseArgs(argv) {
 
   if (!Number.isFinite(options.ttlDays) || options.ttlDays <= 0) {
     throw new Error('--ttl-days must be a positive number');
+  }
+  if (!Number.isFinite(options.failureTtlDays) || options.failureTtlDays <= 0) {
+    throw new Error('--failure-ttl-days must be a positive number');
   }
   if (!Number.isInteger(options.concurrency) || options.concurrency <= 0) {
     throw new Error('--concurrency must be a positive integer');
@@ -153,8 +160,10 @@ function buildEntry(url, existingEntry, result, now, ttlDays) {
     if (existingEntry) {
       return {
         ...existingEntry,
+        expiresAt,
         lastAttemptAt: attemptedAt,
         lastError: result?.error || 'OGP fetch failed',
+        status: 'fallback',
       };
     }
 
@@ -224,7 +233,8 @@ async function main() {
 
   await mapLimit(refreshUrls, options.concurrency, async (url) => {
     const result = await fetchFreshOgpMetadata(url);
-    store.entries[url] = buildEntry(url, store.entries[url], result, new Date(), options.ttlDays);
+    const ttlDays = result?.status === 'fallback' ? options.failureTtlDays : options.ttlDays;
+    store.entries[url] = buildEntry(url, store.entries[url], result, new Date(), ttlDays);
     const status = result?.status || 'skipped';
     console.log(`${status}: ${url}`);
   });

@@ -1,4 +1,124 @@
 {
   "version": 1,
-  "entries": {}
+  "entries": {
+    "https://ast-science.com/": {
+      "title": "Home - AST SpaceMobile",
+      "description": "The SpaceMobile Network Our BlueBird satellites provide full broadband directly to standard smartphones without specialized hardware or phone modifications. Make video calls, browse the web, and use your apps at 4G and 5G speeds from anywhere on Earth. How it Works How You Connect Limitless Possibilities 5.8 billion mobile users moving in and out of coverage [&hellip;]",
+      "image": "https://ast-science.com/wp-content/uploads/2025/10/Untitled-1-1-1.png",
+      "url": "https://ast-science.com/",
+      "siteName": "AST SpaceMobile",
+      "type": "website",
+      "fetchedAt": "2026-06-23T06:03:02.476Z",
+      "expiresAt": "2026-07-23T06:03:02.476Z",
+      "lastAttemptAt": "2026-06-23T06:03:02.476Z",
+      "source": "fetch",
+      "status": "ok"
+    },
+    "https://docs.anthropic.com/en/docs/claude-code/hooks": {
+      "title": "Hooks reference - Claude Code Docs",
+      "description": "Reference for Claude Code hook events, configuration schema, JSON input/output formats, exit codes, async hooks, HTTP hooks, prompt hooks, and MCP tool hooks.",
+      "image": "https://claude-code.mintlify.app/_next/image?url=%2F_mintlify%2Fapi%2Fog%3Fdivision%3DReference%26appearance%3Dsystem%26title%3DHooks%2Breference%26description%3DReference%2Bfor%2BClaude%2BCode%2Bhook%2Bevents%252C%2Bconfiguration%2Bschema%252C%2BJSON%2Binput%252Foutput%2Bformats%252C%2Bexit%2Bcodes%252C%2Basync%2Bhooks%252C%2BHTTP%2Bhooks%252C%2Bprompt%2Bhooks%252C%2Band%2BMCP%2Btool%2Bhooks.%26logoLight%3Dhttps%253A%252F%252Fmintcdn.com%252Fclaude-code%252Fc5r9_6tjPMzFdDDT%252Flogo%252Flight.svg%253Ffit%253Dmax%2526auto%253Dformat%2526n%253Dc5r9_6tjPMzFdDDT%2526q%253D85%2526s%253D78fd01ff4f4340295a4f66e2ea54903c%26logoDark%3Dhttps%253A%252F%252Fmintcdn.com%252Fclaude-code%252Fc5r9_6tjPMzFdDDT%252Flogo%252Fdark.svg%253Ffit%253Dmax%2526auto%253Dformat%2526n%253Dc5r9_6tjPMzFdDDT%2526q%253D85%2526s%253D1298a0c3b3a1da603b190d0de0e31712%26primaryColor%3D%25230E0E0E%26lightColor%3D%2523D4A27F%26darkColor%3D%25230E0E0E%26backgroundLight%3D%2523FDFDF7%26backgroundDark%3D%252309090B&w=1200&q=100",
+      "url": "https://code.claude.com/docs/en/hooks",
+      "type": "website",
+      "fetchedAt": "2026-06-23T06:03:01.292Z",
+      "expiresAt": "2026-07-23T06:03:01.292Z",
+      "lastAttemptAt": "2026-06-23T06:03:01.292Z",
+      "source": "fetch",
+      "status": "ok"
+    },
+    "https://rocketlabcorp.com/": {
+      "title": "Rocketlabcorp",
+      "url": "https://rocketlabcorp.com/",
+      "siteName": "rocketlabcorp.com",
+      "description": "Visit rocketlabcorp.com",
+      "fetchedAt": "2026-06-23T06:01:46.442Z",
+      "expiresAt": "2026-06-30T06:03:08.430Z",
+      "lastAttemptAt": "2026-06-23T06:03:08.430Z",
+      "lastError": "403 Forbidden",
+      "source": "fallback",
+      "status": "fallback"
+    },
+    "https://www.jobyaviation.com/": {
+      "title": "Joby Aviation",
+      "description": "Experience Joby Aviation’s all-electric air taxi: vertical take-off and landing, seamless door to door travel, all from our app.",
+      "image": "https://cdn.sanity.io/images/h5mp19kq/production/b4d839a20b69d18660a477be188d08402b871a80-3840x2160.png?rect=0%2C72%2C3840%2C2016&w=1200&h=630&fit=crop&v=image-b4d839a20b69d18660a477be188d08402b871a80-3840x2160-png",
+      "url": "https://www.jobyaviation.com/",
+      "type": "website",
+      "fetchedAt": "2026-06-23T06:03:01.633Z",
+      "expiresAt": "2026-07-23T06:03:01.633Z",
+      "lastAttemptAt": "2026-06-23T06:03:01.633Z",
+      "source": "fetch",
+      "status": "ok"
+    },
+    "https://www.nexteraenergy.com/": {
+      "title": "Enabling American Energy Dominance | NextEra Energy",
+      "description": "Discover how NextEra Energy is leading America&#39;s energy evolution using an all forms of energy strategy to keep prices low for customers.",
+      "url": "http://www.nexteraenergy.com/content/nee/us/en/home.html",
+      "fetchedAt": "2026-06-23T06:03:02.395Z",
+      "expiresAt": "2026-07-23T06:03:02.395Z",
+      "lastAttemptAt": "2026-06-23T06:03:02.395Z",
+      "source": "fetch",
+      "status": "ok"
+    },
+    "https://www.palantir.com/jp": {
+      "title": "Palantir (パランティア)",
+      "description": "Palantir (パランティア) は、お客様があらゆるデータ、意思決定、オペレーションを効果的に統合することを可能にするソフトウェア ソリューションを提供しています。",
+      "image": "https://www.palantir.com/assets/xrfr7uokpv1b/5MGQnj3IDJpURPzBDnXklZ/b7eed64a4f71a959250e19ec76bdf5de/Palantir_Chevron.png",
+      "url": "https://www.palantir.com/jp/home/",
+      "siteName": "Palantir",
+      "type": "website",
+      "fetchedAt": "2026-06-23T06:03:02.458Z",
+      "expiresAt": "2026-07-23T06:03:02.458Z",
+      "lastAttemptAt": "2026-06-23T06:03:02.458Z",
+      "source": "fetch",
+      "status": "ok"
+    },
+    "https://www.sofi.com/": {
+      "title": "Sofi",
+      "url": "https://www.sofi.com/",
+      "siteName": "sofi.com",
+      "description": "Visit sofi.com",
+      "fetchedAt": "2026-06-23T06:01:49.512Z",
+      "expiresAt": "2026-06-30T06:03:10.396Z",
+      "lastAttemptAt": "2026-06-23T06:03:10.396Z",
+      "lastError": "403 Forbidden",
+      "source": "fallback",
+      "status": "fallback"
+    },
+    "https://www.zillow.com/": {
+      "title": "Zillow: Real Estate, Apartments, Mortgages & Home Values",
+      "description": "The leading real estate marketplace. Search millions of for-sale and rental listings, compare Zestimate® home values and connect with local professionals.",
+      "url": "https://www.zillow.com/",
+      "siteName": "Zillow",
+      "fetchedAt": "2026-06-23T06:03:07.361Z",
+      "expiresAt": "2026-07-23T06:03:07.361Z",
+      "lastAttemptAt": "2026-06-23T06:03:07.361Z",
+      "source": "fetch",
+      "status": "ok"
+    },
+    "https://zenn.dev/acntechjp/articles/963898a51d7a5a": {
+      "title": "WindowsでClaude Codeを使う3つの方法を徹底比較",
+      "image": "https://res.cloudinary.com/zenn/image/upload/s--OrmNcrwd--/c_fit%2Cg_north_west%2Cl_text:notosansjp-medium.otf_55:Windows%25E3%2581%25A7Claude%2520Code%25E3%2582%2592%25E4%25BD%25BF%25E3%2581%25863%25E3%2581%25A4%25E3%2581%25AE%25E6%2596%25B9%25E6%25B3%2595%25E3%2582%2592%25E5%25BE%25B9%25E5%25BA%2595%25E6%25AF%2594%25E8%25BC%2583%2Cw_1010%2Cx_90%2Cy_100/g_south_west%2Cl_text:notosansjp-medium.otf_34:%25E3%2583%259E%25E3%2583%2583%25E3%2582%25B5%25E3%2583%25B3%2520%2528Masanori%2520Yos...%2Cx_220%2Cy_108/bo_3px_solid_rgb:d6e3ed%2Cg_south_west%2Ch_90%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyL2U2ZDA4MDY5ODcuanBlZw==%2Cr_20%2Cw_90%2Cx_92%2Cy_102/g_south_west%2Ch_34%2Cl_default:og-publication-pro-mark-xcosax%2Cw_34%2Cx_217%2Cy_158/co_rgb:6e7b85%2Cg_south_west%2Cl_text:notosansjp-medium.otf_30:Accenture%2520Japan%2520%2528%25E6%259C%2589%25E5%25BF%2597%2529%2Cx_255%2Cy_160/bo_4px_solid_white%2Cg_south_west%2Ch_50%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyLzU5MzkwNDBmYjYuanBlZw==%2Cr_max%2Cw_50%2Cx_139%2Cy_84/v1627283836/default/og-base-w1200-v2.png?_a=BACMTiAE",
+      "url": "https://zenn.dev/acntechjp/articles/963898a51d7a5a",
+      "siteName": "Zenn",
+      "type": "article",
+      "fetchedAt": "2026-06-23T06:03:07.584Z",
+      "expiresAt": "2026-07-23T06:03:07.584Z",
+      "lastAttemptAt": "2026-06-23T06:03:07.584Z",
+      "source": "fetch",
+      "status": "ok"
+    },
+    "https://zenn.dev/acntechjp/articles/fc111da7542e00": {
+      "title": "devcontainerでClaude Codeを動かす(Windows)",
+      "image": "https://res.cloudinary.com/zenn/image/upload/s--XtjR8L__--/c_fit%2Cg_north_west%2Cl_text:notosansjp-medium.otf_55:devcontainer%25E3%2581%25A7Claude%2520Code%25E3%2582%2592%25E5%258B%2595%25E3%2581%258B%25E3%2581%2599%2528Windows%2529%2Cw_1010%2Cx_90%2Cy_100/g_south_west%2Cl_text:notosansjp-medium.otf_34:%25E3%2583%259E%25E3%2583%2583%25E3%2582%25B5%25E3%2583%25B3%2520%2528Masanori%2520Yos...%2Cx_220%2Cy_108/bo_3px_solid_rgb:d6e3ed%2Cg_south_west%2Ch_90%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyL2U2ZDA4MDY5ODcuanBlZw==%2Cr_20%2Cw_90%2Cx_92%2Cy_102/g_south_west%2Ch_34%2Cl_default:og-publication-pro-mark-xcosax%2Cw_34%2Cx_217%2Cy_158/co_rgb:6e7b85%2Cg_south_west%2Cl_text:notosansjp-medium.otf_30:Accenture%2520Japan%2520%2528%25E6%259C%2589%25E5%25BF%2597%2529%2Cx_255%2Cy_160/bo_4px_solid_white%2Cg_south_west%2Ch_50%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyLzU5MzkwNDBmYjYuanBlZw==%2Cr_max%2Cw_50%2Cx_139%2Cy_84/v1627283836/default/og-base-w1200-v2.png?_a=BACMTiAE",
+      "url": "https://zenn.dev/acntechjp/articles/fc111da7542e00",
+      "siteName": "Zenn",
+      "type": "article",
+      "fetchedAt": "2026-06-23T06:03:07.766Z",
+      "expiresAt": "2026-07-23T06:03:07.766Z",
+      "lastAttemptAt": "2026-06-23T06:03:07.766Z",
+      "source": "fetch",
+      "status": "ok"
+    }
+  }
 }
