@@ -48,7 +48,7 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
       // 商品カードの構造を構築
       data.hName = 'div';
       data.hProperties = {
-        className: 'amazon-embed',
+        className: ['amazon-embed'],
         'data-amazon-asin': asin,
         'data-component-name': 'AmazonEmbed',
       };
@@ -67,7 +67,7 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
               tagName: 'a',
               properties: {
                 href: link,
-                rel: 'noopener noreferrer',
+                rel: ['noopener', 'noreferrer'],
                 target: '_blank',
                 className: ['amazon-card__image'],
               },
@@ -98,7 +98,7 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
                   tagName: 'a',
                   properties: {
                     href: link,
-                    rel: 'noopener noreferrer',
+                    rel: ['noopener', 'noreferrer'],
                     target: '_blank',
                     className: ['amazon-card__title'],
                   },
@@ -114,7 +114,7 @@ export const remarkAmazonEmbed: Plugin<[], Root, Root> = () => {
                   tagName: 'a',
                   properties: {
                     href: link,
-                    rel: 'noopener noreferrer',
+                    rel: ['noopener', 'noreferrer'],
                     target: '_blank',
                     className: ['amazon-card__cta'],
                   },

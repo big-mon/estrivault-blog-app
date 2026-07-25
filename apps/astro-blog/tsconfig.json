@@ -22,8 +22,8 @@
   },
   "include": ["src/**/*", "astro.config.mjs"],
   "references": [
-    { "path": "../../packages/cloudinary-utils" },
-    { "path": "../../packages/content-processor" },
-    { "path": "../../packages/og-image-generator" }
+    { "path": "../../packages/cloudinary-utils/tsconfig.json" },
+    { "path": "../../packages/content-processor/tsconfig.json" },
+    { "path": "../../packages/og-image-generator/tsconfig.json" }
   ]
 }
