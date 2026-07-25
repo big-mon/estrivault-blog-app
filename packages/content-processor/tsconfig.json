@@ -11,5 +11,5 @@
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"],
-  "references": [{ "path": "../cloudinary-utils" }]
+  "references": [{ "path": "../cloudinary-utils/tsconfig.json" }]
 }

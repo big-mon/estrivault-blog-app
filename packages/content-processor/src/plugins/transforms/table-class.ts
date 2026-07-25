@@ -15,10 +15,7 @@ export const rehypeTableClass: Plugin<[], Root, Root> = () => {
       }
 
       const existingClassName = node.properties?.className;
-      const classNames =
-        Array.isArray(existingClassName) ? existingClassName.map(String)
-        : typeof existingClassName === 'string' ? existingClassName.split(/\s+/).filter(Boolean)
-        : [];
+      const classNames = Array.isArray(existingClassName) ? existingClassName.map(String) : [];
 
       node.properties = {
         ...node.properties,

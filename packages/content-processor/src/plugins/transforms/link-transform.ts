@@ -38,7 +38,7 @@ export const rehypeLinkTransform: Plugin<[LinkTransformOptions?], Root, Root> = 
         node.properties = {
           ...node.properties,
           target: '_blank',
-          rel: 'noopener noreferrer',
+          rel: ['noopener', 'noreferrer'],
         };
       }
     });

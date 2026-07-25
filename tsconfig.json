@@ -40,9 +40,9 @@
 
   // プロジェクト参照設定
   "references": [
-    { "path": "./packages/cloudinary-utils" },
-    { "path": "./packages/content-processor" },
-    { "path": "./packages/og-image-generator" },
-    { "path": "./apps/astro-blog" }
+    { "path": "./packages/cloudinary-utils/tsconfig.json" },
+    { "path": "./packages/content-processor/tsconfig.json" },
+    { "path": "./packages/og-image-generator/tsconfig.json" },
+    { "path": "./apps/astro-blog/tsconfig.json" }
   ]
 }
