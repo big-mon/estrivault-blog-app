@@ -23,9 +23,6 @@
 - `parseFrontmatter(markdown)`:
   frontmatter と本文を分離します。
 
-- `createPipeline(options, enableSyntaxHighlight)`:
-  unified/remark/rehype の変換パイプラインを直接作成します。
-
 - `normalizeForSlug(value)` / `normalizeForTagFilter(value)`:
   ルーティングやタグ絞り込み用に文字列を正規化します。
 

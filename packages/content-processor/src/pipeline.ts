@@ -28,7 +28,7 @@ import type { ProcessorOptions } from './types';
  * @param enableSyntaxHighlight - シンタックスハイライトを有効化する場合はtrue
  * @returns MarkdownからHTMLへの変換処理を行うunifiedパイプライン
  */
-function createBasePipeline(
+export function createPipeline(
   options: ProcessorOptions = {},
   enableSyntaxHighlight: boolean = false,
 ) {
@@ -84,17 +84,4 @@ function createBasePipeline(
       // 最終出力
       .use(rehypeStringify)
   );
-}
-
-/**
- * パイプラインを構築する
- * @param options 処理オプション
- * @param enableSyntaxHighlight シンタックスハイライトを有効化するか
- * @returns 構築されたパイプライン
- */
-export function createPipeline(
-  options: ProcessorOptions = {},
-  enableSyntaxHighlight: boolean = false,
-) {
-  return createBasePipeline(options, enableSyntaxHighlight);
 }

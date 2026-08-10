@@ -3,14 +3,10 @@ import type { Plugin } from 'unified';
 import type { Root } from 'mdast';
 import type { Node } from 'unist';
 
-interface TwitterEmbedOptions {
-  onTwitterFound?: () => void;
-}
-
 /**
  * ::twitter{id="..."} ディレクティブをHTML要素に変換するremarkプラグイン
  */
-export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (options = {}) => {
+export const remarkTwitterEmbed: Plugin<[], Root, Root> = () => {
   return (tree) => {
     visit(tree, function (node: Node) {
       const isTargetType =
@@ -43,11 +39,6 @@ export const remarkTwitterEmbed: Plugin<[TwitterEmbedOptions?], Root, Root> = (o
           node,
         );
         return undefined;
-      }
-
-      // コールバックがあれば呼び出し
-      if (options.onTwitterFound) {
-        options.onTwitterFound();
       }
 
       // HTMLノードに変換 - blockquoteを直接作成

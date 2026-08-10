@@ -16,18 +16,9 @@ const dateString = new Intl.DateTimeFormat('ja-JP', {
   .format(note.publishedAt)
   .replace(/\//g, '.');
 const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
-const tagList = note.tags.join(' ');
 ---
 
-<a
-  class:list={['note-card', compact && 'note-card--compact']}
-  href={noteUrl}
-  data-note-card-link
-  data-note-slug={note.slug}
-  data-note-tags={tagList}
-  data-note-title={note.title}
-  data-note-excerpt={note.excerpt}
->
+<a class:list={['note-card', compact && 'note-card--compact']} href={noteUrl} data-note-card-link>
   <article>
     <header class="note-card-header">
       <span>Note</span>

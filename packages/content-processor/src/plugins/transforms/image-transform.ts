@@ -118,9 +118,3 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
     return tree;
   };
 };
-
-// 後方互換性のため
-/**
- * @deprecated 代わりに `rehypeImageTransform` を使用してください
- */
-export const remarkImageTransform = rehypeImageTransform;
