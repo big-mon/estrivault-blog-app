@@ -1,64 +1,39 @@
 import type { APIRoute } from 'astro';
-import { getPosts } from '$lib/content';
-import { SITE_URL, SOCIAL_LINK_X, SOCIAL_LINK_GITHUB } from '$constants';
+import { SITE_DESCRIPTION, SITE_URL, SOCIAL_LINK_GITHUB, SOCIAL_LINK_X } from '$constants';
 
 export const prerender = true;
 
-export const GET: APIRoute = async () => {
-  const { posts } = await getPosts({ perPage: 20 });
+export const GET: APIRoute = () => {
   const siteBase = SITE_URL.replace(/\/$/, '');
-
   const body = `# Estrilda Blog
 
-> Personal blog by big-mon covering technology, investments, gaming, and military gear reviews
+> ${SITE_DESCRIPTION}
 
-## About
+Primarily Japanese, with English technical terms where useful.
 
-This site contains technical articles, investment analysis, gaming guides, and military gear reviews, primarily written in Japanese with English technical terms. The content focuses on practical insights and detailed analysis across multiple domains.
+## Start here
 
-## Target Audience
+- XML sitemap: ${siteBase}/sitemap.xml
+- Markdown sitemap: ${siteBase}/sitemap.md
 
-- Japanese tech professionals and developers
-- Individual investors interested in US markets
-- Gaming enthusiasts (especially Black Desert Online players)
-- Tactical gear and airsoft users
-- Readers seeking technical content
+## Public routes
 
-## Content Categories
-
-- **investing / 投資・企業分析**: US stock analysis, industry analysis, investment strategies, SEC filing research
-- **software / 開発・Web**: Web development, APIs, XBRL/EDGAR data access, blog platform work, development environments
-- **ai / AI・生成ツール**: Claude Code, ChatGPT, Stable Diffusion, generative AI workflows
-- **games / ゲーム**: Game guides, mods, translations, settings, troubleshooting
-- **gear / ギア・装備レビュー**: Airsoft gear, desk setups, audio, keyboards, physical gadgets
-- **essays / 考察・エッセイ**: Personal essays, social and business commentary, opinion pieces
-- **meta / このサイトについて**: About and site operation notes
-
-## Featured Articles
-
-${posts
-  .slice(0, 25)
-  .map(
-    (post) =>
-      `- [${post.title}](${siteBase}/post/${post.slug}) (${post.publishedAt.toISOString().split('T')[0]}) - ${post.description || '記事の詳細な解説'}`,
-  )
-  .join('\n')}
-
-*For complete article list, see: ${siteBase}/llms-full.txt*
-
-## Site Structure
-
-- Home: ${SITE_URL}
+- Home and paginated archive: ${SITE_URL} and ${siteBase}/[page]/
 - Posts: ${siteBase}/post/[slug]
+- Notes archive and notes: ${siteBase}/notes/ and ${siteBase}/notes/[slug]
 - Categories: ${siteBase}/category/[category]/ and ${siteBase}/category/[category]/[page]/
 - Tags: ${siteBase}/tag/[tag]/ and ${siteBase}/tag/[tag]/[page]/
 
+## Canonical representation
+
+Canonical article and note representations are the public HTML document URLs. Use sitemap.xml for standards-based crawling and sitemap.md for a readable inventory; both list the same canonical resources.
+
 ## Contact
 
-Site: ${SITE_URL}
-Author: big-mon
-Twitter: https://x.com/${SOCIAL_LINK_X}
-GitHub: https://github.com/${SOCIAL_LINK_GITHUB}`.trim();
+- Site: ${SITE_URL}
+- Author: big-mon
+- X: https://x.com/${SOCIAL_LINK_X}
+- GitHub: https://github.com/${SOCIAL_LINK_GITHUB}`.trim();
 
   return new Response(body, {
     headers: {

@@ -18,7 +18,6 @@ interface Props {
   posts: PostMeta[];
   total: number;
   page: number;
-  perPage: number;
   totalPages: number;
   routeBase: string;
   sideMeta: ArchiveMeta[];
@@ -33,7 +32,6 @@ const {
   posts,
   total,
   page,
-  perPage,
   totalPages,
   routeBase,
   sideMeta,
@@ -41,7 +39,6 @@ const {
   emptyMessage,
 } = Astro.props;
 
-const startNumber = (page - 1) * perPage;
 const visibleTopTags = topTags.slice(0, 5);
 ---
 
@@ -98,9 +95,9 @@ const visibleTopTags = topTags.slice(0, 5);
     {
       posts.length > 0 ?
         <ol class="post-list">
-          {posts.map((post, index) => (
+          {posts.map((post) => (
             <li>
-              <ArchivePostRow post={post} displayNumber={startNumber + index + 1} />
+              <ArchivePostRow post={post} />
             </li>
           ))}
         </ol>

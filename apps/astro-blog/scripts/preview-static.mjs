@@ -29,6 +29,7 @@ const contentTypes = new Map([
   ['.jpg', 'image/jpeg'],
   ['.json', 'application/json; charset=utf-8'],
   ['.mjs', 'application/javascript; charset=utf-8'],
+  ['.md', 'text/markdown; charset=utf-8'],
   ['.png', 'image/png'],
   ['.svg', 'image/svg+xml'],
   ['.txt', 'text/plain; charset=utf-8'],
@@ -38,8 +39,14 @@ const contentTypes = new Map([
   ['.xml', 'application/xml; charset=utf-8'],
 ]);
 
-function getContentType(filePath) {
-  return contentTypes.get(path.extname(filePath).toLowerCase()) ?? 'application/octet-stream';
+const contentTypeOverrides = new Map([['/llms.txt', 'text/markdown; charset=utf-8']]);
+
+function getContentType(filePath, urlPathname) {
+  return (
+    contentTypeOverrides.get(urlPathname) ??
+    contentTypes.get(path.extname(filePath).toLowerCase()) ??
+    'application/octet-stream'
+  );
 }
 
 function resolveRequestPath(urlPathname) {
@@ -81,7 +88,7 @@ const server = createServer(async (req, res) => {
       return;
     }
 
-    res.writeHead(200, { 'Content-Type': getContentType(filePath) });
+    res.writeHead(200, { 'Content-Type': getContentType(filePath, requestUrl.pathname) });
     createReadStream(filePath).pipe(res);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

@@ -27,8 +27,8 @@ pnpm --filter astro-blog test:e2e
 - `/tag/[tag]/`
 - `/tag/[tag]/[page]/`
 - `/sitemap.xml`
+- `/sitemap.md`
 - `/llms.txt`
-- `/llms-full.txt`
 
 ## URL Canonicalization and Redirects
 
