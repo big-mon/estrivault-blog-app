@@ -10,10 +10,13 @@ export const rehypeLinkTransform: Plugin<[], Root, Root> = () => {
     // 空のリンクやフラグメントは内部リンク
     if (!url || url.startsWith('#')) return true;
 
-    // 相対パス（./ または ../ で始まる）の場合のみ内部リンクと判定
+    // 同一サイトのルート相対パス（プロトコル相対URLは除く）
+    if (url.startsWith('/') && !url.startsWith('//')) return true;
+
+    // 相対パス（./ または ../ で始まる）は内部リンク
     if (url.startsWith('./') || url.startsWith('../')) return true;
 
-    // 絶対パス（/ で始まる）や完全なURLは外部リンクとみなす
+    // 完全なURLとプロトコル相対URLは外部リンク
     return false;
   };
 
