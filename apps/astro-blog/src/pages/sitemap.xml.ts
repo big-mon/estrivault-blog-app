@@ -1,13 +1,5 @@
 import type { APIRoute } from 'astro';
-import type { PostMeta } from '@estrivault/content-processor';
-import { POSTS_PER_PAGE, SITE_URL } from '$constants';
-import { getAllNotesMeta, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
-import {
-  encodeRouteSegment,
-  getArchivePageUrl,
-  getCategoryRouteSegment,
-  getTagRouteSegment,
-} from '$lib/url-segments.mjs';
+import { getPublicDiscoveryInventory } from '$lib/public-discovery';
 
 export const prerender = true;
 
@@ -21,104 +13,20 @@ function xmlEscape(value: string): string {
 }
 
 export const GET: APIRoute = async () => {
-  const siteBase = SITE_URL.replace(/\/$/, '');
-  const posts = await getAllPostsMeta();
-  const notes = await getAllNotesMeta();
-  const indexTotalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
-  const indexPageUrls: string[] = [];
-
-  for (let page = 2; page <= indexTotalPages; page++) {
-    indexPageUrls.push(`<url>
-    <loc>${xmlEscape(getArchivePageUrl(siteBase, '/', page))}</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>`);
-  }
-
-  const categories = [...new Set(posts.map((post) => post.category))].sort((a, b) =>
-    a.localeCompare(b),
-  );
-  const categoryUrls: string[] = [];
-
-  for (const category of categories) {
-    const categoryPosts = getPaginatedPosts(posts, { category, perPage: POSTS_PER_PAGE });
-    const encodedCategory = encodeRouteSegment(getCategoryRouteSegment(category));
-
-    for (let page = 1; page <= categoryPosts.totalPages; page++) {
-      categoryUrls.push(`<url>
-    <loc>${xmlEscape(getArchivePageUrl(siteBase, `/category/${encodedCategory}`, page))}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>`);
-    }
-  }
-
-  const tags = [...new Set(posts.flatMap((post) => post.tags))].sort((a, b) => a.localeCompare(b));
-  const tagUrls: string[] = [];
-
-  for (const tag of tags) {
-    const tagPosts = getPaginatedPosts(posts, { tag, perPage: POSTS_PER_PAGE });
-    const encodedTag = encodeRouteSegment(getTagRouteSegment(tag));
-
-    for (let page = 1; page <= tagPosts.totalPages; page++) {
-      tagUrls.push(`<url>
-    <loc>${xmlEscape(getArchivePageUrl(siteBase, `/tag/${encodedTag}`, page))}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>`);
-    }
-  }
-
-  const postUrls = posts
+  const entries = await getPublicDiscoveryInventory();
+  const urls = entries
     .map(
-      (post: PostMeta) => `<url>
-    <loc>${xmlEscape(`${siteBase}/post/${encodeURIComponent(post.slug)}`)}</loc>
-    <lastmod>${(post.updatedAt || post.publishedAt).toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+      (entry) => `  <url>
+    <loc>${xmlEscape(entry.url)}</loc>
+${entry.lastmod ? `    <lastmod>${entry.lastmod.toISOString()}</lastmod>\n` : ''}    <changefreq>${entry.changefreq}</changefreq>
+    <priority>${entry.priority.toFixed(1)}</priority>
   </url>`,
     )
-    .join('');
-
-  const noteUrls = notes
-    .map(
-      (note) => `<url>
-    <loc>${xmlEscape(`${siteBase}/notes/${encodeURIComponent(note.slug)}`)}</loc>
-    <lastmod>${note.publishedAt.toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>`,
-    )
-    .join('');
-
+    .join('\n');
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${xmlEscape(SITE_URL)}</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>${xmlEscape(`${siteBase}/llms.txt`)}</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>${xmlEscape(`${siteBase}/llms-full.txt`)}</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>${xmlEscape(`${siteBase}/notes/`)}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  ${indexPageUrls.join('')}
-  ${postUrls}
-  ${noteUrls}
-  ${categoryUrls.join('')}
-  ${tagUrls.join('')}
-</urlset>`.trim();
+${urls}
+</urlset>`;
 
   return new Response(sitemap, {
     headers: {

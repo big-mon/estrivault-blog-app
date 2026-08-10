@@ -28,3 +28,53 @@ test('post pages expose generated OGP images', async ({ page, request }) => {
   expect(response.ok()).toBeTruthy();
   expect(response.headers()['content-type']).toContain('image/png');
 });
+
+test('public discovery endpoints share one canonical URL inventory', async ({ request }) => {
+  const [xmlResponse, markdownResponse] = await Promise.all([
+    request.get('/sitemap.xml'),
+    request.get('/sitemap.md'),
+  ]);
+
+  expect(xmlResponse.ok()).toBeTruthy();
+  expect(xmlResponse.headers()['content-type']).toContain('application/xml');
+  expect(markdownResponse.ok()).toBeTruthy();
+  expect(markdownResponse.headers()['content-type']).toContain('text/markdown');
+
+  const xml = await xmlResponse.text();
+  const markdown = await markdownResponse.text();
+  const xmlUrls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+  const markdownUrls = [...markdown.matchAll(/\]\(<([^>]+)>\)/g)].map((match) => match[1]);
+
+  expect(new Set(markdownUrls)).toEqual(new Set(xmlUrls));
+  expect(markdownUrls).toHaveLength(xmlUrls.length);
+
+  const importantUrls = [
+    'https://estrilda.damonge.com/post/about',
+    'https://estrilda.damonge.com/notes/2026-06-20_独自性のある価値ある投稿',
+    'https://estrilda.damonge.com/category/software/',
+    'https://estrilda.damonge.com/tag/プログラミング/',
+  ];
+  for (const url of importantUrls) {
+    const encodedUrl = encodeURI(url);
+    expect(xmlUrls).toContain(encodedUrl);
+    expect(markdownUrls).toContain(encodedUrl);
+  }
+
+  expect(markdown).toContain('[S\\&P500に勝てない、それでも個別株投資がやめられない]');
+  expect(markdown).toContain('AT\\&T');
+});
+
+test('LLM guide points to both sitemaps and the removed full endpoint stays absent', async ({
+  request,
+}) => {
+  const guideResponse = await request.get('/llms.txt');
+
+  expect(guideResponse.ok()).toBeTruthy();
+  expect(guideResponse.headers()['content-type']).toContain('text/markdown');
+  const guide = await guideResponse.text();
+  expect(guide).toContain('https://estrilda.damonge.com/sitemap.xml');
+  expect(guide).toContain('https://estrilda.damonge.com/sitemap.md');
+
+  const removedResponse = await request.get('/llms-full.txt');
+  expect(removedResponse.status()).toBe(404);
+});

@@ -4,5 +4,5 @@ https://*.pages.dev/*
 /llms.txt
   Content-Type: text/markdown; charset=utf-8
 
-/llms-full.txt
+/sitemap.md
   Content-Type: text/markdown; charset=utf-8
