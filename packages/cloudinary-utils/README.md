@@ -95,6 +95,8 @@ const heroImage = buildUrl('your-cloud-name', 'path/to/hero.jpg', CUSTOM_PRESETS
 
 ## 開発
 
+リポジトリルートから実行します。
+
 ### セットアップ
 
 ```bash
@@ -104,7 +106,7 @@ pnpm install
 ### ビルド
 
 ```bash
-pnpm build
+pnpm --filter @estrivault/cloudinary-utils build
 ```
 
 ### 開発モード
@@ -112,7 +114,7 @@ pnpm build
 ファイルの変更を監視して自動的にビルドします。
 
 ```bash
-pnpm dev
+pnpm --filter @estrivault/cloudinary-utils dev
 ```
 
 ## ライセンス

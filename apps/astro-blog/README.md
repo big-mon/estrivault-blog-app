@@ -12,11 +12,16 @@ pnpm --filter astro-blog check
 pnpm --filter astro-blog test:e2e
 ```
 
+コマンドの前提、副作用、テスト選択はルートの
+[development guide](../../docs/development.md)を参照してください。
+
 ## Routes
 
 - `/`
 - `/[page]/`
 - `/post/[slug]`
+- `/notes/`
+- `/notes/[slug]`
 - `/category/[category]/`
 - `/category/[category]/[page]/`
 - `/tag/[tag]/`
