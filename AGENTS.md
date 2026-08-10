@@ -68,24 +68,6 @@ before continuing.
   edit a pull request using write permissions.
 - Do not commit, push, deploy, or trigger workflows unless the user explicitly authorizes it.
 
-## Toolchain and setup
-
-The repository declares `pnpm@10.13.1` in `packageManager`; use that version. It does not declare a
-project `engines.node` support range, but the locked Astro 7.1.3 package requires Node `>=22.12.0`.
-GitHub workflows currently use Node 22.x, so a current Node 22 release is the safest local choice.
-Keep the dependency requirement distinct from a project support guarantee.
-
-From the repository root:
-
-```bash
-pnpm install
-pnpm --filter astro-blog run setup:e2e  # only when local Chromium E2E is needed
-pnpm dev
-```
-
-If pnpm is unavailable but npm/npx is available, commands may be run without a global installation
-as `npx --yes pnpm@10.13.1 <arguments>`.
-
 ## Architecture invariants
 
 - Posts and notes load through `apps/astro-blog/src/lib/content.ts` and share
