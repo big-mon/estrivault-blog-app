@@ -13,7 +13,8 @@ import {
   getCategoryLabel,
 } from '$constants';
 import { getAllNotes, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
-import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments';
+import { formatEditorialDate } from '$lib/format-date';
+import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments.mjs';
 
 const allPosts = await getAllPostsMeta();
 const allNotes = await getAllNotes();
@@ -33,17 +34,12 @@ const categoryRows = Object.entries(CATEGORY_META)
     href: getArchivePagePath(`/category/${slug}`, 1),
   }));
 
-const fmtDate = (date: Date) =>
-  new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
-    .format(date)
-    .replace(/\//g, '.');
-
 const oldestPost = allPosts.at(-1);
 const archiveStats = {
   articles: allPosts.length,
   categories: categoryRows.length,
   notes: allNotes.length,
-  since: oldestPost ? fmtDate(oldestPost.publishedAt) : '----',
+  since: oldestPost ? formatEditorialDate(oldestPost.publishedAt) : '----',
 };
 
 const seriesCards = [
@@ -142,7 +138,7 @@ const seriesCards = [
             latestPosts.map((post) => (
               <a href={`/post/${post.slug}`} class="latest-item">
                 <div class="latest-meta">
-                  <time>{fmtDate(post.publishedAt)}</time>
+                  <time>{formatEditorialDate(post.publishedAt)}</time>
                   <p class="cat">{getCategoryLabel(post.category)}</p>
                 </div>
                 <h4>{post.title}</h4>
@@ -201,9 +197,6 @@ const seriesCards = [
     padding: 0;
   }
   .editorial-home {
-    --font-display: 'Times New Roman', serif;
-    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
-    --font-meta: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
     min-height: 100vh;
     font-family: var(--font-body);
     color: #111;

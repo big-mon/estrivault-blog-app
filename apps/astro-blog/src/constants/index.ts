@@ -66,7 +66,4 @@ export const SOCIAL_LINK_GITHUB = 'big-mon/estrivault-blog-app';
 
 export const POSTS_PER_PAGE = 12;
 
-export const GITHUB_REPO = 'https://github.com/big-mon/estrivault-blog-app';
-export const MAIN_BRANCH = 'main';
-
 export const GOOGLE_ADSENSE_CLIENT = 'ca-pub-6950127103154689';

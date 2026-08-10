@@ -18,8 +18,7 @@
   "dependencies": {
     "@estrivault/content-processor": "workspace:^",
     "@estrivault/og-image-generator": "workspace:^",
-    "@resvg/resvg-js": "^2.6.2",
-    "gray-matter": "^4.0.3"
+    "@resvg/resvg-js": "^2.6.2"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",

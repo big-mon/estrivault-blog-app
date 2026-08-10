@@ -1,6 +1,7 @@
 ---
 import type { PostMeta } from '@estrivault/content-processor';
 import { getCategoryLabel } from '$constants';
+import { formatEditorialDate } from '$lib/format-date';
 
 interface Props {
   post: PostMeta;
@@ -9,13 +10,7 @@ interface Props {
 
 const { post, displayNumber } = Astro.props;
 
-const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-});
-
-const formattedDate = dateFormatter.format(post.publishedAt).replace(/\//g, '.');
+const formattedDate = formatEditorialDate(post.publishedAt);
 ---
 
 <article>

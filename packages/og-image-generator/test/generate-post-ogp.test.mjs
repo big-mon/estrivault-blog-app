@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { generatePostOgpPng, layoutPostOgpTitle } from '../dist/index.js';
+import { generatePostOgpPng } from '../dist/index.js';
+import { layoutPostOgpTitle } from '../dist/title-layout.js';
 
 function readPngSize(buffer) {
   return {
@@ -15,9 +16,6 @@ test('generates a PNG for a short title', async () => {
       title: 'About',
       category: 'Other',
       publishedAt: new Date('2020-11-23T00:00:00.000Z'),
-      slug: 'about',
-      siteTitle: 'Estrilda',
-      siteUrl: 'https://estrilda.damonge.com/',
     }),
   );
 
@@ -31,9 +29,6 @@ test('supports long Japanese titles without exceeding three lines', async () => 
       title: 'SvelteKitで作るGitHubコントリビューター表示コンポーネント',
       category: 'Tech',
       publishedAt: new Date('2025-06-24T12:00:00.000Z'),
-      slug: 'svelte-github-contributors-component-implementation',
-      siteTitle: 'Estrilda',
-      siteUrl: 'https://estrilda.damonge.com/',
     }),
   );
 
@@ -52,7 +47,9 @@ test('consumes consecutive prohibited-start characters when adjusting line break
   const layout = layoutPostOgpTitle('かてく）』?】、』】ちおおあちうせ');
 
   assert.ok(
-    layout.lines.every((line) => !/^[、。，．・：；！？!?\])）｝」』】〉》ぁぃぅぇぉっゃゅょー…]/.test(line)),
+    layout.lines.every(
+      (line) => !/^[、。，．・：；！？!?\])）｝」』】〉》ぁぃぅぇぉっゃゅょー…]/.test(line),
+    ),
   );
 });
 
@@ -65,6 +62,8 @@ test('adds an ellipsis once the title exceeds the three-line budget', () => {
   assert.equal(layout.truncated, true);
   assert.match(layout.lines.at(-1) ?? '', /…$/);
   assert.ok(
-    layout.lines.every((line) => !/^[、。，．・：；！？!?\])）｝」』】〉》ぁぃぅぇぉっゃゅょー…]/.test(line)),
+    layout.lines.every(
+      (line) => !/^[、。，．・：；！？!?\])）｝」』】〉》ぁぃぅぇぉっゃゅょー…]/.test(line),
+    ),
   );
 });

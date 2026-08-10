@@ -28,7 +28,7 @@ import type { ProcessorOptions } from './types';
  * @param enableSyntaxHighlight - シンタックスハイライトを有効化する場合はtrue
  * @returns MarkdownからHTMLへの変換処理を行うunifiedパイプライン
  */
-function createBasePipeline(
+export function createPipeline(
   options: ProcessorOptions = {},
   enableSyntaxHighlight: boolean = false,
 ) {
@@ -65,8 +65,6 @@ function createBasePipeline(
       // 画像変換
       .use(rehypeImageTransform, {
         cloudinaryCloudName: cloudinaryCloudName || '',
-        width: 1200,
-        mode: 'fit',
       })
 
       // リンク変換
@@ -84,17 +82,4 @@ function createBasePipeline(
       // 最終出力
       .use(rehypeStringify)
   );
-}
-
-/**
- * パイプラインを構築する
- * @param options 処理オプション
- * @param enableSyntaxHighlight シンタックスハイライトを有効化するか
- * @returns 構築されたパイプライン
- */
-export function createPipeline(
-  options: ProcessorOptions = {},
-  enableSyntaxHighlight: boolean = false,
-) {
-  return createBasePipeline(options, enableSyntaxHighlight);
 }

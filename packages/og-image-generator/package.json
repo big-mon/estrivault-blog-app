@@ -12,7 +12,6 @@
     "build:types": "tsc --build",
     "build:bundle": "tsup",
     "build": "pnpm run build:types && pnpm run build:bundle",
-    "rebuild": "pnpm run clean && pnpm run build",
     "dev": "tsup --watch",
     "test": "node --test test/*.test.mjs"
   },

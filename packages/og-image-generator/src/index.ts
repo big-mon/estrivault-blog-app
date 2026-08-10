@@ -11,9 +11,6 @@ export interface PostOgpCardData {
   title: string;
   category: string;
   publishedAt: Date | string;
-  slug: string;
-  siteTitle: string;
-  siteUrl: string;
 }
 
 const IMAGE_WIDTH = 1200;
@@ -52,7 +49,7 @@ async function getPostOgpTemplateDigest(): Promise<string> {
   return templateDigestPromise;
 }
 
-export async function getPostOgpCacheKey(input: PostOgpCardData): Promise<string> {
+async function getPostOgpCacheKey(input: PostOgpCardData): Promise<string> {
   const hash = createHash('sha256');
   hash.update(
     JSON.stringify({
@@ -349,5 +346,3 @@ export async function generatePostOgpPng(
 
   return png;
 }
-
-export { layoutPostOgpTitle };

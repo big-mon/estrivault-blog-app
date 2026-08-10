@@ -10,23 +10,6 @@ export interface BuildUrlOptions {
 }
 
 /**
- * 基本的な画像サイズ・品質プリセット
- */
-export const IMAGE_PRESETS = {
-  thumbnail: { w: 150, h: 150, mode: 'fill' as const, quality: 80 as const },
-  small: { w: 300, mode: 'fit' as const, quality: 85 as const },
-  medium: { w: 600, mode: 'fit' as const, quality: 90 as const },
-  large: { w: 1200, mode: 'fit' as const, quality: 90 as const },
-  xlarge: { w: 1800, mode: 'fit' as const, quality: 90 as const },
-  social: { w: 1200, h: 630, mode: 'fill' as const, quality: 85 as const },
-
-  // 記事専用プリセット
-  blogContent: { w: 1600, mode: 'fit' as const, quality: 90 as const },
-  blogCover: { w: 1200, mode: 'fit' as const, quality: 90 as const },
-  blogThumbnail: { w: 400, mode: 'fit' as const, quality: 85 as const },
-} as const;
-
-/**
  * Cloudinary画像URLを生成
  */
 export function buildUrl(cloudName: string, publicId: string, opts: BuildUrlOptions): string {

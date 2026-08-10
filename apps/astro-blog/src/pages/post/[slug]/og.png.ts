@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import path from 'node:path';
 import { generatePostOgpPng } from '@estrivault/og-image-generator';
-import { getCategoryLabel, SITE_TITLE, SITE_URL } from '$constants';
+import { getCategoryLabel } from '$constants';
 import { getAllPostsMeta } from '$lib/content';
 
 const ogpCacheDir = path.join(process.cwd(), 'node_modules', '.astro', 'og-image-cache');
@@ -27,9 +27,6 @@ export const GET: APIRoute = async ({ params }) => {
       title: post.title,
       category: getCategoryLabel(post.category || 'meta'),
       publishedAt: post.publishedAt,
-      slug: post.slug,
-      siteTitle: SITE_TITLE,
-      siteUrl: SITE_URL,
     },
     { cacheDir: ogpCacheDir },
   );

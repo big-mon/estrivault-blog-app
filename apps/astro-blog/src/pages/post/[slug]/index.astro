@@ -4,8 +4,9 @@ import EditorialFooter from '$components/EditorialFooter.astro';
 import EditorialMasthead from '$components/EditorialMasthead.astro';
 import { getCategoryLabel, SITE_TITLE, SITE_URL, SOCIAL_LINK_X } from '$constants';
 import { getAllPostsMeta, getPostBySlug } from '$lib/content';
+import { formatEditorialDate } from '$lib/format-date';
 import { getPostOgpImageUrl } from '$lib/og';
-import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments';
+import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments.mjs';
 
 export async function getStaticPaths() {
   const allPosts = await getAllPostsMeta();
@@ -35,15 +36,8 @@ const title = `${post.meta.title} | ${SITE_TITLE}`;
 const description = post.meta.description || `${post.meta.title}についての記事です。`;
 const categoryLabel = getCategoryLabel(post.meta.category);
 const ogImage = getPostOgpImageUrl(post.meta.slug);
-const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
-  timeZone: 'Asia/Tokyo',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-});
-const publishedDate = dateFormatter.format(post.meta.publishedAt).replace(/\//g, '.');
-const updatedDate =
-  post.meta.updatedAt ? dateFormatter.format(post.meta.updatedAt).replace(/\//g, '.') : undefined;
+const publishedDate = formatEditorialDate(post.meta.publishedAt);
+const updatedDate = post.meta.updatedAt ? formatEditorialDate(post.meta.updatedAt) : undefined;
 const readingTime =
   post.meta.readingTime ? `${Math.ceil(post.meta.readingTime)} min` : 'FIELD NOTE';
 const articleSourcePath = post.originalPath ?? '';
@@ -426,9 +420,6 @@ const schemaData = {
     padding: 0;
   }
   .article-page {
-    --font-display: 'Times New Roman', serif;
-    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
-    --font-meta: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
     min-height: 100vh;
     padding: clamp(1rem, 2vw, 2rem);
     color: #111;

@@ -1,5 +1,6 @@
 ---
 import type { NoteHTML, NoteMeta } from '$lib/content';
+import { formatEditorialDate } from '$lib/format-date';
 
 interface Props {
   note: NoteHTML;
@@ -8,23 +9,7 @@ interface Props {
 }
 
 const { note, relatedNotes = [], variant = 'page' } = Astro.props;
-const dateString = new Intl.DateTimeFormat('ja-JP', {
-  timeZone: 'Asia/Tokyo',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-})
-  .format(note.meta.publishedAt)
-  .replace(/\//g, '.');
-const formatDate = (date: Date) =>
-  new Intl.DateTimeFormat('ja-JP', {
-    timeZone: 'Asia/Tokyo',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
-    .format(date)
-    .replace(/\//g, '.');
+const dateString = formatEditorialDate(note.meta.publishedAt);
 const titleId = `note-title-${note.meta.slug.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 const pageUrl = `/notes/${encodeURIComponent(note.meta.slug)}`;
 ---
@@ -65,7 +50,7 @@ const pageUrl = `/notes/${encodeURIComponent(note.meta.slug)}`;
         <div>
           {relatedNotes.map((related) => (
             <a href={`/notes/${encodeURIComponent(related.slug)}`}>
-              <span>{formatDate(related.publishedAt)}</span>
+              <span>{formatEditorialDate(related.publishedAt)}</span>
               <strong>{related.title}</strong>
             </a>
           ))}
@@ -85,9 +70,6 @@ const pageUrl = `/notes/${encodeURIComponent(note.meta.slug)}`;
 
 <style>
   .note-detail {
-    --font-display: 'Times New Roman', serif;
-    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
-    --font-meta: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
     color: #111;
     font-family: var(--font-body);
   }

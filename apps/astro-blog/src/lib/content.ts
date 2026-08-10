@@ -9,7 +9,7 @@ import {
   type PostMeta,
   type ProcessorOptions,
 } from '@estrivault/content-processor';
-import { getSlugFromMarkdownPath } from './url-segments';
+import { getSlugFromMarkdownPath } from './url-segments.mjs';
 
 export interface PaginatedPosts {
   posts: PostMeta[];
@@ -30,7 +30,6 @@ export interface NoteMeta {
 export interface NoteHTML {
   meta: NoteMeta;
   html: string;
-  originalPath?: string;
 }
 
 function getOgpMetadataStore(): OgpMetadataStore {
@@ -250,11 +249,7 @@ function extractNoteMeta(filePath: string, content: string): NoteMeta | null {
   return meta;
 }
 
-async function extractFrontmatterOnly(
-  filePath: string,
-  content: string,
-  options: ProcessorOptions = defaultProcessorOptions,
-): Promise<PostMeta | null> {
+async function extractFrontmatterOnly(filePath: string, content: string): Promise<PostMeta | null> {
   const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!frontmatterMatch) {
     throw new Error(`Frontmatter block is missing: ${filePath}`);
@@ -269,7 +264,7 @@ async function extractFrontmatterOnly(
     }
 
     const slug = getSlugFromMarkdownPath(filePath);
-    const meta = await extractMetadata(content, options, slug);
+    const meta = await extractMetadata(content, defaultProcessorOptions, slug);
 
     if (meta.draft) {
       return null;
@@ -283,29 +278,21 @@ async function extractFrontmatterOnly(
   }
 }
 
-export async function getAllPostsMeta(
-  options: ProcessorOptions = defaultProcessorOptions,
-): Promise<PostMeta[]> {
-  return (await getPostIndex(options)).meta;
+export async function getAllPostsMeta(): Promise<PostMeta[]> {
+  return (await getPostIndex()).meta;
 }
 
-async function getPostIndex(
-  options: ProcessorOptions = defaultProcessorOptions,
-): Promise<ContentIndex<PostMeta>> {
-  if (options === defaultProcessorOptions) {
-    postIndexPromise ??= loadPostIndex(options);
-    return postIndexPromise;
-  }
-
-  return loadPostIndex(options);
+async function getPostIndex(): Promise<ContentIndex<PostMeta>> {
+  postIndexPromise ??= loadPostIndex();
+  return postIndexPromise;
 }
 
-async function loadPostIndex(options: ProcessorOptions): Promise<ContentIndex<PostMeta>> {
+async function loadPostIndex(): Promise<ContentIndex<PostMeta>> {
   return createContentIndex({
     markdownFiles: getMarkdownFiles(),
     contentRoot: 'content/blog/',
     emptySlugSubject: 'Post',
-    extractMeta: (filePath, content) => extractFrontmatterOnly(filePath, content, options),
+    extractMeta: extractFrontmatterOnly,
     sortMeta: (a, b) => b.publishedAt.getTime() - a.publishedAt.getTime(),
   });
 }
@@ -330,10 +317,7 @@ async function loadNoteIndex(): Promise<ContentIndex<NoteMeta>> {
   });
 }
 
-export async function getNoteBySlug(
-  slug: string,
-  options: ProcessorOptions = defaultProcessorOptions,
-): Promise<NoteHTML | null> {
+export async function getNoteBySlug(slug: string): Promise<NoteHTML | null> {
   const noteIndex = await getNoteIndex();
   const source = noteIndex.bySlug.get(slug);
 
@@ -341,27 +325,25 @@ export async function getNoteBySlug(
     return null;
   }
 
-  return processNoteSource(source, options);
+  return processNoteSource(source);
 }
 
-export async function getAllNotes(
-  options: ProcessorOptions = defaultProcessorOptions,
-): Promise<NoteHTML[]> {
+export async function getAllNotes(): Promise<NoteHTML[]> {
   const noteIndex = await getNoteIndex();
 
-  return Promise.all(noteIndex.sources.map((source) => processNoteSource(source, options)));
+  return Promise.all(noteIndex.sources.map(processNoteSource));
 }
 
-async function processNoteSource(
-  source: ContentSource<NoteMeta>,
-  options: ProcessorOptions,
-): Promise<NoteHTML> {
+async function processNoteSource(source: ContentSource<NoteMeta>): Promise<NoteHTML> {
   try {
-    const processed = await processMarkdown(source.content, options, source.meta.slug);
+    const processed = await processMarkdown(
+      source.content,
+      defaultProcessorOptions,
+      source.meta.slug,
+    );
     return {
       meta: source.meta,
       html: processed.html,
-      originalPath: source.originalPath,
     };
   } catch (error) {
     throw new Error(
@@ -459,11 +441,8 @@ export async function getPosts(options?: {
   return getPaginatedPosts(await getAllPostsMeta(), options);
 }
 
-export async function getPostBySlug(
-  slug: string,
-  options: ProcessorOptions = defaultProcessorOptions,
-): Promise<PostHTML | null> {
-  const postIndex = await getPostIndex(options);
+export async function getPostBySlug(slug: string): Promise<PostHTML | null> {
+  const postIndex = await getPostIndex();
   const source = postIndex.bySlug.get(slug);
 
   if (!source) {
@@ -471,7 +450,7 @@ export async function getPostBySlug(
   }
 
   try {
-    const post = await processMarkdown(source.content, options, source.meta.slug);
+    const post = await processMarkdown(source.content, defaultProcessorOptions, source.meta.slug);
     post.originalPath = source.originalPath;
     return post;
   } catch (error) {
@@ -482,22 +461,4 @@ export async function getPostBySlug(
       },
     );
   }
-}
-
-export async function getAllCategories(): Promise<string[]> {
-  const allPosts = await getAllPostsMeta();
-  return [...new Set(allPosts.map((post) => post.category))].sort((a, b) => a.localeCompare(b));
-}
-
-export async function getAllTags(): Promise<string[]> {
-  const allPosts = await getAllPostsMeta();
-  const tagSet = new Set<string>();
-
-  allPosts.forEach((post) => {
-    post.tags.forEach((tag) => {
-      tagSet.add(tag);
-    });
-  });
-
-  return [...tagSet].sort((a, b) => a.localeCompare(b));
 }

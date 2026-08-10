@@ -1,19 +1,13 @@
 import type { APIRoute } from 'astro';
 import type { PostMeta } from '@estrivault/content-processor';
 import { POSTS_PER_PAGE, SITE_URL } from '$constants';
-import {
-  getAllCategories,
-  getAllNotesMeta,
-  getAllPostsMeta,
-  getAllTags,
-  getPosts,
-} from '$lib/content';
+import { getAllNotesMeta, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
 import {
   encodeRouteSegment,
   getArchivePageUrl,
   getCategoryRouteSegment,
   getTagRouteSegment,
-} from '$lib/url-segments';
+} from '$lib/url-segments.mjs';
 
 export const prerender = true;
 
@@ -41,11 +35,13 @@ export const GET: APIRoute = async () => {
   </url>`);
   }
 
-  const categories = await getAllCategories();
+  const categories = [...new Set(posts.map((post) => post.category))].sort((a, b) =>
+    a.localeCompare(b),
+  );
   const categoryUrls: string[] = [];
 
   for (const category of categories) {
-    const categoryPosts = await getPosts({ category, perPage: POSTS_PER_PAGE });
+    const categoryPosts = getPaginatedPosts(posts, { category, perPage: POSTS_PER_PAGE });
     const encodedCategory = encodeRouteSegment(getCategoryRouteSegment(category));
 
     for (let page = 1; page <= categoryPosts.totalPages; page++) {
@@ -57,11 +53,11 @@ export const GET: APIRoute = async () => {
     }
   }
 
-  const tags = await getAllTags();
+  const tags = [...new Set(posts.flatMap((post) => post.tags))].sort((a, b) => a.localeCompare(b));
   const tagUrls: string[] = [];
 
   for (const tag of tags) {
-    const tagPosts = await getPosts({ tag, perPage: POSTS_PER_PAGE });
+    const tagPosts = getPaginatedPosts(posts, { tag, perPage: POSTS_PER_PAGE });
     const encodedTag = encodeRouteSegment(getTagRouteSegment(tag));
 
     for (let page = 1; page <= tagPosts.totalPages; page++) {

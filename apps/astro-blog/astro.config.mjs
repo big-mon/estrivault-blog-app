@@ -2,6 +2,14 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
 
+const externalDependencies = [
+  '@estrivault/og-image-generator',
+  '@resvg/resvg-js',
+  '@resvg/resvg-js-linux-x64-gnu',
+  '@resvg/resvg-js-linux-x64-musl',
+  '@resvg/resvg-js-win32-x64-msvc',
+];
+
 export default defineConfig({
   output: 'static',
   trailingSlash: 'ignore',
@@ -12,23 +20,11 @@ export default defineConfig({
     },
     build: {
       rollupOptions: {
-        external: [
-          '@estrivault/og-image-generator',
-          '@resvg/resvg-js',
-          '@resvg/resvg-js-linux-x64-gnu',
-          '@resvg/resvg-js-linux-x64-musl',
-          '@resvg/resvg-js-win32-x64-msvc',
-        ],
+        external: externalDependencies,
       },
     },
     ssr: {
-      external: [
-        '@estrivault/og-image-generator',
-        '@resvg/resvg-js',
-        '@resvg/resvg-js-linux-x64-gnu',
-        '@resvg/resvg-js-linux-x64-musl',
-        '@resvg/resvg-js-win32-x64-msvc',
-      ],
+      external: externalDependencies,
     },
     resolve: {
       alias: {

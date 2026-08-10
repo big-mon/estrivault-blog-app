@@ -2,7 +2,7 @@
 
 `estrivault-blog-app` の Markdown コンテンツを HTML に変換するワークスペース内パッケージです。
 
-ブログ記事とノートの本文処理を担い、frontmatter、カスタム埋め込み、画像・リンク変換、見出し抽出、読了時間の算出をまとめて扱います。このパッケージはリポジトリ管理下の Markdown を前提にしています。実装方針や trust boundary の詳細はルートの `AGENTS.md` を参照してください。
+ブログ記事とノートの本文処理を担い、frontmatter、カスタム埋め込み、画像・リンク変換、見出し抽出、読了時間の算出をまとめて扱います。このパッケージはリポジトリ管理下の Markdown を前提にしています。実装方針や trust boundary の詳細はルートの [AGENTS.md](../../AGENTS.md) を参照してください。
 
 ## 主な役割
 
@@ -22,9 +22,6 @@
 
 - `parseFrontmatter(markdown)`:
   frontmatter と本文を分離します。
-
-- `createPipeline(options, enableSyntaxHighlight)`:
-  unified/remark/rehype の変換パイプラインを直接作成します。
 
 - `normalizeForSlug(value)` / `normalizeForTagFilter(value)`:
   ルーティングやタグ絞り込み用に文字列を正規化します。

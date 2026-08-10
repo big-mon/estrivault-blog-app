@@ -1,10 +1,3 @@
-export interface EmbedOptions {
-  youtube?: boolean;
-  twitter?: boolean;
-  github?: boolean;
-  amazon?: boolean;
-}
-
 export type OgpMode = 'cache-only' | 'fetch' | 'disabled';
 
 export type OgpMetadataSource = 'fetch' | 'manual' | 'fallback';
@@ -34,13 +27,10 @@ export interface OgpMetadataStore {
 export interface OgpOptions {
   mode?: OgpMode;
   metadataStore?: OgpMetadataStore;
-  forceRefresh?: boolean;
 }
 
 export interface ProcessorOptions {
-  embeds?: EmbedOptions;
   cloudinaryCloudName?: string;
-  imageBase?: string;
   ogp?: OgpOptions;
 }
 

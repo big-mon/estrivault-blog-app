@@ -1,39 +1,13 @@
 ---
-import type { PostMeta } from '@estrivault/content-processor';
 import BaseLayout from '$layouts/BaseLayout.astro';
 import ArchiveListing from '$components/ArchiveListing.astro';
 import { POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
+import { getArchiveTagStats } from '$lib/archive-tags';
 import { filterPosts, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
-import { encodeRouteSegment, getArchivePageUrl, getTagRouteSegment } from '$lib/url-segments';
+import { encodeRouteSegment, getArchivePageUrl, getTagRouteSegment } from '$lib/url-segments.mjs';
 
 interface Props {
   tag: string;
-}
-
-function getTopTags(posts: PostMeta[], excludedTag: string): string[] {
-  const tagCounts = new Map<string, { tag: string; count: number }>();
-
-  for (const post of posts) {
-    for (const tag of post.tags) {
-      if (tag === excludedTag) {
-        continue;
-      }
-
-      const current = tagCounts.get(tag) ?? { tag, count: 0 };
-      current.count += 1;
-      tagCounts.set(tag, current);
-    }
-  }
-
-  return [...tagCounts.values()]
-    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
-    .slice(0, 5)
-    .map((item) => item.tag);
-}
-
-function getTagCount(posts: PostMeta[], excludedTag: string): number {
-  return new Set(posts.flatMap((post) => post.tags).filter((postTag) => postTag !== excludedTag))
-    .size;
 }
 
 export async function getStaticPaths() {
@@ -70,8 +44,7 @@ const result = getPaginatedPosts(archivePosts, {
   page: currentPage,
   perPage: POSTS_PER_PAGE,
 });
-const topTags = getTopTags(archivePosts, tag);
-const tagCount = getTagCount(archivePosts, tag);
+const { topTags, uniqueTagCount } = getArchiveTagStats(archivePosts, tag);
 
 const siteBase = SITE_URL.replace(/\/$/, '');
 const tagRouteSegment = String(Astro.params.tag ?? getTagRouteSegment(tag));
@@ -115,7 +88,7 @@ const nextUrl =
       { label: 'TYPE', value: 'TAG' },
       { label: 'TAG', value: tag },
       { label: 'ARTICLES', value: result.total },
-      { label: 'TAGS', value: tagCount },
+      { label: 'TAGS', value: uniqueTagCount },
     ]}
     emptyMessage="このタグにはまだ記事がありません。"
   />

@@ -201,22 +201,17 @@ async function fetchWithStrategy(
       ...additionalHeaders,
     };
 
-    // ソーシャルメディアボットの場合はよりシンプルなヘッダー
-    if (userAgent.includes('bot') || userAgent.includes('Bot')) {
-      return await fetch(url, {
-        method: 'GET',
-        headers: {
+    const headers =
+      userAgent.includes('bot') || userAgent.includes('Bot') ?
+        {
           'User-Agent': userAgent,
           Accept: 'text/html',
-        },
-        signal: controller.signal,
-      });
-    }
+        }
+      : baseHeaders;
 
-    // 通常のブラウザの場合はリアルなヘッダー
     return await fetch(url, {
       method: 'GET',
-      headers: baseHeaders,
+      headers,
       signal: controller.signal,
     });
   } finally {
@@ -355,7 +350,7 @@ export async function fetchOgpMetadata(
   }
 
   const storedMetadata = getStoredMetadata(url, options);
-  if (storedMetadata && (mode === 'cache-only' || !options.forceRefresh)) {
+  if (storedMetadata) {
     return storedMetadata;
   }
 
@@ -363,7 +358,7 @@ export async function fetchOgpMetadata(
     return createFallbackMetadata(url);
   }
 
-  if (ogpCache.has(url) && !options.forceRefresh) {
+  if (ogpCache.has(url)) {
     return ogpCache.get(url) || null;
   }
 

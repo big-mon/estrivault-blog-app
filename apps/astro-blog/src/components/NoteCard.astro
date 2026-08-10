@@ -1,5 +1,6 @@
 ---
 import type { NoteMeta } from '$lib/content';
+import { formatEditorialDate } from '$lib/format-date';
 
 interface Props {
   note: NoteMeta;
@@ -7,27 +8,11 @@ interface Props {
 }
 
 const { note, compact = false } = Astro.props;
-const dateString = new Intl.DateTimeFormat('ja-JP', {
-  timeZone: 'Asia/Tokyo',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-})
-  .format(note.publishedAt)
-  .replace(/\//g, '.');
+const dateString = formatEditorialDate(note.publishedAt);
 const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
-const tagList = note.tags.join(' ');
 ---
 
-<a
-  class:list={['note-card', compact && 'note-card--compact']}
-  href={noteUrl}
-  data-note-card-link
-  data-note-slug={note.slug}
-  data-note-tags={tagList}
-  data-note-title={note.title}
-  data-note-excerpt={note.excerpt}
->
+<a class:list={['note-card', compact && 'note-card--compact']} href={noteUrl} data-note-card-link>
   <article>
     <header class="note-card-header">
       <span>Note</span>
@@ -81,7 +66,7 @@ const tagList = note.tags.join(' ');
   .note-card-more,
   .note-card-header,
   .note-card-tags {
-    font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-family: var(--font-meta);
     font-style: normal;
   }
 
@@ -112,7 +97,7 @@ const tagList = note.tags.join(' ');
   h3 {
     margin: 1rem 0 0;
     color: #111;
-    font-family: 'Times New Roman', serif;
+    font-family: var(--font-display);
     font-size: 1.55rem;
     font-weight: 400;
     line-height: 1.2;

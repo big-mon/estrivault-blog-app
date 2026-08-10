@@ -4,7 +4,7 @@ import Pagination from '$components/Pagination.astro';
 import PostCard from '$components/PostCard.astro';
 import { POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
 import { getPosts } from '$lib/content';
-import { getArchivePageUrl } from '$lib/url-segments';
+import { getArchivePageUrl } from '$lib/url-segments.mjs';
 
 export async function getStaticPaths() {
   const allPosts = await getPosts({ perPage: POSTS_PER_PAGE });
@@ -24,8 +24,7 @@ const pageTitle = `記事一覧 - ページ${currentPage} | ${SITE_TITLE}`;
 const pageDescription = `${SITE_TITLE}の記事一覧ページ${currentPage}です。技術記事やプログラミング情報を探すことができます。`;
 const siteBase = SITE_URL.replace(/\/$/, '');
 const pageUrl = getArchivePageUrl(siteBase, '/', currentPage);
-const prevUrl =
-  currentPage > 1 ? getArchivePageUrl(siteBase, '/', currentPage - 1) : undefined;
+const prevUrl = currentPage > 1 ? getArchivePageUrl(siteBase, '/', currentPage - 1) : undefined;
 const nextUrl =
   currentPage < result.totalPages ? getArchivePageUrl(siteBase, '/', currentPage + 1) : undefined;
 ---
