@@ -26,8 +26,7 @@ const latestPosts = featuredPost ? pageData.posts.slice(1, 5) : pageData.posts.s
 
 const categoryRows = Object.entries(CATEGORY_META)
   .filter(([slug]) => slug !== 'meta')
-  .map(([slug, category], index) => ({
-    id: String(index + 1).padStart(2, '0'),
+  .map(([slug, category]) => ({
     slug,
     label: category.label,
     description: category.description,
@@ -43,15 +42,14 @@ const archiveStats = {
 };
 
 const seriesCards = [
-  { id: '01', title: 'EDGAR / XBRL', desc: 'SEC書類とAPIを読み解く', tag: 'EDGAR' },
+  { title: 'EDGAR / XBRL', desc: 'SEC書類とAPIを読み解く', tag: 'EDGAR' },
   {
-    id: '02',
     title: 'Stable Diffusion',
     desc: '生成画像とモデル運用',
     tag: 'Stable Diffusion',
   },
-  { id: '03', title: 'Stock Analysis', desc: '個別銘柄と業界の深掘り', tag: '銘柄分析' },
-  { id: '04', title: 'Gear Reviews', desc: '装備・機材の使用感レビュー', tag: 'レビュー' },
+  { title: 'Stock Analysis', desc: '個別銘柄と業界の深掘り', tag: '銘柄分析' },
+  { title: 'Gear Reviews', desc: '装備・機材の使用感レビュー', tag: 'レビュー' },
 ].map((card) => ({
   ...card,
   href: getArchivePagePath(`/tag/${encodeRouteSegment(getTagRouteSegment(card.tag))}`, 1),
@@ -108,7 +106,6 @@ const seriesCards = [
         {
           categoryRows.map((category) => (
             <a class="table-row" href={category.href}>
-              <span class="no">{category.id}</span>
               <span class="name">{category.label}</span>
               <span class="desc">{category.description}</span>
             </a>
@@ -172,7 +169,6 @@ const seriesCards = [
         {
           seriesCards.map((card) => (
             <a class="series-card" href={card.href}>
-              <p>{card.id}</p>
               <h4>{card.title}</h4>
               <p>{card.desc}</p>
             </a>
@@ -312,8 +308,8 @@ const seriesCards = [
   }
   .table-row {
     display: grid;
-    grid-template-columns: 52px minmax(0, 1fr);
-    gap: 0.35rem 1rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
     align-content: start;
     padding: 1rem 0;
     border-top: 1px solid #aaa;
@@ -333,11 +329,6 @@ const seriesCards = [
   .series-card:hover h4 {
     color: #d6452a;
   }
-  .no {
-    font-family: var(--font-meta);
-    font-style: normal;
-    color: #d6452a;
-  }
   .name {
     font-family: var(--font-display);
     font-size: 1.45rem;
@@ -345,7 +336,6 @@ const seriesCards = [
     transition: color 120ms ease;
   }
   .desc {
-    grid-column: 2 / -1;
     color: #666;
     line-height: 1.65;
   }
@@ -507,13 +497,8 @@ const seriesCards = [
     font-size: 2rem;
     font-weight: 400;
     line-height: 1.15;
-    margin: 0.5rem 0;
+    margin: 0 0 0.5rem;
     transition: color 120ms ease;
-  }
-  .series-card p:first-child {
-    font-family: var(--font-meta);
-    color: #d6452a;
-    font-style: normal;
   }
   @media (max-width: 900px) {
     .editorial-home {
@@ -548,19 +533,14 @@ const seriesCards = [
     .table-like {
       grid-template-columns: 1fr;
     }
-    .table-row {
-      grid-template-columns: 56px 1fr;
-      gap: 0.5rem;
-    }
+
     .table-row:nth-child(odd),
     .table-row:nth-child(even) {
       border-right: 0;
       padding-right: 0;
       padding-left: 0;
     }
-    .desc {
-      grid-column: 2;
-    }
+
     .name {
       font-size: 1.6rem;
     }

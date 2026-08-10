@@ -5,17 +5,15 @@ import { formatEditorialDate } from '$lib/format-date';
 
 interface Props {
   post: PostMeta;
-  displayNumber: number;
 }
 
-const { post, displayNumber } = Astro.props;
+const { post } = Astro.props;
 
 const formattedDate = formatEditorialDate(post.publishedAt);
 ---
 
 <article>
   <a href={`/post/${post.slug}`} class="post-row">
-    <span class="post-number">{String(displayNumber).padStart(2, '0')}</span>
     <span class="post-copy">
       <span class="post-date">
         <time datetime={post.publishedAt.toISOString()}>{formattedDate}</time>
@@ -40,7 +38,7 @@ const formattedDate = formatEditorialDate(post.publishedAt);
 <style>
   .post-row {
     display: grid;
-    grid-template-columns: 64px minmax(0, 1fr) 112px;
+    grid-template-columns: minmax(0, 1fr) 112px;
     gap: 1rem;
     align-items: center;
     min-height: 156px;
@@ -52,13 +50,11 @@ const formattedDate = formatEditorialDate(post.publishedAt);
   .post-row:hover .post-title {
     color: #d6452a;
   }
-  .post-number,
   .post-date,
   .post-tags {
     font-family: var(--font-meta);
     font-style: normal;
   }
-  .post-number,
   .post-date time {
     color: #d6452a;
   }
@@ -73,10 +69,7 @@ const formattedDate = formatEditorialDate(post.publishedAt);
     color: #222;
     font-size: 0.86rem;
   }
-  .post-number {
-    font-size: 1rem;
-    line-height: 1.2;
-  }
+
   .post-copy {
     flex-direction: column;
     min-width: 0;
@@ -109,7 +102,6 @@ const formattedDate = formatEditorialDate(post.publishedAt);
     line-height: 1.1;
   }
   .post-image {
-    grid-column: 3;
     display: block;
     width: 112px;
     aspect-ratio: 4/3;
@@ -123,15 +115,11 @@ const formattedDate = formatEditorialDate(post.publishedAt);
   }
   @media (max-width: 900px) {
     .post-row {
-      grid-template-columns: 56px minmax(0, 1fr) 72px;
+      grid-template-columns: minmax(0, 1fr) 72px;
       gap: 0.75rem;
       min-height: 0;
     }
-    .post-copy {
-      grid-column: 2;
-    }
     .post-image {
-      grid-column: 3;
       grid-row: 1 / span 3;
       width: 72px;
     }
