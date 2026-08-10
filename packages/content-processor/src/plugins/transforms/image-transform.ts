@@ -6,24 +6,13 @@ import { buildUrl, buildSrcSet, type BuildUrlOptions } from '@estrivault/cloudin
 export interface ImageTransformOptions {
   /** Cloudinaryクラウド名（必須） */
   cloudinaryCloudName: string;
-  /** 画像幅 */
-  width?: number;
-  /** 画像のトリミングモード */
-  mode?: 'fit' | 'fill';
-  /** 画像品質設定 */
-  quality?: number | 'auto' | 'eco' | 'low';
 }
 
 /**
  * 画像パスをCloudinary CDN URLに変換するrehypeプラグイン
  */
 export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> = (options) => {
-  const {
-    cloudinaryCloudName,
-    width = 1200,
-    quality = 90,
-    mode: defaultMode = 'fit',
-  } = options || {};
+  const { cloudinaryCloudName } = options || {};
 
   if (!cloudinaryCloudName?.trim()) {
     throw new Error('cloudinaryCloudName is required for rehypeImageTransform');
@@ -59,11 +48,13 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
 
         // Cloudinary URLを生成
         const mode =
-          (node.properties['data-mode'] as string) === 'fill' ? ('fill' as const) : defaultMode;
+          (node.properties['data-mode'] as string) === 'fill' ?
+            ('fill' as const)
+          : ('fit' as const);
         const buildOptions: BuildUrlOptions = {
-          w: width,
+          w: 1200,
           mode,
-          quality,
+          quality: 90,
         };
 
         node.properties.src = buildUrl(normalizedCloudinaryCloudName, publicId, buildOptions);

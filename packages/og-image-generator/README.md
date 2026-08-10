@@ -27,26 +27,9 @@ const png = await generatePostOgpPng({
   title: 'SvelteKitで作るGitHubコントリビューター表示コンポーネント',
   category: 'Tech',
   publishedAt: new Date('2025-06-24T12:00:00.000Z'),
-  slug: 'svelte-github-contributors-component-implementation',
-  siteTitle: 'Estrilda',
-  siteUrl: 'https://estrilda.damonge.com/',
 });
 
 await writeFile('post-ogp.png', png);
-```
-
-### タイトルレイアウトだけを確認する
-
-```typescript
-import { layoutPostOgpTitle } from '@estrivault/og-image-generator';
-
-const layout = layoutPostOgpTitle(
-  'これは非常に長い記事タイトルであり、三行に収まりきらないケースを確認するためのサンプルです。',
-);
-
-console.log(layout.lines);
-console.log(layout.fontSize);
-console.log(layout.truncated);
 ```
 
 ## API
@@ -60,15 +43,8 @@ interface PostOgpCardData {
   title: string;
   category: string;
   publishedAt: Date | string;
-  slug: string;
-  siteTitle: string;
-  siteUrl: string;
 }
 ```
-
-### `layoutPostOgpTitle(title)`
-
-タイトル文字数に応じて、フォントサイズ、行高、改行位置を決定します。長すぎる場合は 3 行以内に収め、末尾に省略記号を付けます。
 
 ## 開発
 

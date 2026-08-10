@@ -4,7 +4,7 @@ import ArchivePagination from '$components/ArchivePagination.astro';
 import ArchivePostRow from '$components/ArchivePostRow.astro';
 import EditorialFooter from '$components/EditorialFooter.astro';
 import EditorialMasthead from '$components/EditorialMasthead.astro';
-import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments';
+import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments.mjs';
 
 interface ArchiveMeta {
   label: string;
@@ -125,9 +125,6 @@ const visibleTopTags = topTags.slice(0, 5);
     padding: 0;
   }
   .archive-page {
-    --font-display: 'Times New Roman', serif;
-    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
-    --font-meta: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
     min-height: 100vh;
     color: #111;
     background: #f1eee7;

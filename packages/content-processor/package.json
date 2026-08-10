@@ -17,8 +17,7 @@
     "clean": "rimraf dist",
     "build:types": "tsc --build",
     "build:bundle": "tsup",
-    "build": "pnpm run build:types && pnpm run build:bundle",
-    "rebuild": "pnpm run clean && pnpm run build"
+    "build": "pnpm run build:types && pnpm run build:bundle"
   },
   "dependencies": {
     "@estrivault/cloudinary-utils": "workspace:^",

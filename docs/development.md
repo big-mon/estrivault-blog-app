@@ -5,7 +5,7 @@ in `package.json` files are authoritative; inspect them before changing command 
 
 ## Setup
 
-The repository pins `pnpm@10.13.1` in the root `packageManager` field. It has no root
+The repository pins pnpm in the root `packageManager` field. It has no root
 `engines.node` support declaration, while the locked Astro 7.1.3 package requires Node `>=22.12.0`.
 GitHub Actions uses Node 22.x; use a current Node 22 release to satisfy both constraints locally.
 
@@ -15,22 +15,20 @@ pnpm --filter astro-blog run setup:e2e # only when local Chromium E2E is require
 ```
 
 Installation runs `postinstall`, which builds `@estrivault/cloudinary-utils`,
-`@estrivault/content-processor`, and `@estrivault/og-image-generator`. Without global pnpm, use the
-pinned executable, for example `npx --yes pnpm@10.13.1 install`.
+`@estrivault/content-processor`, and `@estrivault/og-image-generator`. Without global pnpm, invoke the
+root-pinned executable with `npx --yes "$(node -p "require('./package.json').packageManager")" install`.
 
 ## Local development and builds
 
 ```bash
 pnpm dev
-pnpm validate:workspace
 pnpm build
 pnpm --filter astro-blog preview
 ```
 
-`pnpm dev` validates the workspace, builds missing package outputs, then starts package watchers and
-Astro. `validate:workspace` checks that all three packages and their `dist` directories exist; it is
-a setup check, not a source correctness test. The development watchers cover `cloudinary-utils` and
-`og-image-generator`, but not `content-processor`; rebuild `content-processor` after changing it.
+`pnpm dev` builds all three packages, then starts watchers for `cloudinary-utils` and
+`og-image-generator` alongside Astro. `content-processor` is not watched; rebuild it after changing
+it.
 
 `pnpm build` incrementally builds all packages, generates Cloudflare redirect rules, and builds the
 Astro static output. `wrangler.toml` uses this root command and publishes `apps/astro-blog/dist`.
@@ -75,7 +73,8 @@ relevant Astro check, build, or E2E coverage for consumer-visible changes.
 
 ## Local checks versus GitHub Actions
 
-Pull-request CI uses Node 22.x and pnpm 10.13.1. After a frozen install, it runs exactly Astro lint,
+Pull-request CI uses Node 22.x and the pnpm version pinned by root `packageManager`. After a frozen
+install, it runs exactly Astro lint,
 Astro check, Playwright Chromium setup, and the full Astro E2E suite. It does not directly run root
 lint, root format check, `pnpm type-check`, or the OGP unit tests. Run omitted checks locally when
 their ownership area changes. A local pass does not prove GitHub Actions passed.

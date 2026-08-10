@@ -1,5 +1,6 @@
 ---
 import type { NoteMeta } from '$lib/content';
+import { formatEditorialDate } from '$lib/format-date';
 
 interface Props {
   note: NoteMeta;
@@ -7,14 +8,7 @@ interface Props {
 }
 
 const { note, compact = false } = Astro.props;
-const dateString = new Intl.DateTimeFormat('ja-JP', {
-  timeZone: 'Asia/Tokyo',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-})
-  .format(note.publishedAt)
-  .replace(/\//g, '.');
+const dateString = formatEditorialDate(note.publishedAt);
 const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
 ---
 

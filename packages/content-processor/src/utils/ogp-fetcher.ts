@@ -201,22 +201,17 @@ async function fetchWithStrategy(
       ...additionalHeaders,
     };
 
-    // ソーシャルメディアボットの場合はよりシンプルなヘッダー
-    if (userAgent.includes('bot') || userAgent.includes('Bot')) {
-      return await fetch(url, {
-        method: 'GET',
-        headers: {
+    const headers =
+      userAgent.includes('bot') || userAgent.includes('Bot') ?
+        {
           'User-Agent': userAgent,
           Accept: 'text/html',
-        },
-        signal: controller.signal,
-      });
-    }
+        }
+      : baseHeaders;
 
-    // 通常のブラウザの場合はリアルなヘッダー
     return await fetch(url, {
       method: 'GET',
-      headers: baseHeaders,
+      headers,
       signal: controller.signal,
     });
   } finally {

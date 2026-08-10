@@ -1,34 +1,13 @@
 ---
-import type { PostMeta } from '@estrivault/content-processor';
 import BaseLayout from '$layouts/BaseLayout.astro';
 import ArchiveListing from '$components/ArchiveListing.astro';
 import { getCategoryMeta, POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
+import { getArchiveTagStats } from '$lib/archive-tags';
 import { filterPosts, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
-import { getArchivePageUrl, getCategoryRouteSegment } from '$lib/url-segments';
+import { getArchivePageUrl, getCategoryRouteSegment } from '$lib/url-segments.mjs';
 
 interface Props {
   category: string;
-}
-
-function getTopTags(posts: PostMeta[]): string[] {
-  const tagCounts = new Map<string, { tag: string; count: number }>();
-
-  for (const post of posts) {
-    for (const tag of post.tags) {
-      const current = tagCounts.get(tag) ?? { tag, count: 0 };
-      current.count += 1;
-      tagCounts.set(tag, current);
-    }
-  }
-
-  return [...tagCounts.values()]
-    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
-    .slice(0, 5)
-    .map((item) => item.tag);
-}
-
-function getTagCount(posts: PostMeta[]): number {
-  return new Set(posts.flatMap((post) => post.tags)).size;
 }
 
 export async function getStaticPaths() {
@@ -66,8 +45,7 @@ const result = getPaginatedPosts(archivePosts, {
   page: currentPage,
   perPage: POSTS_PER_PAGE,
 });
-const topTags = getTopTags(archivePosts);
-const tagCount = getTagCount(archivePosts);
+const { topTags, uniqueTagCount } = getArchiveTagStats(archivePosts);
 
 const siteBase = SITE_URL.replace(/\/$/, '');
 const routeBase = `/category/${Astro.params.category}`;
@@ -109,7 +87,7 @@ const nextUrl =
       { label: 'TYPE', value: 'CATEGORY' },
       { label: 'SLUG', value: (Astro.params.category ?? category).toUpperCase() },
       { label: 'ARTICLES', value: result.total },
-      { label: 'TAGS', value: tagCount },
+      { label: 'TAGS', value: uniqueTagCount },
     ]}
     emptyMessage="このカテゴリーにはまだ記事がありません。"
   />

@@ -11,14 +11,14 @@ semantics.
 - `apps/astro-blog/`: Astro static-site application, routes, components, shared presentation, and
   generated post OGP endpoints.
 - `packages/content-processor/`: trusted Markdown/frontmatter processing and embed transformations.
-- `packages/cloudinary-utils/`: Cloudinary URL construction and image presets.
+- `packages/cloudinary-utils/`: Cloudinary URL and responsive `srcset` construction.
 - `packages/og-image-generator/`: Satori/resvg post-image generation, fonts, title layout, and its
   Node test suite.
 - `content/blog/` and `content/notes/`: canonical authored Markdown. These are source content, not
   generated fixtures.
 - `content/ogp-metadata.json`: generated/cache-like metadata maintained by the OGP refresh command
   and scheduled workflow; it is not authored article text.
-- `scripts/`: workspace validation/development orchestration and OGP metadata refresh.
+- `scripts/`: pnpm usage enforcement and OGP metadata refresh.
 - `apps/astro-blog/scripts/generate-redirects.mjs`: authoritative generator for the ignored
   `apps/astro-blog/public/_redirects` file.
 - `wrangler.toml`: Cloudflare Workers Static Assets build and deployment configuration.
@@ -57,8 +57,8 @@ before continuing.
 ### Treat side-effecting commands explicitly
 
 - `pnpm install` runs `postinstall` and builds all three workspace packages.
-- `pnpm dev` validates build artifacts, may build missing package outputs, and starts watchers plus
-  the Astro server.
+- `pnpm dev` builds all three workspace packages, then starts the Cloudinary and OGP generator
+  watchers plus the Astro server; `content-processor` is not watched.
 - `pnpm build` generates `apps/astro-blog/public/_redirects` before producing the static app.
 - `pnpm ogp:refresh` reads authored Markdown, makes outbound requests for eligible URLs, and normally
   rewrites `content/ogp-metadata.json`. Use `--dry-run` when no write is intended, but it still

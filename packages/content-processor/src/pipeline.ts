@@ -65,8 +65,6 @@ export function createPipeline(
       // 画像変換
       .use(rehypeImageTransform, {
         cloudinaryCloudName: cloudinaryCloudName || '',
-        width: 1200,
-        mode: 'fit',
       })
 
       // リンク変換
