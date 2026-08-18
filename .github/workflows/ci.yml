@@ -39,6 +39,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
 
+      - name: Test workspace cleanup
+        run: pnpm test:clean
+
       - name: Lint astro-blog
         run: pnpm --filter astro-blog lint
 

@@ -14,7 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "clean": "rimraf dist",
+    "clean": "node ../../scripts/clean-workspace-dist.mjs",
     "build:types": "tsc --build",
     "build:bundle": "tsup",
     "build": "pnpm run build:types && pnpm run build:bundle"
@@ -39,7 +39,6 @@
     "@types/mdast": "^4.0.4",
     "@types/node": "^26.1.1",
     "@types/unist": "^3.0.3",
-    "rimraf": "^6.1.3",
     "tsup": "^8.5.1"
   }
 }

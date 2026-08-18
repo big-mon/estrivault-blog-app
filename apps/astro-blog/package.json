@@ -17,8 +17,7 @@
   },
   "dependencies": {
     "@estrivault/content-processor": "workspace:^",
-    "@estrivault/og-image-generator": "workspace:^",
-    "@resvg/resvg-js": "^2.6.2"
+    "@estrivault/og-image-generator": "workspace:^"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
