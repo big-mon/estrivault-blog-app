@@ -110,10 +110,10 @@ criteria are in [docs/development.md](docs/development.md).
 - Dependency or workspace changes: install with the frozen lockfile when appropriate, then run the
   affected package checks and the PR-CI command set.
 
-PR CI is narrower than the repository's full local check surface: it runs only Astro lint, Astro
-check, and Playwright E2E after a frozen install. It does not directly run root lint, root format
-check, package type-checks, or the OGP package unit tests. Run omitted checks locally when the change
-touches their ownership area.
+PR CI is narrower than the repository's full local check surface: after a frozen install, it runs
+the workspace-cleanup test, Astro lint, Astro check, and Playwright E2E. It does not directly run
+root lint, root format check, package type-checks, or the OGP package unit tests. Run omitted checks
+locally when the change touches their ownership area.
 
 ## Completion criteria
 
