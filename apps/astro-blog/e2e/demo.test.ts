@@ -1,4 +1,18 @@
+import { readFile } from 'node:fs/promises';
+
 import { expect, test } from '@playwright/test';
+
+test('built deployment advertises discovery resources from the homepage only', async () => {
+  const headers = await readFile(new URL('../dist/_headers', import.meta.url), 'utf8');
+  const homepageRule = headers
+    .split(/\r?\n\s*\r?\n/)
+    .find((block) => block.split(/\r?\n/, 1)[0] === '/');
+
+  expect(homepageRule).toBeDefined();
+  expect(homepageRule).toContain('Link: </llms.txt>; rel="describedby"; type="text/markdown"');
+  expect(homepageRule).toContain('Link: </sitemap.xml>; rel="describedby"; type="application/xml"');
+  expect(homepageRule).toContain('Link: </sitemap.md>; rel="describedby"; type="text/markdown"');
+});
 
 test('home page has expected h1', async ({ page }) => {
   await page.goto('/');
