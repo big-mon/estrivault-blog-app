@@ -10,7 +10,6 @@ const SKIP_TAGS = new Set([
   'footer',
   'template',
   'noscript',
-  'iframe',
   'svg',
   'canvas',
 ]);
@@ -115,7 +114,18 @@ function getTextContent(node) {
   return (node?.childNodes ?? []).map(getTextContent).join('');
 }
 
-function renderInline(node) {
+function getIframeLabel(node) {
+  for (const attribute of ['title', 'aria-label', 'data-title', 'data-label']) {
+    const value = getAttribute(node, attribute)?.trim();
+    if (value) {
+      return escapeInlineText(value);
+    }
+  }
+
+  return 'Embedded content';
+}
+
+function renderInline(node, options = {}) {
   if (node?.nodeName === '#text') {
     return escapeInlineText(node.value);
   }
@@ -129,8 +139,16 @@ function renderInline(node) {
     return '  \n';
   }
 
+  if (tagName === 'iframe') {
+    const src = getAttribute(node, 'src');
+    if (!src) {
+      return '';
+    }
+    return `[${getIframeLabel(node)}](${src.replace(/([\\)])/g, '\\$1')})`;
+  }
+
   if (tagName === 'a') {
-    const content = renderInlineChildren(node.childNodes).trim();
+    const content = renderInlineChildren(node.childNodes, options).trim();
     const href = getAttribute(node, 'href');
     if (!content) {
       return '';
@@ -148,17 +166,17 @@ function renderInline(node) {
   }
 
   if (tagName === 'strong' || tagName === 'b') {
-    const content = renderInlineChildren(node.childNodes).trim();
+    const content = renderInlineChildren(node.childNodes, options).trim();
     return content ? `**${content}**` : '';
   }
 
   if (tagName === 'em' || tagName === 'i') {
-    const content = renderInlineChildren(node.childNodes).trim();
+    const content = renderInlineChildren(node.childNodes, options).trim();
     return content ? `*${content}*` : '';
   }
 
   if (tagName === 'del' || tagName === 's') {
-    const content = renderInlineChildren(node.childNodes).trim();
+    const content = renderInlineChildren(node.childNodes, options).trim();
     return content ? `~~${content}~~` : '';
   }
 
@@ -167,11 +185,16 @@ function renderInline(node) {
     return content ? `\`${content.replace(/`/g, '\\`')}\`` : '';
   }
 
-  return renderInlineChildren(node.childNodes);
+  return renderInlineChildren(node.childNodes, options);
 }
 
-function renderInlineChildren(nodes = []) {
-  return nodes.map(renderInline).reduce((result, part) => {
+function renderInlineChildren(nodes = [], options = {}) {
+  const parts = nodes.map((node) => renderInline(node, options));
+  if (options.insertInlineSeparators === false) {
+    return parts.join('');
+  }
+
+  return parts.reduce((result, part) => {
     if (!result || !part || /\s$/.test(result) || /^\s/.test(part)) {
       return result + part;
     }
@@ -186,10 +209,10 @@ function renderInlineChildren(nodes = []) {
   }, '');
 }
 
-function renderList(node) {
+function renderList(node, options = {}) {
   const items = (node.childNodes ?? []).filter((child) => child.nodeName === 'li');
   if (items.length === 0) {
-    return renderBlocks(node.childNodes);
+    return renderBlocks(node.childNodes, options);
   }
 
   const ordered = node.nodeName === 'ol';
@@ -200,12 +223,13 @@ function renderList(node) {
     );
     const itemContent = renderInlineChildren(
       (item.childNodes ?? []).filter((child) => !nestedLists.includes(child)),
+      options,
     ).trim();
     const marker = ordered ? `${index + 1}.` : '-';
     lines.push(`${marker} ${itemContent}`.trimEnd());
 
     for (const nestedList of nestedLists) {
-      const nested = renderList(nestedList).trim();
+      const nested = renderList(nestedList, options).trim();
       if (nested) {
         lines.push(...nested.split('\n').map((line) => `  ${line}`));
       }
@@ -215,7 +239,7 @@ function renderList(node) {
   return `${lines.join('\n')}\n\n`;
 }
 
-function renderTable(node) {
+function renderTable(node, options = {}) {
   const rows = [];
   const visit = (current) => {
     if (current.nodeName === 'tr') {
@@ -225,7 +249,10 @@ function renderTable(node) {
       if (cells.length > 0) {
         rows.push(
           cells.map((cell) =>
-            renderInlineChildren(cell.childNodes).replace(/\s+/g, ' ').replace(/\|/g, '\\|').trim(),
+            renderInlineChildren(cell.childNodes, options)
+              .replace(/\s+/g, ' ')
+              .replace(/\|/g, '\\|')
+              .trim(),
           ),
         );
       }
@@ -250,32 +277,32 @@ function renderTable(node) {
   return `${[header, separator, ...body].join('\n')}\n\n`;
 }
 
-function renderBlock(node) {
+function renderBlock(node, options = {}) {
   if (!node || shouldSkip(node)) {
     return '';
   }
 
   if (node.nodeName === '#text') {
-    return node.value.trim() ? renderInline(node) : '';
+    return node.value.trim() ? renderInline(node, options) : '';
   }
 
   const tagName = node.nodeName;
   if (/^h[1-6]$/.test(tagName)) {
-    const content = renderInlineChildren(node.childNodes).trim();
+    const content = renderInlineChildren(node.childNodes, options).trim();
     return content ? `${'#'.repeat(Number(tagName.slice(1)))} ${content}\n\n` : '';
   }
 
   if (tagName === 'p' || tagName === 'figcaption' || tagName === 'dt' || tagName === 'dd') {
-    const content = renderInlineChildren(node.childNodes).trim();
+    const content = renderInlineChildren(node.childNodes, options).trim();
     return content ? `${content}\n\n` : '';
   }
 
   if (tagName === 'ul' || tagName === 'ol') {
-    return renderList(node);
+    return renderList(node, options);
   }
 
   if (tagName === 'blockquote') {
-    const content = renderBlocks(node.childNodes).trim();
+    const content = renderBlocks(node.childNodes, options).trim();
     return content ?
         `${content
           .split('\n')
@@ -293,7 +320,7 @@ function renderBlock(node) {
   }
 
   if (tagName === 'table') {
-    return renderTable(node);
+    return renderTable(node, options);
   }
 
   if (tagName === 'hr') {
@@ -317,17 +344,17 @@ function renderBlock(node) {
       'summary',
     ]).has(tagName)
   ) {
-    return renderBlocks(node.childNodes);
+    return renderBlocks(node.childNodes, options);
   }
 
   return null;
 }
 
-function renderBlocks(nodes = []) {
+function renderBlocks(nodes = [], options = {}) {
   return nodes
     .map((node) => {
-      const block = renderBlock(node);
-      return block === null ? renderInline(node) : block;
+      const block = renderBlock(node, options);
+      return block === null ? renderInline(node, options) : block;
     })
     .join('\n\n');
 }
@@ -342,7 +369,11 @@ export function htmlToMarkdown(html) {
     contentRoot ?
       [findFirst(main, 'h1'), findFirstWithClass(main, 'article-lead'), contentRoot]
         .filter(Boolean)
-        .map((node) => (node === contentRoot ? renderBlocks(node.childNodes) : renderBlock(node)))
+        .map((node) =>
+          node === contentRoot ?
+            renderBlocks(node.childNodes, { insertInlineSeparators: false })
+          : renderBlock(node),
+        )
         .join('\n\n')
     : renderBlocks(main.childNodes);
   const markdown = content

@@ -39,7 +39,7 @@ async function fetchMarkdownSidecar(request, env) {
   }
 
   const response = await env.ASSETS.fetch(createAssetRequest(request, sidecarPath));
-  if (!response.ok) {
+  if (!response.ok && response.status !== 304) {
     return null;
   }
 

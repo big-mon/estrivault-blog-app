@@ -99,6 +99,56 @@ test('extracts article and note content without site chrome or metadata noise', 
   assert.equal(noteMarkdown, '# Note title\n\nNote body.\n');
 });
 
+test('preserves article iframe embeds as labeled Markdown links without presentation noise', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <header><nav>Navigation noise</nav></header>
+      <article>
+        <h1>Article title</h1>
+        <div class="article-body">
+          <p>本文</p>
+          <div class="youtube-embed">
+            <iframe src="https://www.youtube.com/embed/video-123" title="紹介動画"></iframe>
+          </div>
+          <iframe src="https://example.test/embed/fallback"></iframe>
+          <script>window.noise = true;</script>
+        </div>
+      </article>
+      <footer>Footer noise</footer>
+    </main>
+  `);
+
+  assert.match(markdown, /\[紹介動画\]\(https:\/\/www\.youtube\.com\/embed\/video-123\)/);
+  assert.match(markdown, /\[Embedded content\]\(https:\/\/example\.test\/embed\/fallback\)/);
+  assert.doesNotMatch(markdown, /Navigation noise|Footer noise|window\.noise/);
+});
+
+test('preserves authored inline adjacency in article and note bodies', () => {
+  const articleMarkdown = htmlToMarkdown(`
+    <main>
+      <article>
+        <h1>Article title</h1>
+        <div class="article-body">
+          <p>これは<strong>重要</strong>。<a href="/detail">リンク</a>です。</p>
+        </div>
+      </article>
+    </main>
+  `);
+  const noteMarkdown = htmlToMarkdown(`
+    <main>
+      <article>
+        <h1>Note title</h1>
+        <div class="note-body">
+          <p>これは<strong>重要</strong>。<a href="/detail">リンク</a>です。</p>
+        </div>
+      </article>
+    </main>
+  `);
+
+  assert.equal(articleMarkdown, '# Article title\n\nこれは**重要**。[リンク](/detail)です。\n');
+  assert.equal(noteMarkdown, '# Note title\n\nこれは**重要**。[リンク](/detail)です。\n');
+});
+
 test('separates adjacent fields in generic document cards', () => {
   const markdown = htmlToMarkdown(`
     <main>

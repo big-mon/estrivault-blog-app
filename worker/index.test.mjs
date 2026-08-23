@@ -14,18 +14,23 @@ function createAssets(files) {
         });
       }
 
-      return new Response(request.method === 'HEAD' ? null : file.body, {
-        status: file.status ?? 200,
+      const status = file.status ?? 200;
+      const body = request.method === 'HEAD' || status === 304 ? null : file.body;
+      return new Response(body, {
+        status,
         headers: file.headers,
       });
     },
   };
 }
 
-function createRequest(pathname, { method = 'GET', accept } = {}) {
+function createRequest(pathname, { method = 'GET', accept, ifNoneMatch } = {}) {
   const headers = new Headers();
   if (accept !== undefined) {
     headers.set('Accept', accept);
+  }
+  if (ifNoneMatch !== undefined) {
+    headers.set('If-None-Match', ifNoneMatch);
   }
   return new Request(`https://example.test${pathname}`, { method, headers });
 }
@@ -34,6 +39,39 @@ const htmlHeaders = {
   'Content-Type': 'text/html; charset=utf-8',
   'Cache-Control': 'public, max-age=60',
 };
+
+test('preserves a conditional 304 Markdown sidecar response', async () => {
+  const env = {
+    ASSETS: createAssets({
+      '/post/about/index.html': { body: '<main><h1>About</h1></main>', headers: htmlHeaders },
+      '/post/about/index.md': {
+        status: 304,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'public, max-age=120',
+          ETag: '"markdown-version"',
+          'Last-Modified': 'Sat, 01 Aug 2026 00:00:00 GMT',
+        },
+      },
+    }),
+  };
+
+  const response = await worker.fetch(
+    createRequest('/post/about', {
+      accept: 'text/markdown',
+      ifNoneMatch: '"markdown-version"',
+    }),
+    env,
+  );
+
+  assert.equal(response.status, 304);
+  assert.equal(await response.text(), '');
+  assert.equal(response.headers.get('Content-Type'), 'text/markdown; charset=utf-8');
+  assert.equal(response.headers.get('Vary'), 'Accept');
+  assert.equal(response.headers.get('Cache-Control'), 'public, max-age=120');
+  assert.equal(response.headers.get('ETag'), '"markdown-version"');
+  assert.equal(response.headers.get('Last-Modified'), 'Sat, 01 Aug 2026 00:00:00 GMT');
+});
 
 test('serves a GET or HEAD Markdown sidecar for an explicitly accepted HTML page', async () => {
   const env = {
