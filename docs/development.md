@@ -30,8 +30,10 @@ pnpm --filter astro-blog preview
 `og-image-generator` alongside Astro. `content-processor` is not watched; rebuild it after changing
 it.
 
-`pnpm build` incrementally builds all packages, generates Cloudflare redirect rules, and builds the
-Astro static output. `wrangler.toml` uses this root command and publishes `apps/astro-blog/dist`.
+`pnpm build` incrementally builds all packages, generates Cloudflare redirect rules, builds the Astro
+static output, and writes a Markdown sidecar next to each generated `index.html` document route.
+`wrangler.toml` uses this root command and publishes `apps/astro-blog/dist` through the Worker and its
+Static Assets binding.
 
 ## Select checks by change
 
@@ -51,6 +53,12 @@ pnpm --filter astro-blog lint
 pnpm --filter astro-blog check
 pnpm --filter astro-blog build
 pnpm --filter astro-blog test:e2e --grep "test name"
+```
+
+For Markdown content negotiation and sidecar generation:
+
+```bash
+pnpm test:markdown
 ```
 
 Install Chromium first and run the full `pnpm --filter astro-blog test:e2e` suite for cross-cutting
@@ -74,10 +82,10 @@ relevant Astro check, build, or E2E coverage for consumer-visible changes.
 ## Local checks versus GitHub Actions
 
 Pull-request CI uses Node 22.x and the pnpm version pinned by root `packageManager`. After a frozen
-install, it runs exactly the workspace-cleanup test, Astro lint, Astro check, Playwright Chromium
-setup, and the full Astro E2E suite. It does not directly run root lint, root format check,
-`pnpm type-check`, or the OGP unit tests. Run omitted checks locally when their ownership area
-changes. A local pass does not prove GitHub Actions passed.
+install, it runs the workspace-cleanup test, Astro lint, Astro check, Markdown generator/Worker
+tests (`pnpm test:markdown`), Playwright Chromium setup, and the full Astro E2E suite. It does not
+directly run root lint, root format check, `pnpm type-check`, or the OGP unit tests. Run omitted
+checks locally when their ownership area changes. A local pass does not prove GitHub Actions passed.
 
 ## OGP metadata: network and mutation boundary
 

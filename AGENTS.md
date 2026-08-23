@@ -59,7 +59,8 @@ before continuing.
 - `pnpm install` runs `postinstall` and builds all three workspace packages.
 - `pnpm dev` builds all three workspace packages, then starts the Cloudinary and OGP generator
   watchers plus the Astro server; `content-processor` is not watched.
-- `pnpm build` generates `apps/astro-blog/public/_redirects` before producing the static app.
+- `pnpm build` generates `apps/astro-blog/public/_redirects`, produces the static app, and writes a
+  Markdown sidecar next to each generated `index.html` document route.
 - `pnpm ogp:refresh` reads authored Markdown, makes outbound requests for eligible URLs, and normally
   rewrites `content/ogp-metadata.json`. Use `--dry-run` when no write is intended, but it still
   performs network fetches for URLs selected for refresh.
@@ -111,9 +112,9 @@ criteria are in [docs/development.md](docs/development.md).
   affected package checks and the PR-CI command set.
 
 PR CI is narrower than the repository's full local check surface: after a frozen install, it runs
-the workspace-cleanup test, Astro lint, Astro check, and Playwright E2E. It does not directly run
-root lint, root format check, package type-checks, or the OGP package unit tests. Run omitted checks
-locally when the change touches their ownership area.
+the workspace-cleanup test, Astro lint, Astro check, Markdown generator/Worker tests, and Playwright
+E2E. It does not directly run root lint, root format check, package type-checks, or the OGP package
+unit tests. Run omitted checks locally when the change touches their ownership area.
 
 ## Completion criteria
 

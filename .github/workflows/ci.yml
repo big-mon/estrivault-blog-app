@@ -48,6 +48,9 @@ jobs:
       - name: Check astro-blog
         run: pnpm --filter astro-blog check
 
+      - name: Test Markdown generator and Worker
+        run: pnpm test:markdown
+
       - name: Get Playwright version
         id: playwright-version
         shell: bash

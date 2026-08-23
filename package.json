@@ -13,6 +13,7 @@
     "postinstall": "pnpm run build:packages",
     "clean": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor --filter @estrivault/og-image-generator run clean",
     "test:clean": "node --test scripts/clean-workspace-dist.test.mjs",
+    "test:markdown": "pnpm --filter astro-blog run test:markdown",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
