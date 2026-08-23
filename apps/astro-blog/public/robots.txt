@@ -1,6 +1,6 @@
 # No crawlers are intentionally blocked; allow all.
 User-agent: *
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 Sitemap: https://estrilda.damonge.com/sitemap.xml
