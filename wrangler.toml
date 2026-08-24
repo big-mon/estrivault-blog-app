@@ -1,6 +1,11 @@
 name = "estrilda"
 compatibility_date = "2025-06-27"
 main = "worker/index.mjs"
+find_additional_modules = true
+
+[[rules]]
+type = "ESModule"
+globs = ["markdown-negotiation.mjs"]
 
 [assets]
 directory = "apps/astro-blog/dist"

@@ -6,6 +6,13 @@ import {
 } from './markdown-negotiation.mjs';
 
 const MARKDOWN_CONTENT_TYPE = 'text/markdown; charset=utf-8';
+const REPRESENTATION_CONDITIONAL_HEADERS = [
+  'If-Match',
+  'If-None-Match',
+  'If-Modified-Since',
+  'If-Unmodified-Since',
+  'If-Range',
+];
 
 function createAssetRequest(request, pathname) {
   const url = new URL(request.url);
@@ -14,6 +21,19 @@ function createAssetRequest(request, pathname) {
     method: request.method,
     headers: request.headers,
   });
+}
+
+function hasRepresentationConditionalHeaders(request) {
+  return REPRESENTATION_CONDITIONAL_HEADERS.some((header) => request.headers.has(header));
+}
+
+function createHtmlEligibilityRequest(request) {
+  const headers = new Headers(request.headers);
+  for (const header of REPRESENTATION_CONDITIONAL_HEADERS) {
+    headers.delete(header);
+  }
+
+  return new Request(request, { headers });
 }
 
 function copyResponse(response, { contentType, varyByAccept = false, method } = {}) {
@@ -39,7 +59,7 @@ async function fetchMarkdownSidecar(request, env) {
   }
 
   const response = await env.ASSETS.fetch(createAssetRequest(request, sidecarPath));
-  if (!response.ok && response.status !== 304) {
+  if (!response.ok && response.status !== 304 && response.status !== 412) {
     return null;
   }
 
@@ -56,15 +76,34 @@ export default {
       return env.ASSETS.fetch(request);
     }
 
-    const response = await env.ASSETS.fetch(request);
+    const markdownPath =
+      acceptsMarkdown(request.headers.get('Accept')) ?
+        getMarkdownAssetPath(new URL(request.url).pathname)
+      : null;
+    const shouldProbeWithoutConditionals =
+      markdownPath !== null && hasRepresentationConditionalHeaders(request);
+    const response = await env.ASSETS.fetch(
+      shouldProbeWithoutConditionals ? createHtmlEligibilityRequest(request) : request,
+    );
     if ((!response.ok && response.status !== 304) || !isHtmlResponse(response)) {
+      if (shouldProbeWithoutConditionals) {
+        return env.ASSETS.fetch(request);
+      }
+
       return response;
     }
 
-    if (acceptsMarkdown(request.headers.get('Accept'))) {
+    if (markdownPath) {
       const markdownResponse = await fetchMarkdownSidecar(request, env);
       if (markdownResponse) {
         return markdownResponse;
+      }
+
+      if (shouldProbeWithoutConditionals) {
+        return copyResponse(await env.ASSETS.fetch(request), {
+          method: request.method,
+          varyByAccept: true,
+        });
       }
     }
 

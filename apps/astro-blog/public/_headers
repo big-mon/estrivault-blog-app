@@ -1,6 +1,11 @@
 https://*.pages.dev/*
   X-Robots-Tag: noindex
 
+/
+  Link: </llms.txt>; rel="describedby"; type="text/markdown"
+  Link: </sitemap.xml>; rel="describedby"; type="application/xml"
+  Link: </sitemap.md>; rel="describedby"; type="text/markdown"
+
 /llms.txt
   Content-Type: text/markdown; charset=utf-8
 

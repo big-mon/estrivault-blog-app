@@ -24,13 +24,16 @@ function createAssets(files) {
   };
 }
 
-function createRequest(pathname, { method = 'GET', accept, ifNoneMatch } = {}) {
+function createRequest(pathname, { method = 'GET', accept, ifNoneMatch, ifMatch } = {}) {
   const headers = new Headers();
   if (accept !== undefined) {
     headers.set('Accept', accept);
   }
   if (ifNoneMatch !== undefined) {
     headers.set('If-None-Match', ifNoneMatch);
+  }
+  if (ifMatch !== undefined) {
+    headers.set('If-Match', ifMatch);
   }
   return new Request(`https://example.test${pathname}`, { method, headers });
 }
@@ -111,6 +114,123 @@ test('negotiates Markdown before an eligible HTML 304 response', async () => {
   assert.equal(response.headers.get('ETag'), '"markdown-version"');
   assert.equal(response.headers.get('Last-Modified'), 'Sun, 02 Aug 2026 00:00:00 GMT');
   assert.equal(response.headers.get('Vary'), 'Accept');
+});
+
+test('selects Markdown before an HTML 412 from a Markdown If-Match condition', async () => {
+  const requests = [];
+  const env = {
+    ASSETS: {
+      fetch: async (request) => {
+        requests.push(request);
+        const pathname = new URL(request.url).pathname;
+        const assetPath = pathname === '/post/about' ? '/post/about/index.html' : pathname;
+
+        if (assetPath === '/post/about/index.html') {
+          if (request.headers.has('If-Match')) {
+            return new Response('HTML precondition failed', {
+              status: 412,
+              headers: htmlHeaders,
+            });
+          }
+
+          return new Response('<main><h1>About</h1></main>', {
+            headers: htmlHeaders,
+          });
+        }
+
+        if (assetPath === '/post/about/index.md') {
+          return new Response('# About\n', {
+            headers: {
+              'Content-Type': 'text/markdown; charset=utf-8',
+              ETag: '"markdown-version"',
+            },
+          });
+        }
+
+        return new Response('Not found', { status: 404 });
+      },
+    },
+  };
+
+  const response = await worker.fetch(
+    createRequest('/post/about', {
+      accept: 'text/markdown',
+      ifMatch: '"markdown-version"',
+    }),
+    env,
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), '# About\n');
+  assert.equal(requests.length, 2);
+  assert.equal(new URL(requests[0].url).pathname, '/post/about');
+  assert.equal(requests[0].headers.get('If-Match'), null);
+  assert.equal(new URL(requests[1].url).pathname, '/post/about/index.md');
+  assert.equal(requests[1].headers.get('If-Match'), '"markdown-version"');
+});
+
+test('preserves a Markdown 412 from a mismatching If-Match condition', async () => {
+  const requests = [];
+  const env = {
+    ASSETS: {
+      fetch: async (request) => {
+        requests.push(request);
+        const pathname = new URL(request.url).pathname;
+        const assetPath = pathname === '/post/about' ? '/post/about/index.html' : pathname;
+
+        if (assetPath === '/post/about/index.html') {
+          if (request.headers.has('If-Match')) {
+            return new Response('HTML precondition failed', {
+              status: 412,
+              headers: {
+                ...htmlHeaders,
+                ETag: '"html-current"',
+              },
+            });
+          }
+
+          return new Response('<main><h1>About</h1></main>', {
+            headers: htmlHeaders,
+          });
+        }
+
+        if (assetPath === '/post/about/index.md') {
+          return new Response('Markdown precondition failed', {
+            status: 412,
+            headers: {
+              'Content-Type': 'text/plain; charset=utf-8',
+              'Cache-Control': 'public, max-age=120',
+              ETag: '"markdown-current"',
+              'Last-Modified': 'Mon, 03 Aug 2026 00:00:00 GMT',
+            },
+          });
+        }
+
+        return new Response('Not found', { status: 404 });
+      },
+    },
+  };
+
+  const response = await worker.fetch(
+    createRequest('/post/about', {
+      accept: 'text/markdown',
+      ifMatch: '"stale-version"',
+    }),
+    env,
+  );
+
+  assert.equal(response.status, 412);
+  assert.equal(await response.text(), 'Markdown precondition failed');
+  assert.equal(response.headers.get('Content-Type'), 'text/markdown; charset=utf-8');
+  assert.equal(response.headers.get('Cache-Control'), 'public, max-age=120');
+  assert.equal(response.headers.get('ETag'), '"markdown-current"');
+  assert.equal(response.headers.get('Last-Modified'), 'Mon, 03 Aug 2026 00:00:00 GMT');
+  assert.equal(response.headers.get('Vary'), 'Accept');
+  assert.equal(requests.length, 2);
+  assert.equal(new URL(requests[0].url).pathname, '/post/about');
+  assert.equal(requests[0].headers.get('If-Match'), null);
+  assert.equal(new URL(requests[1].url).pathname, '/post/about/index.md');
+  assert.equal(requests[1].headers.get('If-Match'), '"stale-version"');
 });
 
 test('serves a GET or HEAD Markdown sidecar for an explicitly accepted HTML page', async () => {
