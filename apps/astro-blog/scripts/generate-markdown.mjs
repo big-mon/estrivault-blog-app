@@ -219,6 +219,72 @@ function renderInlineChildren(nodes = [], options = {}) {
   }, '');
 }
 
+function escapeBlockLeadingSyntax(value) {
+  const escapedOrderedMarkers = value.replace(/(^|\n)(\d{1,9})([.)])(?=[ \t]+|$)/g, '$1$2\\$3');
+  return escapedOrderedMarkers.replace(
+    /(^|\n)(?=(?:#{1,6}(?:[ \t]+|$)|>[ \t]?|[-+](?:[ \t]+|$)|-{3,}[ \t]*(?:\n|$)|<))/g,
+    '$1\\',
+  );
+}
+
+function indentListBlock(content, continuationPrefix) {
+  return content.split('\n').map((line) => (line ? `${continuationPrefix}${line}` : line));
+}
+
+function renderListItem(item, marker, options = {}) {
+  const continuationPrefix = ' '.repeat(`${marker} `.length);
+  const parts = [];
+  let inlineNodes = [];
+  const flushInline = () => {
+    const content = renderInlineChildren(inlineNodes, options).trim();
+    if (content) {
+      parts.push({ content, isList: false });
+    }
+    inlineNodes = [];
+  };
+
+  for (const child of item.childNodes ?? []) {
+    const block = child.nodeName === '#text' ? null : renderBlock(child, options);
+    if (block === null) {
+      inlineNodes.push(child);
+      continue;
+    }
+
+    flushInline();
+    const content = block.trim();
+    if (content) {
+      parts.push({
+        content,
+        isList: child.nodeName === 'ul' || child.nodeName === 'ol',
+      });
+    }
+  }
+  flushInline();
+
+  if (parts.length === 0) {
+    return [marker];
+  }
+
+  const lines = [];
+  for (const [index, part] of parts.entries()) {
+    const contentLines = part.content.split('\n');
+    const indentedLines = indentListBlock(part.content, continuationPrefix);
+    if (index > 0) {
+      lines.push('');
+    }
+
+    if (index === 0 && !part.isList) {
+      lines.push(`${marker} ${contentLines[0]}`.trimEnd(), ...indentedLines.slice(1));
+    } else if (index === 0) {
+      lines.push(marker, ...indentedLines);
+    } else {
+      lines.push(...indentedLines);
+    }
+  }
+
+  return lines;
+}
+
 function renderList(node, options = {}) {
   const items = (node.childNodes ?? []).filter((child) => child.nodeName === 'li');
   if (items.length === 0) {
@@ -226,24 +292,14 @@ function renderList(node, options = {}) {
   }
 
   const ordered = node.nodeName === 'ol';
+  const startAttribute = getAttribute(node, 'start')?.trim();
+  const parsedStart =
+    startAttribute && /^-?\d+$/.test(startAttribute) ? Number(startAttribute) : NaN;
+  const startingNumber = Number.isSafeInteger(parsedStart) ? parsedStart : 1;
   const lines = [];
   for (const [index, item] of items.entries()) {
-    const nestedLists = (item.childNodes ?? []).filter(
-      (child) => child.nodeName === 'ul' || child.nodeName === 'ol',
-    );
-    const itemContent = renderInlineChildren(
-      (item.childNodes ?? []).filter((child) => !nestedLists.includes(child)),
-      options,
-    ).trim();
-    const marker = ordered ? `${index + 1}.` : '-';
-    lines.push(`${marker} ${itemContent}`.trimEnd());
-
-    for (const nestedList of nestedLists) {
-      const nested = renderList(nestedList, options).trim();
-      if (nested) {
-        lines.push(...nested.split('\n').map((line) => `  ${line}`));
-      }
-    }
+    const marker = ordered ? `${startingNumber + index}.` : '-';
+    lines.push(...renderListItem(item, marker, options));
   }
 
   return `${lines.join('\n')}\n\n`;
@@ -303,7 +359,7 @@ function renderBlock(node, options = {}) {
   }
 
   if (tagName === 'p' || tagName === 'figcaption' || tagName === 'dt' || tagName === 'dd') {
-    const content = renderInlineChildren(node.childNodes, options).trim();
+    const content = escapeBlockLeadingSyntax(renderInlineChildren(node.childNodes, options).trim());
     return content ? `${content}\n\n` : '';
   }
 

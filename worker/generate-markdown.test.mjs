@@ -55,6 +55,104 @@ test('keeps semantic block boundaries and omits generated heading anchors', () =
   assert.equal(markdown, '[Brand](/)\n\nLead text\n\n## Lead heading\n');
 });
 
+test('escapes block markers at the start of paragraph text', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <p># literal</p>
+      <p>> literal</p>
+      <p>- literal</p>
+      <p>1. literal</p>
+      <p>1) literal</p>
+      <p>&lt;div&gt;literal&lt;/div&gt;</p>
+    </main>
+  `);
+
+  assert.equal(
+    markdown,
+    '\\# literal\n\n\\> literal\n\n\\- literal\n\n1\\. literal\n\n1\\) literal\n\n\\<div>literal</div>\n',
+  );
+});
+
+test('preserves block children and their order inside list items', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <ul>
+        <li>
+          <p>First paragraph</p>
+          <p>Second paragraph</p>
+          <ul><li>Nested item</li></ul>
+          <blockquote><p>Quoted block</p></blockquote>
+          <pre><code>const value = 1;</code></pre>
+          <p>After code</p>
+        </li>
+        <li>One line</li>
+      </ul>
+    </main>
+  `);
+
+  const expected = [
+    '- First paragraph',
+    '',
+    '  Second paragraph',
+    '',
+    '  - Nested item',
+    '',
+    '  > Quoted block',
+    '',
+    '  ```',
+    '  const value = 1;',
+    '  ```',
+    '',
+    '  After code',
+    '- One line',
+    '',
+  ].join('\n');
+
+  assert.equal(markdown, expected);
+});
+
+test('indents ordered list block children by visible marker width', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <ol start="10">
+        <li>
+          <p>First paragraph</p>
+          <p>Second paragraph</p>
+          <ul><li>Nested item</li></ul>
+          <blockquote><p>Quoted block</p></blockquote>
+        </li>
+        <li>Next item</li>
+      </ol>
+    </main>
+  `);
+
+  const expected = [
+    '10. First paragraph',
+    '',
+    '    Second paragraph',
+    '',
+    '    - Nested item',
+    '',
+    '    > Quoted block',
+    '11. Next item',
+    '',
+  ].join('\n');
+
+  assert.equal(markdown, expected);
+});
+
+test('preserves ordered list start and defaults invalid starts safely', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <ol start="4"><li>Fourth</li><li>Fifth</li></ol>
+      <ol><li>Default</li></ol>
+      <ol start="not-a-number"><li>Invalid</li></ol>
+    </main>
+  `);
+
+  assert.equal(markdown, '4. Fourth\n5. Fifth\n\n1. Default\n\n1. Invalid\n');
+});
+
 test('extracts article and note content without site chrome or metadata noise', () => {
   const articleMarkdown = htmlToMarkdown(`
     <main>
