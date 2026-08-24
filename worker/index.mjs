@@ -12,6 +12,7 @@ const REPRESENTATION_CONDITIONAL_HEADERS = [
   'If-Modified-Since',
   'If-Unmodified-Since',
   'If-Range',
+  'Range',
 ];
 
 function createAssetRequest(request, pathname) {
@@ -59,7 +60,12 @@ async function fetchMarkdownSidecar(request, env) {
   }
 
   const response = await env.ASSETS.fetch(createAssetRequest(request, sidecarPath));
-  if (!response.ok && response.status !== 304 && response.status !== 412) {
+  if (
+    !response.ok &&
+    response.status !== 304 &&
+    response.status !== 412 &&
+    response.status !== 416
+  ) {
     return null;
   }
 

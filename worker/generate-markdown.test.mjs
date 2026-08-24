@@ -155,6 +155,18 @@ test('uses a longer fence when code contains a triple-backtick run', () => {
   assert.equal(markdown, '````\nconst fence = "```";\n````\n');
 });
 
+test('uses a longer inline delimiter when code contains an internal backtick run', () => {
+  const markdown = htmlToMarkdown('<main><p><code>literal ``` run</code></p></main>');
+
+  assert.equal(markdown, '````literal ``` run````\n');
+});
+
+test('pads inline code when its content starts and ends with a backtick', () => {
+  const markdown = htmlToMarkdown('<main><p><code>`literal`</code></p></main>');
+
+  assert.equal(markdown, '`` `literal` ``\n');
+});
+
 test('separates adjacent fields in generic document cards', () => {
   const markdown = htmlToMarkdown(`
     <main>

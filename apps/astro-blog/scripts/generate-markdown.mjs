@@ -114,6 +114,10 @@ function getTextContent(node) {
   return (node?.childNodes ?? []).map(getTextContent).join('');
 }
 
+function getMaxBacktickRunLength(content) {
+  return Math.max(0, ...(content.match(/`+/g) ?? []).map((run) => run.length));
+}
+
 function getIframeLabel(node) {
   for (const attribute of ['title', 'aria-label', 'data-title', 'data-label']) {
     const value = getAttribute(node, attribute)?.trim();
@@ -182,7 +186,13 @@ function renderInline(node, options = {}) {
 
   if (tagName === 'code') {
     const content = getTextContent(node).replace(/\s+/g, ' ').trim();
-    return content ? `\`${content.replace(/`/g, '\\`')}\`` : '';
+    if (!content) {
+      return '';
+    }
+
+    const delimiter = '`'.repeat(getMaxBacktickRunLength(content) + 1);
+    const padding = content.startsWith('`') || content.endsWith('`') ? ' ' : '';
+    return `${delimiter}${padding}${content}${padding}${delimiter}`;
   }
 
   return renderInlineChildren(node.childNodes, options);
@@ -316,11 +326,7 @@ function renderBlock(node, options = {}) {
     const language =
       (getAttribute(code, 'class') ?? '').match(/(?:^|\s)language-([^\s]+)/)?.[1] ?? '';
     const content = getTextContent(code).replace(/^\n+|\n+$/g, '');
-    const maxBacktickRunLength = Math.max(
-      0,
-      ...(content.match(/`+/g) ?? []).map((run) => run.length),
-    );
-    const fence = '`'.repeat(Math.max(3, maxBacktickRunLength + 1));
+    const fence = '`'.repeat(Math.max(3, getMaxBacktickRunLength(content) + 1));
     return `${fence}${language}\n${content}\n${fence}\n\n`;
   }
 

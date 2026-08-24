@@ -24,7 +24,10 @@ function createAssets(files) {
   };
 }
 
-function createRequest(pathname, { method = 'GET', accept, ifNoneMatch, ifMatch } = {}) {
+function createRequest(
+  pathname,
+  { method = 'GET', accept, ifNoneMatch, ifMatch, ifRange, range } = {},
+) {
   const headers = new Headers();
   if (accept !== undefined) {
     headers.set('Accept', accept);
@@ -34,6 +37,12 @@ function createRequest(pathname, { method = 'GET', accept, ifNoneMatch, ifMatch 
   }
   if (ifMatch !== undefined) {
     headers.set('If-Match', ifMatch);
+  }
+  if (ifRange !== undefined) {
+    headers.set('If-Range', ifRange);
+  }
+  if (range !== undefined) {
+    headers.set('Range', range);
   }
   return new Request(`https://example.test${pathname}`, { method, headers });
 }
@@ -231,6 +240,96 @@ test('preserves a Markdown 412 from a mismatching If-Match condition', async () 
   assert.equal(requests[0].headers.get('If-Match'), null);
   assert.equal(new URL(requests[1].url).pathname, '/post/about/index.md');
   assert.equal(requests[1].headers.get('If-Match'), '"stale-version"');
+});
+
+test('strips Range and If-Range from the HTML probe but preserves them for Markdown', async () => {
+  const requests = [];
+  const env = {
+    ASSETS: {
+      fetch: async (request) => {
+        requests.push(request);
+        const pathname = new URL(request.url).pathname;
+
+        if (pathname === '/post/about') {
+          if (request.headers.has('Range')) {
+            return new Response('HTML range was not eligible', {
+              status: 416,
+              headers: {
+                ...htmlHeaders,
+                'Content-Range': 'bytes */7',
+              },
+            });
+          }
+
+          return new Response('<main><h1>About</h1></main>', { headers: htmlHeaders });
+        }
+
+        if (pathname === '/post/about/index.md') {
+          return new Response('# About', {
+            status: 206,
+            headers: {
+              'Content-Type': 'text/plain; charset=utf-8',
+              'Content-Range': 'bytes 0-5/6',
+            },
+          });
+        }
+
+        return new Response('Not found', { status: 404 });
+      },
+    },
+  };
+
+  const response = await worker.fetch(
+    createRequest('/post/about', {
+      accept: 'text/markdown',
+      ifRange: '"markdown-version"',
+      range: 'bytes=0-5',
+    }),
+    env,
+  );
+
+  assert.equal(response.status, 206);
+  assert.equal(await response.text(), '# About');
+  assert.equal(requests.length, 2);
+  assert.equal(new URL(requests[0].url).pathname, '/post/about');
+  assert.equal(requests[0].headers.get('Range'), null);
+  assert.equal(requests[0].headers.get('If-Range'), null);
+  assert.equal(new URL(requests[1].url).pathname, '/post/about/index.md');
+  assert.equal(requests[1].headers.get('Range'), 'bytes=0-5');
+  assert.equal(requests[1].headers.get('If-Range'), '"markdown-version"');
+});
+
+test('preserves an unsatisfiable Markdown Range response and its representation headers', async () => {
+  const env = {
+    ASSETS: createAssets({
+      '/post/about/index.html': { body: '<main><h1>About</h1></main>', headers: htmlHeaders },
+      '/post/about/index.md': {
+        body: 'Markdown range not satisfiable',
+        status: 416,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Content-Range': 'bytes */7',
+          'Cache-Control': 'public, max-age=120',
+          ETag: '"markdown-version"',
+          'Last-Modified': 'Tue, 04 Aug 2026 00:00:00 GMT',
+        },
+      },
+    }),
+  };
+
+  const response = await worker.fetch(
+    createRequest('/post/about', { accept: 'text/markdown', range: 'bytes=99-100' }),
+    env,
+  );
+
+  assert.equal(response.status, 416);
+  assert.equal(await response.text(), 'Markdown range not satisfiable');
+  assert.equal(response.headers.get('Content-Type'), 'text/markdown; charset=utf-8');
+  assert.equal(response.headers.get('Content-Range'), 'bytes */7');
+  assert.equal(response.headers.get('Cache-Control'), 'public, max-age=120');
+  assert.equal(response.headers.get('ETag'), '"markdown-version"');
+  assert.equal(response.headers.get('Last-Modified'), 'Tue, 04 Aug 2026 00:00:00 GMT');
+  assert.equal(response.headers.get('Vary'), 'Accept');
 });
 
 test('serves a GET or HEAD Markdown sidecar for an explicitly accepted HTML page', async () => {
