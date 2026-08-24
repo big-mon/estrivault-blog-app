@@ -106,6 +106,10 @@ function escapeInlineText(value) {
     .replace(/([*_`[\]~])/g, '\\$1');
 }
 
+function escapeMarkdownDestination(value) {
+  return value.replace(/[\\()]/g, '\\$&');
+}
+
 function getTextContent(node) {
   if (node?.nodeName === '#text') {
     return node.value;
@@ -148,7 +152,7 @@ function renderInline(node, options = {}) {
     if (!src) {
       return '';
     }
-    return `[${getIframeLabel(node)}](${src.replace(/([\\)])/g, '\\$1')})`;
+    return `[${getIframeLabel(node)}](${escapeMarkdownDestination(src)})`;
   }
 
   if (tagName === 'a') {
@@ -157,7 +161,7 @@ function renderInline(node, options = {}) {
     if (!content) {
       return '';
     }
-    return href ? `[${content}](${href.replace(/([\\)])/g, '\\$1')})` : content;
+    return href ? `[${content}](${escapeMarkdownDestination(href)})` : content;
   }
 
   if (tagName === 'img') {
@@ -166,7 +170,7 @@ function renderInline(node, options = {}) {
       return '';
     }
     const alt = (getAttribute(node, 'alt') ?? '').replaceAll('[', '\\[').replaceAll(']', '\\]');
-    return `![${alt}](${src.replace(/([\\)])/g, '\\$1')})`;
+    return `![${alt}](${escapeMarkdownDestination(src)})`;
   }
 
   if (tagName === 'strong' || tagName === 'b') {
@@ -380,7 +384,10 @@ function renderBlock(node, options = {}) {
   if (tagName === 'pre') {
     const code = findFirst(node, 'code') ?? node;
     const language =
-      (getAttribute(code, 'class') ?? '').match(/(?:^|\s)language-([^\s]+)/)?.[1] ?? '';
+      getAttribute(code, 'data-language')?.trim() ||
+      getAttribute(node, 'data-language')?.trim() ||
+      (getAttribute(code, 'class') ?? '').match(/(?:^|\s)language-([^\s]+)/)?.[1] ||
+      '';
     const content = getTextContent(code).replace(/^\n+|\n+$/g, '');
     const fence = '`'.repeat(Math.max(3, getMaxBacktickRunLength(content) + 1));
     return `${fence}${language}\n${content}\n${fence}\n\n`;

@@ -221,6 +221,21 @@ test('preserves article iframe embeds as labeled Markdown links without presenta
   assert.doesNotMatch(markdown, /Navigation noise|Footer noise|window\.noise/);
 });
 
+test('escapes balanced parentheses in anchor, iframe, and image destinations', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <p><a href="https://example.com/a(b)">Anchor</a></p>
+      <p><iframe src="https://example.com/a(b)" title="Frame"></iframe></p>
+      <p><img src="https://example.com/a(b)" alt="Image" /></p>
+    </main>
+  `);
+
+  assert.equal(
+    markdown,
+    '[Anchor](https://example.com/a\\(b\\))\n\n[Frame](https://example.com/a\\(b\\))\n\n![Image](https://example.com/a\\(b\\))\n',
+  );
+});
+
 test('preserves authored inline adjacency in article and note bodies', () => {
   const articleMarkdown = htmlToMarkdown(`
     <main>
@@ -251,6 +266,14 @@ test('uses a longer fence when code contains a triple-backtick run', () => {
   const markdown = htmlToMarkdown('<main><pre><code>const fence = "```";</code></pre></main>');
 
   assert.equal(markdown, '````\nconst fence = "```";\n````\n');
+});
+
+test('preserves a fenced code block data-language attribute', () => {
+  const markdown = htmlToMarkdown(
+    '<main><pre><code data-language="javascript">const value = 1;</code></pre></main>',
+  );
+
+  assert.equal(markdown, '```javascript\nconst value = 1;\n```\n');
 });
 
 test('uses a longer inline delimiter when code contains an internal backtick run', () => {
