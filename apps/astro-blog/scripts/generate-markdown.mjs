@@ -316,7 +316,12 @@ function renderBlock(node, options = {}) {
     const language =
       (getAttribute(code, 'class') ?? '').match(/(?:^|\s)language-([^\s]+)/)?.[1] ?? '';
     const content = getTextContent(code).replace(/^\n+|\n+$/g, '');
-    return `\`\`\`${language}\n${content}\n\`\`\`\n\n`;
+    const maxBacktickRunLength = Math.max(
+      0,
+      ...(content.match(/`+/g) ?? []).map((run) => run.length),
+    );
+    const fence = '`'.repeat(Math.max(3, maxBacktickRunLength + 1));
+    return `${fence}${language}\n${content}\n${fence}\n\n`;
   }
 
   if (tagName === 'table') {

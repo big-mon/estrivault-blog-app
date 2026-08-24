@@ -149,6 +149,12 @@ test('preserves authored inline adjacency in article and note bodies', () => {
   assert.equal(noteMarkdown, '# Note title\n\nこれは**重要**。[リンク](/detail)です。\n');
 });
 
+test('uses a longer fence when code contains a triple-backtick run', () => {
+  const markdown = htmlToMarkdown('<main><pre><code>const fence = "```";</code></pre></main>');
+
+  assert.equal(markdown, '````\nconst fence = "```";\n````\n');
+});
+
 test('separates adjacent fields in generic document cards', () => {
   const markdown = htmlToMarkdown(`
     <main>

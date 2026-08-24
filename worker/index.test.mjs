@@ -73,6 +73,46 @@ test('preserves a conditional 304 Markdown sidecar response', async () => {
   assert.equal(response.headers.get('Last-Modified'), 'Sat, 01 Aug 2026 00:00:00 GMT');
 });
 
+test('negotiates Markdown before an eligible HTML 304 response', async () => {
+  const env = {
+    ASSETS: createAssets({
+      '/post/about/index.html': {
+        status: 304,
+        headers: {
+          ...htmlHeaders,
+          ETag: '"html-version"',
+          'Last-Modified': 'Sat, 01 Aug 2026 00:00:00 GMT',
+        },
+      },
+      '/post/about/index.md': {
+        status: 304,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'public, max-age=120',
+          ETag: '"markdown-version"',
+          'Last-Modified': 'Sun, 02 Aug 2026 00:00:00 GMT',
+        },
+      },
+    }),
+  };
+
+  const response = await worker.fetch(
+    createRequest('/post/about', {
+      accept: 'text/markdown',
+      ifNoneMatch: '"markdown-version"',
+    }),
+    env,
+  );
+
+  assert.equal(response.status, 304);
+  assert.equal(await response.text(), '');
+  assert.equal(response.headers.get('Content-Type'), 'text/markdown; charset=utf-8');
+  assert.equal(response.headers.get('Cache-Control'), 'public, max-age=120');
+  assert.equal(response.headers.get('ETag'), '"markdown-version"');
+  assert.equal(response.headers.get('Last-Modified'), 'Sun, 02 Aug 2026 00:00:00 GMT');
+  assert.equal(response.headers.get('Vary'), 'Accept');
+});
+
 test('serves a GET or HEAD Markdown sidecar for an explicitly accepted HTML page', async () => {
   const env = {
     ASSETS: createAssets({

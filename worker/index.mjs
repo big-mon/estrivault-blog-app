@@ -57,7 +57,7 @@ export default {
     }
 
     const response = await env.ASSETS.fetch(request);
-    if (!response.ok || !isHtmlResponse(response)) {
+    if ((!response.ok && response.status !== 304) || !isHtmlResponse(response)) {
       return response;
     }
 
