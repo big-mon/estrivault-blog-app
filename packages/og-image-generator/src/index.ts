@@ -15,7 +15,7 @@ export interface PostOgpCardData {
 
 const IMAGE_WIDTH = 1200;
 const IMAGE_HEIGHT = 630;
-const CACHE_SCHEMA_VERSION = 'post-ogp-cache-v1';
+const CACHE_SCHEMA_VERSION = 'post-ogp-cache-v2';
 
 export interface PostOgpCacheOptions {
   cacheDir?: string;
