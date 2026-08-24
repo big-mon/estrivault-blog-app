@@ -240,7 +240,7 @@ function renderListItem(item, marker, options = {}) {
   const parts = [];
   let inlineNodes = [];
   const flushInline = () => {
-    const content = renderInlineChildren(inlineNodes, options).trim();
+    const content = escapeBlockLeadingSyntax(renderInlineChildren(inlineNodes, options).trim());
     if (content) {
       parts.push({ content, isList: false });
     }

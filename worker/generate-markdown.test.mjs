@@ -73,6 +73,36 @@ test('escapes block markers at the start of paragraph text', () => {
   );
 });
 
+test('escapes block markers at the start of tight list item text', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <ul>
+        <li># literal</li>
+        <li>> literal</li>
+        <li>- literal</li>
+        <li>1. literal</li>
+        <li>1) literal</li>
+        <li>---</li>
+        <li>&lt;div&gt;literal&lt;/div&gt;</li>
+      </ul>
+    </main>
+  `);
+
+  assert.equal(
+    markdown,
+    [
+      '- \\# literal',
+      '- \\> literal',
+      '- \\- literal',
+      '- 1\\. literal',
+      '- 1\\) literal',
+      '- \\---',
+      '- \\<div>literal</div>',
+      '',
+    ].join('\n'),
+  );
+});
+
 test('preserves block children and their order inside list items', () => {
   const markdown = htmlToMarkdown(`
     <main>
