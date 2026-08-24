@@ -5,3 +5,8 @@ packages:
 overrides:
   '@modelcontextprotocol/sdk>@hono/node-server': 2.0.11
   'tsup>esbuild': 0.28.1
+
+allowBuilds:
+  esbuild: true
+
+autoInstallPeers: false
