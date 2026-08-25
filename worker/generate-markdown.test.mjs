@@ -55,6 +55,36 @@ test('keeps semantic block boundaries and omits generated heading anchors', () =
   assert.equal(markdown, '[Brand](/)\n\nLead text\n\n## Lead heading\n');
 });
 
+test('preserves supported directive types and custom content in labeled blockquotes', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <div class="directive-box directive-info" data-directive-type="info"><p>Info body</p></div>
+      <div class="directive-box directive-alert" data-directive-type="alert">
+        <p class="directive-title"><strong>Custom title</strong></p>
+        <p>Alert body</p>
+      </div>
+      <div class="directive-box directive-warn" data-directive-type="warn"><p>Warn body</p></div>
+    </main>
+  `);
+
+  assert.equal(
+    markdown,
+    [
+      '> [!INFO]',
+      '> Info body',
+      '',
+      '> [!ALERT]',
+      '> **Custom title**',
+      '>',
+      '> Alert body',
+      '',
+      '> [!WARN]',
+      '> Warn body',
+      '',
+    ].join('\n'),
+  );
+});
+
 test('escapes block markers at the start of paragraph text', () => {
   const markdown = htmlToMarkdown(`
     <main>
@@ -341,6 +371,12 @@ test('preserves fenced code whitespace and generated hard breaks', () => {
   );
 });
 
+test('preserves authored boundary blank lines in fenced code', () => {
+  const markdown = htmlToMarkdown('<main><pre><code>\nalpha\n\n</code></pre></main>');
+
+  assert.equal(markdown, '```\n\nalpha\n\n\n```\n');
+});
+
 test('preserves blank lines in highlighted fenced code', () => {
   const markdown = htmlToMarkdown(
     '<main><pre data-language="text"><code data-language="text"><span data-line=""><span>alpha</span></span>\n<span data-line=""> </span>\n<span data-line=""><span>beta</span></span></code></pre></main>',
@@ -410,6 +446,14 @@ test('preserves consecutive and boundary spaces in inline code', () => {
   const markdown = htmlToMarkdown('<main><p><code>a  b</code> / <code> a </code></p></main>');
 
   assert.equal(markdown, '`a  b` / `  a  `\n');
+});
+
+test('preserves whitespace-only inline code between adjacent prose', () => {
+  const markdown = htmlToMarkdown(
+    '<main><article><div class="article-body"><p>before<code> </code>after</p></div></article></main>',
+  );
+
+  assert.equal(markdown, 'before` `after\n');
 });
 
 test('separates adjacent fields in generic document cards', () => {

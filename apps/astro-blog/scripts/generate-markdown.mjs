@@ -208,7 +208,7 @@ function renderInline(node, options = {}) {
 
   if (tagName === 'code') {
     const content = getTextContent(node);
-    if (!content.trim()) {
+    if (!content) {
       return '';
     }
 
@@ -217,7 +217,7 @@ function renderInline(node, options = {}) {
       content.startsWith('`') ||
       content.endsWith('`') ||
       (content.startsWith(' ') && content.endsWith(' '));
-    const padding = needsPadding ? ' ' : '';
+    const padding = content.trim() && needsPadding ? ' ' : '';
     return `${delimiter}${padding}${content}${padding}${delimiter}`;
   }
 
@@ -426,7 +426,7 @@ function renderBlock(node, options = {}) {
       getAttribute(node, 'data-language')?.trim() ||
       (getAttribute(code, 'class') ?? '').match(/(?:^|\s)language-([^\s]+)/)?.[1] ||
       '';
-    const content = getFencedCodeTextContent(code).replace(/^\n+|\n+$/g, '');
+    const content = getFencedCodeTextContent(code);
     const fence = '`'.repeat(Math.max(3, getMaxBacktickRunLength(content) + 1));
     return `${fence}${language}\n${content}\n${fence}\n\n`;
   }
@@ -437,6 +437,18 @@ function renderBlock(node, options = {}) {
 
   if (tagName === 'hr') {
     return '---\n\n';
+  }
+
+  if (tagName === 'div') {
+    const directiveType = getAttribute(node, 'data-directive-type')?.trim().toLowerCase();
+    if (['info', 'alert', 'warn'].includes(directiveType)) {
+      const content = renderBlocks(node.childNodes, options).trim();
+      const lines = [`> [!${directiveType.toUpperCase()}]`];
+      if (content) {
+        lines.push(...content.split('\n').map((line) => (line ? `> ${line}` : '>')));
+      }
+      return `${lines.join('\n')}\n\n`;
+    }
   }
 
   if (
