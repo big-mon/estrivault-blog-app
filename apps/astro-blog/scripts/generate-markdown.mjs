@@ -120,6 +120,18 @@ function getTextContent(node) {
   return (node?.childNodes ?? []).map(getTextContent).join('');
 }
 
+function getFencedCodeTextContent(node) {
+  return (node?.childNodes ?? [])
+    .filter(
+      (child) =>
+        child.nodeName !== 'span' ||
+        getAttribute(child, 'data-line') !== '' ||
+        getTextContent(child) !== ' ',
+    )
+    .map(getTextContent)
+    .join('');
+}
+
 function getMaxBacktickRunLength(content) {
   return Math.max(0, ...(content.match(/`+/g) ?? []).map((run) => run.length));
 }
@@ -195,13 +207,17 @@ function renderInline(node, options = {}) {
   }
 
   if (tagName === 'code') {
-    const content = getTextContent(node).replace(/\s+/g, ' ').trim();
-    if (!content) {
+    const content = getTextContent(node);
+    if (!content.trim()) {
       return '';
     }
 
     const delimiter = '`'.repeat(getMaxBacktickRunLength(content) + 1);
-    const padding = content.startsWith('`') || content.endsWith('`') ? ' ' : '';
+    const needsPadding =
+      content.startsWith('`') ||
+      content.endsWith('`') ||
+      (content.startsWith(' ') && content.endsWith(' '));
+    const padding = needsPadding ? ' ' : '';
     return `${delimiter}${padding}${content}${padding}${delimiter}`;
   }
 
@@ -410,7 +426,7 @@ function renderBlock(node, options = {}) {
       getAttribute(node, 'data-language')?.trim() ||
       (getAttribute(code, 'class') ?? '').match(/(?:^|\s)language-([^\s]+)/)?.[1] ||
       '';
-    const content = getTextContent(code).replace(/^\n+|\n+$/g, '');
+    const content = getFencedCodeTextContent(code).replace(/^\n+|\n+$/g, '');
     const fence = '`'.repeat(Math.max(3, getMaxBacktickRunLength(content) + 1));
     return `${fence}${language}\n${content}\n${fence}\n\n`;
   }

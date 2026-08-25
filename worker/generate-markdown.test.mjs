@@ -341,6 +341,14 @@ test('preserves fenced code whitespace and generated hard breaks', () => {
   );
 });
 
+test('preserves blank lines in highlighted fenced code', () => {
+  const markdown = htmlToMarkdown(
+    '<main><pre data-language="text"><code data-language="text"><span data-line=""><span>alpha</span></span>\n<span data-line=""> </span>\n<span data-line=""><span>beta</span></span></code></pre></main>',
+  );
+
+  assert.equal(markdown, '```text\nalpha\n\nbeta\n```\n');
+});
+
 test('preserves a fenced code block data-language attribute', () => {
   const markdown = htmlToMarkdown(
     '<main><pre><code data-language="javascript">const value = 1;</code></pre></main>',
@@ -396,6 +404,12 @@ test('pads inline code when its content starts and ends with a backtick', () => 
   const markdown = htmlToMarkdown('<main><p><code>`literal`</code></p></main>');
 
   assert.equal(markdown, '`` `literal` ``\n');
+});
+
+test('preserves consecutive and boundary spaces in inline code', () => {
+  const markdown = htmlToMarkdown('<main><p><code>a  b</code> / <code> a </code></p></main>');
+
+  assert.equal(markdown, '`a  b` / `  a  `\n');
 });
 
 test('separates adjacent fields in generic document cards', () => {
