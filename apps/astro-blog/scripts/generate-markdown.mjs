@@ -103,7 +103,9 @@ function escapeInlineText(value) {
   return value
     .replace(/\s+/g, ' ')
     .replace(/\\/g, '\\\\')
-    .replace(/([*_`[\]~])/g, '\\$1');
+    .replace(/([*_`[\]~])/g, '\\$1')
+    .replace(/<(?=\/?[A-Za-z][A-Za-z0-9-]*(?:\s+[^<>]*)?\/?>)/g, '\\<')
+    .replace(/&(?:(?:[A-Za-z][A-Za-z0-9]*)|#(?:\d+|[xX][0-9A-Fa-f]+));/g, '\\$&');
 }
 
 function escapeMarkdownDestination(value) {
@@ -145,6 +147,10 @@ function renderInline(node, options = {}) {
   const tagName = node.nodeName;
   if (tagName === 'br') {
     return '  \n';
+  }
+
+  if (tagName === 'input' && getAttribute(node, 'type')?.toLowerCase() === 'checkbox') {
+    return getAttribute(node, 'checked') !== null ? '[x]' : '[ ]';
   }
 
   if (tagName === 'iframe') {

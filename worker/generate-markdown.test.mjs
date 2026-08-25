@@ -69,7 +69,7 @@ test('escapes block markers at the start of paragraph text', () => {
 
   assert.equal(
     markdown,
-    '\\# literal\n\n\\> literal\n\n\\- literal\n\n1\\. literal\n\n1\\) literal\n\n\\<div>literal</div>\n',
+    '\\# literal\n\n\\> literal\n\n\\- literal\n\n1\\. literal\n\n1\\) literal\n\n\\<div>literal\\</div>\n',
   );
 });
 
@@ -97,10 +97,18 @@ test('escapes block markers at the start of tight list item text', () => {
       '- 1\\. literal',
       '- 1\\) literal',
       '- \\---',
-      '- \\<div>literal</div>',
+      '- \\<div>literal\\</div>',
       '',
     ].join('\n'),
   );
+});
+
+test('preserves checked and unchecked GFM task-list checkboxes', () => {
+  const markdown = htmlToMarkdown(
+    '<main><ul><li><input type="checkbox" checked disabled> done</li><li><input type="checkbox" disabled> todo</li></ul></main>',
+  );
+
+  assert.equal(markdown, '- [x] done\n- [ ] todo\n');
 });
 
 test('preserves block children and their order inside list items', () => {
@@ -290,6 +298,19 @@ test('preserves authored inline adjacency in article and note bodies', () => {
 
   assert.equal(articleMarkdown, '# Article title\n\nこれは**重要**。[リンク](/detail)です。\n');
   assert.equal(noteMarkdown, '# Note title\n\nこれは**重要**。[リンク](/detail)です。\n');
+});
+
+test('escapes inline tag-like and entity-like openers without broad punctuation escaping', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <p>before &lt;widget&gt; and &lt;/widget&gt; and &amp;copy; and &amp;#169; and &amp;#x1f642; while 2 &lt; 3 and R&amp;D</p>
+    </main>
+  `);
+
+  assert.equal(
+    markdown,
+    'before \\<widget> and \\</widget> and \\&copy; and \\&#169; and \\&#x1f642; while 2 < 3 and R&D\n',
+  );
 });
 
 test('uses a longer fence when code contains a triple-backtick run', () => {
