@@ -311,12 +311,27 @@ function renderList(node, options = {}) {
 
 function renderTable(node, options = {}) {
   const rows = [];
+  const headerAlignments = [];
   const visit = (current) => {
     if (current.nodeName === 'tr') {
       const cells = (current.childNodes ?? []).filter(
         (child) => child.nodeName === 'th' || child.nodeName === 'td',
       );
       if (cells.length > 0) {
+        if (rows.length === 0) {
+          headerAlignments.push(
+            ...cells.map((cell) => {
+              const alignment =
+                cell.nodeName === 'th' ? getAttribute(cell, 'align')?.trim().toLowerCase() : null;
+              return (
+                alignment === 'left' ? ':---'
+                : alignment === 'center' ? ':---:'
+                : alignment === 'right' ? '---:'
+                : '---'
+              );
+            }),
+          );
+        }
         rows.push(
           cells.map((cell) =>
             renderInlineChildren(cell.childNodes, options)
@@ -342,7 +357,7 @@ function renderTable(node, options = {}) {
   const columnCount = Math.max(...rows.map((row) => row.length));
   const normalizedRows = rows.map((row) => [...row, ...Array(columnCount - row.length).fill('')]);
   const header = `| ${normalizedRows[0].join(' | ')} |`;
-  const separator = `| ${Array(columnCount).fill('---').join(' | ')} |`;
+  const separator = `| ${Array.from({ length: columnCount }, (_, index) => headerAlignments[index] ?? '---').join(' | ')} |`;
   const body = normalizedRows.slice(1).map((row) => `| ${row.join(' | ')} |`);
   return `${[header, separator, ...body].join('\n')}\n\n`;
 }
@@ -424,13 +439,27 @@ function renderBlock(node, options = {}) {
   return null;
 }
 
+function joinRenderedBlocks(blocks = []) {
+  return blocks.filter(Boolean).reduce((result, block) => {
+    if (!result) {
+      return block;
+    }
+
+    const separator =
+      result.endsWith('\n\n') ? ''
+      : result.endsWith('\n') ? '\n'
+      : '\n\n';
+    return result + separator + block;
+  }, '');
+}
+
 function renderBlocks(nodes = [], options = {}) {
-  return nodes
-    .map((node) => {
+  return joinRenderedBlocks(
+    nodes.map((node) => {
       const block = renderBlock(node, options);
       return block === null ? renderInline(node, options) : block;
-    })
-    .join('\n\n');
+    }),
+  );
 }
 
 export function htmlToMarkdown(html) {
@@ -441,19 +470,17 @@ export function htmlToMarkdown(html) {
   const contentRoot = articleBody ?? noteBody;
   const content =
     contentRoot ?
-      [findFirst(main, 'h1'), findFirstWithClass(main, 'article-lead'), contentRoot]
-        .filter(Boolean)
-        .map((node) =>
-          node === contentRoot ?
-            renderBlocks(node.childNodes, { insertInlineSeparators: false })
-          : renderBlock(node),
-        )
-        .join('\n\n')
+      joinRenderedBlocks(
+        [findFirst(main, 'h1'), findFirstWithClass(main, 'article-lead'), contentRoot]
+          .filter(Boolean)
+          .map((node) =>
+            node === contentRoot ?
+              renderBlocks(node.childNodes, { insertInlineSeparators: false })
+            : renderBlock(node),
+          ),
+      )
     : renderBlocks(main.childNodes);
-  const markdown = content
-    .replace(/[ \t]+\n/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
+  const markdown = content.trim();
 
   return markdown ? `${markdown}\n` : '';
 }

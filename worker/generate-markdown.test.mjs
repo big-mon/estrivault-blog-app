@@ -298,12 +298,58 @@ test('uses a longer fence when code contains a triple-backtick run', () => {
   assert.equal(markdown, '````\nconst fence = "```";\n````\n');
 });
 
+test('preserves fenced code whitespace and generated hard breaks', () => {
+  const markdown = htmlToMarkdown(
+    '<main><pre><code>line with two spaces  \n\n\nline after gaps</code></pre><p>Before<br>After</p></main>',
+  );
+
+  assert.equal(
+    markdown,
+    [
+      '```',
+      'line with two spaces  ',
+      '',
+      '',
+      'line after gaps',
+      '```',
+      '',
+      'Before  ',
+      'After',
+      '',
+    ].join('\n'),
+  );
+});
+
 test('preserves a fenced code block data-language attribute', () => {
   const markdown = htmlToMarkdown(
     '<main><pre><code data-language="javascript">const value = 1;</code></pre></main>',
   );
 
   assert.equal(markdown, '```javascript\nconst value = 1;\n```\n');
+});
+
+test('preserves first-row table header alignment markers', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <table>
+        <thead>
+          <tr>
+            <th align="left">Left</th>
+            <th align="center">Center</th>
+            <th align="right">Right</th>
+            <th>Unset</th>
+            <th align="justify">Invalid</th>
+          </tr>
+        </thead>
+        <tbody><tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr></tbody>
+      </table>
+    </main>
+  `);
+
+  assert.equal(
+    markdown,
+    '| Left | Center | Right | Unset | Invalid |\n| :--- | :---: | ---: | --- | --- |\n| 1 | 2 | 3 | 4 | 5 |\n',
+  );
 });
 
 test('uses a longer inline delimiter when code contains an internal backtick run', () => {
