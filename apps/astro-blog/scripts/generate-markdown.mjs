@@ -335,6 +335,7 @@ function renderTable(node, options = {}) {
         rows.push(
           cells.map((cell) =>
             renderInlineChildren(cell.childNodes, options)
+              .replace(/ {2}\n/g, '<br>')
               .replace(/\s+/g, ' ')
               .replace(/\|/g, '\\|')
               .trim(),

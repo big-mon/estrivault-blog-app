@@ -15,6 +15,14 @@ test('does not treat q=0 or a wildcard as explicit Markdown acceptance', () => {
   assert.equal(acceptsMarkdown(undefined), false);
 });
 
+test('does not treat q=0 after a quoted comma as Markdown acceptance', () => {
+  assert.equal(acceptsMarkdown('text/markdown;profile="a,b";q=0'), false);
+});
+
+test('ignores q-like text after a quoted semicolon in an Accept parameter', () => {
+  assert.equal(acceptsMarkdown('text/markdown;profile="a;q=0"'), true);
+});
+
 test('maps canonical document URLs to their Markdown sidecars', () => {
   assert.equal(getMarkdownAssetPath('/'), '/index.md');
   assert.equal(getMarkdownAssetPath('/post/about'), '/post/about/index.md');

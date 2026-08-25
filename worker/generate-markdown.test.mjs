@@ -352,6 +352,19 @@ test('preserves first-row table header alignment markers', () => {
   );
 });
 
+test('preserves table-cell line breaks as inline HTML', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <table>
+        <tr><th>Label</th></tr>
+        <tr><td>Before<br>After</td></tr>
+      </table>
+    </main>
+  `);
+
+  assert.equal(markdown, '| Label |\n| --- |\n| Before<br>After |\n');
+});
+
 test('uses a longer inline delimiter when code contains an internal backtick run', () => {
   const markdown = htmlToMarkdown('<main><p><code>literal ``` run</code></p></main>');
 

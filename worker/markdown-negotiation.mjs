@@ -1,5 +1,35 @@
 const MARKDOWN_MEDIA_TYPE = 'text/markdown';
 
+function splitOutsideQuotedStrings(value, delimiter) {
+  const parts = [];
+  let start = 0;
+  let inQuotes = false;
+  let escaped = false;
+
+  for (let index = 0; index < value.length; index += 1) {
+    const character = value[index];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (inQuotes && character === '\\') {
+      escaped = true;
+      continue;
+    }
+    if (character === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+    if (!inQuotes && character === delimiter) {
+      parts.push(value.slice(start, index));
+      start = index + 1;
+    }
+  }
+
+  parts.push(value.slice(start));
+  return parts;
+}
+
 function parseQualityParameter(parameters) {
   const qualityParameter = parameters.find((parameter) => /^\s*q\s*=/i.test(parameter));
   if (!qualityParameter) {
@@ -17,8 +47,8 @@ export function acceptsMarkdown(accept) {
     return false;
   }
 
-  return accept.split(',').some((item) => {
-    const [mediaType, ...parameters] = item.split(';');
+  return splitOutsideQuotedStrings(accept, ',').some((item) => {
+    const [mediaType, ...parameters] = splitOutsideQuotedStrings(item, ';');
     if (mediaType.trim().toLowerCase() !== MARKDOWN_MEDIA_TYPE) {
       return false;
     }
