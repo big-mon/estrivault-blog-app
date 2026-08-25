@@ -397,6 +397,14 @@ test('uses a longer fence when code contains a triple-backtick run', () => {
   assert.equal(markdown, '````\nconst fence = "```";\n````\n');
 });
 
+test('adds one separator newline before the fenced code closing fence', () => {
+  const trailingNewline = htmlToMarkdown('<main><pre><code>alpha\n</code></pre></main>');
+  const noTrailingNewline = htmlToMarkdown('<main><pre><code>alpha</code></pre></main>');
+
+  assert.equal(trailingNewline, '```\nalpha\n```\n');
+  assert.equal(noTrailingNewline, '```\nalpha\n```\n');
+});
+
 test('preserves fenced code whitespace and generated hard breaks', () => {
   const markdown = htmlToMarkdown(
     '<main><pre><code>line with two spaces  \n\n\nline after gaps</code></pre><p>Before<br>After</p></main>',
@@ -422,7 +430,7 @@ test('preserves fenced code whitespace and generated hard breaks', () => {
 test('preserves authored boundary blank lines in fenced code', () => {
   const markdown = htmlToMarkdown('<main><pre><code>\nalpha\n\n</code></pre></main>');
 
-  assert.equal(markdown, '```\n\nalpha\n\n\n```\n');
+  assert.equal(markdown, '```\n\nalpha\n\n```\n');
 });
 
 test('preserves blank lines in highlighted fenced code', () => {

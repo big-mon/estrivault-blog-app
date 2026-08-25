@@ -441,7 +441,8 @@ function renderBlock(node, options = {}) {
       '';
     const content = getFencedCodeTextContent(code);
     const fence = '`'.repeat(Math.max(3, getMaxBacktickRunLength(content) + 1));
-    return `${fence}${language}\n${content}\n${fence}\n\n`;
+    const separator = content.endsWith('\n') ? '' : '\n';
+    return `${fence}${language}\n${content}${separator}${fence}\n\n`;
   }
 
   if (tagName === 'table') {
