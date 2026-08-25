@@ -112,6 +112,18 @@ function escapeMarkdownDestination(value) {
   return value.replace(/[\\()]/g, '\\$&');
 }
 
+function splitInlineBoundaryWhitespace(value) {
+  const leading = value.match(/^\s*/)?.[0] ?? '';
+  const trailing = value.match(/\s*$/)?.[0] ?? '';
+  const content = value.slice(leading.length, value.length - trailing.length);
+  return { content, leading, trailing };
+}
+
+function wrapInlineContent(value, marker) {
+  const { content, leading, trailing } = splitInlineBoundaryWhitespace(value);
+  return content ? `${leading}${marker}${content}${marker}${trailing}` : '';
+}
+
 function getTextContent(node) {
   if (node?.nodeName === '#text') {
     return node.value;
@@ -126,6 +138,7 @@ function getFencedCodeTextContent(node) {
       (child) =>
         child.nodeName !== 'span' ||
         getAttribute(child, 'data-line') !== '' ||
+        child.childNodes?.some((grandchild) => grandchild.nodeName !== '#text') ||
         getTextContent(child) !== ' ',
     )
     .map(getTextContent)
@@ -174,12 +187,15 @@ function renderInline(node, options = {}) {
   }
 
   if (tagName === 'a') {
-    const content = renderInlineChildren(node.childNodes, options).trim();
+    const rawContent = renderInlineChildren(node.childNodes, options);
+    const { content, leading, trailing } = splitInlineBoundaryWhitespace(rawContent);
     const href = getAttribute(node, 'href');
     if (!content) {
       return '';
     }
-    return href ? `[${content}](${escapeMarkdownDestination(href)})` : content;
+    return href ?
+        `${leading}[${content}](${escapeMarkdownDestination(href)})${trailing}`
+      : rawContent;
   }
 
   if (tagName === 'img') {
@@ -187,23 +203,20 @@ function renderInline(node, options = {}) {
     if (!src) {
       return '';
     }
-    const alt = (getAttribute(node, 'alt') ?? '').replaceAll('[', '\\[').replaceAll(']', '\\]');
+    const alt = escapeInlineText(getAttribute(node, 'alt') ?? '');
     return `![${alt}](${escapeMarkdownDestination(src)})`;
   }
 
   if (tagName === 'strong' || tagName === 'b') {
-    const content = renderInlineChildren(node.childNodes, options).trim();
-    return content ? `**${content}**` : '';
+    return wrapInlineContent(renderInlineChildren(node.childNodes, options), '**');
   }
 
   if (tagName === 'em' || tagName === 'i') {
-    const content = renderInlineChildren(node.childNodes, options).trim();
-    return content ? `*${content}*` : '';
+    return wrapInlineContent(renderInlineChildren(node.childNodes, options), '*');
   }
 
   if (tagName === 'del' || tagName === 's') {
-    const content = renderInlineChildren(node.childNodes, options).trim();
-    return content ? `~~${content}~~` : '';
+    return wrapInlineContent(renderInlineChildren(node.childNodes, options), '~~');
   }
 
   if (tagName === 'code') {

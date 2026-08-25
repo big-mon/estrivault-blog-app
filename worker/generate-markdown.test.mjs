@@ -304,6 +304,54 @@ test('escapes balanced parentheses in anchor, iframe, and image destinations', (
   );
 });
 
+test('escapes image alt text with the same inline rules as text nodes', () => {
+  const markdown = htmlToMarkdown(
+    '<main><p><img src="https://example.com/a(b)" alt=" [bracket] *stars* _under_ `code` ~strike~ &lt;tag&gt; &amp;copy; \\path " /></p></main>',
+  );
+
+  assert.equal(
+    markdown,
+    '![ \\[bracket\\] \\*stars\\* \\_under\\_ \\`code\\` \\~strike\\~ \\<tag> \\&copy; \\\\path ](https://example.com/a\\(b\\))\n',
+  );
+});
+
+test('preserves boundary whitespace around inline wrappers and keeps empty wrappers empty', () => {
+  const markdown = htmlToMarkdown(`
+    <main>
+      <p>before<a href="/link"> link </a>after</p>
+      <p>before<strong> bold </strong>after</p>
+      <p>before<b> bold </b>after</p>
+      <p>before<em> italic </em>after</p>
+      <p>before<i> italic </i>after</p>
+      <p>before<del> deleted </del>after</p>
+      <p>before<s> deleted </s>after</p>
+      <p>empty<strong> </strong>and<em></em>done</p>
+    </main>
+  `);
+
+  assert.equal(
+    markdown,
+    [
+      'before [link](/link) after',
+      '',
+      'before **bold** after',
+      '',
+      'before **bold** after',
+      '',
+      'before *italic* after',
+      '',
+      'before *italic* after',
+      '',
+      'before ~~deleted~~ after',
+      '',
+      'before ~~deleted~~ after',
+      '',
+      'empty and done',
+      '',
+    ].join('\n'),
+  );
+});
+
 test('preserves authored inline adjacency in article and note bodies', () => {
   const articleMarkdown = htmlToMarkdown(`
     <main>
@@ -383,6 +431,14 @@ test('preserves blank lines in highlighted fenced code', () => {
   );
 
   assert.equal(markdown, '```text\nalpha\n\nbeta\n```\n');
+});
+
+test('preserves nested authored one-space lines in highlighted fenced code', () => {
+  const markdown = htmlToMarkdown(
+    '<main><pre data-language="text"><code data-language="text"><span data-line=""><span> </span></span>\n<span data-line=""> </span>\n<span data-line=""><span>beta</span></span></code></pre></main>',
+  );
+
+  assert.equal(markdown, '```text\n \n\nbeta\n```\n');
 });
 
 test('preserves a fenced code block data-language attribute', () => {
