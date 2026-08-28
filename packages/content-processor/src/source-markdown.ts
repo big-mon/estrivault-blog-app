@@ -2,8 +2,9 @@ import { unified } from 'unified';
 import remarkDirective from 'remark-directive';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
+import { decodeString } from 'micromark-util-decode-string';
 import { visit } from 'unist-util-visit';
-import type { Heading, Image, Root } from 'mdast';
+import type { Definition, Heading, Image, ImageReference, Root } from 'mdast';
 import type { Node, Parent } from 'unist';
 import { parseFrontmatter } from './processor';
 import matter from 'gray-matter';
@@ -29,6 +30,8 @@ interface SourceLine extends SourceRange {
   text: string;
 }
 
+type DefinitionContext = Map<string, { url: string; title: string | null; source: string }>;
+
 const directiveParser = unified().use(remarkParse).use(remarkDirective).use(remarkGfm);
 const LEAF_LIKE_DIRECTIVES = new Set(['amazon', 'youtube', 'twitter']);
 const FALLBACK_CALLOUT_NAMES = new Set(['info', 'warn', 'alert', 'message']);
@@ -52,8 +55,14 @@ export function renderPublicMarkdownBody(
   return body ? `${generatedHeading}\n\n${body}` : `${generatedHeading}\n`;
 }
 
-function renderMarkdownBody(markdown: string, options: ProcessorOptions = {}): string {
-  const tree = directiveParser.parse(markdown) as Root;
+function renderMarkdownBody(
+  markdown: string,
+  options: ProcessorOptions = {},
+  inheritedDefinitions: DefinitionContext = new Map(),
+): string {
+  const tree = parseMarkdown(markdown, inheritedDefinitions);
+  const definitions = new Map(inheritedDefinitions);
+  collectDefinitionContext(tree, definitions, markdown, markdown.length);
   const replacements: Replacement[] = [];
   const codeRanges = collectCodeRanges(tree);
   const directiveOpenings = collectDirectiveOpenings(tree, markdown);
@@ -63,13 +72,21 @@ function renderMarkdownBody(markdown: string, options: ProcessorOptions = {}): s
   visit(tree, (node: Node) => {
     if (isDirectiveNode(node)) {
       const range = getDirectiveRange(node, markdown, directiveOpenings, codeRanges);
-      const value = renderDirective(node, markdown, range, options);
+      const value = renderDirective(node, markdown, range, options, definitions);
       replacements.push({ ...range, value });
       return;
     }
 
     if (isImage(node)) {
       const replacement = projectImage(node, markdown, options);
+      if (replacement) {
+        replacements.push(replacement);
+      }
+      return;
+    }
+
+    if (isImageReference(node)) {
+      const replacement = projectImageReference(node, markdown, options, definitions);
       if (replacement) {
         replacements.push(replacement);
       }
@@ -89,12 +106,46 @@ function renderMarkdownBody(markdown: string, options: ProcessorOptions = {}): s
     directiveStarts,
     codeRanges,
     options,
+    definitions,
   );
   const body = applyReplacements(
     markdown,
     selectNonOverlappingReplacements([...replacements, ...fallbackReplacements]),
   );
   return body;
+}
+
+function parseMarkdown(markdown: string, inheritedDefinitions: DefinitionContext): Root {
+  if (!inheritedDefinitions.size) {
+    return directiveParser.parse(markdown) as Root;
+  }
+
+  const definitionStubs = [...inheritedDefinitions.values()]
+    .map((definition) => definition.source)
+    .join('\n');
+  return directiveParser.parse(
+    `${markdown}${markdown.endsWith('\n') ? '\n' : '\n\n'}${definitionStubs}`,
+  ) as Root;
+}
+
+function collectDefinitionContext(
+  tree: Root,
+  definitions: DefinitionContext,
+  source: string,
+  sourceLength: number,
+): void {
+  visit(tree, 'definition', (node) => {
+    const definition = node as Definition;
+    const start = definition.position?.start.offset ?? sourceLength;
+    const end = definition.position?.end.offset;
+    if (start >= sourceLength || end === undefined || end > source.length) return;
+    if (definitions.has(definition.identifier)) return;
+    definitions.set(definition.identifier, {
+      url: definition.url,
+      title: definition.title ?? null,
+      source: source.slice(start, end),
+    });
+  });
 }
 
 /**
@@ -139,6 +190,7 @@ function collectFallbackReplacements(
   directiveStarts: Set<number>,
   codeRanges: SourceRange[],
   options: ProcessorOptions,
+  definitions: DefinitionContext,
 ): Replacement[] {
   const lines = collectSourceLines(source);
   const replacements: Replacement[] = [];
@@ -171,7 +223,11 @@ function collectFallbackReplacements(
         end: closing.end,
         value: renderBlockquote(
           getDirectiveLabel(marker.name),
-          renderMarkdownBody(getDelimitedBody(source, markerStart, closing.start), options),
+          renderMarkdownBody(
+            getDelimitedBody(source, markerStart, closing.start),
+            options,
+            definitions,
+          ),
         ),
       });
       continue;
@@ -425,6 +481,7 @@ function renderDirective(
   source: string,
   range: SourceRange,
   options: ProcessorOptions,
+  definitions: DefinitionContext,
 ): string {
   const id = getDirectiveAttribute(node, 'id');
 
@@ -447,7 +504,7 @@ function renderDirective(
   }
 
   const label = getDirectiveLabel(node.name);
-  const body = renderMarkdownBody(getContainerBody(source, range), options);
+  const body = renderMarkdownBody(getContainerBody(source, range), options, definitions);
   return renderBlockquote(label, body);
 }
 
@@ -521,6 +578,10 @@ function isImage(node: Node): node is Image {
   return node.type === 'image' && 'url' in node && typeof node.url === 'string';
 }
 
+function isImageReference(node: Node): node is ImageReference {
+  return node.type === 'imageReference' && 'identifier' in node;
+}
+
 function projectImage(node: Image, source: string, options: ProcessorOptions): Replacement | null {
   const resolvedUrl = resolveBodyImageUrl(node.url, options.cloudinaryCloudName);
   if (resolvedUrl === node.url) {
@@ -536,12 +597,63 @@ function projectImage(node: Image, source: string, options: ProcessorOptions): R
   return { ...destination, value: resolvedUrl };
 }
 
+function projectImageReference(
+  node: ImageReference,
+  source: string,
+  options: ProcessorOptions,
+  definitions: DefinitionContext,
+): Replacement | null {
+  const definition = definitions.get(node.identifier);
+  if (!definition) return null;
+
+  const resolvedUrl = resolveBodyImageUrl(definition.url, options.cloudinaryCloudName);
+  if (resolvedUrl === definition.url) return null;
+
+  const range = getNodeRange(node);
+  if (!range) throw new Error('Markdown image reference transformation requires a source position');
+
+  const nodeSource = source.slice(range.start, range.end);
+  const rawLabel = nodeSource.slice(0, locateImageLabelEnd(nodeSource, range, definition.url) + 1);
+
+  return {
+    ...range,
+    value: `${rawLabel}(${resolvedUrl}${serializeImageTitle(definition.title)})`,
+  };
+}
+
+function serializeImageTitle(title: string | null): string {
+  return title === null ? '' : ` "${title.replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"`;
+}
+
 function locateImageDestination(
   source: string,
   range: SourceRange,
   destination: string,
 ): SourceRange {
   const nodeSource = source.slice(range.start, range.end);
+  const labelEnd = locateImageLabelEnd(nodeSource, range, destination);
+  if (nodeSource[labelEnd + 1] !== '(') {
+    throw new Error(
+      `Markdown image destination ${JSON.stringify(destination)} cannot be located after the inline image label in source range ${range.start}-${range.end}`,
+    );
+  }
+
+  let destinationStart = labelEnd + 2;
+  while (/[ \t\r\n]/.test(nodeSource[destinationStart] ?? '')) {
+    destinationStart += 1;
+  }
+
+  const lexicalDestination = scanDestination(nodeSource, destinationStart, range, destination);
+  assertDecodedDestination(nodeSource, lexicalDestination, destination, range);
+  assertDestinationBoundary(nodeSource, lexicalDestination.after, destination, range);
+
+  return {
+    start: range.start + lexicalDestination.start,
+    end: range.start + lexicalDestination.end,
+  };
+}
+
+function locateImageLabelEnd(nodeSource: string, range: SourceRange, destination: string): number {
   if (nodeSource[0] !== '!' || nodeSource[1] !== '[') {
     throw new Error(
       `Markdown image destination ${JSON.stringify(destination)} has an unsupported inline image source range ${range.start}-${range.end}`,
@@ -549,7 +661,6 @@ function locateImageDestination(
   }
 
   let labelDepth = 1;
-  let labelEnd = -1;
   for (let index = 2; index < nodeSource.length; index += 1) {
     const character = nodeSource[index];
     if (character === '\\') {
@@ -561,51 +672,127 @@ function locateImageDestination(
     } else if (character === ']') {
       labelDepth -= 1;
       if (labelDepth === 0) {
-        labelEnd = index;
-        break;
+        return index;
       }
     }
   }
 
-  if (labelEnd < 0 || nodeSource[labelEnd + 1] !== '(') {
-    throw new Error(
-      `Markdown image destination ${JSON.stringify(destination)} cannot be located after the inline image label in source range ${range.start}-${range.end}`,
-    );
-  }
+  throw new Error(
+    `Markdown image destination ${JSON.stringify(destination)} cannot be located after the inline image label in source range ${range.start}-${range.end}`,
+  );
+}
 
-  let destinationStart = labelEnd + 2;
-  while (/[ \t\r\n]/.test(nodeSource[destinationStart] ?? '')) {
-    destinationStart += 1;
-  }
-
+function scanDestination(
+  nodeSource: string,
+  destinationStart: number,
+  range: SourceRange,
+  destination: string,
+): SourceRange & { after: number } {
   const hasAngleBrackets = nodeSource[destinationStart] === '<';
-  if (hasAngleBrackets) {
-    destinationStart += 1;
+  const destinationStartOffset = hasAngleBrackets ? 1 : 0;
+  const contentStart = destinationStart + destinationStartOffset;
+  let parenthesisDepth = 0;
+
+  for (let index = contentStart; index < nodeSource.length; index += 1) {
+    const character = nodeSource[index];
+
+    if (character === '\\') {
+      if (index + 1 >= nodeSource.length) {
+        throw new Error(
+          `Markdown image destination ${JSON.stringify(destination)} has a trailing escape in its ${hasAngleBrackets ? 'angle-bracket' : 'bare'} destination in source range ${range.start}-${range.end}`,
+        );
+      }
+      if (decodeString(nodeSource.slice(index, index + 2)) === nodeSource[index + 1]) {
+        index += 1;
+      }
+      continue;
+    }
+
+    if (hasAngleBrackets) {
+      if (character === '<') {
+        throw new Error(
+          `Markdown image destination ${JSON.stringify(destination)} has an unescaped < in its angle-bracket destination in source range ${range.start}-${range.end}`,
+        );
+      }
+      if (character === '>') {
+        return { start: contentStart, end: index, after: index + 1 };
+      }
+      continue;
+    }
+
+    if (/[ \t\r\n]/.test(character ?? '')) {
+      if (parenthesisDepth > 0) {
+        throw new Error(
+          `Markdown image destination ${JSON.stringify(destination)} has unbalanced parentheses before destination whitespace in source range ${range.start}-${range.end}`,
+        );
+      }
+      return { start: destinationStart, end: index, after: index };
+    }
+
+    if (character === '(') {
+      parenthesisDepth += 1;
+      continue;
+    }
+
+    if (character === ')') {
+      if (parenthesisDepth === 0) {
+        return { start: destinationStart, end: index, after: index };
+      }
+      parenthesisDepth -= 1;
+    }
   }
 
-  if (!nodeSource.startsWith(destination, destinationStart)) {
+  if (hasAngleBrackets) {
     throw new Error(
-      `Markdown image destination ${JSON.stringify(destination)} cannot be safely matched to inline source range ${range.start}-${range.end}`,
+      `Markdown image destination ${JSON.stringify(destination)} has an unterminated angle-bracket destination in source range ${range.start}-${range.end}`,
     );
   }
 
-  const end = destinationStart + destination.length;
-  if (hasAngleBrackets) {
-    if (nodeSource[end] !== '>') {
-      throw new Error(
-        `Markdown image destination ${JSON.stringify(destination)} has an unterminated angle-bracket destination in source range ${range.start}-${range.end}`,
-      );
-    }
-  } else if (nodeSource[end] !== ')' && !/[ \t\r\n]/.test(nodeSource[end] ?? '')) {
+  if (parenthesisDepth > 0) {
+    throw new Error(
+      `Markdown image destination ${JSON.stringify(destination)} has unbalanced parentheses in its bare destination in source range ${range.start}-${range.end}`,
+    );
+  }
+
+  throw new Error(
+    `Markdown image destination ${JSON.stringify(destination)} has no syntactic closing parenthesis in source range ${range.start}-${range.end}`,
+  );
+}
+
+function assertDecodedDestination(
+  nodeSource: string,
+  lexicalDestination: SourceRange & { after: number },
+  destination: string,
+  range: SourceRange,
+): void {
+  const rawDestination = nodeSource.slice(lexicalDestination.start, lexicalDestination.end);
+  const decodedDestination = decodeString(rawDestination);
+
+  if (decodedDestination !== destination) {
+    throw new Error(
+      `Markdown image destination ${JSON.stringify(destination)} cannot be safely matched: decoded lexical destination ${JSON.stringify(decodedDestination)} differs in source range ${range.start}-${range.end}`,
+    );
+  }
+}
+
+function assertDestinationBoundary(
+  nodeSource: string,
+  afterDestination: number,
+  destination: string,
+  range: SourceRange,
+): void {
+  const boundary = nodeSource[afterDestination];
+  if (boundary !== ')' && !/[ \t\r\n]/.test(boundary ?? '')) {
     throw new Error(
       `Markdown image destination ${JSON.stringify(destination)} has an unsafe inline source boundary in source range ${range.start}-${range.end}`,
     );
   }
 
-  return {
-    start: range.start + destinationStart,
-    end: range.start + end,
-  };
+  if (boundary !== ')' && !nodeSource.endsWith(')')) {
+    throw new Error(
+      `Markdown image destination ${JSON.stringify(destination)} has malformed inline image delimiters in source range ${range.start}-${range.end}`,
+    );
+  }
 }
 
 function getNodeRange(node: Node): SourceRange | null {

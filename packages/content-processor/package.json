@@ -22,6 +22,7 @@
   "dependencies": {
     "@estrivault/cloudinary-utils": "workspace:^",
     "gray-matter": "^4.0.3",
+    "micromark-util-decode-string": "^2.0.1",
     "reading-time": "^1.5.0",
     "rehype-pretty-code": "^0.14.5",
     "rehype-raw": "^7.0.0",

@@ -98,6 +98,9 @@ importers:
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
+      micromark-util-decode-string:
+        specifier: ^2.0.1
+        version: 2.0.1
       reading-time:
         specifier: ^1.5.0
         version: 1.5.0

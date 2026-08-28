@@ -126,6 +126,18 @@ function parseGenerated(markdown) {
   return { data: parsed.data, body: parsed.content };
 }
 
+function renderArticleBody(source, processorOptions = { cloudinaryCloudName: 'damonge' }) {
+  return parseGenerated(
+    renderArticleMarkdown({
+      source,
+      meta: articleMeta,
+      site,
+      canonicalUrl: 'https://example.test/post/resolved-article',
+      processorOptions,
+    }),
+  ).body;
+}
+
 test('article output uses an explicit public metadata allowlist and transforms source Markdown', () => {
   const { data, body } = parseGenerated(
     renderArticleMarkdown({
@@ -191,15 +203,7 @@ test('article body image destinations use Cloudinary without reserializing Markd
   const rootRelativeLink = '[Article link](/article/prose)';
   const source = `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n${rootRelativeImage}\n${absoluteImage}\n${dataImage}\n${rootRelativeLink}\n${fencedImage}\n`;
 
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source,
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-      processorOptions: { cloudinaryCloudName: 'damonge' },
-    }),
-  );
+  const body = renderArticleBody(source);
 
   assert.match(
     body,
@@ -212,19 +216,220 @@ test('article body image destinations use Cloudinary without reserializing Markd
   assert.doesNotMatch(body, /!\[Alt text\]\(\/Tech\/example\.png 'Image title'\)/);
 });
 
+test('HTML and public Markdown share external image URL classification', async () => {
+  const imageSources = [
+    ['//cdn.example.com/network.png', false],
+    ['HTTPS://cdn.example.com/upper.png', false],
+    ['data:image/png;base64,abc', false],
+    ['blob:https://example.test/image-id', false],
+    ['ftp://cdn.example.com/file.png', false],
+    ['/Tech/root.png', true],
+    ['Tech/relative.png', true],
+  ];
+
+  for (const [sourceUrl, shouldTransform] of imageSources) {
+    const source = `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n![Alt](${sourceUrl})\n`;
+    const processorOptions = { cloudinaryCloudName: 'damonge' };
+    const body = renderArticleBody(source, processorOptions);
+    const html = await processMarkdown(source, processorOptions, articleMeta.slug);
+
+    if (shouldTransform) {
+      assert.doesNotMatch(
+        body,
+        new RegExp(`!\\[Alt\\]\\(${sourceUrl.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}\\)`),
+      );
+      assert.match(
+        body,
+        /!\[Alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\//,
+      );
+      assert.match(
+        html.html,
+        /<img src="https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\//,
+      );
+    } else {
+      assert.ok(body.includes(`![Alt](${sourceUrl})`), sourceUrl);
+      assert.ok(html.html.includes(`<img src="${sourceUrl}"`), sourceUrl);
+    }
+  }
+});
+
+test('escaped parentheses in inline image destinations replace only the raw destination', () => {
+  const source =
+    '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n![Escaped alt](/Tech/a\\(b\\).png "Escaped title")\n';
+
+  const body = renderArticleBody(source);
+
+  assert.match(
+    body,
+    /!\[Escaped alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Tech\/a(?:%28|\()b(?:%29|\))\?_a=[^ )]+ "Escaped title"\)/,
+  );
+  assert.doesNotMatch(body, /\/Tech\/a\\\(b\\\)\.png/);
+});
+
+test('character references in inline image destinations replace only the raw destination', () => {
+  const source =
+    '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n![Bare](/Tech/a&amp;b.png)\n![Angle](</Tech/a&amp;b.png>)\n';
+
+  const body = renderArticleBody(source);
+
+  assert.match(
+    body,
+    /!\[Bare\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Tech\/a&b\?_a=[^ )]+\)/,
+  );
+  assert.match(
+    body,
+    /!\[Angle\]\(<https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Tech\/a&b\?_a=[^ )]+>\)/,
+  );
+  assert.doesNotMatch(body, /\/Tech\/a&amp;b\.png/);
+});
+
+test('reference-style images project local definitions without rewriting shared links or definitions', () => {
+  const sharedDefinition = String.raw`[shared]: /Tech/shared.png "Title with \"quotes\" and \\slashes
+continued"`;
+  const source = String.raw`---
+title: Source
+publishedAt: 2026-01-01
+---
+[Shared link][shared]
+
+![Full \*alt\*][shared]
+![Collapsed][]
+![Shortcut]
+![External][external]
+
+:::info
+![Inside][shared]
+:::
+
+${sharedDefinition}
+[collapsed]: /Tech/collapsed.png
+[shortcut]: /Tech/shortcut.png
+[external]: //cdn.example.com/external.png
+`;
+
+  const body = renderArticleBody(source);
+
+  assert.ok(
+    body.includes(
+      String.raw`![Full \*alt\*](https://res.cloudinary.com/damonge/image/upload/c_fit,w_1200/f_auto/q_90/v1/Tech/shared?_a=`,
+    ),
+  );
+  assert.match(
+    body,
+    /!\[Collapsed\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Tech\/collapsed\?_a=[^ )]+\)/,
+  );
+  assert.match(
+    body,
+    /!\[Shortcut\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Tech\/shortcut\?_a=[^ )]+\)/,
+  );
+  assert.match(
+    body,
+    /> !\[Inside\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Tech\/shared\?_a=[^ )]+ /,
+  );
+
+  const serializedTitle = String.raw`"Title with \"quotes\" and \\slashes
+continued"`;
+  assert.ok(body.includes(serializedTitle));
+  assert.ok(body.includes('[Shared link][shared]'));
+  assert.ok(body.includes('![External][external]'));
+  assert.ok(body.includes(sharedDefinition));
+  assert.ok(body.includes('[collapsed]: /Tech/collapsed.png'));
+  assert.ok(body.includes('[shortcut]: /Tech/shortcut.png'));
+  assert.ok(body.includes('[external]: //cdn.example.com/external.png'));
+  assert.doesNotMatch(body, rootRelativeMarkdownImageDestination);
+});
+
+test('recursive reference-style images project definitions with escaped closing brackets', () => {
+  const source = String.raw`---
+title: Source
+publishedAt: 2026-01-01
+---
+:::info
+![nested][a\] b]
+:::
+
+[a\] b]: /Tech/x.png "q"
+`;
+
+  const body = renderArticleBody(source);
+
+  assert.match(
+    body,
+    /> !\[nested\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Tech\/x\?_a=[^ )]+ "q"\)/,
+  );
+  assert.ok(body.includes(String.raw`[a\] b]: /Tech/x.png "q"`));
+});
+
+test('case-normalized duplicate definitions keep the first external authority for images', () => {
+  const source = `---
+title: Source
+publishedAt: 2026-01-01
+---
+[ASSET]: https://cdn.example/original.png
+
+![External image][asset]
+
+[asset]: /images/local.png
+
+[Shared link][ASSET]
+`;
+
+  const body = renderArticleBody(source);
+
+  assert.ok(body.includes('![External image][asset]'));
+  assert.ok(body.includes('[Shared link][ASSET]'));
+  assert.doesNotMatch(body, /res\.cloudinary\.com/);
+});
+
+test('recursive image projection keeps an inherited first definition over a local duplicate', () => {
+  const source = `---
+title: Source
+publishedAt: 2026-01-01
+---
+[ASSET]: https://cdn.example/original.png
+
+:::info
+![Nested image][aSSeT]
+
+[asset]: /images/local.png
+:::
+`;
+
+  const body = renderArticleBody(source);
+
+  assert.match(body, /> !\[Nested image\]\[aSSeT\]/);
+  assert.doesNotMatch(body, /res\.cloudinary\.com/);
+});
+
+test('case-normalized duplicate local definitions use the first Cloudinary public ID', () => {
+  const source = `---
+title: Source
+publishedAt: 2026-01-01
+---
+[ASSET]: /images.v2/first.v2.png
+
+![First local image][asset]
+
+[asset]: /images.v2/second.v2.png
+
+[Shared link][ASSET]
+`;
+
+  const body = renderArticleBody(source);
+
+  assert.match(
+    body,
+    /!\[First local image\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/images\.v2\/first\.v2\?_a=[^ )]+\)/,
+  );
+  assert.doesNotMatch(body, /v1\/images\.v2\/second\.v2\?_a=/);
+  assert.ok(body.includes('[Shared link][ASSET]'));
+});
+
 test('image destination lookup ignores duplicate alt and title text', () => {
   const source =
     '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n![/Tech/repeated.png](/Tech/repeated.png "/Tech/repeated.png")\n';
 
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source,
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-      processorOptions: { cloudinaryCloudName: 'damonge' },
-    }),
-  );
+  const body = renderArticleBody(source);
 
   assert.match(
     body,
@@ -235,15 +440,7 @@ test('image destination lookup ignores duplicate alt and title text', () => {
 test('body images inside demoted headings are projected without replacing heading text', () => {
   const source =
     '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n# Heading ![Heading image](/Tech/heading.png)\n';
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source,
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-      processorOptions: { cloudinaryCloudName: 'damonge' },
-    }),
-  );
+  const body = renderArticleBody(source);
 
   assert.match(
     body,
@@ -255,20 +452,49 @@ test('body images inside demoted headings are projected without replacing headin
 test('public Markdown and HTML body images share the same resolved URL', async () => {
   const source = `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n![Alt text](/Tech/example.png 'Image title')\n`;
   const processorOptions = { cloudinaryCloudName: 'damonge' };
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source,
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-      processorOptions,
-    }),
-  );
+  const body = renderArticleBody(source, processorOptions);
   const publicImageMatch = body.match(/!\[Alt text\]\((\S+) 'Image title'\)/);
   assert.ok(publicImageMatch);
 
   const html = await processMarkdown(source, processorOptions, articleMeta.slug);
   assert.ok(html.html.includes(`<img src="${publicImageMatch[1]}"`));
+});
+
+test('HTML and public Markdown preserve dotted local image paths and strip one ./ prefix', async () => {
+  const imageCases = [
+    ['images.v2/release.v2.png', 'images.v2/release.v2'],
+    ['./images/photo.png', 'images/photo'],
+    ['./images/.photo', 'images/.photo'],
+    ['./images/photo.v2.png?size=large#preview', 'images/photo.v2'],
+  ];
+
+  for (const [sourceUrl, expectedPublicId] of imageCases) {
+    const source = `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n![Alt](${sourceUrl})\n`;
+    const processorOptions = { cloudinaryCloudName: 'damonge' };
+    const body = renderArticleBody(source, processorOptions);
+    const publicImageMatch = body.match(/!\[Alt\]\((\S+)\)/);
+    assert.ok(publicImageMatch, sourceUrl);
+    assert.ok(
+      publicImageMatch[1].includes(`/v1/${expectedPublicId}?_a=`),
+      `${sourceUrl}: ${publicImageMatch[1]}`,
+    );
+
+    const html = await processMarkdown(source, processorOptions, articleMeta.slug);
+    assert.ok(html.html.includes(`<img src="${publicImageMatch[1]}"`), sourceUrl);
+  }
+});
+
+test('HTML and public Markdown reject parent-relative body images', async () => {
+  for (const sourceUrl of ['../images/photo.png', './../images/photo.png']) {
+    const source = `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n![Alt](${sourceUrl})\n`;
+    const processorOptions = { cloudinaryCloudName: 'damonge' };
+
+    assert.throws(() => renderArticleBody(source, processorOptions), /parent-relative/);
+    await assert.rejects(
+      processMarkdown(source, processorOptions, articleMeta.slug),
+      /parent-relative/,
+    );
+  }
 });
 
 test('note body images receive the Cloudinary processor options', () => {
@@ -312,15 +538,7 @@ test('nested callout body image destinations use Cloudinary too', () => {
   const nestedImage = `![Nested alt](/Hero/nested.png 'Nested title')`;
   const source = `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n:::info\n${nestedImage}\n:::\n`;
 
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source,
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-      processorOptions: { cloudinaryCloudName: 'damonge' },
-    }),
-  );
+  const body = renderArticleBody(source);
 
   assert.match(
     body,
@@ -330,14 +548,8 @@ test('nested callout body image destinations use Cloudinary too', () => {
 });
 
 test('standard containers recursively project nested directives without leaking affiliate markers', () => {
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source:
-        '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n:::info\nInfo lead.\n::amazon{asin="NESTED-ASIN" name="Private book"}\n::youtube{id="nested-youtube"}\nInfo tail.\n:::\n',
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-    }),
+  const body = renderArticleBody(
+    '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n:::info\nInfo lead.\n::amazon{asin="NESTED-ASIN" name="Private book"}\n::youtube{id="nested-youtube"}\nInfo tail.\n:::\n',
   );
 
   assert.match(body, /> \*\*Info\*\*/);
@@ -349,14 +561,8 @@ test('standard containers recursively project nested directives without leaking 
 });
 
 test('unknown containers recursively project nested known leaf directives', () => {
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source:
-        '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n:::custom\nCustom lead.\n::youtube{id="unknown-youtube"}\nCustom tail.\n:::\n',
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-    }),
+  const body = renderArticleBody(
+    '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n:::custom\nCustom lead.\n::youtube{id="unknown-youtube"}\nCustom tail.\n:::\n',
   );
 
   assert.match(body, /> \*\*custom\*\*/);
@@ -367,14 +573,8 @@ test('unknown containers recursively project nested known leaf directives', () =
 });
 
 test('closed Amazon containers nested in unknown containers keep surrounding prose in the blockquote', () => {
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source:
-        '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n:::custom\nBefore nested Amazon.\n:::amazon{asin="NESTED-ASIN"}\nPrivate Amazon content.\n:::\nAfter nested Amazon.\n:::\n',
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-    }),
+  const body = renderArticleBody(
+    '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n:::custom\nBefore nested Amazon.\n:::amazon{asin="NESTED-ASIN"}\nPrivate Amazon content.\n:::\nAfter nested Amazon.\n:::\n',
   );
 
   assert.match(body, /> \*\*custom\*\*\n>\n> Before nested Amazon\.\n>\n> After nested Amazon\./);
@@ -382,14 +582,8 @@ test('closed Amazon containers nested in unknown containers keep surrounding pro
 });
 
 test('legacy double-colon callouts recursively project nested directives', () => {
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source:
-        '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n::message\nLegacy lead.\n::amazon{asin="LEGACY-ASIN" name="Legacy book"}\n::youtube{id="legacy-youtube"}\nLegacy tail.\n::\n',
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-    }),
+  const body = renderArticleBody(
+    '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n::message\nLegacy lead.\n::amazon{asin="LEGACY-ASIN" name="Legacy book"}\n::youtube{id="legacy-youtube"}\nLegacy tail.\n::\n',
   );
 
   assert.match(body, /> \*\*Note\*\*/);
@@ -453,13 +647,8 @@ test('a multiline source Setext H1 demotes the underline from the heading range 
 });
 
 test('a source without an ATX H1 keeps H2-H6 levels', () => {
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source: `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n## Source H2\n\n##### Source H5\n\n###### Source H6\n`,
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-    }),
+  const body = renderArticleBody(
+    `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n## Source H2\n\n##### Source H5\n\n###### Source H6\n`,
   );
 
   assert.match(body, /^# Resolved article title$/m);
@@ -513,14 +702,8 @@ test('note metadata uses transformed-body description, date fallback, and note-s
 });
 
 test('an unclosed Amazon container removes its body instead of publishing it', () => {
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source:
-        '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n:::amazon{asin="ASIN"}\nPrivate Amazon content.\n',
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-    }),
+  const body = renderArticleBody(
+    '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n:::amazon{asin="ASIN"}\nPrivate Amazon content.\n',
   );
 
   assert.match(body, /^# Resolved article title$/m);
@@ -528,14 +711,8 @@ test('an unclosed Amazon container removes its body instead of publishing it', (
 });
 
 test('a malformed Amazon directive line is removed without removing adjacent prose', () => {
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source:
-        '---\ntitle: Source\npublishedAt: 2026-01-01\n---\nBefore the malformed directive.\n\n::amazon{asin="B003IWFTZ8" name="MAGPUL(マグプル) Enhanced Rubber Butt-Pad, 0.70" BLK[MAG317-BLK]"}\n\nAfter the malformed directive.\n',
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-    }),
+  const body = renderArticleBody(
+    '---\ntitle: Source\npublishedAt: 2026-01-01\n---\nBefore the malformed directive.\n\n::amazon{asin="B003IWFTZ8" name="MAGPUL(マグプル) Enhanced Rubber Butt-Pad, 0.70" BLK[MAG317-BLK]"}\n\nAfter the malformed directive.\n',
   );
 
   assert.match(body, /Before the malformed directive\./);
@@ -594,27 +771,16 @@ test('post and note slugs must be safe path segments before artifacts are writte
 
 test('ordinary Amazon Markdown links remain unchanged', () => {
   const ordinaryLink = '[ordinary Amazon link](https://www.amazon.co.jp/dp/B000TEST)';
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source: `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n${ordinaryLink}\n`,
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-    }),
+  const body = renderArticleBody(
+    `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n${ordinaryLink}\n`,
   );
 
   assert.ok(body.includes(ordinaryLink));
 });
 
 test('a legacy double-colon message block becomes a Note blockquote and preserves its body', () => {
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source:
-        '---\ntitle: Source\npublishedAt: 2026-01-01\n---\nBefore the legacy message.\n\n::message\nLegacy message body stays here.\nThe second line stays here too.\n::\n\nAfter the legacy message.\n',
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-    }),
+  const body = renderArticleBody(
+    '---\ntitle: Source\npublishedAt: 2026-01-01\n---\nBefore the legacy message.\n\n::message\nLegacy message body stays here.\nThe second line stays here too.\n::\n\nAfter the legacy message.\n',
   );
 
   assert.match(
@@ -636,13 +802,8 @@ test('fallback directive recognizers leave identical marker-like text inside fen
     '::',
     '```',
   ].join('\n');
-  const { body } = parseGenerated(
-    renderArticleMarkdown({
-      source: `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n${codeBlock}\n`,
-      meta: articleMeta,
-      site,
-      canonicalUrl: 'https://example.test/post/resolved-article',
-    }),
+  const body = renderArticleBody(
+    `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n${codeBlock}\n`,
   );
 
   assert.ok(body.includes(codeBlock));
