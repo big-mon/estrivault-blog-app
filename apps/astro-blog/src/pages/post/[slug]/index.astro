@@ -6,7 +6,7 @@ import { getCategoryLabel, SITE_TITLE, SITE_URL, SOCIAL_LINK_X } from '$constant
 import { getAllPostsMeta, getPostBySlug } from '$lib/content';
 import { formatEditorialDate } from '$lib/format-date';
 import { getPostOgpImageUrl } from '$lib/og';
-import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments.mjs';
+import { encodeRouteSegment, getArchivePagePath, getTagRouteMap } from '$lib/url-segments.mjs';
 
 export async function getStaticPaths() {
   const allPosts = await getAllPostsMeta();
@@ -30,6 +30,8 @@ if (!post) {
   throw new Error(`Post not found: ${slug}`);
 }
 
+const allPosts = await getAllPostsMeta();
+const tagRouteMap = getTagRouteMap(allPosts.flatMap((post) => post.tags));
 const siteBase = SITE_URL.replace(/\/$/, '');
 const canonical = `${siteBase}/post/${post.meta.slug}`;
 const title = `${post.meta.title} | ${SITE_TITLE}`;
@@ -60,6 +62,17 @@ const articleMeta = [
   : []),
   { label: 'READING', value: readingTime },
 ];
+const articleTags = post.meta.tags.slice(0, 4).map((tag) => {
+  const routeSegment = tagRouteMap.get(tag);
+  if (!routeSegment) {
+    throw new Error(`No route segment found for article tag: ${tag}`);
+  }
+
+  return {
+    label: tag,
+    href: getArchivePagePath(`/tag/${encodeRouteSegment(routeSegment)}`, 1),
+  };
+});
 const bodyClasses = [
   'article-body',
   post.hasTwitterEmbeds ? 'has-twitter-embeds' : '',
@@ -147,20 +160,7 @@ const schemaData = {
         <h1>{post.meta.title}</h1>
         {post.meta.description && <p class="article-lead">{post.meta.description}</p>}
         <div class="article-tags">
-          {
-            post.meta.tags
-              .slice(0, 4)
-              .map((tag) => (
-                <a
-                  href={getArchivePagePath(
-                    `/tag/${encodeRouteSegment(getTagRouteSegment(tag))}`,
-                    1,
-                  )}
-                >
-                  #{tag}
-                </a>
-              ))
-          }
+          {articleTags.map((tag) => <a href={tag.href}>#{tag.label}</a>)}
         </div>
       </div>
 

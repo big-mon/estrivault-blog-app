@@ -14,7 +14,7 @@ import {
 } from '$constants';
 import { getAllNotes, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
 import { formatEditorialDate } from '$lib/format-date';
-import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments.mjs';
+import { encodeRouteSegment, getArchivePagePath, getTagRouteMap } from '$lib/url-segments.mjs';
 
 const allPosts = await getAllPostsMeta();
 const allNotes = await getAllNotes();
@@ -41,6 +41,7 @@ const archiveStats = {
   since: oldestPost ? formatEditorialDate(oldestPost.publishedAt) : '----',
 };
 
+const tagRouteMap = getTagRouteMap(allPosts.flatMap((post) => post.tags));
 const seriesCards = [
   { title: 'EDGAR / XBRL', desc: 'SEC書類とAPIを読み解く', tag: 'EDGAR' },
   {
@@ -50,10 +51,17 @@ const seriesCards = [
   },
   { title: 'Stock Analysis', desc: '個別銘柄と業界の深掘り', tag: '銘柄分析' },
   { title: 'Gear Reviews', desc: '装備・機材の使用感レビュー', tag: 'レビュー' },
-].map((card) => ({
-  ...card,
-  href: getArchivePagePath(`/tag/${encodeRouteSegment(getTagRouteSegment(card.tag))}`, 1),
-}));
+].map((card) => {
+  const routeSegment = tagRouteMap.get(card.tag);
+  if (!routeSegment) {
+    throw new Error(`No route segment found for homepage tag: ${card.tag}`);
+  }
+
+  return {
+    ...card,
+    href: getArchivePagePath(`/tag/${encodeRouteSegment(routeSegment)}`, 1),
+  };
+});
 ---
 
 <BaseLayout

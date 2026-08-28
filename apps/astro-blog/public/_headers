@@ -5,9 +5,21 @@ https://*.pages.dev/*
   Link: </llms.txt>; rel="describedby"; type="text/markdown"
   Link: </sitemap.xml>; rel="describedby"; type="application/xml"
   Link: </sitemap.md>; rel="describedby"; type="text/markdown"
+  Link: </.well-known/api-catalog>; rel="api-catalog"
 
 /llms.txt
   Content-Type: text/markdown; charset=utf-8
 
 /sitemap.md
   Content-Type: text/markdown; charset=utf-8
+
+/api/v1/*
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
+  X-Content-Type-Options: nosniff
+
+/.well-known/api-catalog
+  Content-Type: application/linkset+json; charset=utf-8
+  Link: </.well-known/api-catalog>; rel="api-catalog"
+  Access-Control-Allow-Origin: *
+  X-Content-Type-Options: nosniff

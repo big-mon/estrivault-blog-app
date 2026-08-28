@@ -228,6 +228,90 @@ test('eligible HTML responses append, deduplicate, and preserve Vary values', as
   }
 });
 
+test('homepage HTML and Markdown HEAD responses append exact discovery Link values', async () => {
+  const discoveryLinks = [
+    '</llms.txt>; rel="describedby"; type="text/markdown"',
+    '</sitemap.xml>; rel="describedby"; type="application/xml"',
+    '</sitemap.md>; rel="describedby"; type="text/markdown"',
+    '</.well-known/api-catalog>; rel="api-catalog"',
+  ];
+  const existingLink = '</existing>; rel="alternate"';
+
+  for (const [method, accept, expectedStatus, expectedBody, expectedPath, existingDuplicate] of [
+    ['GET', 'text/html', 203, '<html>home</html>', '/', discoveryLinks[1]],
+    ['GET', 'text/markdown', 206, '# Markdown\n', '/index.md', discoveryLinks[0]],
+    ['HEAD', 'text/html', 203, '', '/', discoveryLinks[1]],
+    ['HEAD', 'text/markdown', 206, '', '/index.md', discoveryLinks[0]],
+  ]) {
+    const assets = createAssets({
+      '/': {
+        body: '<html>home</html>',
+        status: 203,
+        headers: {
+          Link: `${existingLink}, ${discoveryLinks[1]}`,
+          ETag: '"homepage"',
+          Vary: 'Origin',
+        },
+      },
+      '/index.md': {
+        body: '# Markdown\n',
+        status: 206,
+        headers: {
+          Link: `${existingLink}, ${discoveryLinks[0]}`,
+          ETag: '"markdown"',
+          Vary: 'Origin',
+        },
+      },
+    });
+
+    const response = await worker.fetch(
+      new Request('https://example.test/', { method, headers: { Accept: accept } }),
+      { ASSETS: assets },
+    );
+
+    assert.equal(response.status, expectedStatus, `${method} ${accept}`);
+    assert.equal(await response.text(), expectedBody, `${method} ${accept}`);
+    assert.deepEqual(
+      response.headers.get('Link')?.split(', ').sort(),
+      [existingLink, existingDuplicate, ...discoveryLinks]
+        .filter((value, index, values) => values.indexOf(value) === index)
+        .sort(),
+      `${method} ${accept}`,
+    );
+    assert.equal(response.headers.get('ETag'), expectedPath === '/' ? '"homepage"' : '"markdown"');
+    assert.equal(response.headers.get('Vary'), 'Origin, Accept', `${method} ${accept}`);
+    assert.deepEqual(assets.calls, [{ method, pathname: expectedPath }], `${method} ${accept}`);
+  }
+});
+
+test('homepage discovery Link values do not leak to article or note responses', async () => {
+  const existingLink = '</existing>; rel="alternate"';
+
+  for (const [pathname, accept, expectedPath] of [
+    ['/post/article', 'text/html', '/post/article'],
+    ['/notes/note', 'text/markdown', '/notes/note/index.md'],
+  ]) {
+    const assets = createAssets({
+      [pathname]: {
+        body: '<html>document</html>',
+        headers: { Link: existingLink },
+      },
+      [`${pathname}/index.md`]: {
+        body: '# Document\n',
+        headers: { Link: existingLink },
+      },
+    });
+
+    const response = await worker.fetch(
+      new Request(`https://example.test${pathname}`, { headers: { Accept: accept } }),
+      { ASSETS: assets },
+    );
+
+    assert.equal(response.headers.get('Link'), existingLink, pathname);
+    assert.deepEqual(assets.calls, [{ method: 'GET', pathname: expectedPath }], pathname);
+  }
+});
+
 test('an unavailable Markdown artifact falls back to the original HTML response', async () => {
   const assets = createAssets({
     '/post/missing': {

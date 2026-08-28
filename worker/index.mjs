@@ -149,10 +149,30 @@ function appendVary(headers, value) {
   headers.set('Vary', current ? `${current}, ${value}` : value);
 }
 
-function rewriteResponse(response, { method, contentType } = {}) {
+const HOMEPAGE_DISCOVERY_LINKS = [
+  '</llms.txt>; rel="describedby"; type="text/markdown"',
+  '</sitemap.xml>; rel="describedby"; type="application/xml"',
+  '</sitemap.md>; rel="describedby"; type="text/markdown"',
+  '</.well-known/api-catalog>; rel="api-catalog"',
+];
+
+function appendLinks(headers, links) {
+  const current = headers.get('Link');
+  const existing =
+    current ? (splitOutsideQuotes(current, ',') ?? []).map((item) => item.trim()) : [];
+
+  for (const link of links) {
+    if (existing.includes(link)) continue;
+    headers.append('Link', link);
+    existing.push(link);
+  }
+}
+
+function rewriteResponse(response, { method, contentType, homepage = false } = {}) {
   const headers = new Headers(response.headers);
   appendVary(headers, 'Accept');
   if (contentType) headers.set('Content-Type', contentType);
+  if (homepage) appendLinks(headers, HOMEPAGE_DISCOVERY_LINKS);
 
   return new Response(method === 'HEAD' ? null : response.body, {
     status: response.status,
@@ -178,12 +198,16 @@ const worker = {
         return rewriteResponse(markdownResponse, {
           method: request.method,
           contentType: 'text/markdown; charset=utf-8',
+          homepage: url.pathname === '/',
         });
       }
     }
 
     const htmlResponse = await env.ASSETS.fetch(request);
-    return rewriteResponse(htmlResponse, { method: request.method });
+    return rewriteResponse(htmlResponse, {
+      method: request.method,
+      homepage: url.pathname === '/',
+    });
   },
 };
 

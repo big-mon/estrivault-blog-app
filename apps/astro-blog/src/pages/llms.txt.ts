@@ -15,6 +15,8 @@ Primarily Japanese, with English technical terms where useful.
 
 - XML sitemap: ${siteBase}/sitemap.xml
 - Markdown sitemap: ${siteBase}/sitemap.md
+- API root: ${siteBase}/api/v1/index.json
+- API catalog: ${siteBase}/.well-known/api-catalog
 
 ## Public routes
 
