@@ -74,8 +74,8 @@ relevant Astro check, build, or E2E coverage for consumer-visible changes.
 ## Local checks versus GitHub Actions
 
 Pull-request CI uses Node 22.x and the pnpm version pinned by root `packageManager`. After a frozen
-install, it runs exactly the workspace-cleanup test, Astro lint, Astro check, Playwright Chromium
-setup, and the full Astro E2E suite. It does not directly run root lint, root format check,
+install, it runs exactly the workspace-cleanup test, Worker and source-Markdown tests, Astro lint,
+Astro check, Playwright Chromium setup, and the full Astro E2E suite. It does not directly run root lint, root format check,
 `pnpm type-check`, or the OGP unit tests. Run omitted checks locally when their ownership area
 changes. A local pass does not prove GitHub Actions passed.
 

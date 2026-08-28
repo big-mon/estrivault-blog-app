@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "pnpm run generate:redirects && astro build",
+    "build": "pnpm run generate:redirects && astro build && node scripts/generate-markdown-artifacts.mjs",
     "generate:redirects": "node scripts/generate-redirects.mjs",
     "preview": "astro preview",
     "check": "astro check",
+    "test:source-markdown": "node --test scripts/generate-markdown-artifacts.test.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "setup:e2e": "playwright install --with-deps chromium",
@@ -25,6 +26,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.2.4",
     "tailwindcss": "^4.3.3",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "yaml": "^2.9.0"
   }
 }
