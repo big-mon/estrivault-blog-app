@@ -3,10 +3,12 @@ import remarkDirective from 'remark-directive';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import { visit } from 'unist-util-visit';
-import type { Heading, Root } from 'mdast';
+import type { Heading, Image, Root } from 'mdast';
 import type { Node, Parent } from 'unist';
 import { parseFrontmatter } from './processor';
 import matter from 'gray-matter';
+import { resolveBodyImageUrl } from './plugins/transforms/image-transform';
+import type { ProcessorOptions } from './types';
 
 interface DirectiveNode extends Parent {
   type: 'containerDirective' | 'leafDirective' | 'textDirective';
@@ -38,15 +40,19 @@ const FALLBACK_CALLOUT_NAMES = new Set(['info', 'warn', 'alert', 'message']);
  * 見出しとディレクティブの該当範囲を置換する。これにより、通常のMarkdownや
  * fenced code blockのバイト列を不要に整形しない。
  */
-export function renderPublicMarkdownBody(source: string, title: string): string {
+export function renderPublicMarkdownBody(
+  source: string,
+  title: string,
+  options: ProcessorOptions = {},
+): string {
   const { content: markdown } = parseFrontmatter(source);
-  const body = renderMarkdownBody(markdown);
+  const body = renderMarkdownBody(markdown, options);
   const generatedHeading = `# ${title.replace(/[\r\n]+/g, ' ').trim()}`;
 
   return body ? `${generatedHeading}\n\n${body}` : `${generatedHeading}\n`;
 }
 
-function renderMarkdownBody(markdown: string): string {
+function renderMarkdownBody(markdown: string, options: ProcessorOptions = {}): string {
   const tree = directiveParser.parse(markdown) as Root;
   const replacements: Replacement[] = [];
   const codeRanges = collectCodeRanges(tree);
@@ -57,8 +63,16 @@ function renderMarkdownBody(markdown: string): string {
   visit(tree, (node: Node) => {
     if (isDirectiveNode(node)) {
       const range = getDirectiveRange(node, markdown, directiveOpenings, codeRanges);
-      const value = renderDirective(node, markdown, range);
+      const value = renderDirective(node, markdown, range, options);
       replacements.push({ ...range, value });
+      return;
+    }
+
+    if (isImage(node)) {
+      const replacement = projectImage(node, markdown, options);
+      if (replacement) {
+        replacements.push(replacement);
+      }
       return;
     }
 
@@ -70,7 +84,12 @@ function renderMarkdownBody(markdown: string): string {
     }
   });
 
-  const fallbackReplacements = collectFallbackReplacements(markdown, directiveStarts, codeRanges);
+  const fallbackReplacements = collectFallbackReplacements(
+    markdown,
+    directiveStarts,
+    codeRanges,
+    options,
+  );
   const body = applyReplacements(
     markdown,
     selectNonOverlappingReplacements([...replacements, ...fallbackReplacements]),
@@ -119,6 +138,7 @@ function collectFallbackReplacements(
   source: string,
   directiveStarts: Set<number>,
   codeRanges: SourceRange[],
+  options: ProcessorOptions,
 ): Replacement[] {
   const lines = collectSourceLines(source);
   const replacements: Replacement[] = [];
@@ -151,7 +171,7 @@ function collectFallbackReplacements(
         end: closing.end,
         value: renderBlockquote(
           getDirectiveLabel(marker.name),
-          renderMarkdownBody(getDelimitedBody(source, markerStart, closing.start)),
+          renderMarkdownBody(getDelimitedBody(source, markerStart, closing.start), options),
         ),
       });
       continue;
@@ -303,8 +323,8 @@ function demoteAtxHeading(node: Heading, source: string): Replacement | null {
   }
 
   const prefixLength = match[1].length + match[2].length;
-  const value = `${match[1]}${'#'.repeat(match[2].length + 1)}${line.slice(prefixLength)}`;
-  return { start: range.start, end: lineEnd, value };
+  const value = `${match[1]}${'#'.repeat(match[2].length + 1)}`;
+  return { start: range.start, end: range.start + prefixLength, value };
 }
 
 function demoteSetextH1(node: Heading, source: string): Replacement | null {
@@ -400,7 +420,12 @@ function findClosingDirective(
   return null;
 }
 
-function renderDirective(node: DirectiveNode, source: string, range: SourceRange): string {
+function renderDirective(
+  node: DirectiveNode,
+  source: string,
+  range: SourceRange,
+  options: ProcessorOptions,
+): string {
   const id = getDirectiveAttribute(node, 'id');
 
   if (node.name === 'amazon') {
@@ -422,7 +447,7 @@ function renderDirective(node: DirectiveNode, source: string, range: SourceRange
   }
 
   const label = getDirectiveLabel(node.name);
-  const body = renderMarkdownBody(getContainerBody(source, range));
+  const body = renderMarkdownBody(getContainerBody(source, range), options);
   return renderBlockquote(label, body);
 }
 
@@ -490,6 +515,97 @@ function isDirectiveNode(node: Node): node is DirectiveNode {
 
 function isHeading(node: Node): node is Heading {
   return node.type === 'heading' && 'depth' in node && typeof node.depth === 'number';
+}
+
+function isImage(node: Node): node is Image {
+  return node.type === 'image' && 'url' in node && typeof node.url === 'string';
+}
+
+function projectImage(node: Image, source: string, options: ProcessorOptions): Replacement | null {
+  const resolvedUrl = resolveBodyImageUrl(node.url, options.cloudinaryCloudName);
+  if (resolvedUrl === node.url) {
+    return null;
+  }
+
+  const range = getNodeRange(node);
+  if (!range) {
+    throw new Error('Markdown image transformation requires a source position');
+  }
+
+  const destination = locateImageDestination(source, range, node.url);
+  return { ...destination, value: resolvedUrl };
+}
+
+function locateImageDestination(
+  source: string,
+  range: SourceRange,
+  destination: string,
+): SourceRange {
+  const nodeSource = source.slice(range.start, range.end);
+  if (nodeSource[0] !== '!' || nodeSource[1] !== '[') {
+    throw new Error(
+      `Markdown image destination ${JSON.stringify(destination)} has an unsupported inline image source range ${range.start}-${range.end}`,
+    );
+  }
+
+  let labelDepth = 1;
+  let labelEnd = -1;
+  for (let index = 2; index < nodeSource.length; index += 1) {
+    const character = nodeSource[index];
+    if (character === '\\') {
+      index += 1;
+      continue;
+    }
+    if (character === '[') {
+      labelDepth += 1;
+    } else if (character === ']') {
+      labelDepth -= 1;
+      if (labelDepth === 0) {
+        labelEnd = index;
+        break;
+      }
+    }
+  }
+
+  if (labelEnd < 0 || nodeSource[labelEnd + 1] !== '(') {
+    throw new Error(
+      `Markdown image destination ${JSON.stringify(destination)} cannot be located after the inline image label in source range ${range.start}-${range.end}`,
+    );
+  }
+
+  let destinationStart = labelEnd + 2;
+  while (/[ \t\r\n]/.test(nodeSource[destinationStart] ?? '')) {
+    destinationStart += 1;
+  }
+
+  const hasAngleBrackets = nodeSource[destinationStart] === '<';
+  if (hasAngleBrackets) {
+    destinationStart += 1;
+  }
+
+  if (!nodeSource.startsWith(destination, destinationStart)) {
+    throw new Error(
+      `Markdown image destination ${JSON.stringify(destination)} cannot be safely matched to inline source range ${range.start}-${range.end}`,
+    );
+  }
+
+  const end = destinationStart + destination.length;
+  if (hasAngleBrackets) {
+    if (nodeSource[end] !== '>') {
+      throw new Error(
+        `Markdown image destination ${JSON.stringify(destination)} has an unterminated angle-bracket destination in source range ${range.start}-${range.end}`,
+      );
+    }
+  } else if (nodeSource[end] !== ')' && !/[ \t\r\n]/.test(nodeSource[end] ?? '')) {
+    throw new Error(
+      `Markdown image destination ${JSON.stringify(destination)} has an unsafe inline source boundary in source range ${range.start}-${range.end}`,
+    );
+  }
+
+  return {
+    start: range.start + destinationStart,
+    end: range.start + end,
+  };
 }
 
 function getNodeRange(node: Node): SourceRange | null {

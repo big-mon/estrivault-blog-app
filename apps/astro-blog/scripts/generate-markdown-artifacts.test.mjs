@@ -6,6 +6,7 @@ import path from 'node:path';
 import { test } from 'node:test';
 
 import yaml from 'yaml';
+import { processMarkdown } from '@estrivault/content-processor';
 
 import {
   generateMarkdownArtifacts,
@@ -55,6 +56,7 @@ const site = {
 };
 
 const codeFence = '```';
+const rootRelativeMarkdownImageDestination = /!\[[^\]]*\]\(\s*<?\//m;
 
 const articleMeta = {
   slug: 'resolved-article',
@@ -174,6 +176,157 @@ test('article output uses an explicit public metadata allowlist and transforms s
   assert.match(body, /> \*\*custom\*\*\n>\n> Unknown body\./);
   assert.match(body, /```md\n# heading inside code\n::youtube\n```/);
   assert.match(body, /After directives\./);
+});
+
+test('article body image destinations use Cloudinary without reserializing Markdown', () => {
+  const fencedImage = [
+    codeFence + 'svelte',
+    '<img src="/Tech/fenced-raw.png" alt="Raw image" />',
+    `![Fenced image](/Tech/fenced.png 'Fenced title')`,
+    codeFence,
+  ].join('\n');
+  const rootRelativeImage = `![Alt text](/Tech/example.png 'Image title')`;
+  const absoluteImage = `![Remote alt](https://cdn.example/remote.png "Remote title")`;
+  const dataImage = `![Data alt](data:image/png;base64,abc 'Data title')`;
+  const rootRelativeLink = '[Article link](/article/prose)';
+  const source = `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n${rootRelativeImage}\n${absoluteImage}\n${dataImage}\n${rootRelativeLink}\n${fencedImage}\n`;
+
+  const { body } = parseGenerated(
+    renderArticleMarkdown({
+      source,
+      meta: articleMeta,
+      site,
+      canonicalUrl: 'https://example.test/post/resolved-article',
+      processorOptions: { cloudinaryCloudName: 'damonge' },
+    }),
+  );
+
+  assert.match(
+    body,
+    /!\[Alt text\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Tech\/example\?_a=[^ )]+ 'Image title'\)/,
+  );
+  assert.ok(body.includes(absoluteImage));
+  assert.ok(body.includes(dataImage));
+  assert.ok(body.includes(rootRelativeLink));
+  assert.ok(body.includes(fencedImage));
+  assert.doesNotMatch(body, /!\[Alt text\]\(\/Tech\/example\.png 'Image title'\)/);
+});
+
+test('image destination lookup ignores duplicate alt and title text', () => {
+  const source =
+    '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n![/Tech/repeated.png](/Tech/repeated.png "/Tech/repeated.png")\n';
+
+  const { body } = parseGenerated(
+    renderArticleMarkdown({
+      source,
+      meta: articleMeta,
+      site,
+      canonicalUrl: 'https://example.test/post/resolved-article',
+      processorOptions: { cloudinaryCloudName: 'damonge' },
+    }),
+  );
+
+  assert.match(
+    body,
+    /!\[\/Tech\/repeated\.png\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Tech\/repeated\?_a=[^ )]+ "\/Tech\/repeated\.png"\)/,
+  );
+});
+
+test('body images inside demoted headings are projected without replacing heading text', () => {
+  const source =
+    '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n# Heading ![Heading image](/Tech/heading.png)\n';
+  const { body } = parseGenerated(
+    renderArticleMarkdown({
+      source,
+      meta: articleMeta,
+      site,
+      canonicalUrl: 'https://example.test/post/resolved-article',
+      processorOptions: { cloudinaryCloudName: 'damonge' },
+    }),
+  );
+
+  assert.match(
+    body,
+    /^## Heading !\[Heading image\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Tech\/heading\?_a=[^ )]+\)$/m,
+  );
+  assert.doesNotMatch(body, /^# Heading !\[Heading image\]\(\/Tech\/heading\.png\)$/m);
+});
+
+test('public Markdown and HTML body images share the same resolved URL', async () => {
+  const source = `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n![Alt text](/Tech/example.png 'Image title')\n`;
+  const processorOptions = { cloudinaryCloudName: 'damonge' };
+  const { body } = parseGenerated(
+    renderArticleMarkdown({
+      source,
+      meta: articleMeta,
+      site,
+      canonicalUrl: 'https://example.test/post/resolved-article',
+      processorOptions,
+    }),
+  );
+  const publicImageMatch = body.match(/!\[Alt text\]\((\S+) 'Image title'\)/);
+  assert.ok(publicImageMatch);
+
+  const html = await processMarkdown(source, processorOptions, articleMeta.slug);
+  assert.ok(html.html.includes(`<img src="${publicImageMatch[1]}"`));
+});
+
+test('note body images receive the Cloudinary processor options', () => {
+  const source = `---\ntitle: Source note\npublishedAt: 2026-01-01\ntags: []\n---\n![Note alt](/Stocks/note.png 'Note title')\n`;
+  const { body } = parseGenerated(
+    renderNoteMarkdown({
+      source,
+      meta: {
+        slug: 'resolved-note',
+        title: 'Resolved note title',
+        publishedAt: new Date('2026-01-01T00:00:00.000Z'),
+        tags: [],
+      },
+      site,
+      canonicalUrl: 'https://example.test/notes/resolved-note',
+      processorOptions: { cloudinaryCloudName: 'damonge' },
+    }),
+  );
+
+  assert.match(
+    body,
+    /!\[Note alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Stocks\/note\?_a=[^ )]+ 'Note title'\)/,
+  );
+  assert.doesNotMatch(body, /!\[Note alt\]\(\/Stocks\/note\.png 'Note title'\)/);
+});
+
+test('transformable public body images require a usable Cloudinary cloud name', () => {
+  assert.throws(
+    () =>
+      renderArticleMarkdown({
+        source: '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n![Alt](/Tech/image.png)\n',
+        meta: articleMeta,
+        site,
+        canonicalUrl: 'https://example.test/post/resolved-article',
+      }),
+    /cloudinaryCloudName is required for body image transformation/,
+  );
+});
+
+test('nested callout body image destinations use Cloudinary too', () => {
+  const nestedImage = `![Nested alt](/Hero/nested.png 'Nested title')`;
+  const source = `---\ntitle: Source\npublishedAt: 2026-01-01\n---\n:::info\n${nestedImage}\n:::\n`;
+
+  const { body } = parseGenerated(
+    renderArticleMarkdown({
+      source,
+      meta: articleMeta,
+      site,
+      canonicalUrl: 'https://example.test/post/resolved-article',
+      processorOptions: { cloudinaryCloudName: 'damonge' },
+    }),
+  );
+
+  assert.match(
+    body,
+    /> !\[Nested alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Hero\/nested\?_a=[^ )]+ 'Nested title'\)/,
+  );
+  assert.doesNotMatch(body, /> !\[Nested alt\]\(\/Hero\/nested\.png 'Nested title'\)/);
 });
 
 test('standard containers recursively project nested directives without leaking affiliate markers', () => {
@@ -607,8 +760,22 @@ test('the default generator emits independently parseable public YAML artifacts'
           /^\s*::+(?:amazon|youtube|twitter|info|warn|alert|message)\b/m,
           `${filePath}: known directive marker leaked into public body`,
         );
+        assert.doesNotMatch(
+          body,
+          rootRelativeMarkdownImageDestination,
+          `${filePath}: root-relative Markdown image destination leaked into public body`,
+        );
       }
     }
+
+    const representativeMarkdown = await readFile(
+      path.join(outputDirectory, 'post', 'tales-of-arise-fix-aspect', 'index.md'),
+      'utf8',
+    );
+    assert.match(
+      representativeMarkdown,
+      /!\[Universal Unreal Engine Unlockerを起動\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_90\/v1\/Tech\/toa-ueu1\?_a=[^ )]+ 'Universal Unreal Engine Unlockerを起動'\)/,
+    );
   } finally {
     await rm(outputDirectory, { recursive: true, force: true });
   }

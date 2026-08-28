@@ -9,6 +9,43 @@ export interface ImageTransformOptions {
 }
 
 /**
+ * 本文画像のURLをCloudinary CDN URLへ解決する。
+ *
+ * 絶対URLとデータURLは入力をそのまま返し、それ以外は既存のHTML変換と同じ
+ * public IDおよび変換条件を使う。変換対象なのにクラウド名がない場合は、壊れた
+ * 相対パスを公開しないよう明示的に失敗させる。
+ */
+export function resolveBodyImageUrl(
+  src: string,
+  cloudinaryCloudName: string | undefined,
+  mode: 'fill' | 'fit' = 'fit',
+): string {
+  if (src.startsWith('http') || src.startsWith('data:')) {
+    return src;
+  }
+
+  const publicId = getBodyImagePublicId(src);
+  if (!publicId) {
+    return src;
+  }
+
+  const normalizedCloudinaryCloudName = cloudinaryCloudName?.trim();
+  if (!normalizedCloudinaryCloudName) {
+    throw new Error('cloudinaryCloudName is required for body image transformation');
+  }
+
+  return buildUrl(normalizedCloudinaryCloudName, publicId, {
+    w: 1200,
+    mode,
+    quality: 90,
+  });
+}
+
+function getBodyImagePublicId(src: string): string {
+  return src.replace(/^\//, '').split('.')[0] ?? '';
+}
+
+/**
  * 画像パスをCloudinary CDN URLに変換するrehypeプラグイン
  */
 export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> = (options) => {
@@ -40,7 +77,7 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
 
       try {
         // 拡張子を除いたパス部分を取得
-        const publicId = src.replace(/^\//, '').split('.')[0];
+        const publicId = getBodyImagePublicId(src);
 
         if (!publicId) {
           return undefined;
@@ -57,7 +94,7 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
           quality: 90,
         };
 
-        node.properties.src = buildUrl(normalizedCloudinaryCloudName, publicId, buildOptions);
+        node.properties.src = resolveBodyImageUrl(src, normalizedCloudinaryCloudName, mode);
 
         // レスポンシブ画像用のsrcsetを生成
         node.properties.srcset = buildSrcSet(normalizedCloudinaryCloudName, publicId, buildOptions);

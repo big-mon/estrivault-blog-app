@@ -35,8 +35,8 @@ const defaultSite = {
 /**
  * Build one public article Markdown artifact from canonical source content.
  */
-export function renderArticleMarkdown({ source, meta, site, canonicalUrl }) {
-  const body = renderPublicMarkdownBody(source, meta.title);
+export function renderArticleMarkdown({ source, meta, site, canonicalUrl, processorOptions = {} }) {
+  const body = renderPublicMarkdownBody(source, meta.title, processorOptions);
   return serializePublicMarkdown(
     {
       title: meta.title,
@@ -60,8 +60,8 @@ export function renderArticleMarkdown({ source, meta, site, canonicalUrl }) {
 /**
  * Build one public note Markdown artifact from canonical source content.
  */
-export function renderNoteMarkdown({ source, meta, site, canonicalUrl }) {
-  const body = renderPublicMarkdownBody(source, meta.title);
+export function renderNoteMarkdown({ source, meta, site, canonicalUrl, processorOptions = {} }) {
+  const body = renderPublicMarkdownBody(source, meta.title, processorOptions);
   const description = createMarkdownDescription(body);
 
   return serializePublicMarkdown(
@@ -199,6 +199,7 @@ export async function generateMarkdownArtifacts(options = {}) {
         meta,
         site,
         canonicalUrl: getDocumentUrl(site.url, 'post', meta.slug),
+        processorOptions,
       }),
     })),
     ...notes.map(({ source, meta }) => ({
@@ -208,6 +209,7 @@ export async function generateMarkdownArtifacts(options = {}) {
         meta,
         site,
         canonicalUrl: getDocumentUrl(site.url, 'notes', meta.slug),
+        processorOptions,
       }),
     })),
   ];
