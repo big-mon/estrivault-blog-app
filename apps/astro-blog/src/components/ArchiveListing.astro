@@ -4,7 +4,7 @@ import ArchivePagination from '$components/ArchivePagination.astro';
 import ArchivePostRow from '$components/ArchivePostRow.astro';
 import EditorialFooter from '$components/EditorialFooter.astro';
 import EditorialMasthead from '$components/EditorialMasthead.astro';
-import { encodeRouteSegment, getArchivePagePath, getTagRouteSegment } from '$lib/url-segments.mjs';
+import { encodeRouteSegment, getArchivePagePath } from '$lib/url-segments.mjs';
 
 interface ArchiveMeta {
   label: string;
@@ -20,6 +20,7 @@ interface Props {
   page: number;
   totalPages: number;
   routeBase: string;
+  tagRouteMap: ReadonlyMap<string, string>;
   sideMeta: ArchiveMeta[];
   topTags?: string[];
   emptyMessage: string;
@@ -34,12 +35,22 @@ const {
   page,
   totalPages,
   routeBase,
+  tagRouteMap,
   sideMeta,
   topTags = [],
   emptyMessage,
 } = Astro.props;
 
 const visibleTopTags = topTags.slice(0, 5);
+
+function getTagHref(tag: string): string {
+  const routeSegment = tagRouteMap.get(tag);
+  if (!routeSegment) {
+    throw new Error(`No route segment found for archive tag: ${tag}`);
+  }
+
+  return getArchivePagePath(`/tag/${encodeRouteSegment(routeSegment)}`, 1);
+}
 ---
 
 <div class="archive-page">
@@ -56,13 +67,7 @@ const visibleTopTags = topTags.slice(0, 5);
             <h2>TAG VARIANT</h2>
             <div>
               {visibleTopTags.map((tag) => (
-                <a
-                  class="tag-link"
-                  href={getArchivePagePath(
-                    `/tag/${encodeRouteSegment(getTagRouteSegment(tag))}`,
-                    1,
-                  )}
-                >
+                <a class="tag-link" href={getTagHref(tag)}>
                   #{tag}
                 </a>
               ))}

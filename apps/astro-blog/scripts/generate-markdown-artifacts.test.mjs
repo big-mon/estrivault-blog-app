@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import yaml from 'yaml';
 import { processMarkdown } from '@estrivault/content-processor';
@@ -14,6 +15,7 @@ import {
   renderHomepageMarkdown,
   renderNoteMarkdown,
 } from './generate-markdown-artifacts.mjs';
+import { getTagRouteMap, getTagRouteSegment } from '../src/lib/url-segments.mjs';
 
 const require = createRequire(
   new URL('../../../packages/content-processor/package.json', import.meta.url),
@@ -986,4 +988,76 @@ function assertPublicMetadataTypes(data, contentType, filePath) {
     data.featured_image === null || typeof data.featured_image === 'string',
     `${filePath}: featured_image`,
   );
+}
+
+test('collision-aware tag routes preserve existing routes and resolve AI labels', () => {
+  const routeMap = getTagRouteMap(['AI', 'AIコーディング', 'SBI証券', '自作PC']);
+
+  assert.equal(getTagRouteSegment('AI'), 'ai');
+  assert.equal(getTagRouteSegment('AIコーディング'), 'ai');
+  assert.equal(getTagRouteSegment('SBI証券'), 'sbi');
+  assert.equal(getTagRouteSegment('自作PC'), 'pc');
+  assert.equal(routeMap.get('AI'), 'ai');
+  assert.equal(routeMap.get('AIコーディング'), 'aiコーディング');
+  assert.equal(routeMap.get('SBI証券'), 'sbi');
+  assert.equal(routeMap.get('自作PC'), 'pc');
+});
+
+test('collision-aware tag routes are unique across the public tag corpus', async () => {
+  const labels = await getPublicTagLabels();
+  const routeMap = getTagRouteMap(labels);
+  const existingRoutes = new Map();
+
+  for (const label of labels) {
+    const route = getTagRouteSegment(label);
+    const group = existingRoutes.get(route) ?? [];
+    group.push(label);
+    existingRoutes.set(route, group);
+  }
+
+  const collisionGroups = [...existingRoutes.values()].filter((group) => group.length > 1);
+
+  assert.equal(labels.length, 137);
+  assert.equal(collisionGroups.length, 1);
+  assert.equal(routeMap.size, labels.length);
+  assert.equal(new Set(routeMap.values()).size, labels.length);
+
+  for (const [route, group] of existingRoutes) {
+    if (group.length === 1) {
+      assert.equal(routeMap.get(group[0]), route, group[0]);
+    }
+  }
+});
+
+async function getPublicTagLabels() {
+  const contentRoot = fileURLToPath(new URL('../../../content/blog/', import.meta.url));
+  const files = await collectMarkdownFiles(contentRoot);
+  const labels = new Set();
+
+  for (const filePath of files) {
+    const { data } = matter(await readFile(filePath, 'utf8'));
+    assert.ok(Array.isArray(data.tags), `Missing tags in ${filePath}`);
+    for (const tag of data.tags) {
+      assert.equal(typeof tag, 'string', `Invalid tag in ${filePath}`);
+      labels.add(tag.trim());
+    }
+  }
+
+  return [...labels];
+}
+
+async function collectMarkdownFiles(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries) {
+    const entryPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...(await collectMarkdownFiles(entryPath)));
+    } else if (entry.isFile() && /\.(?:md|mdx)$/.test(entry.name)) {
+      files.push(entryPath);
+    }
+  }
+
+  return files;
 }

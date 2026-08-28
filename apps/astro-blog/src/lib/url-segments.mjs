@@ -28,6 +28,81 @@ export function getTagRouteSegment(tag) {
 }
 
 /**
+ * @param {Iterable<string>} tags
+ * @returns {Map<string, string>}
+ */
+export function getTagRouteMap(tags) {
+  const labels = [...new Set(tags)];
+  const routeGroups = new Map();
+
+  for (const tag of labels) {
+    const routeSegment = getTagRouteSegment(tag);
+    const group = routeGroups.get(routeSegment) ?? [];
+    group.push(tag);
+    routeGroups.set(routeSegment, group);
+  }
+
+  const routeMap = new Map();
+  const usedRouteSegments = new Set();
+
+  for (const [routeSegment, group] of routeGroups) {
+    const primaryTag = [...group].sort(compareTagLabels)[0];
+    if (!primaryTag) {
+      throw new Error(`Tag route collision group is empty for route segment: ${routeSegment}`);
+    }
+
+    routeMap.set(primaryTag, routeSegment);
+    usedRouteSegments.add(routeSegment);
+  }
+
+  for (const group of routeGroups.values()) {
+    if (group.length === 1) {
+      continue;
+    }
+
+    const sortedGroup = [...group].sort(compareTagLabels);
+    for (const tag of sortedGroup.slice(1)) {
+      const fallbackRouteSegment = normalizeForTagFilter(tag)
+        .replace(/[\s/\\?#]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
+      if (!fallbackRouteSegment) {
+        throw new Error(`Tag route collision fallback is empty for tag: ${tag}`);
+      }
+      if (usedRouteSegments.has(fallbackRouteSegment)) {
+        throw new Error(
+          `Tag route collision fallback is not globally unique for tag "${tag}": ${fallbackRouteSegment}`,
+        );
+      }
+
+      routeMap.set(tag, fallbackRouteSegment);
+      usedRouteSegments.add(fallbackRouteSegment);
+    }
+  }
+
+  if (routeMap.size !== labels.length || usedRouteSegments.size !== labels.length) {
+    throw new Error('Tag route map could not produce globally unique non-empty route segments.');
+  }
+
+  return routeMap;
+}
+
+/**
+ * @param {string} left
+ * @param {string} right
+ * @returns {number}
+ */
+function compareTagLabels(left, right) {
+  return (
+    left.length - right.length ||
+    (left < right ? -1
+    : left > right ? 1
+    : 0)
+  );
+}
+
+/**
  * @param {string} category
  * @returns {string}
  */

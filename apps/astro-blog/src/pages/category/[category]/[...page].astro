@@ -4,7 +4,7 @@ import ArchiveListing from '$components/ArchiveListing.astro';
 import { getCategoryMeta, POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
 import { getArchiveTagStats } from '$lib/archive-tags';
 import { filterPosts, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
-import { getArchivePageUrl, getCategoryRouteSegment } from '$lib/url-segments.mjs';
+import { getArchivePageUrl, getCategoryRouteSegment, getTagRouteMap } from '$lib/url-segments.mjs';
 
 interface Props {
   category: string;
@@ -40,6 +40,7 @@ const { category } = Astro.props as Props;
 const categoryMeta = getCategoryMeta(category);
 const currentPage = Number(Astro.params.page ?? '1');
 const allPosts = await getAllPostsMeta();
+const tagRouteMap = getTagRouteMap(allPosts.flatMap((post) => post.tags));
 const archivePosts = filterPosts(allPosts, { category });
 const result = getPaginatedPosts(archivePosts, {
   page: currentPage,
@@ -81,6 +82,7 @@ const nextUrl =
     page={result.page}
     totalPages={result.totalPages}
     routeBase={routeBase}
+    tagRouteMap={tagRouteMap}
     topTags={topTags}
     sideMeta={[
       { label: 'TYPE', value: 'CATEGORY' },

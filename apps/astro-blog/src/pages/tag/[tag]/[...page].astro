@@ -4,10 +4,11 @@ import ArchiveListing from '$components/ArchiveListing.astro';
 import { POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
 import { getArchiveTagStats } from '$lib/archive-tags';
 import { filterPosts, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
-import { encodeRouteSegment, getArchivePageUrl, getTagRouteSegment } from '$lib/url-segments.mjs';
+import { encodeRouteSegment, getArchivePageUrl, getTagRouteMap } from '$lib/url-segments.mjs';
 
 interface Props {
   tag: string;
+  tagRouteSegment: string;
 }
 
 export async function getStaticPaths() {
@@ -15,19 +16,25 @@ export async function getStaticPaths() {
   const tags = [...new Set(allPosts.flatMap((post) => post.tags))].sort((a, b) =>
     a.localeCompare(b),
   );
+  const tagRouteMap = getTagRouteMap(tags);
   const paths = [];
 
   for (const tag of tags) {
     const tagPosts = getPaginatedPosts(allPosts, { tag, perPage: POSTS_PER_PAGE });
+    const routeSegment = tagRouteMap.get(tag);
+    if (!routeSegment) {
+      throw new Error(`No route segment found for public tag: ${tag}`);
+    }
 
     for (let page = 1; page <= tagPosts.totalPages; page++) {
       paths.push({
         params: {
-          tag: getTagRouteSegment(tag),
+          tag: routeSegment,
           page: page === 1 ? undefined : String(page),
         },
         props: {
           tag,
+          tagRouteSegment: routeSegment,
         },
       });
     }
@@ -36,9 +43,10 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { tag } = Astro.props as Props;
+const { tag, tagRouteSegment } = Astro.props as Props;
 const currentPage = Number(Astro.params.page ?? '1');
 const allPosts = await getAllPostsMeta();
+const tagRouteMap = getTagRouteMap(allPosts.flatMap((post) => post.tags));
 const archivePosts = filterPosts(allPosts, { tag });
 const result = getPaginatedPosts(archivePosts, {
   page: currentPage,
@@ -47,7 +55,6 @@ const result = getPaginatedPosts(archivePosts, {
 const { topTags, uniqueTagCount } = getArchiveTagStats(archivePosts, tag);
 
 const siteBase = SITE_URL.replace(/\/$/, '');
-const tagRouteSegment = String(Astro.params.tag ?? getTagRouteSegment(tag));
 const encodedTagRouteSegment = encodeRouteSegment(tagRouteSegment);
 const routeBase = `/tag/${encodedTagRouteSegment}`;
 const pageUrl = getArchivePageUrl(siteBase, routeBase, currentPage);
@@ -82,6 +89,7 @@ const nextUrl =
     page={result.page}
     totalPages={result.totalPages}
     routeBase={routeBase}
+    tagRouteMap={tagRouteMap}
     topTags={topTags}
     sideMeta={[
       { label: 'TYPE', value: 'TAG' },

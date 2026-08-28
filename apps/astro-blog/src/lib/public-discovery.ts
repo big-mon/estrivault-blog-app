@@ -4,7 +4,7 @@ import {
   encodeRouteSegment,
   getArchivePageUrl,
   getCategoryRouteSegment,
-  getTagRouteSegment,
+  getTagRouteMap,
 } from '$lib/url-segments.mjs';
 
 export type PublicDiscoverySection =
@@ -125,9 +125,14 @@ export async function getPublicDiscoveryInventory(): Promise<PublicDiscoveryEntr
   }
 
   const tags = [...new Set(posts.flatMap((post) => post.tags))].sort((a, b) => a.localeCompare(b));
+  const tagRouteMap = getTagRouteMap(tags);
   for (const tag of tags) {
     const tagPosts = getPaginatedPosts(posts, { tag, perPage: POSTS_PER_PAGE });
-    const routeBase = `/tag/${encodeRouteSegment(getTagRouteSegment(tag))}`;
+    const routeSegment = tagRouteMap.get(tag);
+    if (!routeSegment) {
+      throw new Error(`No route segment found for public tag: ${tag}`);
+    }
+    const routeBase = `/tag/${encodeRouteSegment(routeSegment)}`;
 
     for (let page = 1; page <= tagPosts.totalPages; page++) {
       entries.push({
