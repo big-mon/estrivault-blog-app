@@ -43,6 +43,11 @@ jobs:
       - name: Test workspace cleanup
         run: pnpm test:clean
 
+      - name: Test worker and source Markdown
+        run: |
+          pnpm run test:worker
+          pnpm --filter astro-blog run test:source-markdown
+
       - name: Lint astro-blog
         run: pnpm --filter astro-blog lint
 

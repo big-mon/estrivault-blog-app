@@ -1,8 +1,11 @@
 name = "estrilda"
 compatibility_date = "2025-06-27"
+main = "worker/index.mjs"
 
 [assets]
 directory = "apps/astro-blog/dist"
+binding = "ASSETS"
+run_worker_first = ["/", "/post/*", "/notes/*"]
 
 [build]
 command = "pnpm run build"

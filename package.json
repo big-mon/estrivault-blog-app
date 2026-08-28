@@ -12,6 +12,7 @@
     "preinstall": "node scripts/require-pnpm.js",
     "postinstall": "pnpm run build:packages",
     "clean": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor --filter @estrivault/og-image-generator run clean",
+    "test:worker": "node --test worker/index.test.mjs",
     "test:clean": "node --test scripts/clean-workspace-dist.test.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
