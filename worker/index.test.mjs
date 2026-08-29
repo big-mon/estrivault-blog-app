@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { readFileSync } from 'node:fs';
 
 import worker from './index.mjs';
 
@@ -12,6 +13,20 @@ const homepageDiscoveryLinks = [
   '</sitemap.md>; rel="describedby"; type="text/markdown"',
   '</.well-known/api-catalog>; rel="api-catalog"',
 ];
+
+test('production static assets invoke the Worker before every asset', () => {
+  const wranglerConfig = readFileSync(new URL('../wrangler.toml', import.meta.url), 'utf8');
+  const assetsSection = wranglerConfig.match(
+    /^\[assets\]\r?\n([\s\S]*?)(?=^\[[^\r\n]+\]\r?$)/m,
+  )?.[1];
+
+  assert.ok(assetsSection, 'wrangler.toml must define an [assets] section');
+  assert.match(
+    assetsSection,
+    /^\s*run_worker_first\s*=\s*true\s*(?:#.*)?$/m,
+    'wrangler.toml [assets].run_worker_first must be true',
+  );
+});
 
 function createAssets(files) {
   const calls = [];
