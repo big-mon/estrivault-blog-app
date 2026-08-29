@@ -119,6 +119,27 @@ test('post pages expose generated OGP images', async ({ page, request }) => {
   expect(response.headers()['content-type']).toContain('image/png');
 });
 
+test('built article headings expose empty anchors and retain normal Markdown artifacts', async ({
+  page,
+  request,
+}) => {
+  await page.goto('/post/about');
+
+  const heading = page.locator('.article-body h2').first();
+  const anchor = heading.locator('a.heading-anchor');
+  await expect(heading).toHaveText('Estrilda について');
+  await expect(anchor).toHaveText('');
+  await expect(anchor).toHaveAttribute('href', '#estrilda-について');
+  await expect(anchor).toHaveAttribute('aria-label', 'Estrilda についてへの直接リンク');
+  await expect(page.locator('link[rel="alternate"][href="/llms.txt"]')).toHaveCount(0);
+
+  const artifactResponse = await request.get('/post/about/index.md');
+  expect(artifactResponse.ok()).toBeTruthy();
+  const artifact = await artifactResponse.text();
+  expect(artifact).toMatch(/^## Estrilda について$/m);
+  expect(artifact).not.toMatch(/^###+ Estrilda について$/m);
+});
+
 test('public discovery endpoints share one canonical URL inventory', async ({ request }) => {
   const [xmlResponse, markdownResponse] = await Promise.all([
     request.get('/sitemap.xml'),
