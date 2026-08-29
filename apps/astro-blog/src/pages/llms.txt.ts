@@ -1,11 +1,17 @@
 import type { APIRoute } from 'astro';
-import { SITE_DESCRIPTION, SITE_URL, SOCIAL_LINK_GITHUB, SOCIAL_LINK_X } from '$constants';
+import {
+  SITE_DESCRIPTION,
+  SITE_TITLE,
+  SITE_URL,
+  SOCIAL_LINK_GITHUB,
+  SOCIAL_LINK_X,
+} from '$constants';
 
 export const prerender = true;
 
 export const GET: APIRoute = () => {
   const siteBase = SITE_URL.replace(/\/$/, '');
-  const body = `# Estrilda Blog
+  const body = `# ${SITE_TITLE}
 
 > ${SITE_DESCRIPTION}
 

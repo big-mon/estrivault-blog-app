@@ -27,8 +27,10 @@ const description =
   <div class="notes-shell">
     <EditorialMasthead />
 
+    <h1 class="notes-title">Notes</h1>
+
     <section class="notes-grid" aria-label="Notes" data-notes-grid>
-      {noteMetas.map((note) => <NoteCard note={note} />)}
+      {noteMetas.map((note) => <NoteCard note={note} headingLevel="h2" />)}
     </section>
 
     <EditorialFooter />
@@ -54,6 +56,19 @@ const description =
     color: #111;
     background: #f1eee7;
     font-family: var(--font-body);
+  }
+
+  .notes-title {
+    max-width: 1180px;
+    margin: 2.5rem auto 0;
+    border-bottom: 1px solid #222;
+    padding-bottom: 0.8rem;
+    color: #d6452a;
+    font-family: var(--font-meta);
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.05em;
   }
 
   .notes-grid {

@@ -20,15 +20,17 @@ const pageUrl = `/notes/${encodeURIComponent(note.meta.slug)}`;
     <div class="note-detail-meta">
       <time datetime={note.meta.publishedAt.toISOString()}>{dateString}</time>
     </div>
-    <h1 id={titleId}>
-      {
-        variant === 'modal' ?
+    {
+      variant === 'modal' ?
+        <h2 id={titleId} class="note-detail-title">
           <a href={pageUrl} data-note-page-link>
             {note.meta.title}
           </a>
-        : note.meta.title
-      }
-    </h1>
+        </h2>
+      : <h1 id={titleId} class="note-detail-title">
+          {note.meta.title}
+        </h1>
+    }
   </header>
 
   <div class="note-body" set:html={note.html} />
@@ -109,7 +111,7 @@ const pageUrl = `/notes/${encodeURIComponent(note.meta.slug)}`;
     color: #222;
   }
 
-  h1 {
+  .note-detail-title {
     margin: 1rem 0 0;
     color: #111;
     font-family: var(--font-display);
@@ -119,22 +121,22 @@ const pageUrl = `/notes/${encodeURIComponent(note.meta.slug)}`;
     letter-spacing: 0;
   }
 
-  .note-detail--modal h1 {
+  .note-detail--modal .note-detail-title {
     font-size: clamp(1.8rem, 4vw, 2.65rem);
   }
 
-  h1 a {
+  .note-detail-title a {
     color: inherit;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.16em;
   }
 
-  h1 a:hover,
-  h1 a:focus-visible {
+  .note-detail-title a:hover,
+  .note-detail-title a:focus-visible {
     color: #d6452a;
   }
 
-  h1 a:focus-visible {
+  .note-detail-title a:focus-visible {
     outline: 2px solid #d6452a;
     outline-offset: 0.12em;
   }

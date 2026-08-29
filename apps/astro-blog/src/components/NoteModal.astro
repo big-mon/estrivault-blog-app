@@ -105,7 +105,7 @@ const noteMetas = notes.map((note) => note.meta);
     }
 
     modalContent.replaceChildren(template.content.cloneNode(true));
-    const title = modalContent.querySelector<HTMLElement>('h1[id]');
+    const title = modalContent.querySelector<HTMLElement>('h2[id]');
     if (title) {
       title.id = 'note-modal-title';
     }
