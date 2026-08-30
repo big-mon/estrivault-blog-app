@@ -2,7 +2,7 @@
 import BaseLayout from '$layouts/BaseLayout.astro';
 import EditorialFooter from '$components/EditorialFooter.astro';
 import EditorialMasthead from '$components/EditorialMasthead.astro';
-import { getCategoryLabel, SITE_TITLE, SITE_URL, SOCIAL_LINK_X } from '$constants';
+import { AUTHOR_PERSON, getCategoryLabel, SITE_TITLE, SITE_URL } from '$constants';
 import { getAllPostsMeta, getPostBySlug } from '$lib/content';
 import { formatEditorialDate } from '$lib/format-date';
 import { getPostOgpImageUrl } from '$lib/og';
@@ -95,17 +95,8 @@ const schemaData = {
   headline: post.meta.title,
   description,
   image: [ogImage],
-  author: {
-    '@type': 'Person',
-    name: 'big-mon',
-    url: `https://x.com/${SOCIAL_LINK_X}`,
-    sameAs: [`https://x.com/${SOCIAL_LINK_X}`, 'https://github.com/big-mon'],
-  },
-  publisher: {
-    '@type': 'Organization',
-    name: SITE_TITLE,
-    url: SITE_URL,
-  },
+  author: AUTHOR_PERSON,
+  publisher: AUTHOR_PERSON,
   datePublished: post.meta.publishedAt.toISOString(),
   dateModified: (post.meta.updatedAt || post.meta.publishedAt).toISOString(),
   mainEntityOfPage: {

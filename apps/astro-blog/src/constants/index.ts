@@ -36,6 +36,17 @@ export const NAVIGATION_LINKS = [
 
 export const SOCIAL_LINK_X = 'big_mon';
 export const SOCIAL_LINK_GITHUB = 'big-mon/estrivault-blog-app';
+export const AUTHOR_GITHUB_PROFILE = 'big-mon';
+
+const AUTHOR_PAGE_URL = new URL('/post/about', SITE_URL).toString();
+
+export const AUTHOR_PERSON = {
+  '@type': 'Person',
+  '@id': `${AUTHOR_PAGE_URL}#author`,
+  name: SITE_AUTHOR,
+  url: AUTHOR_PAGE_URL,
+  sameAs: [`https://x.com/${SOCIAL_LINK_X}`, `https://github.com/${AUTHOR_GITHUB_PROFILE}`],
+};
 
 export const POSTS_PER_PAGE = 12;
 

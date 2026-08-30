@@ -1,7 +1,7 @@
 export const SITE_TITLE = 'Estrilda';
 export const SITE_DESCRIPTION =
   '投資分析、ソフトウェア開発、AI活用、ゲーム攻略、ギアレビュー、考察を蓄積する個人アーカイブです。';
-export const SITE_AUTHOR = 'Estrilda';
+export const SITE_AUTHOR = 'big-mon';
 export const SITE_URL = 'https://estrilda.damonge.com/';
 export const PUBLIC_MARKDOWN_LANGUAGE = 'ja-JP';
 export const PUBLIC_MARKDOWN_AUTHOR = 'big-mon';
