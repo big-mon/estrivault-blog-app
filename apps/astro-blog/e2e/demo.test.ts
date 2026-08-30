@@ -1,9 +1,60 @@
 import { readFile } from 'node:fs/promises';
 
 import { expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 const countSerializedHeadings = (html: string, level: 1 | 2 | 3) =>
   html.match(new RegExp(`<h${level}\\b`, 'gi'))?.length ?? 0;
+
+const expectedAuthor = {
+  '@type': 'Person',
+  '@id': 'https://estrilda.damonge.com/post/about#author',
+  name: 'big-mon',
+  url: 'https://estrilda.damonge.com/post/about',
+  sameAs: ['https://x.com/big_mon', 'https://github.com/big-mon'],
+};
+
+const parseJsonLd = async (page: Page) => {
+  const script = page.locator('script[type="application/ld+json"]');
+  await expect(script).toHaveCount(1);
+  const source = await script.textContent();
+  expect(source).toBeTruthy();
+  return JSON.parse(source!) as Record<string, unknown>;
+};
+
+const expectAuthorIdentity = (schema: Record<string, unknown>) => {
+  expect(schema['@type']).toBe('BlogPosting');
+  expect(schema.author).toEqual(expectedAuthor);
+  expect(schema.publisher).toEqual(expectedAuthor);
+};
+
+test('post, standalone note, and About expose the permanent author identity', async ({ page }) => {
+  await page.goto('/post/what-humans-must-not-give-up-in-the-age-of-ai');
+  expectAuthorIdentity(await parseJsonLd(page));
+
+  await page.goto('/notes/2026-06-19_itsme');
+  expectAuthorIdentity(await parseJsonLd(page));
+
+  await page.goto('/post/about');
+  expectAuthorIdentity(await parseJsonLd(page));
+  await expect(page.locator('meta[name="author"]')).toHaveAttribute('content', 'big-mon');
+  await expect(page.locator('#author')).toBeVisible();
+
+  const aboutBody = page.locator('.article-body');
+  for (const text of [
+    'big-mon',
+    '個人で運営',
+    '一次情報',
+    '事実と解釈・意見',
+    '確認できた誤り',
+    '投資勧誘',
+  ]) {
+    await expect(aboutBody).toContainText(text);
+  }
+
+  await expect(aboutBody.locator('a[href="https://x.com/big_mon"]')).toBeVisible();
+  await expect(aboutBody.locator('a[href="https://github.com/big-mon"]')).toBeVisible();
+});
 
 test('built deployment advertises discovery resources from the homepage only', async () => {
   const headers = await readFile(new URL('../dist/_headers', import.meta.url), 'utf8');
