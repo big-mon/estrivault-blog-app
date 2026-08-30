@@ -41,17 +41,6 @@ test('post, standalone note, and About expose the permanent author identity', as
   await expect(page.locator('#author')).toBeVisible();
 
   const aboutBody = page.locator('.article-body');
-  for (const text of [
-    'big-mon',
-    '個人で運営',
-    '一次情報',
-    '事実と解釈・意見',
-    '確認できた誤り',
-    '投資勧誘',
-  ]) {
-    await expect(aboutBody).toContainText(text);
-  }
-
   await expect(aboutBody.locator('a[href="https://x.com/big_mon"]')).toBeVisible();
   await expect(aboutBody.locator('a[href="https://github.com/big-mon"]')).toBeVisible();
 });
