@@ -4,6 +4,7 @@ import {
   type PublicDiscoveryEntry,
   type PublicDiscoverySection,
 } from '$lib/public-discovery';
+import { SITE_TITLE } from '$constants';
 
 export const prerender = true;
 
@@ -44,7 +45,7 @@ export const GET: APIRoute = async () => {
         : '';
     })
     .filter(Boolean);
-  const body = `# Estrilda public sitemap
+  const body = `# ${SITE_TITLE} public sitemap
 
 Canonical public resources, grouped for discovery. Dates use ISO 8601.
 

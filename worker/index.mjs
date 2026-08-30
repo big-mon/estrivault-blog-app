@@ -157,22 +157,46 @@ const HOMEPAGE_DISCOVERY_LINKS = [
 ];
 
 function appendLinks(headers, links) {
-  const current = headers.get('Link');
-  const existing =
-    current ? (splitOutsideQuotes(current, ',') ?? []).map((item) => item.trim()) : [];
+  if (links.length === 0) return;
 
-  for (const link of links) {
-    if (existing.includes(link)) continue;
-    headers.append('Link', link);
-    existing.push(link);
+  const current = headers.get('Link');
+  const parsed = current ? splitOutsideQuotes(current, ',') : [];
+  if (parsed === null) {
+    for (const link of links) {
+      if (!current.includes(link)) headers.append('Link', link);
+    }
+    return;
   }
+
+  const existing = parsed.map((item) => item.trim()).filter(Boolean);
+  const unique = [];
+
+  for (const link of [...existing, ...links]) {
+    if (!unique.includes(link)) unique.push(link);
+  }
+
+  headers.set('Link', unique.join(', '));
 }
 
-function rewriteResponse(response, { method, contentType, homepage = false } = {}) {
+function getMediaType(contentType) {
+  return contentType?.split(';', 1)[0]?.trim().toLowerCase() ?? '';
+}
+
+function isLanguageBearingDocument(contentType) {
+  return ['text/html', 'text/markdown'].includes(getMediaType(contentType));
+}
+
+function rewriteResponse(
+  response,
+  { method, contentType, knownJapaneseDocument = false, varyByAccept = false, links = [] } = {},
+) {
   const headers = new Headers(response.headers);
-  appendVary(headers, 'Accept');
+  if (varyByAccept) appendVary(headers, 'Accept');
   if (contentType) headers.set('Content-Type', contentType);
-  if (homepage) appendLinks(headers, HOMEPAGE_DISCOVERY_LINKS);
+  if (knownJapaneseDocument || isLanguageBearingDocument(headers.get('Content-Type'))) {
+    headers.set('Content-Language', 'ja');
+  }
+  appendLinks(headers, links);
 
   return new Response(method === 'HEAD' ? null : response.body, {
     status: response.status,
@@ -188,7 +212,16 @@ const worker = {
     const eligible =
       (request.method === 'GET' || request.method === 'HEAD') && Boolean(artifactPath);
 
-    if (!eligible) return env.ASSETS.fetch(request);
+    if (!eligible) {
+      const response = await env.ASSETS.fetch(request);
+      return rewriteResponse(response, { method: request.method });
+    }
+
+    const homepageLinks = url.pathname === '/' ? HOMEPAGE_DISCOVERY_LINKS : [];
+    const htmlLinks = [
+      `<${artifactPath}>; rel="alternate"; type="text/markdown"`,
+      ...homepageLinks,
+    ];
 
     if (shouldServeMarkdown(request.headers.get('Accept'))) {
       const artifactUrl = new URL(request.url);
@@ -198,7 +231,9 @@ const worker = {
         return rewriteResponse(markdownResponse, {
           method: request.method,
           contentType: 'text/markdown; charset=utf-8',
-          homepage: url.pathname === '/',
+          knownJapaneseDocument: true,
+          varyByAccept: true,
+          links: homepageLinks,
         });
       }
     }
@@ -206,7 +241,9 @@ const worker = {
     const htmlResponse = await env.ASSETS.fetch(request);
     return rewriteResponse(htmlResponse, {
       method: request.method,
-      homepage: url.pathname === '/',
+      knownJapaneseDocument: true,
+      varyByAccept: true,
+      links: htmlLinks,
     });
   },
 };

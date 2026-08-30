@@ -1,7 +1,32 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { readFileSync } from 'node:fs';
 
 import worker from './index.mjs';
+
+const markdownAlternateLink = (artifactPath) =>
+  `<${artifactPath}>; rel="alternate"; type="text/markdown"`;
+
+const homepageDiscoveryLinks = [
+  '</llms.txt>; rel="describedby"; type="text/markdown"',
+  '</sitemap.xml>; rel="describedby"; type="application/xml"',
+  '</sitemap.md>; rel="describedby"; type="text/markdown"',
+  '</.well-known/api-catalog>; rel="api-catalog"',
+];
+
+test('production static assets invoke the Worker before every asset', () => {
+  const wranglerConfig = readFileSync(new URL('../wrangler.toml', import.meta.url), 'utf8');
+  const assetsSection = wranglerConfig.match(
+    /^\[assets\]\r?\n([\s\S]*?)(?=^\[[^\r\n]+\]\r?$)/m,
+  )?.[1];
+
+  assert.ok(assetsSection, 'wrangler.toml must define an [assets] section');
+  assert.match(
+    assetsSection,
+    /^\s*run_worker_first\s*=\s*true\s*(?:#.*)?$/m,
+    'wrangler.toml [assets].run_worker_first must be true',
+  );
+});
 
 function createAssets(files) {
   const calls = [];
@@ -194,6 +219,7 @@ test('negotiated Markdown preserves asset metadata and sets its representation h
   assert.equal(response.headers.get('ETag'), '"markdown"');
   assert.equal(response.headers.get('Cache-Control'), 'public, max-age=60');
   assert.equal(response.headers.get('Vary'), 'Origin, Accept-Encoding, Accept');
+  assert.equal(response.headers.get('Content-Language'), 'ja');
   assert.equal(await response.text(), '# Markdown\n');
 });
 
@@ -236,6 +262,7 @@ test('homepage HTML and Markdown HEAD responses append exact discovery Link valu
     '</.well-known/api-catalog>; rel="api-catalog"',
   ];
   const existingLink = '</existing>; rel="alternate"';
+  const artifactLink = markdownAlternateLink('/index.md');
 
   for (const [method, accept, expectedStatus, expectedBody, expectedPath, existingDuplicate] of [
     ['GET', 'text/html', 203, '<html>home</html>', '/', discoveryLinks[1]],
@@ -271,17 +298,140 @@ test('homepage HTML and Markdown HEAD responses append exact discovery Link valu
 
     assert.equal(response.status, expectedStatus, `${method} ${accept}`);
     assert.equal(await response.text(), expectedBody, `${method} ${accept}`);
+    const expectedLinks = [existingLink, existingDuplicate, ...discoveryLinks];
+    if (accept === 'text/html') expectedLinks.push(artifactLink);
     assert.deepEqual(
       response.headers.get('Link')?.split(', ').sort(),
-      [existingLink, existingDuplicate, ...discoveryLinks]
-        .filter((value, index, values) => values.indexOf(value) === index)
-        .sort(),
+      expectedLinks.filter((value, index, values) => values.indexOf(value) === index).sort(),
       `${method} ${accept}`,
     );
     assert.equal(response.headers.get('ETag'), expectedPath === '/' ? '"homepage"' : '"markdown"');
     assert.equal(response.headers.get('Vary'), 'Origin, Accept', `${method} ${accept}`);
     assert.deepEqual(assets.calls, [{ method, pathname: expectedPath }], `${method} ${accept}`);
   }
+});
+
+test('eligible document HTML responses advertise their Markdown artifact and language', async () => {
+  for (const [pathname, artifactPath, accept, expectedPath] of [
+    ['/', '/index.md', 'text/html', '/'],
+    ['/post/hello', '/post/hello/index.md', 'text/html', '/post/hello'],
+    ['/notes/quick-note', '/notes/quick-note/index.md', 'text/html', '/notes/quick-note'],
+  ]) {
+    const assets = createAssets({
+      [pathname]: {
+        body: '<html>document</html>',
+        ...(pathname === '/post/hello' ?
+          {}
+        : { headers: { 'Content-Type': 'text/html; charset=utf-8' } }),
+      },
+      [artifactPath]: {
+        body: '# Document\n',
+        headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+      },
+    });
+
+    const response = await worker.fetch(
+      new Request(`https://example.test${pathname}`, { headers: { Accept: accept } }),
+      { ASSETS: assets },
+    );
+
+    const links = response.headers.get('Link')?.split(', ') ?? [];
+    assert.ok(links.includes(markdownAlternateLink(artifactPath)), pathname);
+    assert.doesNotMatch(response.headers.get('Link') ?? '', /<\/llms\.txt>; rel="alternate"/);
+    assert.equal(response.headers.get('Content-Language'), 'ja', pathname);
+    assert.equal(response.headers.get('Vary'), 'Accept', pathname);
+    assert.deepEqual(assets.calls, [{ method: 'GET', pathname: expectedPath }], pathname);
+
+    if (pathname === '/') {
+      assert.ok(links.includes(homepageDiscoveryLinks[0]));
+    }
+  }
+});
+
+test('negotiated Markdown document responses retain language metadata without adding an HTML alternate', async () => {
+  const assets = createAssets({
+    '/post/markdown': { body: '<html>document</html>' },
+    '/post/markdown/index.md': { body: '# Document\n' },
+  });
+
+  const response = await worker.fetch(
+    new Request('https://example.test/post/markdown', {
+      headers: { Accept: 'text/markdown' },
+    }),
+    { ASSETS: assets },
+  );
+
+  assert.equal(response.headers.get('Content-Language'), 'ja');
+  assert.equal(response.headers.get('Link'), null);
+  assert.equal(response.headers.get('Vary'), 'Accept');
+});
+
+test('existing Link values are preserved and deduplicated when document metadata is appended', async () => {
+  const artifactLink = markdownAlternateLink('/index.md');
+  const existingLink = '</existing>; rel="alternate"';
+  const assets = createAssets({
+    '/': {
+      body: '<html>home</html>',
+      headers: {
+        Link: `${existingLink}, ${existingLink}, ${artifactLink}, ${artifactLink}`,
+      },
+    },
+    '/index.md': { body: '# Home\n' },
+  });
+
+  const response = await worker.fetch(
+    new Request('https://example.test/', { headers: { Accept: 'text/html' } }),
+    { ASSETS: assets },
+  );
+
+  assert.deepEqual(
+    response.headers.get('Link')?.split(', ').sort(),
+    [existingLink, artifactLink, ...homepageDiscoveryLinks].sort(),
+  );
+});
+
+test('direct language-bearing documents receive Japanese language without negotiation, while binary assets do not', async () => {
+  const describedBy = homepageDiscoveryLinks[0];
+  const assets = createAssets({
+    '/llms.txt': {
+      body: '# Estrilda\n',
+      headers: { 'Content-Type': 'text/markdown; charset=utf-8', Link: describedBy },
+    },
+    '/sitemap.md': {
+      body: '# Sitemap\n',
+      headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+    },
+    '/category/software': {
+      body: '<html>category</html>',
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    },
+    '/assets/icon.png': {
+      body: 'png',
+      headers: { 'Content-Type': 'image/png' },
+    },
+  });
+
+  for (const pathname of ['/llms.txt', '/sitemap.md', '/category/software']) {
+    const response = await worker.fetch(
+      new Request(`https://example.test${pathname}`, { headers: { Accept: 'text/markdown' } }),
+      { ASSETS: assets },
+    );
+
+    assert.equal(response.headers.get('Content-Language'), 'ja', pathname);
+    assert.equal(response.headers.get('Vary'), null, pathname);
+  }
+
+  const guideResponse = await worker.fetch(new Request('https://example.test/llms.txt'), {
+    ASSETS: assets,
+  });
+  assert.equal(guideResponse.headers.get('Link'), describedBy);
+  assert.doesNotMatch(guideResponse.headers.get('Link') ?? '', /rel="alternate"/);
+
+  const binaryResponse = await worker.fetch(new Request('https://example.test/assets/icon.png'), {
+    ASSETS: assets,
+  });
+  assert.equal(binaryResponse.headers.get('Content-Language'), null);
+  assert.equal(binaryResponse.headers.get('Vary'), null);
 });
 
 test('homepage discovery Link values do not leak to article or note responses', async () => {
@@ -307,7 +457,13 @@ test('homepage discovery Link values do not leak to article or note responses', 
       { ASSETS: assets },
     );
 
-    assert.equal(response.headers.get('Link'), existingLink, pathname);
+    const artifactLink = markdownAlternateLink(`${pathname}/index.md`);
+    const expectedLinks = accept === 'text/html' ? [existingLink, artifactLink] : [existingLink];
+    assert.deepEqual(
+      response.headers.get('Link')?.split(', ').sort(),
+      expectedLinks.sort(),
+      pathname,
+    );
     assert.deepEqual(assets.calls, [{ method: 'GET', pathname: expectedPath }], pathname);
   }
 });

@@ -5,9 +5,10 @@ import { formatEditorialDate } from '$lib/format-date';
 interface Props {
   note: NoteMeta;
   compact?: boolean;
+  headingLevel?: 'h2' | 'h3';
 }
 
-const { note, compact = false } = Astro.props;
+const { note, compact = false, headingLevel = 'h3' } = Astro.props;
 const dateString = formatEditorialDate(note.publishedAt);
 const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
 ---
@@ -19,7 +20,11 @@ const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
       <time datetime={note.publishedAt.toISOString()}>{dateString}</time>
     </header>
 
-    <h3>{note.title}</h3>
+    {
+      headingLevel === 'h2' ?
+        <h2 class="note-card-title">{note.title}</h2>
+      : <h3 class="note-card-title">{note.title}</h3>
+    }
     <p class="note-card-excerpt">{note.excerpt}</p>
 
     {
@@ -94,7 +99,7 @@ const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
     white-space: nowrap;
   }
 
-  h3 {
+  .note-card-title {
     margin: 1rem 0 0;
     color: #111;
     font-family: var(--font-display);
@@ -105,8 +110,8 @@ const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
     transition: color 140ms ease;
   }
 
-  .note-card:hover h3,
-  .note-card:focus-visible h3 {
+  .note-card:hover .note-card-title,
+  .note-card:focus-visible .note-card-title {
     color: #d6452a;
   }
 
@@ -144,7 +149,7 @@ const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
     font-weight: 700;
   }
 
-  .note-card--compact h3 {
+  .note-card--compact .note-card-title {
     font-size: 1.35rem;
   }
 

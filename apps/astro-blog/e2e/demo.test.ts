@@ -2,6 +2,9 @@ import { readFile } from 'node:fs/promises';
 
 import { expect, test } from '@playwright/test';
 
+const countSerializedHeadings = (html: string, level: 1 | 2 | 3) =>
+  html.match(new RegExp(`<h${level}\\b`, 'gi'))?.length ?? 0;
+
 test('built deployment advertises discovery resources from the homepage only', async () => {
   const headers = await readFile(new URL('../dist/_headers', import.meta.url), 'utf8');
   const homepageRule = headers
@@ -17,6 +20,66 @@ test('built deployment advertises discovery resources from the homepage only', a
 test('home page has expected h1', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('h1')).toBeVisible();
+});
+
+test('homepage serializes site-name h1, hero h2, and recent notes hierarchy', async ({ page }) => {
+  await page.goto('/');
+
+  const html = await page.content();
+  expect(countSerializedHeadings(html, 1)).toBe(1);
+  await expect(page.locator('h1')).toHaveText('Estrilda');
+  await expect(page.locator('.editorial-masthead h1')).toHaveText('Estrilda');
+  await expect(page.locator('.hero-copy h1')).toHaveCount(0);
+  await expect(page.locator('.hero-copy h2')).toHaveText('投資、開発、AI、趣味の実践ログ。');
+
+  const recentNotes = page.locator('#recent-notes');
+  await expect(recentNotes.locator('.section-heading-row > h2')).toHaveText('RECENT NOTES');
+
+  const noteCards = recentNotes.locator('.recent-notes-grid > [data-note-card-link]');
+  const noteCardCount = await noteCards.count();
+  expect(noteCardCount).toBeGreaterThan(0);
+  await expect(recentNotes.locator('.recent-notes-grid h2')).toHaveCount(0);
+  await expect(recentNotes.locator('.recent-notes-grid h3')).toHaveCount(noteCardCount);
+});
+
+test('notes archive serializes one Notes h1 and uses h2 for note cards', async ({ page }) => {
+  await page.goto('/notes/');
+
+  const html = await page.content();
+  expect(countSerializedHeadings(html, 1)).toBe(1);
+  await expect(page.locator('h1')).toHaveText('Notes');
+  await expect(page.locator('.editorial-masthead h1')).toHaveCount(0);
+
+  const noteCards = page.locator('[data-notes-grid] > [data-note-card-link]');
+  const noteCardCount = await noteCards.count();
+  expect(noteCardCount).toBeGreaterThan(0);
+  await expect(page.locator('[data-notes-grid] h2')).toHaveCount(noteCardCount);
+  await expect(page.locator('[data-notes-grid] h3')).toHaveCount(0);
+});
+
+test('modal note title stays labelled while standalone notes retain an h1', async ({ page }) => {
+  await page.goto('/');
+
+  const noteCard = page.locator('#recent-notes [data-note-card-link]').first();
+  const noteTitle = await noteCard.locator('h3').innerText();
+  const noteHref = await noteCard.getAttribute('href');
+  expect(noteHref).toBeTruthy();
+
+  await noteCard.click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAttribute('aria-labelledby', 'note-modal-title');
+  const modalTitle = dialog.locator('h2#note-modal-title');
+  await expect(modalTitle).toHaveText(noteTitle);
+  await expect(dialog.locator('h1')).toHaveCount(0);
+  await expect(modalTitle.locator('a[data-note-page-link]')).toHaveAttribute('href', noteHref!);
+
+  await page.goto(noteHref!);
+  const standaloneHtml = await page.content();
+  expect(countSerializedHeadings(standaloneHtml, 1)).toBe(1);
+  await expect(page.locator('.note-detail h1')).toHaveText(noteTitle);
+  await expect(page.locator('.editorial-masthead h1')).toHaveCount(0);
 });
 
 test('Japanese tag pages render with unencoded route segments', async ({ page }) => {
@@ -56,6 +119,27 @@ test('post pages expose generated OGP images', async ({ page, request }) => {
   expect(response.headers()['content-type']).toContain('image/png');
 });
 
+test('built article headings expose empty anchors and retain normal Markdown artifacts', async ({
+  page,
+  request,
+}) => {
+  await page.goto('/post/about');
+
+  const heading = page.locator('.article-body h2').first();
+  const anchor = heading.locator('a.heading-anchor');
+  await expect(heading).toHaveText('Estrilda について');
+  await expect(anchor).toHaveText('');
+  await expect(anchor).toHaveAttribute('href', '#estrilda-について');
+  await expect(anchor).toHaveAttribute('aria-label', 'Estrilda についてへの直接リンク');
+  await expect(page.locator('link[rel="alternate"][href="/llms.txt"]')).toHaveCount(0);
+
+  const artifactResponse = await request.get('/post/about/index.md');
+  expect(artifactResponse.ok()).toBeTruthy();
+  const artifact = await artifactResponse.text();
+  expect(artifact).toMatch(/^## Estrilda について$/m);
+  expect(artifact).not.toMatch(/^###+ Estrilda について$/m);
+});
+
 test('public discovery endpoints share one canonical URL inventory', async ({ request }) => {
   const [xmlResponse, markdownResponse] = await Promise.all([
     request.get('/sitemap.xml'),
@@ -69,6 +153,7 @@ test('public discovery endpoints share one canonical URL inventory', async ({ re
 
   const xml = await xmlResponse.text();
   const markdown = await markdownResponse.text();
+  expect(markdown.split(/\r?\n/, 1)[0]).toBe('# Estrilda public sitemap');
   const xmlUrls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
   const markdownUrls = [...markdown.matchAll(/\]\(<([^>]+)>\)/g)].map((match) => match[1]);
 
@@ -99,11 +184,19 @@ test('LLM guide points to both sitemaps and the removed full endpoint stays abse
   expect(guideResponse.ok()).toBeTruthy();
   expect(guideResponse.headers()['content-type']).toContain('text/markdown');
   const guide = await guideResponse.text();
+  expect(guide.split(/\r?\n/, 1)[0]).toBe('# Estrilda');
   expect(guide).toContain('https://estrilda.damonge.com/sitemap.xml');
   expect(guide).toContain('https://estrilda.damonge.com/sitemap.md');
 
   const removedResponse = await request.get('/llms-full.txt');
   expect(removedResponse.status()).toBe(404);
+});
+
+test('standard pages expose the canonical public site name in the footer', async ({ page }) => {
+  await page.goto('/2/');
+
+  await expect(page.locator('footer p')).toContainText('Estrilda');
+  await expect(page.locator('footer p')).not.toContainText('Estrivault');
 });
 
 test('agent API index and posts expose the public read-only collection', async ({ request }) => {

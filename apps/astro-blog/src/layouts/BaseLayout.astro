@@ -89,12 +89,6 @@ const adsenseClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT || GOOGLE_ADS
     {section && <meta property="article:section" content={section} />}
     {tags.map((tag) => <meta property="article:tag" content={tag} />)}
 
-    <link
-      rel="alternate"
-      type="text/markdown"
-      href="/llms.txt"
-      title="LLM-friendly content guide"
-    />
     <script
       is:inline
       defer

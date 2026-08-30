@@ -129,6 +129,11 @@ html {
   display: none;
 }
 
+.article-body .heading-anchor::before,
+.note-body .heading-anchor::before {
+  content: '#';
+}
+
 .article-body ul,
 .article-body ol,
 .note-body ul,

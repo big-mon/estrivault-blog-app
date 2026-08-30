@@ -1,4 +1,6 @@
 ---
+import { SITE_TITLE } from '$constants';
+
 interface Props {
   homePage?: boolean;
 }
@@ -8,7 +10,15 @@ const localPath = (hash: string) => (homePage ? hash : `/${hash}`);
 ---
 
 <section class="editorial-masthead">
-  <div class="brand"><a href="/">Estrilda</a></div>
+  {
+    homePage ?
+      <h1 class="brand">
+        <a href="/">{SITE_TITLE}</a>
+      </h1>
+    : <div class="brand">
+        <a href="/">{SITE_TITLE}</a>
+      </div>
+  }
   <nav aria-label="Primary navigation">
     <a href={localPath('#categories')}>CATEGORIES</a>
     <a href="/notes/">NOTES</a>
@@ -47,6 +57,7 @@ const localPath = (hash: string) => (homePage ? hash : `/${hash}`);
   }
 
   .brand {
+    margin: 0;
     font-family: var(--font-display);
     font-size: clamp(2.9rem, 5vw, 4.25rem);
     font-weight: 700;

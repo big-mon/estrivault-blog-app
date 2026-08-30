@@ -140,6 +140,25 @@ function renderArticleBody(source, processorOptions = { cloudinaryCloudName: 'da
   ).body;
 }
 
+test('HTML heading anchors have no text while public Markdown keeps the normal heading', async () => {
+  const source = '---\ntitle: Source\npublishedAt: 2026-01-01\n---\n## Semantic heading\n';
+  const html = await processMarkdown(
+    source,
+    { cloudinaryCloudName: 'damonge' },
+    'semantic-heading',
+  );
+
+  assert.match(
+    html.html,
+    /<h2 id="semantic-heading"><a href="#semantic-heading" class="heading-anchor" aria-label="Semantic headingへの直接リンク"><\/a>Semantic heading<\/h2>/,
+  );
+  assert.deepEqual(html.headings, [{ id: 'semantic-heading', level: 2, text: 'Semantic heading' }]);
+
+  const body = renderArticleBody(source);
+  assert.match(body, /^## Semantic heading$/m);
+  assert.doesNotMatch(body, /^###+ Semantic heading$/m);
+});
+
 test('article output uses an explicit public metadata allowlist and transforms source Markdown', () => {
   const { data, body } = parseGenerated(
     renderArticleMarkdown({

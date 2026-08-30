@@ -29,14 +29,6 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
         id: slug,
       };
 
-      // 見出しレベルに応じた#の数を決定
-      const levelChar = node.tagName[1];
-      if (!levelChar) {
-        return undefined;
-      }
-      const level = parseInt(levelChar);
-      const hashSymbols = '#'.repeat(level);
-
       // アンカーリンク要素を作成
       const anchorLink: Element = {
         type: 'element',
@@ -46,12 +38,7 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
           className: ['heading-anchor'],
           'aria-label': `${textContent}への直接リンク`,
         },
-        children: [
-          {
-            type: 'text',
-            value: hashSymbols,
-          },
-        ],
+        children: [],
       };
 
       // 見出しの先頭にアンカーリンクを追加
