@@ -106,7 +106,8 @@ jobs:
           git checkout -B "$UPDATE_BRANCH"
           git add content/ogp-metadata.json
           git commit -m "chore: refresh OGP metadata"
-          git push --force-with-lease "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$UPDATE_BRANCH"
+          expected=$(git rev-parse --verify "refs/remotes/origin/$UPDATE_BRANCH" 2>/dev/null || true)
+          git push --force-with-lease="$UPDATE_BRANCH:$expected" "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$UPDATE_BRANCH"
 
       - name: Open pull request
         if: steps.metadata-diff.outputs.changed == 'true'
