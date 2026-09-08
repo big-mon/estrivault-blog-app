@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       # Keep pnpm/action-setup for pnpm@10.13.1; pnpm/setup requires pnpm 11+.
       - name: Set up pnpm
@@ -42,6 +44,14 @@ jobs:
 
       - name: Test workspace cleanup
         run: pnpm test:clean
+
+      - name: Test pnpm enforcement
+        run: pnpm test:require-pnpm
+
+      - name: Check pnpm enforcement lint and formatting
+        run: |
+          pnpm exec eslint scripts/require-pnpm.js scripts/require-pnpm.test.mjs
+          pnpm exec prettier --check scripts/require-pnpm.js scripts/require-pnpm.test.mjs package.json .github/workflows/ci.yml
 
       - name: Test worker and source Markdown
         run: |
