@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -26,15 +25,6 @@ function getRequiredPnpmVersion() {
 
 const REQUIRED_PNPM = getRequiredPnpmVersion();
 
-function hasPnpmInPath() {
-  try {
-    execSync('pnpm --version', { stdio: 'ignore', shell: true });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 function printInstallGuide() {
   console.error('This repository requires pnpm.');
   console.error('Install pnpm and retry:');
@@ -54,14 +44,7 @@ function main() {
     process.exit(0);
   }
 
-  if (!hasPnpmInPath()) {
-    printInstallGuide();
-    process.exit(1);
-  }
-
-  console.error('Detected non-pnpm package manager.');
-  console.error('Use pnpm for this repository:');
-  console.error('  pnpm install');
+  printInstallGuide();
   process.exit(1);
 }
 
