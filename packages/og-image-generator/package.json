@@ -23,12 +23,12 @@
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
-    "react": "^19.2.8",
-    "satori": "^0.33.3"
+    "react": "^19.3.0",
+    "satori": "^0.33.4"
   },
   "devDependencies": {
-    "@types/node": "^26.2.0",
-    "@types/react": "^19.2.18",
+    "@types/node": "^26.5.1",
+    "@types/react": "^19.3.0",
     "tsup": "^8.5.1"
   }
 }
