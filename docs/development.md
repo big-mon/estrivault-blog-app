@@ -5,9 +5,11 @@ in `package.json` files are authoritative; inspect them before changing command 
 
 ## Setup
 
-The repository pins pnpm in the root `packageManager` field. It has no root
-`engines.node` support declaration, while the locked Astro 7.1.3 package requires Node `>=22.12.0`.
-GitHub Actions uses Node 22.x; use a current Node 22 release to satisfy both constraints locally.
+The repository pins pnpm 12 in the root `packageManager` field. Use Node 22.22.1 or newer in the
+Node 22 line to satisfy the locked development tools; GitHub Actions uses Node 22.x. pnpm's native
+CLI and its platform packages are recorded in the first document of `pnpm-lock.yaml`, followed by
+the workspace dependency graph. Commit both documents when changing the pnpm pin so a clean
+`pnpm install --frozen-lockfile` can use it.
 
 ```bash
 pnpm install
@@ -29,6 +31,11 @@ pnpm --filter astro-blog preview
 `pnpm dev` builds all three packages, then starts watchers for `cloudinary-utils` and
 `og-image-generator` alongside Astro. `content-processor` is not watched; rebuild it after changing
 it.
+
+Package builds use TypeScript for declarations and incremental state, then esbuild for the ESM
+bundles. Dependencies stay external, and the OGP bundle emits its imported fonts alongside the JS.
+Both watchers reuse their package's `build:bundle` command. Keep bundling after TypeScript so it does
+not leave unbundled entry points in `dist`.
 
 `pnpm build` incrementally builds all packages, generates Cloudflare redirect rules, and builds the
 Astro static output. `wrangler.toml` uses this root command and publishes `apps/astro-blog/dist`.
@@ -71,11 +78,21 @@ The OGP tests import built `dist` output and must exit 0 with all Node tests pas
 `content-processor` and `cloudinary-utils` have no package test script; use build/type checks and the
 relevant Astro check, build, or E2E coverage for consumer-visible changes.
 
+## Astro formatter upgrades
+
+`pnpm test:format-astro` formats all Astro source files in memory and checks that a second pass is
+identical. It does not require a repository-wide reformat or write authored Markdown.
+`prettier-plugin-astro` remains on 0.14.1: 1.0.0 changes the conditional inline script in
+`BaseLayout.astro` again on its second pass. Reconsider 1.x when this regression check passes with
+both repository plugins. Astro 7 and plugin 1.0 both default to JSX whitespace handling; no extra
+`astroCompressHTML` setting is needed while Astro's `compressHTML` remains at its default.
+
 ## Local checks versus GitHub Actions
 
 Pull-request CI uses Node 22.x and the pnpm version pinned by root `packageManager`. After a frozen
-install, it runs exactly the workspace-cleanup test, Worker and source-Markdown tests, Astro lint,
-Astro check, Playwright Chromium setup, and the full Astro E2E suite. It does not directly run root lint, root format check,
+install, it runs the workspace-cleanup, pnpm-enforcement, Astro-formatting, Worker, and source-Markdown
+tests; pnpm-enforcement lint/format checks; Astro lint and check; Playwright Chromium setup; and the
+full Astro E2E suite. It does not directly run root lint, root format check,
 `pnpm type-check`, or the OGP unit tests. Run omitted checks locally when their ownership area
 changes. A local pass does not prove GitHub Actions passed.
 

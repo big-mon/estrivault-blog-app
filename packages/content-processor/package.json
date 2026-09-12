@@ -16,7 +16,7 @@
   "scripts": {
     "clean": "node ../../scripts/clean-workspace-dist.mjs",
     "build:types": "tsc --build",
-    "build:bundle": "tsup",
+    "build:bundle": "esbuild src/index.ts --bundle --packages=external --format=esm --platform=browser --conditions=worker,browser --target=es2022 --outdir=dist --minify",
     "build": "pnpm run build:types && pnpm run build:bundle"
   },
   "dependencies": {
@@ -39,7 +39,6 @@
     "@types/hast": "^3.0.5",
     "@types/mdast": "^4.0.4",
     "@types/node": "^26.5.1",
-    "@types/unist": "^3.0.3",
-    "tsup": "^8.5.1"
+    "@types/unist": "^3.0.3"
   }
 }
