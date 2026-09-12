@@ -10,9 +10,9 @@
   "scripts": {
     "clean": "node ../../scripts/clean-workspace-dist.mjs",
     "build:types": "tsc --build",
-    "build:bundle": "tsup",
+    "build:bundle": "esbuild src/index.ts --bundle --packages=external --format=esm --platform=node --target=es2022 --outdir=dist --minify --keep-names --sourcemap=external --loader:.otf=file",
     "build": "pnpm run build:types && pnpm run build:bundle",
-    "dev": "tsup --watch",
+    "dev": "pnpm run build:bundle --watch",
     "test": "node --test test/*.test.mjs"
   },
   "exports": {
@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "@types/node": "^26.5.1",
-    "@types/react": "^19.3.0",
-    "tsup": "^8.5.1"
+    "@types/react": "^19.3.0"
   }
 }

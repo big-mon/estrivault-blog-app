@@ -10,9 +10,9 @@
   "scripts": {
     "clean": "node ../../scripts/clean-workspace-dist.mjs",
     "build:types": "tsc --build",
-    "build:bundle": "tsup",
+    "build:bundle": "esbuild src/index.ts --bundle --packages=external --format=esm --platform=node --target=es2022 --outdir=dist --minify --keep-names --sourcemap=external --splitting",
     "build": "pnpm run build:types && pnpm run build:bundle",
-    "dev": "tsup --watch"
+    "dev": "pnpm run build:bundle --watch"
   },
   "exports": {
     ".": {
@@ -22,8 +22,5 @@
   },
   "dependencies": {
     "@cloudinary/url-gen": "^1.22.0"
-  },
-  "devDependencies": {
-    "tsup": "^8.5.1"
   }
 }

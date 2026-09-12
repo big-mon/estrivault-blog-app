@@ -3,7 +3,6 @@ packages:
   - 'packages/*'
 
 overrides:
-  'tsup>esbuild': 0.28.2
   'satori>fflate': 0.7.5
 
 allowBuilds:

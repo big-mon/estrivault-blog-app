@@ -47,6 +47,9 @@ jobs:
       - name: Test pnpm enforcement
         run: pnpm test:require-pnpm
 
+      - name: Test Astro formatting stability
+        run: pnpm test:format-astro
+
       - name: Check pnpm enforcement lint and formatting
         run: |
           pnpm exec eslint scripts/require-pnpm.js scripts/require-pnpm.test.mjs
