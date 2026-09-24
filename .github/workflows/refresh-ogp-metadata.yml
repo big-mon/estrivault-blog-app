@@ -114,8 +114,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          if gh pr view "$UPDATE_BRANCH" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh pr edit "$UPDATE_BRANCH" \
+          pr_number=$(gh api --method GET "repos/$GITHUB_REPOSITORY/pulls" \
+            --field state=open --field base=main \
+            --field head="${GITHUB_REPOSITORY%%/*}:$UPDATE_BRANCH" \
+            --paginate --jq '.[] | select(.head.repo.full_name == .base.repo.full_name) | .number')
+          if [[ -n "$pr_number" ]]; then
+            gh pr edit "$pr_number" \
               --repo "$GITHUB_REPOSITORY" \
               --title "chore: refresh OGP metadata" \
               --body "Automated refresh of content/ogp-metadata.json."

@@ -50,6 +50,9 @@ jobs:
       - name: Test Astro formatting stability
         run: pnpm test:format-astro
 
+      - name: Test OGP refresh workflow
+        run: pnpm test:ogp-workflow
+
       - name: Check pnpm enforcement lint and formatting
         run: |
           pnpm exec eslint scripts/require-pnpm.js scripts/require-pnpm.test.mjs
