@@ -115,7 +115,8 @@ jobs:
         shell: bash
         run: |
           pr_number=$(gh pr list --state open --base main --head "$UPDATE_BRANCH" \
-            --repo "$GITHUB_REPOSITORY" --json number --jq '.[0].number')
+            --repo "$GITHUB_REPOSITORY" --json number,isCrossRepository \
+            --jq 'map(select(.isCrossRepository == false))[0].number')
           if [[ -n "$pr_number" ]]; then
             gh pr edit "$pr_number" \
               --repo "$GITHUB_REPOSITORY" \

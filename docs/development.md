@@ -90,7 +90,7 @@ both repository plugins. Astro 7 and plugin 1.0 both default to JSX whitespace h
 ## Local checks versus GitHub Actions
 
 Pull-request CI uses Node 22.x and the pnpm version pinned by root `packageManager`. After a frozen
-install, it runs the workspace-cleanup, pnpm-enforcement, Astro-formatting, Worker, and source-Markdown
+install, it runs the workspace-cleanup, pnpm-enforcement, Astro-formatting, OGP-workflow, Worker, and source-Markdown
 tests; pnpm-enforcement lint/format checks; Astro lint and check; Playwright Chromium setup; and the
 full Astro E2E suite. It does not directly run root lint, root format check,
 `pnpm type-check`, or the OGP unit tests. Run omitted checks locally when their ownership area
@@ -108,6 +108,9 @@ The separate `.github/workflows/refresh-ogp-metadata.yml` runs weekly and by man
 content and pull-request write permissions. On metadata changes, it commits the JSON file,
 force-with-lease pushes `codex/refresh-ogp-metadata`, and creates or updates a pull request to `main`.
 Triggering it is an external repository mutation, not a CI verification step.
+
+`pnpm test:ogp-workflow` runs its Bash steps with stubbed GitHub/Git commands and jq for JSON
+filtering. It checks PR selection and file outputs without network requests or repository mutations.
 
 ## Final review
 

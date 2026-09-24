@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
+import process from 'node:process';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
@@ -21,10 +22,23 @@ function step(name) {
   };
 }
 
-test('PR handling edits only open PR numbers and propagates search failures', () => {
+test('PR handling edits only same-repository open PRs and propagates search failures', () => {
   const directory = mkdtempSync(path.join(repository, '.ogp-workflow-'));
   try {
-    for (const scenario of ['open', 'merged', 'closed', 'none', 'failure']) {
+    for (const scenario of [
+      'open',
+      'fork',
+      'fork-and-open',
+      'merged',
+      'closed',
+      'none',
+      'failure',
+    ]) {
+      const pulls = [];
+      if (scenario.startsWith('fork')) pulls.push({ number: 999, isCrossRepository: true });
+      if (scenario === 'open' || scenario === 'fork-and-open') {
+        pulls.push({ number: 321, isCrossRepository: false });
+      }
       const result = spawnSync(
         '/bin/bash',
         [
@@ -40,8 +54,9 @@ test('PR handling edits only open PR numbers and propagates search failures', ()
             case "$1 $2" in
               'pr list')
                 [[ "$SCENARIO" != failure ]] || return 42
-                [[ "$SCENARIO" != open ]] || printf '321\\n'
-                return 0 ;;
+                while [[ "$1" != --jq ]]; do shift; done
+                printf '%s' "$PULLS" | jq -r "$2 // empty"
+                return $? ;;
               'pr view')
                 [[ "$SCENARIO" == open || "$SCENARIO" == merged || "$SCENARIO" == closed ]] ;;
               'pr edit'|'pr create') return 0 ;;
@@ -54,6 +69,8 @@ test('PR handling edits only open PR numbers and propagates search failures', ()
           cwd: directory,
           env: {
             SCENARIO: scenario,
+            PATH: process.env.PATH,
+            PULLS: JSON.stringify(pulls),
             UPDATE_BRANCH: 'codex/refresh-ogp-metadata',
             GITHUB_REPOSITORY: 'example/blog',
           },
@@ -66,7 +83,7 @@ test('PR handling edits only open PR numbers and propagates search failures', ()
       const calls = result.stderr.trim().split('\n');
       assert.equal(
         calls[0],
-        'pr list --state open --base main --head codex/refresh-ogp-metadata --repo example/blog --json number --jq .[0].number',
+        'pr list --state open --base main --head codex/refresh-ogp-metadata --repo example/blog --json number,isCrossRepository --jq map(select(.isCrossRepository == false))[0].number',
         scenario,
       );
       const metadata =
@@ -74,7 +91,8 @@ test('PR handling edits only open PR numbers and propagates search failures', ()
       assert.deepEqual(
         calls.slice(1),
         scenario === 'failure' ? []
-        : scenario === 'open' ? [`pr edit 321 --repo example/blog ${metadata}`]
+        : scenario === 'open' || scenario === 'fork-and-open' ?
+          [`pr edit 321 --repo example/blog ${metadata}`]
         : [
             `pr create --repo example/blog --base main --head codex/refresh-ogp-metadata ${metadata}`,
           ],

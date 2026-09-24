@@ -16,6 +16,7 @@
     "test:clean": "node --test scripts/clean-workspace-dist.test.mjs",
     "test:require-pnpm": "node --test scripts/require-pnpm.test.mjs",
     "test:format-astro": "node --test scripts/format-astro.test.mjs",
+    "test:ogp-workflow": "node --test scripts/refresh-ogp-workflow.test.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
