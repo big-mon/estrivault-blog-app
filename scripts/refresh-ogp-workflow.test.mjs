@@ -29,15 +29,23 @@ test('PR handling edits only same-repository open PRs and propagates search fail
       'open',
       'fork',
       'fork-and-open',
+      'fork-page-and-open',
       'merged',
       'closed',
       'none',
       'failure',
+      'partial-failure',
     ]) {
       const pulls = [];
-      if (scenario.startsWith('fork')) pulls.push({ number: 999, isCrossRepository: true });
-      if (scenario === 'open' || scenario === 'fork-and-open') {
-        pulls.push({ number: 321, isCrossRepository: false });
+      const base = { repo: { full_name: 'example/blog' } };
+      if (scenario.startsWith('fork')) {
+        for (let index = 0; index < (scenario === 'fork-page-and-open' ? 35 : 1); index++) {
+          pulls.push({ number: 999 + index, head: { repo: { full_name: 'example/fork' } }, base });
+        }
+      }
+      const hasOwnPr = scenario === 'open' || scenario.endsWith('and-open');
+      if (hasOwnPr) {
+        pulls.push({ number: 321, head: { repo: { full_name: 'example/blog' } }, base });
       }
       const result = spawnSync(
         '/bin/bash',
@@ -52,10 +60,11 @@ test('PR handling edits only same-repository open PRs and propagates search fail
           gh() {
             printf '%s\\n' "$*" >&2
             case "$1 $2" in
-              'pr list')
+              'api --method')
+                if [[ "$SCENARIO" == partial-failure ]]; then printf '321\\n'; return 42; fi
                 [[ "$SCENARIO" != failure ]] || return 42
                 while [[ "$1" != --jq ]]; do shift; done
-                printf '%s' "$PULLS" | jq -r "$2 // empty"
+                printf '%s' "$PULLS" | jq -c '.[]' | jq -r "$2"
                 return $? ;;
               'pr view')
                 [[ "$SCENARIO" == open || "$SCENARIO" == merged || "$SCENARIO" == closed ]] ;;
@@ -70,7 +79,7 @@ test('PR handling edits only same-repository open PRs and propagates search fail
           env: {
             SCENARIO: scenario,
             PATH: process.env.PATH,
-            PULLS: JSON.stringify(pulls),
+            PULLS: JSON.stringify([pulls.slice(0, 30), pulls.slice(30)]),
             UPDATE_BRANCH: 'codex/refresh-ogp-metadata',
             GITHUB_REPOSITORY: 'example/blog',
           },
@@ -79,20 +88,19 @@ test('PR handling edits only same-repository open PRs and propagates search fail
         },
       );
       assert.ifError(result.error);
-      assert.equal(result.status, scenario === 'failure' ? 42 : 0, scenario);
+      assert.equal(result.status, scenario.endsWith('failure') ? 42 : 0, scenario);
       const calls = result.stderr.trim().split('\n');
       assert.equal(
         calls[0],
-        'pr list --state open --base main --head codex/refresh-ogp-metadata --repo example/blog --json number,isCrossRepository --jq map(select(.isCrossRepository == false))[0].number',
+        'api --method GET repos/example/blog/pulls --field state=open --field base=main --field head=example:codex/refresh-ogp-metadata --paginate --jq .[] | select(.head.repo.full_name == .base.repo.full_name) | .number',
         scenario,
       );
       const metadata =
         '--title chore: refresh OGP metadata --body Automated refresh of content/ogp-metadata.json.';
       assert.deepEqual(
         calls.slice(1),
-        scenario === 'failure' ? []
-        : scenario === 'open' || scenario === 'fork-and-open' ?
-          [`pr edit 321 --repo example/blog ${metadata}`]
+        scenario.endsWith('failure') ? []
+        : hasOwnPr ? [`pr edit 321 --repo example/blog ${metadata}`]
         : [
             `pr create --repo example/blog --base main --head codex/refresh-ogp-metadata ${metadata}`,
           ],
