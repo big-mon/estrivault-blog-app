@@ -1,13 +1,15 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin, Transformer } from 'unified';
 import type { Root, Element } from 'hast';
+import type { HeadingInfo } from '../../types';
 
 /**
  * 見出しタグ(h1-h6)にアンカーリンクを付与するrehypeプラグイン
  * 見出しテキストからslugを生成し、id属性とクリック可能なアンカーリンクを追加する
  */
 export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
-  const transformer: Transformer<Root, Root> = (tree: Root) => {
+  const transformer: Transformer<Root, Root> = (tree: Root, file) => {
+    const headings: HeadingInfo[] = [];
     visit(tree, 'element', (node: Element) => {
       // h1-h6タグのみ処理
       if (!node.tagName.match(/^h[1-6]$/)) {
@@ -22,6 +24,10 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
 
       // slugを生成（日本語対応）
       const slug = generateSlug(textContent);
+
+      if (slug && /^h[1-3]$/.test(node.tagName)) {
+        headings.push({ id: slug, level: Number(node.tagName[1]), text: textContent });
+      }
 
       // id属性を設定
       node.properties = {
@@ -46,6 +52,7 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
       return undefined;
     });
 
+    file.data.headings = headings;
     return tree;
   };
 

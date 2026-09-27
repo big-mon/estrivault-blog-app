@@ -23,6 +23,12 @@
 - `parseFrontmatter(markdown)`:
   frontmatter と本文を分離します。
 
+- `extractNoteMetadata(markdown, filePath, slug)`:
+  HTMLと公開Markdownで共通のNoteメタデータを抽出・検証します。
+
+- `extractOgpUrls(markdown)`:
+  HTMLのOGPカードと共通の条件で更新対象URLを抽出します。通信は行いません。
+
 - `normalizeForSlug(value)` / `normalizeForTagFilter(value)`:
   ルーティングやタグ絞り込み用に文字列を正規化します。
 

@@ -63,7 +63,4 @@ export interface PostHTML {
   headings: HeadingInfo[];
   originalPath?: string;
   hasCodeBlocks?: boolean;
-  hasTwitterEmbeds?: boolean;
-  hasAmazonEmbeds?: boolean;
-  hasDirectiveBoxes?: boolean;
 }

@@ -2,16 +2,21 @@ import matter from 'gray-matter';
 import readingTime from 'reading-time';
 import { buildUrl } from '@estrivault/cloudinary-utils';
 import { createPipeline } from './pipeline';
+import { findOgpLinks } from './plugins/embeds/common-link-embed';
 import { hasCodeBlocks } from './utils/code-detector';
-import { hasTwitterEmbeds } from './utils/twitter-detector';
-import { hasAmazonEmbeds } from './utils/amazon-detector';
-import { hasDirectiveBoxes } from './utils/directive-boxes-detector';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkDirective from 'remark-directive';
 import remarkGfm from 'remark-gfm';
 import type { PostMeta, PostHTML, ProcessorOptions, HeadingInfo } from './types';
 import { FrontMatterError, MarkdownParseError } from './errors';
+
+const markdownParser = unified().use(remarkParse).use(remarkDirective).use(remarkGfm);
+
+export function extractOgpUrls(source: string): string[] {
+  const { content } = parseFrontmatter(source);
+  return [...new Set(findOgpLinks(markdownParser.parse(content)).map(({ url }) => url))];
+}
 
 /**
  * フロントマターの解析
@@ -134,12 +139,12 @@ function normalizePostMeta(
 /**
  * Markdownコンテンツ（フロントマター付き）を解析し、HTML・メタデータ・見出し情報・各種埋め込み検出結果を返します。
  *
- * Markdown本文からフロントマターを抽出・検証し、HTMLへの変換、タグや日付の正規化、読了時間の算出、コードブロックや埋め込み要素（Twitter、Amazon、ディレクティブボックス）の有無を判定します。
+ * Markdown本文からフロントマターを抽出・検証し、HTMLへの変換、タグや日付の正規化、読了時間の算出、コードブロックの検出を行います。
  *
  * @param content - フロントマターを含むMarkdownコンテンツ
  * @param options - Markdown処理のオプション
  * @param slug - 記事のスラッグ（省略時は空文字列）
- * @returns HTML本文、メタデータ、見出し情報、コードブロック・埋め込み要素の有無を含むオブジェクト
+ * @returns HTML本文、メタデータ、見出し情報、コードブロックの有無を含むオブジェクト
  */
 export async function processMarkdown(
   content: string,
@@ -152,22 +157,17 @@ export async function processMarkdown(
     const meta = normalizePostMeta(data, markdown, options, slug);
 
     // マークダウンをパースしてコードブロックを自動検出
-    const parseProcessor = unified().use(remarkParse).use(remarkDirective).use(remarkGfm);
+    const parseResult = markdownParser.parse(markdown);
 
-    const parseResult = parseProcessor.parse(markdown);
-
-    // 各種埋め込みの存在を検出
+    // シンタックスハイライトが必要か判定
     const enableSyntaxHighlight = hasCodeBlocks(parseResult);
-    const enableTwitterEmbeds = hasTwitterEmbeds(parseResult);
-    const enableAmazonEmbeds = hasAmazonEmbeds(parseResult);
-    const enableDirectiveBoxes = hasDirectiveBoxes(parseResult);
 
     // パイプラインでHTMLに変換
     const pipeline = createPipeline(options, enableSyntaxHighlight);
     const result = await pipeline.process(markdown);
     const html = String(result);
 
-    // 見出し情報を取得（heading-extractorプラグインで抽出されたもの）
+    // アンカー生成時に収集した見出し情報を取得
     const headings: HeadingInfo[] =
       ((result.data as Record<string, unknown>)?.headings as HeadingInfo[]) || [];
 
@@ -176,9 +176,6 @@ export async function processMarkdown(
       html,
       headings,
       hasCodeBlocks: enableSyntaxHighlight,
-      hasTwitterEmbeds: enableTwitterEmbeds,
-      hasAmazonEmbeds: enableAmazonEmbeds,
-      hasDirectiveBoxes: enableDirectiveBoxes,
     };
   } catch (error) {
     if (error instanceof FrontMatterError || error instanceof MarkdownParseError) {
@@ -213,4 +210,30 @@ export async function extractMetadata(
     const message = error instanceof Error ? error.message : String(error);
     throw new MarkdownParseError(`メタデータの抽出中にエラーが発生しました: ${message}`);
   }
+}
+
+/** Shared note metadata for HTML pages and public Markdown artifacts. */
+export function extractNoteMetadata(source: string, filePath: string, slug: string) {
+  const { data } = parseFrontmatter(source);
+  for (const field of ['title', 'publishedAt', 'tags']) {
+    if (!data[field] || (field === 'tags' && !Array.isArray(data.tags))) {
+      throw new Error(`Required frontmatter field "${field}" is missing: ${filePath}`);
+    }
+  }
+  const value = data.publishedAt;
+  const publishedAt =
+    value instanceof Date ? value
+    : typeof value === 'string' || typeof value === 'number' ? new Date(value)
+    : new Date(NaN);
+  if (Number.isNaN(publishedAt.getTime())) {
+    throw new Error(`Required frontmatter field "publishedAt" is invalid: ${filePath}`);
+  }
+  return {
+    slug: (data.slug as string) || slug,
+    title: data.title as string,
+    publishedAt,
+    tags: (data.tags as unknown[])
+      .filter((tag): tag is string => typeof tag === 'string')
+      .map((tag) => tag.trim()),
+  };
 }

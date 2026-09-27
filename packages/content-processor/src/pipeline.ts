@@ -9,7 +9,6 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import { rehypeImageTransform } from './plugins/transforms/image-transform';
 import { rehypeLinkTransform } from './plugins/transforms/link-transform';
 import { rehypeHeadingAnchor } from './plugins/transforms/heading-anchor';
-import { rehypeHeadingExtractor } from './plugins/transforms/heading-extractor';
 import { rehypeTableClass } from './plugins/transforms/table-class';
 import { remarkYoutubeEmbed } from './plugins/embeds/youtube-embed';
 import { remarkTwitterEmbed } from './plugins/embeds/twitter-embed';
@@ -75,9 +74,6 @@ export function createPipeline(
 
       // 見出しアンカー追加
       .use(rehypeHeadingAnchor)
-
-      // 見出し情報抽出
-      .use(rehypeHeadingExtractor)
 
       // 最終出力
       .use(rehypeStringify)

@@ -1,5 +1,6 @@
 import {
   extractMetadata,
+  extractNoteMetadata,
   parseFrontmatter,
   normalizeForTagFilter,
   processMarkdown,
@@ -121,31 +122,6 @@ function createExcerpt(markdown: string, maxLength = 120): string {
   return text.length > maxLength ? `${text.slice(0, maxLength).trim()}...` : text;
 }
 
-function normalizeDate(value: unknown, filePath: string, fieldName = 'publishedAt'): Date {
-  if (value instanceof Date) {
-    if (Number.isNaN(value.getTime())) {
-      throw new Error(`Required frontmatter field "${fieldName}" is invalid: ${filePath}`);
-    }
-
-    return value;
-  }
-
-  if (typeof value === 'string' || typeof value === 'number') {
-    const date = new Date(value);
-    if (!Number.isNaN(date.getTime())) {
-      return date;
-    }
-  }
-
-  throw new Error(`Required frontmatter field "${fieldName}" is invalid: ${filePath}`);
-}
-
-function normalizeTags(value: unknown): string[] {
-  return Array.isArray(value) ?
-      value.filter((tag): tag is string => typeof tag === 'string').map((tag) => tag.trim())
-    : [];
-}
-
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
@@ -223,30 +199,12 @@ async function createContentIndex<TMeta extends { slug: string }>(options: {
   };
 }
 
-function extractNoteMeta(filePath: string, content: string): NoteMeta | null {
-  const { data, content: markdown } = parseFrontmatter(content);
-
-  if (!data.title) {
-    throw new Error(`Required frontmatter field "title" is missing: ${filePath}`);
-  }
-  if (!data.publishedAt) {
-    throw new Error(`Required frontmatter field "publishedAt" is missing: ${filePath}`);
-  }
-  if (!Array.isArray(data.tags)) {
-    throw new Error(`Required frontmatter field "tags" is missing: ${filePath}`);
-  }
-
-  const publishedAt = normalizeDate(data.publishedAt, filePath);
-
-  const meta: NoteMeta = {
-    slug: (data.slug as string) || getSlugFromMarkdownPath(filePath),
-    title: data.title as string,
+function extractNoteMeta(filePath: string, content: string): NoteMeta {
+  const { content: markdown } = parseFrontmatter(content);
+  return {
+    ...extractNoteMetadata(content, filePath, getSlugFromMarkdownPath(filePath)),
     excerpt: createExcerpt(markdown, 150),
-    publishedAt,
-    tags: normalizeTags(data.tags),
   };
-
-  return meta;
 }
 
 async function extractFrontmatterOnly(filePath: string, content: string): Promise<PostMeta | null> {

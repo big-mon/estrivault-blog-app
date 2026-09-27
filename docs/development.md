@@ -100,6 +100,9 @@ changes. A local pass does not prove GitHub Actions passed.
 
 `pnpm ogp:refresh` builds the content processor, scans eligible standalone URLs in `content/blog`
 and `content/notes`, fetches remote OGP data, and normally writes `content/ogp-metadata.json`.
+Discovery shares the HTML card selector: only paragraphs containing one eligible link are selected.
+Frontmatter, code blocks, and links mixed with paragraph text are excluded; Markdown link destinations
+with parentheses are supported.
 `pnpm ogp:refresh -- --dry-run` suppresses the file write but still makes outbound requests.
 Normal Astro content rendering defaults to `cache-only`; setting `OGP_MODE=fetch` also crosses the
 network boundary.

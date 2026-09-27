@@ -4,7 +4,7 @@ import process from 'node:process';
 import {
   createFallbackMetadata,
   fetchFreshOgpMetadata,
-  shouldFetchOgp,
+  extractOgpUrls,
 } from '../packages/content-processor/dist/index.js';
 
 const DEFAULT_TTL_DAYS = 30;
@@ -87,103 +87,14 @@ async function listMarkdownFiles(root) {
   return nested.flat();
 }
 
-function extractStandaloneUrls(markdown) {
-  const urls = new Set();
-
-  for (const line of markdown.split(/\r?\n/)) {
-    const url = extractStandaloneUrlFromLine(line);
-    if (url) {
-      urls.add(url);
-    }
-  }
-
-  return urls;
-}
-
-function extractStandaloneUrlFromLine(line) {
-  const value = stripMarkdownContainerMarkers(line);
-  const bareUrlMatch = value.match(/^<?(https?:\/\/[^\s<>()]+)>?$/);
-  if (bareUrlMatch) {
-    return bareUrlMatch[1];
-  }
-
-  return extractMarkdownLinkDestination(value);
-}
-
-function extractMarkdownLinkDestination(value) {
-  if (!value.startsWith('[')) {
-    return null;
-  }
-
-  const labelEnd = findClosingBracket(value, 0);
-  if (labelEnd === -1 || value[labelEnd + 1] !== '(' || !value.endsWith(')')) {
-    return null;
-  }
-
-  const target = value.slice(labelEnd + 2, -1).trim();
-  const angleDestinationMatch = target.match(/^<(https?:\/\/[^<>\s]+)>(?:\s+["'][^"']*["'])?$/);
-  if (angleDestinationMatch) {
-    return angleDestinationMatch[1];
-  }
-
-  const destinationMatch = target.match(/^(https?:\/\/[^\s)]+)(?:\s+["'][^"']*["'])?$/);
-  return destinationMatch?.[1] ?? null;
-}
-
-function findClosingBracket(value, openIndex) {
-  let depth = 0;
-
-  for (let index = openIndex; index < value.length; index += 1) {
-    const character = value[index];
-
-    if (character === '\\') {
-      index += 1;
-      continue;
-    }
-
-    if (character === '[') {
-      depth += 1;
-    } else if (character === ']') {
-      depth -= 1;
-      if (depth === 0) {
-        return index;
-      }
-    }
-  }
-
-  return -1;
-}
-
-function stripMarkdownContainerMarkers(line) {
-  let value = line.trim();
-
-  while (value.length > 0) {
-    const next = value
-      .replace(/^>\s*/, '')
-      .replace(/^[-*+]\s+/, '')
-      .replace(/^\d+[.)]\s+/, '')
-      .trim();
-
-    if (next === value) {
-      return value;
-    }
-
-    value = next;
-  }
-
-  return value;
-}
-
 async function discoverUrls() {
   const files = (await Promise.all(CONTENT_ROOTS.map((root) => listMarkdownFiles(root)))).flat();
   const urls = new Set();
 
   for (const file of files) {
     const markdown = await fs.readFile(file, 'utf8');
-    for (const url of extractStandaloneUrls(markdown)) {
-      if (shouldFetchOgp(url, { mode: 'fetch' })) {
-        urls.add(url);
-      }
+    for (const url of extractOgpUrls(markdown)) {
+      urls.add(url);
     }
   }
 
