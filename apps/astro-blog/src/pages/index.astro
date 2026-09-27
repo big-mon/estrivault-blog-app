@@ -128,9 +128,6 @@ const seriesCards = [
         {
           featuredPost && (
             <a href={`/post/${featuredPost.slug}`} class="featured">
-              {featuredPost.coverImage && (
-                <img src={featuredPost.coverImage} alt={featuredPost.title} loading="lazy" />
-              )}
               <p class="cat">{getCategoryLabel(featuredPost.category)}</p>
               <h4>{featuredPost.title}</h4>
               <p class="note-summary">{featuredPost.description}</p>
@@ -406,12 +403,6 @@ const seriesCards = [
   }
   .featured > * + * {
     margin-top: 0.75rem;
-  }
-  .featured img {
-    width: 100%;
-    aspect-ratio: 16/9;
-    object-fit: cover;
-    border: 1px solid #555;
   }
   .cat {
     font-family: var(--font-meta);
