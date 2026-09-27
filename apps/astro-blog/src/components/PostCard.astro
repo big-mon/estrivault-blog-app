@@ -24,19 +24,6 @@ const dateString = new Intl.DateTimeFormat('ja-JP', {
     data-testid="post-card"
   >
     <header>
-      {
-        post.coverImage && (
-          <figure class="relative w-full overflow-hidden pt-[56.25%]">
-            <img
-              src={post.coverImage}
-              alt={post.title}
-              class="absolute inset-0 h-full w-full object-cover"
-              loading="lazy"
-            />
-          </figure>
-        )
-      }
-
       <div class="flex flex-col justify-between p-4 font-sans text-gray-800">
         <div class="space-y-1">
           <div class="flex items-center justify-between">
