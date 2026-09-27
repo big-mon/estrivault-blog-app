@@ -7,7 +7,11 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import yaml from 'yaml';
-import { processMarkdown } from '@estrivault/content-processor';
+import {
+  extractNoteMetadata,
+  extractOgpUrls,
+  processMarkdown,
+} from '@estrivault/content-processor';
 
 import {
   generateMarkdownArtifacts,
@@ -157,6 +161,120 @@ test('HTML heading anchors have no text while public Markdown keeps the normal h
   const body = renderArticleBody(source);
   assert.match(body, /^## Semantic heading$/m);
   assert.doesNotMatch(body, /^###+ Semantic heading$/m);
+});
+
+test('OGP refresh selects the same authored links as HTML cards', async () => {
+  const source = `---
+title: Links
+---
+https://example.test/plain
+
+> [Quoted](https://example.test/quoted)
+
+- [Nested [label]](https://example.test/a_(b))
+
+Text followed by a URL in the same paragraph
+https://example.test/continuation
+
+https://github.com/example/repo
+
+https://example.test/image.png
+
+\`\`\`md
+https://example.test/code
+\`\`\`
+`;
+  const expected = [
+    'https://example.test/plain',
+    'https://example.test/quoted',
+    'https://example.test/a_(b)',
+  ];
+  assert.deepEqual(extractOgpUrls(source), expected);
+  const { html } = await processMarkdown(source, {
+    cloudinaryCloudName: 'damonge',
+    ogp: { mode: 'cache-only' },
+  });
+  const cards = [...html.matchAll(/<a href="([^"]+)"[^>]*class="link-card"/g)].map(
+    (match) => match[1],
+  );
+  assert.deepEqual(cards, expected);
+  assert.doesNotMatch(html, /<style>/);
+  for (const [card] of html.matchAll(/<a[^>]*class="link-card"[^>]*>/g)) {
+    assert.doesNotMatch(card, /style=|onmouseover=|onmouseout=/);
+  }
+});
+
+test('embeds and heading metadata do not depend on feature flags', async () => {
+  const source = `---
+title: Embeds
+---
+# 見出し **一**
+
+## Two
+
+### Three
+
+#### Four
+
+::twitter{id="123"}
+
+::amazon{asin="B123" name="Book"}
+
+:::info
+Box text
+:::
+
+\`\`\`js
+const value = 1;
+\`\`\`
+`;
+  const result = await processMarkdown(source, {
+    cloudinaryCloudName: 'damonge',
+    ogp: { mode: 'disabled' },
+  });
+  assert.match(result.html, /class="twitter-tweet"/);
+  assert.match(result.html, /class="amazon-card"/);
+  assert.match(result.html, /class="directive-box directive-info"/);
+  assert.match(result.html, /data-rehype-pretty-code-figure/);
+  assert.match(result.html, /<h4 id="four">/);
+  assert.deepEqual(result.headings, [
+    { id: '見出し-一', level: 1, text: '見出し 一' },
+    { id: 'two', level: 2, text: 'Two' },
+    { id: 'three', level: 3, text: 'Three' },
+  ]);
+  assert.equal(result.hasCodeBlocks, true);
+  for (const flag of ['hasTwitterEmbeds', 'hasAmazonEmbeds', 'hasDirectiveBoxes'])
+    assert.equal(flag in result, false);
+  const next = await processMarkdown('---\ntitle: Next\n---\n## Next', {
+    cloudinaryCloudName: 'damonge',
+  });
+  assert.deepEqual(next.headings, [{ id: 'next', level: 2, text: 'Next' }]);
+});
+
+test('shared note metadata preserves dates and tags and rejects invalid required fields', () => {
+  const source = '---\ntitle: Note\npublishedAt: 2026-01-02\ntags: [" one ", two, 3]\n---\nBody';
+  const meta = extractNoteMetadata(source, 'note.md', 'note');
+  assert.deepEqual(meta, {
+    slug: 'note',
+    title: 'Note',
+    publishedAt: new Date('2026-01-02'),
+    tags: ['one', 'two'],
+  });
+  const { data } = parseGenerated(
+    renderNoteMarkdown({ source, meta, site, canonicalUrl: 'https://example.test/notes/note' }),
+  );
+  assert.equal(data.date_published, meta.publishedAt.toISOString());
+  assert.deepEqual(data.tags, meta.tags);
+  for (const invalid of [
+    source.replace('title: Note', 'title:'),
+    source.replace('publishedAt: 2026-01-02', 'publishedAt: invalid'),
+    source.replace('publishedAt: 2026-01-02', 'publishedAt: false'),
+    source.replace('tags: [" one ", two, 3]', 'tags: invalid'),
+  ])
+    assert.throws(
+      () => extractNoteMetadata(invalid, 'note.md', 'note'),
+      /Required frontmatter field.*note\.md/,
+    );
 });
 
 test('article output uses an explicit public metadata allowlist and transforms source Markdown', () => {

@@ -1,5 +1,11 @@
 // コアAPI - Markdownコンテンツ処理
-export { processMarkdown, parseFrontmatter, extractMetadata } from './processor';
+export {
+  processMarkdown,
+  parseFrontmatter,
+  extractMetadata,
+  extractNoteMetadata,
+  extractOgpUrls,
+} from './processor';
 export { renderPublicMarkdownBody, serializePublicMarkdown } from './source-markdown';
 
 // 型

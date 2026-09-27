@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
   extractMetadata,
+  extractNoteMetadata,
   parseFrontmatter,
   renderPublicMarkdownBody,
   serializePublicMarkdown,
@@ -170,7 +171,11 @@ export async function generateMarkdownArtifacts(options = {}) {
   const notes = await Promise.all(
     noteSources.map(async (filePath) => {
       const source = await readFile(filePath, 'utf8');
-      return { filePath, source, meta: extractNoteMeta(filePath, source) };
+      return {
+        filePath,
+        source,
+        meta: extractNoteMetadata(source, filePath, getSlugFromMarkdownPath(filePath)),
+      };
     }),
   );
 
@@ -238,39 +243,12 @@ async function extractPostMeta(filePath, source, processorOptions) {
   return meta.draft ? null : meta;
 }
 
-function extractNoteMeta(filePath, source) {
-  const { data } = parseFrontmatter(source);
-  assertRequiredFields(data, ['title', 'publishedAt', 'tags'], filePath);
-
-  return {
-    slug:
-      typeof data.slug === 'string' && data.slug ? data.slug : getSlugFromMarkdownPath(filePath),
-    title: String(data.title),
-    publishedAt: normalizeDate(data.publishedAt, filePath),
-    tags: normalizeTags(data.tags),
-  };
-}
-
 function assertRequiredFields(data, fields, filePath) {
   for (const field of fields) {
     if (!(field in data)) {
       throw new Error(`Required frontmatter field "${field}" is missing: ${filePath}`);
     }
   }
-}
-
-function normalizeDate(value, filePath) {
-  const date = value instanceof Date ? new Date(value.getTime()) : new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    throw new Error(`Required frontmatter field "publishedAt" is invalid: ${filePath}`);
-  }
-  return date;
-}
-
-function normalizeTags(value) {
-  return Array.isArray(value) ?
-      value.filter((tag) => typeof tag === 'string').map((tag) => tag.trim())
-    : [];
 }
 
 async function collectMarkdownFiles(directory) {

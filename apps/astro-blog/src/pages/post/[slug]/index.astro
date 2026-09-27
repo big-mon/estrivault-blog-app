@@ -73,13 +73,7 @@ const articleTags = post.meta.tags.slice(0, 4).map((tag) => {
     href: getArchivePagePath(`/tag/${encodeRouteSegment(routeSegment)}`, 1),
   };
 });
-const bodyClasses = [
-  'article-body',
-  post.hasTwitterEmbeds ? 'has-twitter-embeds' : '',
-  post.hasAmazonEmbeds ? 'has-amazon-embeds' : '',
-  post.hasCodeBlocks ? 'has-code-blocks' : '',
-  post.hasDirectiveBoxes ? 'has-directive-boxes' : '',
-]
+const bodyClasses = ['article-body', post.hasCodeBlocks ? 'has-code-blocks' : '']
   .filter(Boolean)
   .join(' ');
 const shouldShowArticleThumbnail =
