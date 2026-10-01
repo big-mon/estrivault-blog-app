@@ -77,3 +77,50 @@ test('note dialogs preserve history, Escape and focus restoration', async ({ pag
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(note).toBeFocused();
 });
+
+for (const width of [320, 360, 390, 430]) {
+  test(`mobile footer ends cleanly on short and long pages at ${width}px`, async ({
+    browser,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({
+      baseURL,
+      isMobile: true,
+      hasTouch: true,
+      viewport: { width, height: 800 },
+    });
+    const page = await context.newPage();
+    for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+      await page.emulateMedia({ reducedMotion });
+      for (const path of ['/', '/tag/aiコーディング/', '/post/about']) {
+        await page.goto(path);
+        // Resize through small/large browser viewports, including a viewport taller than the short archive.
+        for (const height of [600, 1400, 800]) {
+          await page.setViewportSize({ width, height });
+          await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+          await expect(page.locator('.editorial-footer')).toBeInViewport();
+          await expect(page.locator('.woodland-right')).toBeHidden();
+          await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 253, 242)');
+          const geometry = await page.evaluate(() => ({
+            end: document.querySelector('body > main')!.getBoundingClientRect().bottom + scrollY,
+            pageEnd: document.documentElement.scrollHeight,
+            sceneEnd: document.querySelector('.woodland')!.getBoundingClientRect().bottom + scrollY,
+            overflow: document.documentElement.scrollWidth > innerWidth,
+          }));
+          expect(Math.abs(geometry.end - geometry.pageEnd)).toBeLessThanOrEqual(1);
+          expect(geometry.sceneEnd).toBe(176);
+          expect(geometry.overflow).toBe(false);
+          if (reducedMotion === 'reduce') {
+            await expect(page.locator('.woodland-mobile .water')).toHaveCSS(
+              'animation-name',
+              'none',
+            );
+          }
+          await page.evaluate(() => window.scrollTo(0, 0));
+          await expect(page.locator('.woodland-mobile')).toBeInViewport();
+        }
+      }
+    }
+    await context.close();
+  });
+}

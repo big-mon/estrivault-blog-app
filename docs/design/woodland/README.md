@@ -17,7 +17,7 @@ These review assets are not included in the application bundle.
 | [Ultrawide](ultrawide.png)                 | 2560 × 1080 |
 | [Article](article-mobile.png)              | 390 × 900   |
 | [Notes](notes-desktop.png)                 | 1366 × 900  |
-| [Mobile footer scenery](mobile-bottom.png) | 390 × 900   |
+| [Mobile footer ending](mobile-bottom.png)  | 390 × 800   |
 | [Category dropdown](mobile-categories.png) | 390 × 900   |
 
 The approved Library reference (version 5) could not be downloaded after the
@@ -27,3 +27,6 @@ centered Japanese masthead/navigation, sans-serif article titles, layered woodla
 visible cottage and lake, and a dedicated compact mobile panorama.
 Final visual acceptance against the reference remains with the parent reviewer.
 The Library screenshot upload also failed; no Library IDs were issued.
+
+[Mobile footer regression captures](footer/README.md) cover 320/360/390/430px,
+short and long pages, the footer transition, and the complete page ending.

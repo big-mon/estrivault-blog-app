@@ -118,7 +118,10 @@ body.woodland-blog .note-body {
 @media (max-width: 900px) {
   body.woodland-blog > main {
     width: 100%;
-    margin: 176px auto 136px;
+    margin: 176px auto 0;
+    min-height: calc(100vh - 176px);
+    min-height: calc(100svh - 176px);
+    border-bottom: 0;
     border-left: 0;
     border-right: 0;
   }
@@ -131,10 +134,14 @@ body.woodland-blog .note-body {
   }
   .woodland {
     position: absolute;
-    min-height: 100%;
+    /* Keep the mobile panorama at the top; never expose a cropped desktop lake. */
+    height: 176px;
+    min-height: 0;
+    bottom: auto;
   }
   .woodland-horizon,
   .woodland-left,
+  .woodland-right,
   .cloud {
     display: none;
   }
@@ -146,24 +153,10 @@ body.woodland-blog .note-body {
     width: 960px;
     height: 176px;
   }
-  .woodland-right {
-    width: 240px;
-    height: 360px;
-    bottom: 0;
-    right: 0;
-  }
-  .cloud-left {
-    top: 15px;
-    left: 48%;
-    width: 128px;
-    height: 40px;
-  }
-  .cloud-right {
-    display: none;
-  }
   body.woodland-blog {
     position: relative;
     display: flow-root;
+    background: #fffdf2;
   }
   body.woodland-blog .article-page h1 {
     font-size: 1.75rem;
