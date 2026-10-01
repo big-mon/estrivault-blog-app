@@ -197,3 +197,63 @@ test('article and note body links use accessible green normal, hover and focus s
     await expect(link).toHaveCSS('outline-color', 'rgb(36, 69, 47)');
   }
 });
+
+for (const width of [390, 820, 1440]) {
+  test(`ambient motion stays decorative and pauses offscreen at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    const scene = page.locator('.woodland');
+    await expect(scene).not.toHaveAttribute('data-motion-paused');
+    const contentBefore = await page.locator('body > main').boundingBox();
+    const cloud = page.locator('.cloud-left');
+    const before = (await cloud.boundingBox())!.x;
+    await expect.poll(async () => (await cloud.boundingBox())!.x).toBeGreaterThan(before + 2);
+    expect(await page.locator('body > main').boundingBox()).toEqual(contentBefore);
+
+    const layers = width <= 1100 ? '.woodland-mobile' : '.woodland-right';
+    for (const detail of ['.breeze', '.water']) {
+      const element = page.locator(`${layers} ${detail}`).first();
+      const initial = await element.evaluate((node) => getComputedStyle(node).transform);
+      await expect
+        .poll(() => element.evaluate((node) => getComputedStyle(node).transform), {
+          timeout: 10_000,
+        })
+        .not.toBe(initial);
+    }
+    expect(await page.locator('body > main').boundingBox()).toEqual(contentBefore);
+
+    // Both sides of a cloud's loop are outside the viewport: no visible teleport.
+    const loop = await cloud.evaluate((element) => {
+      const animation = element.getAnimations()[0];
+      animation.pause();
+      const { duration, delay } = animation.effect!.getTiming();
+      animation.currentTime = Number(duration) + Number(delay) - 1;
+      const exit = element.getBoundingClientRect().left;
+      animation.currentTime = Number(duration) + Number(delay);
+      const entrance = element.getBoundingClientRect().right;
+      return { exit, entrance, width: innerWidth };
+    });
+    expect(loop.exit).toBeGreaterThanOrEqual(loop.width - 4);
+    expect(loop.entrance).toBeLessThanOrEqual(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+
+    if (width <= 1100) {
+      await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+      await expect(scene).toHaveAttribute('data-motion-paused');
+      await expect(page.locator('.woodland-mobile .breeze').first()).toHaveCSS(
+        'animation-play-state',
+        'paused',
+      );
+      await page.evaluate(() => scrollTo(0, 0));
+      await expect(scene).not.toHaveAttribute('data-motion-paused');
+    }
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    expect(await scene.evaluate((element) => element.getAnimations({ subtree: true }).length)).toBe(
+      0,
+    );
+    await expect(cloud).toBeInViewport();
+    expect(await page.locator('body > main').boundingBox()).toEqual(contentBefore);
+  });
+}

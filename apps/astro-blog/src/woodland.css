@@ -74,27 +74,62 @@ body.woodland-blog .note-body {
   right: 0;
 }
 .cloud-left {
-  left: 5%;
   top: 9%;
+  animation-delay: -30s;
 }
 .cloud-right {
-  right: 6%;
   top: 16%;
+  animation-delay: -210s;
 }
 .cloud {
-  animation: cloud-drift 36s steps(8, end) infinite alternate;
+  left: -200px;
+  --cloud-travel: calc(100vw + 200px);
+  animation-name: cloud-drift;
+  animation-duration: 220s;
+  animation-timing-function: steps(820, end);
+  animation-iteration-count: infinite;
+}
+.cloud-right {
+  animation-duration: 260s;
 }
 .water {
-  animation: water-shift 9s steps(3, end) infinite alternate;
+  animation: water-shift 6s steps(4, end) infinite alternate;
+}
+.breeze {
+  animation: leaf-breeze 8s steps(2, end) infinite alternate;
+}
+.breeze-grass {
+  animation-duration: 10s;
+  animation-delay: -4s;
+}
+.woodland-right .breeze {
+  animation-delay: -3s;
+}
+.woodland[data-motion-paused] * {
+  animation-play-state: paused;
 }
 @keyframes cloud-drift {
   to {
-    transform: translateX(24px);
+    transform: translateX(var(--cloud-travel));
+  }
+}
+@keyframes leaf-breeze {
+  to {
+    transform: translateX(1px);
   }
 }
 @keyframes water-shift {
+  from {
+    opacity: 0.6;
+  }
   to {
-    transform: translateX(4px);
+    transform: translateX(3px);
+    opacity: 0.9;
+  }
+}
+@media (min-width: 1101px) {
+  .woodland-mobile * {
+    animation: none;
   }
 }
 @media (min-width: 2000px) {
@@ -142,9 +177,29 @@ body.woodland-blog .note-body {
   }
   .woodland-horizon,
   .woodland-left,
-  .woodland-right,
-  .cloud {
+  .woodland-right {
     display: none;
+  }
+  .woodland-left *,
+  .woodland-right * {
+    animation: none;
+  }
+  .cloud {
+    left: -100px;
+    width: 100px;
+    height: 30px;
+    --cloud-travel: calc(100vw + 100px);
+    animation-duration: 120s;
+    animation-timing-function: steps(320, end);
+  }
+  .cloud-left {
+    top: 8px;
+    animation-delay: -48s;
+  }
+  .cloud-right {
+    top: 30px;
+    animation-duration: 160s;
+    animation-delay: -132s;
   }
   .woodland .woodland-mobile {
     display: block;
@@ -164,6 +219,13 @@ body.woodland-blog .note-body {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .cloud-left {
+    left: 5%;
+  }
+  .cloud-right {
+    left: auto;
+    right: 6%;
+  }
   .woodland *,
   body.woodland-blog a {
     animation: none;
