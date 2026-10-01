@@ -15,6 +15,7 @@ for (const width of [360, 390, 1366, 1920, 2560]) {
     }
     await page.goto('/');
     const first = page.locator('.post-row').first();
+    if (width < 700) expect((await first.boundingBox())!.width).toBeGreaterThan(width - 70);
     const metadata = await first.locator('.post-date').boundingBox();
     const title = await first.locator('.post-title').boundingBox();
     expect(metadata!.y + metadata!.height).toBeLessThanOrEqual(title!.y);

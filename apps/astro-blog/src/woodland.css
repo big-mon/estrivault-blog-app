@@ -100,7 +100,7 @@ body.woodland-blog .note-body {
     border-left: 0;
     border-right: 0;
   }
-  .woodland-blog
+  body.woodland-blog
     :is(.editorial-home, .archive-page, .article-page, .notes-shell, .note-page-shell) {
     padding: 28px 20px;
   }
