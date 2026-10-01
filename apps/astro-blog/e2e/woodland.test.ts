@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-for (const width of [360, 390, 1366, 1920, 2560]) {
+for (const width of [320, 360, 390, 768, 1024, 1180, 1366, 1440, 1920, 2560]) {
   test(`woodland reading layout at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     for (const path of ['/', '/category/software/', '/post/about', '/notes/']) {
@@ -10,12 +10,16 @@ for (const width of [360, 390, 1366, 1920, 2560]) {
       ).toBe(true);
       const surface = await page.locator('body > main').boundingBox();
       expect(surface!.width).toBeLessThanOrEqual(860);
-      if (width < 700) expect(surface!.width).toBeGreaterThan(width - 24);
+      if (width <= 900) expect(surface!.width).toBeGreaterThan(width - 24);
       await expect(page.locator('body > main')).toHaveCSS('background-color', 'rgb(255, 253, 242)');
     }
     await page.goto('/');
+    await expect(page.locator('.editorial-masthead nav')).toHaveText(
+      /記事\s*メモ\s*このブログについて/,
+    );
+    if (width <= 900) await expect(page.locator('.woodland-mobile')).toBeVisible();
     const first = page.locator('.post-row').first();
-    if (width < 700) expect((await first.boundingBox())!.width).toBeGreaterThan(width - 70);
+    if (width <= 900) expect((await first.boundingBox())!.width).toBeGreaterThan(width - 70);
     const metadata = await first.locator('.post-date').boundingBox();
     const title = await first.locator('.post-title').boundingBox();
     expect(metadata!.y + metadata!.height).toBeLessThanOrEqual(title!.y);

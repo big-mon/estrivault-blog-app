@@ -18,31 +18,33 @@ const path = Astro.url.pathname;
       </div>
   }
   <nav aria-label="Primary navigation">
-    <a href="/" aria-current={path === '/' ? 'page' : undefined}>Articles</a>
-    <a href="/notes/" aria-current={path.startsWith('/notes') ? 'page' : undefined}>Notes</a>
-    <a href="/post/about" aria-current={path === '/post/about' ? 'page' : undefined}>About</a>
+    <a href="/" aria-current={path === '/' ? 'page' : undefined}>記事</a>
+    <a href="/notes/" aria-current={path.startsWith('/notes') ? 'page' : undefined}>メモ</a>
+    <a href="/post/about" aria-current={path === '/post/about' ? 'page' : undefined}
+      >このブログについて</a
+    >
   </nav>
 </header>
 <style>
   .editorial-masthead {
     display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem 2rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.1rem;
     padding: 0 0 1.6rem;
     margin-bottom: 2.5rem;
     border-bottom: 1px solid #bbc1ae;
   }
   .brand {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(2.25rem, 5vw, 3rem);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(3.5rem, 5vw, 4rem);
     font-weight: 400;
     line-height: 1.1;
   }
   a {
-    color: #354d3e;
+    color: #20231e;
     text-decoration: none;
   }
   nav {
@@ -58,7 +60,10 @@ const path = Astro.url.pathname;
     text-decoration: underline;
     text-underline-offset: 0.4rem;
   }
-  @media (max-width: 480px) {
+  @media (max-width: 900px) {
+    .brand {
+      font-size: 3rem;
+    }
     .editorial-masthead {
       gap: 1rem;
       margin-bottom: 2rem;

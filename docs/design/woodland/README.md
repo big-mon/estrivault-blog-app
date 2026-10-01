@@ -5,6 +5,11 @@ These review assets are not included in the application bundle.
 
 | Screenshot                                 | Viewport    |
 | ------------------------------------------ | ----------- |
+| [Small mobile](width-320.png)              | 320 × 1000  |
+| [Tablet](width-768.png)                    | 768 × 1000  |
+| [Compact laptop](width-1024.png)           | 1024 × 1000 |
+| [Laptop](width-1180.png)                   | 1180 × 1000 |
+| [Desktop](width-1440.png)                  | 1440 × 1000 |
 | [Mobile](mobile-360.png)                   | 360 × 900   |
 | [Mobile](mobile-390.png)                   | 390 × 900   |
 | [Laptop](laptop.png)                       | 1366 × 900  |
@@ -17,5 +22,8 @@ These review assets are not included in the application bundle.
 
 The approved Library reference (version 5) could not be downloaded after the
 supported retry, so visual matching against that image remains unverified.
-These screenshots document implementation of the approved written specification.
+These corrected screenshots incorporate the parent reviewer’s pixel-comparison feedback:
+centered Japanese masthead/navigation, sans-serif article titles, layered woodland,
+visible cottage and lake, and a dedicated compact mobile panorama.
+Final visual acceptance against the reference remains with the parent reviewer.
 The Library screenshot upload also failed; no Library IDs were issued.
