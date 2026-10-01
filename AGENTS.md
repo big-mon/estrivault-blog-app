@@ -21,7 +21,8 @@ semantics.
 - `scripts/`: pnpm usage enforcement and OGP metadata refresh.
 - `apps/astro-blog/scripts/generate-redirects.mjs`: authoritative generator for the ignored
   `apps/astro-blog/public/_redirects` file.
-- `wrangler.toml`: Cloudflare Workers Static Assets build and deployment configuration.
+- `cloudflare.config.ts`: Cloudflare Worker and Static Assets configuration.
+- `wrangler.config.ts`: build settings for the Wrangler bundler used by `cf`.
 
 ## Hard safety boundaries
 
@@ -60,6 +61,8 @@ before continuing.
 - `pnpm dev` builds all three workspace packages, then starts the Cloudinary and OGP generator
   watchers plus the Astro server; `content-processor` is not watched.
 - `pnpm build` generates `apps/astro-blog/public/_redirects` before producing the static app.
+- `pnpm build:worker`, `pnpm dev:worker`, and `pnpm test:worker:smoke` run the static build before
+  invoking `cf`. `pnpm deploy:dry-run` validates without upload; `pnpm deploy` uploads and deploys.
 - `pnpm ogp:refresh` reads authored Markdown, makes outbound requests for eligible URLs, and normally
   rewrites `content/ogp-metadata.json`. Use `--dry-run` when no write is intended, but it still
   performs network fetches for URLs selected for refresh.

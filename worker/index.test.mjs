@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { readFileSync } from 'node:fs';
 
+import cloudflareConfig from '../cloudflare.config.ts';
+import wranglerConfig from '../wrangler.config.ts';
 import worker from './index.mjs';
 
 const markdownAlternateLink = (artifactPath) =>
@@ -15,17 +16,12 @@ const homepageDiscoveryLinks = [
 ];
 
 test('production static assets invoke the Worker before every asset', () => {
-  const wranglerConfig = readFileSync(new URL('../wrangler.toml', import.meta.url), 'utf8');
-  const assetsSection = wranglerConfig.match(
-    /^\[assets\]\r?\n([\s\S]*?)(?=^\[[^\r\n]+\]\r?$)/m,
-  )?.[1];
-
-  assert.ok(assetsSection, 'wrangler.toml must define an [assets] section');
-  assert.match(
-    assetsSection,
-    /^\s*run_worker_first\s*=\s*true\s*(?:#.*)?$/m,
-    'wrangler.toml [assets].run_worker_first must be true',
-  );
+  assert.equal(cloudflareConfig.worker.name, 'estrilda');
+  assert.equal(cloudflareConfig.worker.entrypoint, 'worker/index.mjs');
+  assert.equal(cloudflareConfig.worker.compatibilityDate, '2025-06-27');
+  assert.equal(cloudflareConfig.worker.assets.runWorkerFirst, true);
+  assert.equal(cloudflareConfig.worker.env.ASSETS.type, 'assets');
+  assert.equal(wranglerConfig.assetsDirectory, 'apps/astro-blog/dist');
 });
 
 function createAssets(files) {

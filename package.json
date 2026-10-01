@@ -5,6 +5,10 @@
   "scripts": {
     "dev": "pnpm run build:packages && pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/og-image-generator --filter astro-blog run dev",
     "build": "pnpm run build:packages:incremental && pnpm --filter astro-blog run build",
+    "dev:worker": "pnpm run build && cf dev",
+    "build:worker": "pnpm run build && cf build",
+    "deploy:dry-run": "pnpm run build && cf deploy --dry-run",
+    "deploy": "pnpm run build && cf deploy",
     "build:packages": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor --filter @estrivault/og-image-generator run build",
     "build:packages:incremental": "tsc --build packages/cloudinary-utils packages/content-processor packages/og-image-generator && pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor --filter @estrivault/og-image-generator run build:bundle",
     "preogp:refresh": "pnpm --filter @estrivault/content-processor build",
@@ -13,6 +17,7 @@
     "postinstall": "pnpm run build:packages",
     "clean": "pnpm --parallel --filter @estrivault/cloudinary-utils --filter @estrivault/content-processor --filter @estrivault/og-image-generator run clean",
     "test:worker": "node --test worker/index.test.mjs",
+    "test:worker:smoke": "pnpm run build:worker && node --test worker/runtime.test.mjs",
     "test:clean": "node --test scripts/clean-workspace-dist.test.mjs",
     "test:require-pnpm": "node --test scripts/require-pnpm.test.mjs",
     "test:format-astro": "node --test scripts/format-astro.test.mjs",
@@ -28,6 +33,7 @@
   "devDependencies": {
     "@eslint/compat": "^2.1.1",
     "@eslint/js": "^10.0.1",
+    "cf": "1.0.0-beta.10",
     "esbuild": "^0.28.2",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
@@ -38,7 +44,8 @@
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.70.0"
+    "typescript-eslint": "^8.70.0",
+    "wrangler": "4.145.0"
   },
   "lint-staged": {
     "**/*.{js,ts,svelte}": [

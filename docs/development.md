@@ -37,8 +37,39 @@ bundles. Dependencies stay external, and the OGP bundle emits its imported fonts
 Both watchers reuse their package's `build:bundle` command. Keep bundling after TypeScript so it does
 not leave unbundled entry points in `dist`.
 
-`pnpm build` incrementally builds all packages, generates Cloudflare redirect rules, and builds the
-Astro static output. `wrangler.toml` uses this root command and publishes `apps/astro-blog/dist`.
+`pnpm build` incrementally builds all packages, generates Cloudflare redirect rules, builds the
+Astro static output, and generates the public Markdown artifacts.
+
+## Cloudflare Worker
+
+Run the Cloudflare commands from the repository root:
+
+```bash
+pnpm dev:worker       # build static assets, then start the local Workers runtime
+pnpm build:worker     # build static assets and Cloudflare Build Output
+pnpm deploy:dry-run   # build and validate without authentication or upload
+pnpm test:worker:smoke # build and check HTTP behavior in the local Workers runtime
+```
+
+`cloudflare.config.ts` is the Worker configuration. It preserves `estrilda`, `worker/index.mjs`,
+the `ASSETS` binding, worker-first routing, and the compatibility date. `wrangler.config.ts` contains
+only bundler settings and points to `apps/astro-blog/dist`. The pinned `cf` beta delegates Worker
+bundling and local development to the pinned Wrangler dependency. There is no Astro SSR adapter.
+
+The Worker scripts explicitly run `pnpm build` before `cf`: this beta's delegated `cf build` does
+not execute Wrangler custom build commands. Calling `cf build` or `cf deploy` directly requires
+fresh static assets. `.cloudflare/` is generated output. The `.` workspace entry identifies the
+root Worker project to cf's framework detector; the other workspace packages remain unchanged.
+
+`pnpm deploy` builds and deploys the Worker. It requires separate cf authentication (`cf auth login`),
+or `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` for automation. A Wrangler login does not sign
+cf in. The local build, smoke test, and dry run require neither credentials nor new secrets.
+
+Production deployment uses the existing Cloudflare Workers Builds Git integration. Its settings
+live outside this repository: use `pnpm build:worker` as the build command and
+`pnpm exec cf deploy --prebuilt` as the deploy command, with cf credentials available to that step.
+Keep the build root at the repository root. The PR workflow only builds, tests, and runs an
+unauthenticated dry run; it has no deployment step.
 
 ## Select checks by change
 
@@ -91,7 +122,8 @@ both repository plugins. Astro 7 and plugin 1.0 both default to JSX whitespace h
 
 Pull-request CI uses Node 22.x and the pnpm version pinned by root `packageManager`. After a frozen
 install, it runs the workspace-cleanup, pnpm-enforcement, Astro-formatting, OGP-workflow, Worker, and source-Markdown
-tests; pnpm-enforcement lint/format checks; Astro lint and check; Playwright Chromium setup; and the
+tests; pnpm-enforcement lint/format checks; Astro lint and check; Cloudflare configuration type-check,
+local runtime smoke and prebuilt deployment dry run; Playwright Chromium setup; and the
 full Astro E2E suite. It does not directly run root lint, root format check,
 `pnpm type-check`, or the OGP unit tests. Run omitted checks locally when their ownership area
 changes. A local pass does not prove GitHub Actions passed.

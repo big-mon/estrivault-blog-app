@@ -12,6 +12,8 @@ concurrency:
 
 env:
   ASTRO_TELEMETRY_DISABLED: '1'
+  CF_SEND_TELEMETRY: 'false'
+  WRANGLER_SEND_METRICS: 'false'
   CI: true
 
 jobs:
@@ -68,6 +70,14 @@ jobs:
 
       - name: Check astro-blog
         run: pnpm --filter astro-blog check
+
+      - name: Check Cloudflare configuration
+        run: pnpm exec tsc --ignoreConfig --noEmit --skipLibCheck --module NodeNext --target ES2022 cloudflare.config.ts wrangler.config.ts
+
+      - name: Test Cloudflare local runtime and dry-run deployment
+        run: |
+          pnpm run test:worker:smoke
+          pnpm exec cf deploy --prebuilt --dry-run
 
       - name: Get Playwright version
         id: playwright-version
