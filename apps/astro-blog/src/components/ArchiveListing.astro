@@ -1,5 +1,6 @@
 ---
 import type { PostMeta } from '@estrivault/content-processor';
+import CategoryMenu from '$components/CategoryMenu.astro';
 import ArchivePagination from '$components/ArchivePagination.astro';
 import ArchivePostRow from '$components/ArchivePostRow.astro';
 import EditorialFooter from '$components/EditorialFooter.astro';
@@ -31,12 +32,10 @@ const {
   title,
   description,
   posts,
-  total,
   page,
   totalPages,
   routeBase,
   tagRouteMap,
-  sideMeta,
   topTags = [],
   emptyMessage,
 } = Astro.props;
@@ -76,25 +75,12 @@ function getTagHref(tag: string): string {
         )
       }
     </div>
-    <aside>
-      <h2>ARCHIVE STATUS</h2>
-      <dl>
-        {
-          sideMeta.map((item) => (
-            <div>
-              <dt>{item.label}</dt>
-              <dd>{item.value}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </aside>
   </section>
 
   <section class="archive-index" aria-labelledby="archive-index-title">
     <div class="section-heading">
-      <h2 id="archive-index-title">ARTICLES MATCHING YOUR SELECTION</h2>
-      <p>{total} RESULTS</p>
+      <h2 id="archive-index-title">記事一覧</h2>
+      <CategoryMenu />
     </div>
 
     {
@@ -119,7 +105,7 @@ function getTagHref(tag: string): string {
 
 <style>
   :global(.archive-editorial-page) {
-    background: #f1eee7;
+    background: #fffdf2;
   }
   :global(.archive-editorial-main) {
     width: 100%;
@@ -129,7 +115,7 @@ function getTagHref(tag: string): string {
   .archive-page {
     min-height: 100vh;
     color: #111;
-    background: #f1eee7;
+    background: #fffdf2;
     font-family: var(--font-body);
     padding: clamp(1rem, 2vw, 2rem);
   }
@@ -141,22 +127,19 @@ function getTagHref(tag: string): string {
   }
   .kicker,
   .section-heading h2,
-  .section-heading p,
-  dl dt,
-  dl dd {
+  .section-heading p {
     font-family: var(--font-meta);
     font-style: normal;
   }
   .kicker,
-  .section-heading h2,
-  dl dt {
-    color: #d6452a;
+  .section-heading h2 {
+    color: #536d53;
   }
   .archive-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
-    min-height: 300px;
+    min-height: 0;
     border-bottom: 1px solid #222;
     margin-top: 0;
     padding: 1rem 0;
@@ -167,7 +150,7 @@ function getTagHref(tag: string): string {
     border: 1px solid #222;
     margin: 0 0 1.2rem;
     padding: 0.34rem 0.65rem 0.28rem;
-    color: #f1eee7;
+    color: #fffdf2;
     background: #222;
     line-height: 1.1;
     letter-spacing: 0.05em;
@@ -176,7 +159,7 @@ function getTagHref(tag: string): string {
     max-width: 24ch;
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(2.25rem, 4vw, 3.5rem);
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
     font-weight: 700;
     line-height: 1.18;
   }
@@ -192,7 +175,7 @@ function getTagHref(tag: string): string {
   }
   .tag-variants h2 {
     margin: 0 0 0.7rem;
-    color: #d6452a;
+    color: #536d53;
     font-family: var(--font-meta);
     font-size: 0.88rem;
     font-style: normal;
@@ -220,42 +203,8 @@ function getTagHref(tag: string): string {
       border-color 120ms ease;
   }
   .tag-variants .tag-link:hover {
-    border-color: #d6452a;
-    color: #d6452a;
-  }
-  aside {
-    border-left: 1px solid #222;
-    margin-top: -1rem;
-    margin-bottom: -1rem;
-    padding: 1rem 0 1rem 1rem;
-  }
-  aside h2 {
-    margin: 0;
-    font-family: var(--font-meta);
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    line-height: 1.2;
-    white-space: nowrap;
-  }
-  dl {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    column-gap: 1.25rem;
-    border-top: 1px solid #d6452a;
-    margin: 1rem 0 0;
-    padding-top: 0.75rem;
-  }
-  dl div {
-    display: contents;
-  }
-  dl dt,
-  dl dd {
-    margin: 0;
-    line-height: 1.65;
-  }
-  dl dd {
-    text-align: right;
+    border-color: #536d53;
+    color: #536d53;
   }
   .archive-index {
     margin-top: 2.5rem;
@@ -296,9 +245,6 @@ function getTagHref(tag: string): string {
     }
     .archive-hero {
       grid-template-columns: 1fr;
-    }
-    aside {
-      display: none;
     }
     h1 {
       max-width: none;

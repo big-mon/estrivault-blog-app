@@ -62,7 +62,9 @@ test('home page has expected h1', async ({ page }) => {
   await expect(page.locator('h1')).toBeVisible();
 });
 
-test('homepage serializes site-name h1, hero h2, and recent notes hierarchy', async ({ page }) => {
+test('homepage serializes site-name h1, recent articles, and recent notes hierarchy', async ({
+  page,
+}) => {
   await page.goto('/');
 
   const html = await page.content();
@@ -70,7 +72,8 @@ test('homepage serializes site-name h1, hero h2, and recent notes hierarchy', as
   await expect(page.locator('h1')).toHaveText('Estrilda');
   await expect(page.locator('.editorial-masthead h1')).toHaveText('Estrilda');
   await expect(page.locator('.hero-copy h1')).toHaveCount(0);
-  await expect(page.locator('.hero-copy h2')).toHaveText('投資、開発、AI、趣味の実践ログ。');
+  await expect(page.locator('#latest-title')).toHaveText('最近の記事');
+  await expect(page.locator('.home-hero, .archive-status, .series-card')).toHaveCount(0);
 
   const recentNotes = page.locator('#recent-notes');
   await expect(recentNotes.locator('.section-heading-row > h2')).toHaveText('RECENT NOTES');

@@ -2,66 +2,16 @@
 import BaseLayout from '$layouts/BaseLayout.astro';
 import EditorialFooter from '$components/EditorialFooter.astro';
 import EditorialMasthead from '$components/EditorialMasthead.astro';
+import ArchivePostRow from '$components/ArchivePostRow.astro';
+import ArchivePagination from '$components/ArchivePagination.astro';
+import CategoryMenu from '$components/CategoryMenu.astro';
 import NoteCard from '$components/NoteCard.astro';
 import NoteModal from '$components/NoteModal.astro';
-import {
-  CATEGORY_META,
-  POSTS_PER_PAGE,
-  SITE_DESCRIPTION,
-  SITE_TITLE,
-  SITE_URL,
-  getCategoryLabel,
-} from '$constants';
+import { POSTS_PER_PAGE, SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '$constants';
 import { getAllNotes, getAllPostsMeta, getPaginatedPosts } from '$lib/content';
-import { formatEditorialDate } from '$lib/format-date';
-import { encodeRouteSegment, getArchivePagePath, getTagRouteMap } from '$lib/url-segments.mjs';
-
 const allPosts = await getAllPostsMeta();
-const allNotes = await getAllNotes();
-const recentNoteDetails = allNotes.slice(0, 4);
-const recentNotes = recentNoteDetails.map((note) => note.meta);
+const recentNoteDetails = (await getAllNotes()).slice(0, 4);
 const pageData = getPaginatedPosts(allPosts, { page: 1, perPage: POSTS_PER_PAGE });
-const featuredPost = pageData.posts[0] ?? null;
-const latestPosts = featuredPost ? pageData.posts.slice(1, 5) : pageData.posts.slice(0, 4);
-
-const categoryRows = Object.entries(CATEGORY_META)
-  .filter(([slug]) => slug !== 'meta')
-  .map(([slug, category]) => ({
-    slug,
-    label: category.label,
-    description: category.description,
-    href: getArchivePagePath(`/category/${slug}`, 1),
-  }));
-
-const oldestPost = allPosts.at(-1);
-const archiveStats = {
-  articles: allPosts.length,
-  categories: categoryRows.length,
-  notes: allNotes.length,
-  since: oldestPost ? formatEditorialDate(oldestPost.publishedAt) : '----',
-};
-
-const tagRouteMap = getTagRouteMap(allPosts.flatMap((post) => post.tags));
-const seriesCards = [
-  { title: 'EDGAR / XBRL', desc: 'SEC書類とAPIを読み解く', tag: 'EDGAR' },
-  {
-    title: 'Stable Diffusion',
-    desc: '生成画像とモデル運用',
-    tag: 'Stable Diffusion',
-  },
-  { title: 'Stock Analysis', desc: '個別銘柄と業界の深掘り', tag: '銘柄分析' },
-  { title: 'Gear Reviews', desc: '装備・機材の使用感レビュー', tag: 'レビュー' },
-].map((card) => {
-  const routeSegment = tagRouteMap.get(card.tag);
-  if (!routeSegment) {
-    throw new Error(`No route segment found for homepage tag: ${card.tag}`);
-  }
-
-  return {
-    ...card,
-    href: getArchivePagePath(`/tag/${encodeRouteSegment(routeSegment)}`, 1),
-  };
-});
 ---
 
 <BaseLayout
@@ -75,477 +25,73 @@ const seriesCards = [
 >
   <div class="editorial-home">
     <EditorialMasthead homePage />
-
-    <section class="home-hero">
-      <article class="hero-copy">
-        <h2>投資、開発、AI、趣味の実践ログ。</h2>
-        <p>
-          米国株の企業分析、Web開発、生成AIツール、ゲーム攻略、ギアレビューまで。
-          調べたこと・試したこと・考えたことを蓄積する、個人のための公開ノート。
-        </p>
-      </article>
-    </section>
-
-    <section class="archive-status" aria-labelledby="archive-status-heading">
-      <h2 id="archive-status-heading">ARCHIVE STATUS</h2>
-      <dl>
-        <div>
-          <dt>ARTICLES</dt>
-          <dd>{archiveStats.articles}</dd>
-        </div>
-        <div>
-          <dt>CATEGORIES</dt>
-          <dd>{archiveStats.categories}</dd>
-        </div>
-        <div>
-          <dt>NOTES</dt>
-          <dd>{archiveStats.notes}</dd>
-        </div>
-        <div>
-          <dt>SINCE</dt>
-          <dd>{archiveStats.since}</dd>
-        </div>
-      </dl>
-    </section>
-
-    <section id="categories" class="section-block category-index">
-      <h3>CATEGORY INDEX</h3>
-      <div class="table-like">
+    <section id="latest" aria-labelledby="latest-title">
+      <div class="section-heading-row"><h2 id="latest-title">最近の記事</h2><CategoryMenu /></div>
+      <ol class="post-list">
         {
-          categoryRows.map((category) => (
-            <a class="table-row" href={category.href}>
-              <span class="name">{category.label}</span>
-              <span class="desc">{category.description}</span>
-            </a>
+          pageData.posts.map((post) => (
+            <li>
+              <ArchivePostRow post={post} />
+            </li>
           ))
         }
-      </div>
+      </ol>
+      <ArchivePagination page={1} totalPages={pageData.totalPages} routeBase="" />
     </section>
-
-    <section id="latest" class="section-block latest-articles">
-      <h3>LATEST ARTICLES</h3>
-      <div class="latest-grid">
-        {
-          featuredPost && (
-            <a href={`/post/${featuredPost.slug}`} class="featured">
-              <p class="cat">{getCategoryLabel(featuredPost.category)}</p>
-              <h4>{featuredPost.title}</h4>
-              <p class="note-summary">{featuredPost.description}</p>
-              <span>READ ARTICLE →</span>
-            </a>
-          )
-        }
-        <div class="latest-list">
-          {
-            latestPosts.map((post) => (
-              <a href={`/post/${post.slug}`} class="latest-item">
-                <div class="latest-meta">
-                  <time>{formatEditorialDate(post.publishedAt)}</time>
-                  <p class="cat">{getCategoryLabel(post.category)}</p>
-                </div>
-                <h4>{post.title}</h4>
-                <p class="note-summary">{post.description}</p>
-              </a>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
     {
-      recentNotes.length > 0 && (
-        <section id="recent-notes" class="section-block recent-notes">
+      recentNoteDetails.length > 0 && (
+        <section id="recent-notes">
           <div class="section-heading-row">
-            <h2>RECENT NOTES</h2>
-            <a href="/notes/">VIEW NOTES</a>
+            <>
+              <h2>RECENT NOTES</h2>
+              <a href="/notes/">すべての Notes →</a>
+            </>
           </div>
           <div class="recent-notes-grid">
-            {recentNotes.map((note) => (
-              <NoteCard note={note} compact />
+            {recentNoteDetails.map((note) => (
+              <NoteCard note={note.meta} compact />
             ))}
           </div>
         </section>
       )
     }
-
-    <section class="section-block series-section">
-      <h3>DEEP DIVES / SERIES</h3>
-      <div class="series-grid">
-        {
-          seriesCards.map((card) => (
-            <a class="series-card" href={card.href}>
-              <h4>{card.title}</h4>
-              <p>{card.desc}</p>
-            </a>
-          ))
-        }
-      </div>
-    </section>
-
     <EditorialFooter />
   </div>
-
   <NoteModal notes={recentNoteDetails} basePath="/" />
 </BaseLayout>
-
 <style>
-  :global(.editorial-page) {
-    background: #f1eee7;
-  }
-  :global(.editorial-main) {
-    width: 100%;
-    max-width: none;
-    padding: 0;
-  }
-  .editorial-home {
-    min-height: 100vh;
-    font-family: var(--font-body);
-    color: #111;
-    background: #f1eee7;
-    border: 0;
-    padding: clamp(1rem, 2vw, 2rem);
-  }
-  .editorial-home::before {
-    display: none;
-  }
-  .home-hero,
-  .archive-status,
-  .section-block {
-    max-width: 1180px;
-    margin-right: auto;
-    margin-left: auto;
-  }
-  .home-hero {
-    border-bottom: 1px solid #b9b2a4;
-    padding: 1.05rem 0 1.25rem;
-  }
-  .hero-copy h2 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(2.15rem, 3.35vw, 3.35rem);
-    font-weight: 700;
-    line-height: 1.25;
-    letter-spacing: 0;
-  }
-  .hero-copy p {
-    margin: 1rem 0 0;
-    color: #555;
-    font-size: 1.02rem;
-    line-height: 1.9;
-  }
-  .archive-status {
-    display: grid;
-    grid-template-columns: 1.05fr 4fr;
-    align-items: stretch;
-    border-bottom: 1px solid #b9b2a4;
-    padding: 0;
-  }
-  .archive-status h2 {
-    display: flex;
-    align-items: center;
-    margin: 0;
-    padding: 1.25rem 1rem 1.1rem 0;
-    color: #222;
-    font-family: var(--font-meta);
-    font-size: 0.9rem;
-    font-style: normal;
-    font-weight: 400;
-    letter-spacing: 0;
-  }
-  .archive-status dl {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    margin: 0;
-  }
-  .archive-status div {
-    display: grid;
-    place-items: center;
-    border-left: 1px solid #b9b2a4;
-    padding: 0.95rem 1rem;
-    text-align: center;
-  }
-  .archive-status dt,
-  .archive-status dd {
-    margin: 0;
-  }
-  .archive-status dt {
-    color: #6f665d;
-    font-family: var(--font-meta);
-    font-size: 0.72rem;
-    font-style: normal;
-    letter-spacing: 0.04em;
-  }
-  .archive-status dd {
-    margin-top: 0.25rem;
-    color: #222;
-    font-family: var(--font-display);
-    font-size: 1.08rem;
-    font-weight: 700;
-    line-height: 1.2;
-  }
-  .section-block {
-    border-top: 1px solid #222;
-    padding-top: 1rem;
-    margin-top: 1rem;
-  }
-  .section-block > h3 {
-    font-family: var(--font-meta);
-    font-style: normal;
-    font-weight: 700;
-    color: #d6452a;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.75rem;
-  }
-  .category-index {
-    border-top: 0;
-    margin-top: 2.5rem;
-    padding-top: 0;
-  }
-  .category-index > h3 {
-    border-bottom: 1px solid #222;
-    margin-bottom: 0;
-    padding-bottom: 0.8rem;
-  }
-  .table-like {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    border-bottom: 1px solid #222;
-  }
-  .table-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.35rem;
-    align-content: start;
-    padding: 1rem 0;
-    border-top: 1px solid #aaa;
-    color: inherit;
-    text-decoration: none;
-  }
-  .table-row:nth-child(odd) {
-    border-right: 1px solid #aaa;
-    padding-right: 1.25rem;
-  }
-  .table-row:nth-child(even) {
-    padding-left: 1.25rem;
-  }
-  .table-row:hover .name,
-  .featured:hover h4,
-  .latest-item:hover h4,
-  .series-card:hover h4 {
-    color: #d6452a;
-  }
-  .name {
-    font-family: var(--font-display);
-    font-size: 1.45rem;
-    font-weight: 700;
-    transition: color 120ms ease;
-  }
-  .desc {
-    color: #666;
-    line-height: 1.65;
-  }
-  .latest-articles,
-  .recent-notes,
-  .series-section {
-    border-top: 0;
-    margin-top: 2.5rem;
-    padding-top: 0;
-  }
-  .latest-articles > h3,
-  .section-heading-row,
-  .series-section > h3 {
-    border-bottom: 1px solid #222;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.8rem;
-  }
-  .latest-articles > h3 {
-    margin-bottom: 1.5rem;
-  }
   .section-heading-row {
     display: flex;
-    gap: 1rem;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.5rem;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
   }
-  .section-heading-row h2 {
+  h2 {
     margin: 0;
-    color: #d6452a;
-    font-family: var(--font-meta);
-    font-size: 1rem;
-    font-style: normal;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .section-heading-row a {
-    color: #222;
-    font-family: var(--font-meta);
-    font-size: 0.82rem;
-    font-style: normal;
-    font-weight: 700;
-    text-decoration: none;
-  }
-  .section-heading-row a:hover {
-    color: #d6452a;
-  }
-  .latest-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-    gap: 2rem;
-  }
-  .featured {
-    display: block;
-    min-width: 0;
-    border: 1px solid #222;
-    padding: 1rem;
-    text-decoration: none;
-    color: inherit;
-  }
-  .featured > * + * {
-    margin-top: 0.75rem;
-  }
-  .cat {
-    font-family: var(--font-meta);
-    color: #d6452a;
-    font-style: normal;
-  }
-  .featured h4,
-  .latest-item h4 {
-    font-family: var(--font-display);
-    font-weight: 400;
-    line-height: 1.2;
-    transition: color 120ms ease;
-  }
-  .featured h4 {
-    font-size: 1.9rem;
-  }
-  .featured > span {
-    font-family: var(--font-meta);
-    color: #d6452a;
-    font-style: normal;
-  }
-  .note-summary {
-    display: block;
-    max-width: 100%;
-    overflow: hidden;
-    color: #666;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .latest-item .note-summary {
-    max-width: calc(100% - 3ch);
-  }
-  .latest-item h4 {
-    font-size: 1.5rem;
-  }
-  .latest-list,
-  .latest-item {
-    min-width: 0;
-  }
-  .latest-list {
-    border-bottom: 1px solid #aaa;
-  }
-  .latest-item {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    border-top: 1px solid #aaa;
-    padding: 1rem 0;
-  }
-  .latest-item > * + * {
-    margin-top: 0.55rem;
-  }
-  .latest-meta {
-    display: flex;
-    gap: 0.8rem;
-    align-items: baseline;
+    color: #52634d;
     font-size: 0.9rem;
-    line-height: 1.2;
+    font-weight: 500;
+    letter-spacing: 0.06em;
   }
-  .latest-meta time {
-    font-family: var(--font-meta);
-    color: #d6452a;
-    font-style: normal;
-  }
-  .latest-meta .cat {
-    color: #222;
-    font-size: inherit;
-    line-height: inherit;
+  .post-list {
     margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  #recent-notes {
+    margin-top: 3rem;
+  }
+  .section-heading-row > a {
+    color: #52634d;
+    font-size: 0.8rem;
   }
   .recent-notes-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
   }
-  .series-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    border-top: 1px solid #222;
-    border-left: 1px solid #222;
-  }
-  .series-card {
-    border-right: 1px solid #222;
-    border-bottom: 1px solid #222;
-    padding: 1rem;
-    color: inherit;
-    text-decoration: none;
-  }
-  .series-card h4 {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 400;
-    line-height: 1.15;
-    margin: 0 0 0.5rem;
-    transition: color 120ms ease;
-  }
-  @media (max-width: 900px) {
-    .editorial-home {
-      padding: 1rem;
-    }
-    .home-hero {
-      padding-top: 1.45rem;
-    }
-    .hero-copy h2 {
-      max-width: none;
-      font-size: clamp(2rem, 9vw, 3rem);
-    }
-    .archive-status {
-      grid-template-columns: 1fr;
-    }
-    .archive-status h2 {
-      border-bottom: 1px solid #b9b2a4;
-      padding: 1rem 0 0.85rem;
-    }
-    .archive-status dl {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .archive-status div:nth-child(odd) {
-      border-left: 0;
-    }
-    .archive-status div:nth-child(n + 3) {
-      border-top: 1px solid #b9b2a4;
-    }
-    .latest-grid {
-      grid-template-columns: 1fr;
-    }
-    .table-like {
-      grid-template-columns: 1fr;
-    }
-
-    .table-row:nth-child(odd),
-    .table-row:nth-child(even) {
-      border-right: 0;
-      padding-right: 0;
-      padding-left: 0;
-    }
-
-    .name {
-      font-size: 1.6rem;
-    }
-    .series-grid {
-      grid-template-columns: 1fr 1fr;
-    }
+  @media (max-width: 600px) {
     .recent-notes-grid {
       grid-template-columns: 1fr;
     }

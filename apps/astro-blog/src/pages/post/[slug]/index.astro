@@ -76,8 +76,6 @@ const articleTags = post.meta.tags.slice(0, 4).map((tag) => {
 const bodyClasses = ['article-body', post.hasCodeBlocks ? 'has-code-blocks' : '']
   .filter(Boolean)
   .join(' ');
-const shouldShowArticleThumbnail =
-  post.meta.showArticleThumbnail !== false && Boolean(post.meta.coverImage);
 const tocHeadings =
   post.headings.length > 10 ?
     post.headings.filter((heading) => heading.level === 2)
@@ -142,32 +140,24 @@ const schemaData = {
             {categoryLabel}
           </a>
         </div>
+        <dl class="article-meta-inline">
+          {
+            articleMeta.map((item) => (
+              <div>
+                <>
+                  <dt>{item.label}</dt>
+                  <dd>{item.value}</dd>
+                </>
+              </div>
+            ))
+          }
+        </dl>
         <h1>{post.meta.title}</h1>
         {post.meta.description && <p class="article-lead">{post.meta.description}</p>}
         <div class="article-tags">
           {articleTags.map((tag) => <a href={tag.href}>#{tag.label}</a>)}
         </div>
       </div>
-
-      <aside class="article-meta">
-        <dl>
-          {
-            articleMeta.map((item) => (
-              <div>
-                <dt>{item.label}</dt>
-                <dd>{item.value}</dd>
-              </div>
-            ))
-          }
-        </dl>
-        {
-          shouldShowArticleThumbnail && post.meta.coverImage && (
-            <figure class="article-thumbnail">
-              <img src={post.meta.coverImage} alt="" loading="lazy" />
-            </figure>
-          )
-        }
-      </aside>
     </header>
 
     <div class="article-layout">
@@ -397,7 +387,7 @@ const schemaData = {
 
 <style>
   :global(.article-editorial-page) {
-    background: #f1eee7;
+    background: #fffdf2;
   }
   :global(.article-editorial-main) {
     width: 100%;
@@ -408,7 +398,7 @@ const schemaData = {
     min-height: 100vh;
     padding: clamp(1rem, 2vw, 2rem);
     color: #111;
-    background: #f1eee7;
+    background: #fffdf2;
     font-family: var(--font-body);
   }
   .article-hero,
@@ -419,18 +409,17 @@ const schemaData = {
   }
   .article-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
-    min-height: 330px;
+    min-height: 0;
     margin-top: 0;
     border-bottom: 2px solid #222;
   }
   .article-heading {
-    padding: 1rem 2rem 1.4rem 0;
+    padding: 0 0 1.4rem;
   }
   .article-badges,
   .article-tags,
-  .article-meta,
   .article-toc,
   .article-return {
     font-family: var(--font-meta);
@@ -440,7 +429,7 @@ const schemaData = {
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem 0.75rem;
-    margin-bottom: 2rem;
+    margin-bottom: 0.8rem;
   }
   .article-badges a,
   .article-tags a {
@@ -457,13 +446,13 @@ const schemaData = {
       border-color 120ms ease;
   }
   .article-badges .article-category {
-    color: #f1eee7;
+    color: #fffdf2;
     background: #222;
   }
   .article-badges .article-category:hover {
-    border-color: #d6452a;
-    color: #f1eee7;
-    background: #d6452a;
+    border-color: #536d53;
+    color: #fffdf2;
+    background: #536d53;
   }
   .article-tags {
     display: flex;
@@ -472,15 +461,15 @@ const schemaData = {
     margin-top: 1.25rem;
   }
   .article-tags a:hover {
-    border-color: #d6452a;
-    color: #d6452a;
+    border-color: #536d53;
+    color: #536d53;
   }
   h1 {
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(2rem, 4vw, 3.6rem);
+    font-size: clamp(1.7rem, 3vw, 2.35rem);
     font-weight: 700;
-    line-height: 1.14;
+    line-height: 1.55;
     letter-spacing: 0;
   }
   .article-lead {
@@ -490,74 +479,38 @@ const schemaData = {
     font-size: 1.08rem;
     line-height: 1.85;
   }
-  .article-meta {
-    border-left: 1px solid #222;
-    padding: 1.55rem 0 1.4rem 1.35rem;
+  .article-meta-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.2rem;
+    margin: 0 0 1rem;
+    font-size: 0.75rem;
+    color: #586951;
   }
-  .article-toc h2 {
+  .article-meta-inline div {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .article-meta-inline dd {
     margin: 0;
-    color: #d6452a;
-    font-size: 0.92rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .article-meta dl {
-    margin: 0;
-  }
-  .article-thumbnail {
-    margin: 1.5rem 0 0;
-    padding: 1.2rem 2rem 0;
-  }
-  .article-thumbnail img {
-    display: block;
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    border: 1px solid #222;
-    object-fit: cover;
-    background: #ddd6c8;
-  }
-  .article-meta div {
-    display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: 1rem;
-    padding: 0.95rem 0;
-  }
-  .article-meta div + div {
-    border-top: 1px solid #b9b2a4;
-  }
-  .article-meta dt {
-    color: #d6452a;
-    font-size: 0.74rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
-  .article-meta dd {
-    margin: 0;
-    color: #222;
-    font-size: 0.88rem;
-    font-weight: 700;
-    line-height: 1.45;
-    text-align: right;
-    overflow-wrap: anywhere;
   }
   .article-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
     padding-top: 3rem;
   }
   .article-content {
     min-width: 0;
-    padding-right: 2rem;
+    padding-right: 0;
   }
   .article-sidebar {
     min-width: 0;
-    border-left: 1px solid #222;
-    padding-left: 1.35rem;
+    order: -1;
+    padding: 0 0 1rem;
   }
   .article-toc {
-    position: sticky;
-    top: 1.5rem;
+    position: static;
   }
   .article-toc h2 {
     border-bottom: 2px solid #222;
@@ -586,10 +539,10 @@ const schemaData = {
       background-color 120ms ease;
   }
   .article-toc a:hover {
-    color: #d6452a;
+    color: #536d53;
   }
   :global(.article-toc a.is-active) {
-    color: #d6452a !important;
+    color: #536d53 !important;
     background: transparent;
   }
   .article-toc .toc-level-2 a {
@@ -624,8 +577,8 @@ const schemaData = {
       border-color 120ms ease;
   }
   .article-return a:hover {
-    border-color: #d6452a;
-    color: #d6452a;
+    border-color: #536d53;
+    color: #536d53;
   }
   .article-contributors {
     margin-top: 5rem;
@@ -645,7 +598,7 @@ const schemaData = {
   }
   .contributors-heading h2 {
     margin: 0;
-    color: #d6452a;
+    color: #536d53;
     font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -712,7 +665,7 @@ const schemaData = {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    color: #f1eee7;
+    color: #fffdf2;
     background: #222;
   }
   .contributors-actions .edit-source-link svg {
@@ -721,13 +674,13 @@ const schemaData = {
     fill: currentColor;
   }
   .contributors-actions .edit-source-link:hover {
-    border-color: #d6452a;
-    color: #f1eee7;
-    background: #d6452a;
+    border-color: #536d53;
+    color: #fffdf2;
+    background: #536d53;
   }
   .contributors-actions a:hover {
-    border-color: #d6452a;
-    color: #d6452a;
+    border-color: #536d53;
+    color: #536d53;
   }
   @media (max-width: 900px) {
     .article-hero,
@@ -739,11 +692,6 @@ const schemaData = {
     }
     h1 {
       max-width: none;
-    }
-    .article-meta {
-      border-top: 1px solid #222;
-      border-left: 0;
-      padding: 1.25rem 0;
     }
     .article-content {
       padding-right: 0;

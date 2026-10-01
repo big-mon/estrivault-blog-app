@@ -22,6 +22,6 @@ for (const width of [375, 1280]) {
     }
 
     await page.goto('/post/about');
-    await expect(page.locator('.article-thumbnail img')).toBeVisible();
+    await expect(page.locator('.article-thumbnail img')).toHaveCount(0);
   });
 }

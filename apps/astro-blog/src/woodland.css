@@ -1,0 +1,153 @@
+/* The scene stays outside an opaque, bounded reading surface at every width. */
+body.woodland-blog {
+  margin: 0;
+  background: #e5e9d6;
+  color: #303e32;
+  --font-display: Georgia, 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+  --font-body: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
+  --font-meta: var(--font-body);
+}
+body.woodland-blog > main {
+  position: relative;
+  width: min(100% - 80px, 860px);
+  max-width: 860px;
+  min-height: calc(100vh - 160px);
+  margin: 80px auto;
+  padding: 0;
+  background: #fffdf2;
+  border: 1px solid #c8ceba;
+}
+body.woodland-blog
+  :is(.editorial-home, .archive-page, .article-page, .notes-shell, .note-page-shell) {
+  min-height: 0;
+  padding: 42px 52px;
+  background: #fffdf2;
+  color: #303e32;
+}
+body.woodland-blog :is(.notes-title, .notes-grid, .note-page-content) {
+  max-width: 100%;
+}
+body.woodland-blog .notes-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+body.woodland-blog :is(a, summary, button):focus-visible {
+  outline: 2px solid #476446;
+  outline-offset: 4px;
+}
+body.woodland-blog .editorial-footer {
+  border-top: 1px solid #bbc1ae;
+}
+body.woodland-blog .article-body,
+body.woodland-blog .note-body {
+  color: #303e32;
+}
+.woodland {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.woodland svg {
+  position: absolute;
+  image-rendering: pixelated;
+}
+.woodland-left {
+  left: max(0px, calc(50% - 950px));
+  bottom: 0;
+}
+.woodland-right {
+  right: max(0px, calc(50% - 950px));
+  bottom: 0;
+}
+.cloud-left {
+  left: 8%;
+  top: 8%;
+}
+.cloud-right {
+  right: 7%;
+  top: 15%;
+}
+.cloud {
+  animation: cloud-drift 36s steps(8, end) infinite alternate;
+}
+.water {
+  animation: water-shift 9s steps(3, end) infinite alternate;
+}
+@keyframes cloud-drift {
+  to {
+    transform: translateX(24px);
+  }
+}
+@keyframes water-shift {
+  to {
+    transform: translateX(6px);
+  }
+}
+@media (min-width: 1800px) {
+  .woodland-left {
+    width: 512px;
+    height: 880px;
+  }
+  .woodland-right {
+    width: 512px;
+    height: 880px;
+  }
+}
+@media (max-width: 700px) {
+  body.woodland-blog > main {
+    width: 100%;
+    margin: 108px auto 136px;
+    border-left: 0;
+    border-right: 0;
+  }
+  .woodland-blog
+    :is(.editorial-home, .archive-page, .article-page, .notes-shell, .note-page-shell) {
+    padding: 28px 20px;
+  }
+  body.woodland-blog .notes-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .woodland {
+    position: absolute;
+    min-height: 100%;
+  }
+  .woodland-left,
+  .woodland-right {
+    width: 192px;
+    height: 330px;
+  }
+  .woodland-left {
+    top: -20px;
+    width: 128px;
+    height: 220px;
+    left: -12px;
+    bottom: auto;
+  }
+  .woodland-right {
+    bottom: 0;
+    right: 0;
+  }
+  .cloud-left {
+    top: 22px;
+    left: 38%;
+    width: 128px;
+    height: 40px;
+  }
+  .cloud-right {
+    display: none;
+  }
+  body.woodland-blog {
+    position: relative;
+    display: flow-root;
+  }
+  body.woodland-blog .article-page h1 {
+    font-size: 1.75rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .woodland *,
+  body.woodland-blog a {
+    animation: none;
+    transition: none;
+  }
+}

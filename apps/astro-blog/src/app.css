@@ -67,7 +67,7 @@ html {
 .note-body h2::before {
   content: counter(content-section, decimal-leading-zero);
   counter-increment: content-section;
-  color: #d6452a;
+  color: #536d53;
   font-family: var(--font-meta);
   font-size: clamp(1.05rem, 1.6vw, 1.35rem);
   font-weight: 700;
@@ -80,7 +80,7 @@ html {
   margin: 3rem 0 1.1rem;
   border-bottom: 1px solid #8f897e;
   padding-bottom: 0.55rem;
-  color: #d6452a;
+  color: #536d53;
   font-family: var(--font-meta);
   font-size: 1rem;
   font-style: normal;
@@ -113,14 +113,14 @@ html {
 
 .article-body a:not(.heading-anchor):hover,
 .note-body a:not(.heading-anchor):hover {
-  color: #d6452a;
+  color: #536d53;
   text-decoration-thickness: 0.12em;
 }
 
 .article-body a:not(.heading-anchor):focus-visible,
 .note-body a:not(.heading-anchor):focus-visible {
   border-radius: 0.15em;
-  outline: 2px solid #d6452a;
+  outline: 2px solid #536d53;
   outline-offset: 0.18em;
 }
 
@@ -189,7 +189,7 @@ html {
   top: 0.95em;
   left: -1.75rem;
   transform: translateY(-50%);
-  color: #d6452a;
+  color: #536d53;
   font-family: var(--font-meta);
   font-size: 0.78rem;
   font-weight: 700;
@@ -217,7 +217,7 @@ html {
 .article-body blockquote,
 .note-body blockquote {
   margin: 2.4rem 0;
-  border-left: 2px solid #d6452a;
+  border-left: 2px solid #536d53;
   padding: 0.9rem 0 0.9rem 1.3rem;
   color: #555;
   line-height: 1.95;
@@ -248,7 +248,7 @@ html {
 
 .article-body th,
 .note-body th {
-  color: #d6452a;
+  color: #536d53;
   font-family: var(--font-meta);
   font-size: 0.86rem;
 }
@@ -269,7 +269,7 @@ html {
   margin: 2.4rem 0;
   padding: 1.25rem;
   background: #161616;
-  color: #f1eee7;
+  color: #fffdf2;
   font-family: var(--font-meta);
   font-size: 0.9rem;
   line-height: 1.7;
@@ -300,7 +300,7 @@ html {
 .article-body .directive-box,
 .note-body .directive-box {
   margin: 2.4rem 0;
-  border: 1px solid #d6452a;
+  border: 1px solid #536d53;
   padding: 1.1rem 1.25rem;
   background: transparent;
   line-height: 1.9;
@@ -348,7 +348,7 @@ html {
   border-radius: 0;
   box-shadow: none;
   object-fit: contain;
-  background: #f1eee7;
+  background: #fffdf2;
   transition: opacity 120ms ease;
 }
 
@@ -380,7 +380,7 @@ html {
 
 .article-body .amazon-card__title:hover,
 .note-body .amazon-card__title:hover {
-  color: #d6452a;
+  color: #536d53;
   text-decoration: none;
 }
 

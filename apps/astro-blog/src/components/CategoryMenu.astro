@@ -1,0 +1,70 @@
+---
+import { CATEGORY_META } from '$constants';
+import { getAllPostsMeta } from '$lib/content';
+const posts = await getAllPostsMeta();
+const categories = Object.entries(CATEGORY_META).filter(([slug]) =>
+  posts.some((post) => post.category === slug),
+);
+---
+
+<details class="category-menu" id="categories">
+  <summary>カテゴリー <span aria-hidden="true">⌄</span></summary>
+  <nav aria-label="カテゴリー">
+    <a href="/">すべての記事</a>
+    {categories.map(([slug, category]) => <a href={`/category/${slug}/`}>{category.label}</a>)}
+  </nav>
+</details>
+<script>
+  document.querySelectorAll<HTMLDetailsElement>('.category-menu').forEach((menu) => {
+    menu.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        menu.open = false;
+        menu.querySelector('summary')?.focus();
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+    });
+  });
+</script>
+<style>
+  .category-menu {
+    position: relative;
+    font-size: 0.85rem;
+  }
+  summary {
+    cursor: pointer;
+    list-style: none;
+    border: 1px solid #b6bdac;
+    padding: 0.5rem 0.8rem;
+    border-radius: 2px;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary span {
+    margin-left: 0.6rem;
+  }
+  nav {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.4rem);
+    z-index: 10;
+    width: 13rem;
+    max-width: 80vw;
+    padding: 0.4rem;
+    border: 1px solid #b6bdac;
+    background: #fffdf2;
+    box-shadow: 0 4px 12px #32473518;
+  }
+  nav a {
+    display: block;
+    padding: 0.6rem 0.7rem;
+    color: #354d3e;
+    text-decoration: none;
+  }
+  nav a:hover,
+  nav a:focus-visible {
+    background: #e8eddf;
+  }
+</style>
