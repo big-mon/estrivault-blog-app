@@ -210,6 +210,27 @@ for (const width of [390, 820, 1440]) {
     await expect.poll(async () => (await cloud.boundingBox())!.x).toBeGreaterThan(before + 2);
     expect(await page.locator('body > main').boundingBox()).toEqual(contentBefore);
 
+    const cadence = await page.locator('.cloud').evaluateAll(async (clouds) => {
+      const samples: number[][] = [];
+      const started = performance.now();
+      for (let i = 0; i <= 40; i++) {
+        samples.push(clouds.map((element) => element.getBoundingClientRect().x));
+        if (i < 40) await new Promise((resolve) => setTimeout(resolve, 50));
+      }
+      return clouds.map((_, index) => ({
+        seconds: (performance.now() - started) / 1000,
+        changes: samples
+          .slice(1)
+          .map((sample, i) => sample[index] - samples[i][index])
+          .filter((delta) => delta !== 0),
+      }));
+    });
+    for (const { seconds, changes } of cadence) {
+      expect(changes.length / seconds).toBeGreaterThan(1.4);
+      expect(changes.length / seconds).toBeLessThan(2.6);
+      for (const step of changes) expect(step).toBeCloseTo(1, 3);
+    }
+
     const layers = width <= 1100 ? '.woodland-mobile' : '.woodland-right';
     for (const detail of ['.breeze', '.water']) {
       const element = page.locator(`${layers} ${detail}`).first();

@@ -251,6 +251,20 @@
 <script>
   const scene = document.querySelector<HTMLElement>('.woodland');
   if (scene) {
+    // Recalculate only on resize: one CSS pixel per step, two steps per second.
+    // The travel distance includes the cloud width so both loop endpoints are offscreen.
+    const sizeCloudMotion = () => {
+      const compact = window.matchMedia('(max-width: 1100px)').matches;
+      const distance = Math.ceil(window.innerWidth) + (compact ? 100 : 200);
+      const duration = distance / 2;
+      scene.style.setProperty('--cloud-travel', `${distance}px`);
+      scene.style.setProperty('--cloud-steps', String(distance));
+      scene.style.setProperty('--cloud-duration', `${duration}s`);
+      scene.style.setProperty('--cloud-delay-left', `${-duration * (compact ? 0.4 : 0.14)}s`);
+      scene.style.setProperty('--cloud-delay-right', `${-duration * (compact ? 0.825 : 0.8)}s`);
+    };
+    sizeCloudMotion();
+    window.addEventListener('resize', sizeCloudMotion);
     let inView = false;
     const updateMotion = () => {
       scene.toggleAttribute('data-motion-paused', document.hidden || !inView);

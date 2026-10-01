@@ -75,22 +75,18 @@ body.woodland-blog .note-body {
 }
 .cloud-left {
   top: 9%;
-  animation-delay: -30s;
+  animation-delay: var(--cloud-delay-left);
 }
 .cloud-right {
   top: 16%;
-  animation-delay: -210s;
+  animation-delay: var(--cloud-delay-right);
 }
 .cloud {
   left: -200px;
-  --cloud-travel: calc(100vw + 200px);
   animation-name: cloud-drift;
-  animation-duration: 220s;
-  animation-timing-function: steps(820, end);
+  animation-duration: var(--cloud-duration);
+  animation-timing-function: steps(var(--cloud-steps), end);
   animation-iteration-count: infinite;
-}
-.cloud-right {
-  animation-duration: 260s;
 }
 .water {
   animation: water-shift 6s steps(4, end) infinite alternate;
@@ -188,18 +184,12 @@ body.woodland-blog .note-body {
     left: -100px;
     width: 100px;
     height: 30px;
-    --cloud-travel: calc(100vw + 100px);
-    animation-duration: 120s;
-    animation-timing-function: steps(320, end);
   }
   .cloud-left {
     top: 8px;
-    animation-delay: -48s;
   }
   .cloud-right {
     top: 30px;
-    animation-duration: 160s;
-    animation-delay: -132s;
   }
   .woodland .woodland-mobile {
     display: block;
