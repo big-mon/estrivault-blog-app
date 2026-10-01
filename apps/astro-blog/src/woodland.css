@@ -11,17 +11,18 @@ body.woodland-blog > main {
   position: relative;
   width: min(100% - 80px, 860px);
   max-width: 860px;
-  min-height: calc(100vh - 160px);
-  margin: 80px auto;
+  min-height: calc(100vh - 80px);
+  min-height: calc(100svh - 80px);
+  margin: 80px auto 0;
   padding: 0;
-  background: #fffdf2;
-  border: 1px solid #c8ceba;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
 }
 body.woodland-blog
   :is(.editorial-home, .archive-page, .article-page, .notes-shell, .note-page-shell) {
   min-height: 0;
   padding: 42px 52px;
-  background: #fffdf2;
+  background: var(--color-surface);
   color: #303e32;
 }
 body.woodland-blog :is(.notes-title, .notes-grid, .note-page-content) {
@@ -31,11 +32,11 @@ body.woodland-blog .notes-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 body.woodland-blog :is(a, summary, button):focus-visible {
-  outline: 2px solid #476446;
+  outline: 2px solid var(--color-link-hover);
   outline-offset: 4px;
 }
 body.woodland-blog .editorial-footer {
-  border-top: 1px solid #bbc1ae;
+  border-top: 1px solid var(--color-line);
 }
 body.woodland-blog .article-body,
 body.woodland-blog .note-body {
@@ -104,7 +105,7 @@ body.woodland-blog .note-body {
     right: calc(50% - 1050px);
   }
 }
-@media (max-width: 1280px) and (min-width: 901px) {
+@media (max-width: 1280px) and (min-width: 1101px) {
   body.woodland-blog > main {
     width: calc(100% - 288px);
     max-width: 780px;
@@ -115,7 +116,7 @@ body.woodland-blog .note-body {
     height: 540px;
   }
 }
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   body.woodland-blog > main {
     width: 100%;
     margin: 176px auto 0;
@@ -156,7 +157,7 @@ body.woodland-blog .note-body {
   body.woodland-blog {
     position: relative;
     display: flow-root;
-    background: #fffdf2;
+    background: var(--color-surface);
   }
   body.woodland-blog .article-page h1 {
     font-size: 1.75rem;
@@ -168,4 +169,21 @@ body.woodland-blog .note-body {
     animation: none;
     transition: none;
   }
+}
+
+/* Keep the approved masthead and titles neutral; filled links retain contrast. */
+body.woodland-blog .brand a,
+body.woodland-blog .brand a:visited {
+  color: #20231e;
+}
+body.woodland-blog .post-title a,
+body.woodland-blog .post-title a:visited {
+  color: var(--color-ink);
+}
+body.woodland-blog .post-title a:hover {
+  color: var(--color-link-hover);
+}
+body.woodland-blog :is(.article-category, .edit-source-link),
+body.woodland-blog :is(.article-category, .edit-source-link):visited {
+  color: var(--color-surface);
 }

@@ -26,7 +26,9 @@ const pageData = getPaginatedPosts(allPosts, { page: 1, perPage: POSTS_PER_PAGE 
   <div class="editorial-home">
     <EditorialMasthead homePage />
     <section id="latest" aria-labelledby="latest-title">
-      <div class="section-heading-row"><h2 id="latest-title">最近の記事</h2><CategoryMenu /></div>
+      <div class="section-heading-row listing-heading">
+        <h2 id="latest-title">最近の記事</h2><CategoryMenu />
+      </div>
       <ol class="post-list">
         {
           pageData.posts.map((post) => (
@@ -41,7 +43,7 @@ const pageData = getPaginatedPosts(allPosts, { page: 1, perPage: POSTS_PER_PAGE 
     {
       recentNoteDetails.length > 0 && (
         <section id="recent-notes">
-          <div class="section-heading-row">
+          <div class="section-heading-row listing-heading">
             <>
               <h2>RECENT NOTES</h2>
               <a href="/notes/">すべての Notes →</a>
@@ -60,20 +62,6 @@ const pageData = getPaginatedPosts(allPosts, { page: 1, perPage: POSTS_PER_PAGE 
   <NoteModal notes={recentNoteDetails} basePath="/" />
 </BaseLayout>
 <style>
-  .section-heading-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 0.8rem;
-  }
-  h2 {
-    margin: 0;
-    color: #52634d;
-    font-size: 0.9rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-  }
   .post-list {
     margin: 0;
     padding: 0;
@@ -83,7 +71,7 @@ const pageData = getPaginatedPosts(allPosts, { page: 1, perPage: POSTS_PER_PAGE 
     margin-top: 3rem;
   }
   .section-heading-row > a {
-    color: #52634d;
+    color: var(--color-muted);
     font-size: 0.8rem;
   }
   .recent-notes-grid {

@@ -59,12 +59,12 @@ const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
 
   .note-card:hover,
   .note-card:focus-visible {
-    border-color: #536d53;
+    border-color: var(--color-accent);
     background: #fffdf8;
   }
 
   .note-card:focus-visible {
-    outline: 2px solid #536d53;
+    outline: 2px solid var(--color-accent);
     outline-offset: 3px;
   }
 
@@ -88,7 +88,7 @@ const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
     gap: 0.75rem;
     align-items: baseline;
     justify-content: space-between;
-    color: #536d53;
+    color: var(--color-accent);
     font-size: 0.78rem;
     font-weight: 700;
     line-height: 1.25;
@@ -112,7 +112,7 @@ const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
 
   .note-card:hover .note-card-title,
   .note-card:focus-visible .note-card-title {
-    color: #536d53;
+    color: var(--color-accent);
   }
 
   .note-card-excerpt {
@@ -144,7 +144,7 @@ const noteUrl = `/notes/${encodeURIComponent(note.slug)}`;
     width: fit-content;
     margin-top: auto;
     padding-top: 1rem;
-    color: #536d53;
+    color: var(--color-accent);
     font-size: 0.8rem;
     font-weight: 700;
   }

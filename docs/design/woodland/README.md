@@ -30,3 +30,6 @@ The Library screenshot upload also failed; no Library IDs were issued.
 
 [Mobile footer regression captures](footer/README.md) cover 320/360/390/430px,
 short and long pages, the footer transition, and the complete page ending.
+
+[Archive, link palette and tablet ending screenshots](consistency/README.md)
+cover final top/bottom views on mobile, tablet and desktop.

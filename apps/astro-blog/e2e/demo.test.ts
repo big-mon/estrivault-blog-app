@@ -238,8 +238,8 @@ test('LLM guide points to both sitemaps and the removed full endpoint stays abse
 test('standard pages expose the canonical public site name in the footer', async ({ page }) => {
   await page.goto('/2/');
 
-  await expect(page.locator('footer p')).toContainText('Estrilda');
-  await expect(page.locator('footer p')).not.toContainText('Estrivault');
+  await expect(page.locator('.editorial-footer .footer-brand')).toContainText('Estrilda');
+  await expect(page.locator('.editorial-footer .footer-brand')).not.toContainText('Estrivault');
 });
 
 test('agent API index and posts expose the public read-only collection', async ({ request }) => {

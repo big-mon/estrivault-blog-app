@@ -52,12 +52,11 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
 {
   totalPages > 1 && (
     <nav class="archive-pagination" aria-label="ページネーション">
-      <h2>PAGINATION</h2>
       {page > 1 ?
         <a href={getArchivePagePath(routeBase, page - 1)} aria-label="前のページ">
-          ← PREV
+          ← 前へ
         </a>
-      : <span aria-disabled="true">← PREV</span>}
+      : <span aria-disabled="true">← 前へ</span>}
       <div>
         {visiblePaginationItems.map((item) =>
           item.type === 'ellipsis' ?
@@ -76,77 +75,51 @@ const visiblePaginationItems = getVisiblePaginationItems(page, totalPages);
       </div>
       {page < totalPages ?
         <a href={getArchivePagePath(routeBase, page + 1)} aria-label="次のページ">
-          NEXT →
+          次へ →
         </a>
-      : <span aria-disabled="true">NEXT →</span>}
+      : <span aria-disabled="true">次へ →</span>}
     </nav>
   )
 }
 
 <style>
-  .archive-pagination {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem;
-    align-items: center;
-    justify-content: flex-start;
-    max-width: 1180px;
-    border-top: 0;
-    border-bottom: 0;
-    margin: 3.5rem auto 0;
-    padding: 0;
-    font-family: var(--font-meta);
-    font-style: normal;
-  }
-  .archive-pagination h2 {
-    flex-basis: 100%;
-    border-bottom: 1px solid #222;
-    margin: 0 0 0.85rem;
-    padding-bottom: 0.8rem;
-    color: #536d53;
-    font-family: var(--font-meta);
-    font-size: 0.88rem;
-    font-style: normal;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
+  .archive-pagination,
   .archive-pagination > div {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
-    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
   }
-  .archive-pagination a,
-  .archive-pagination span {
+  .archive-pagination {
+    margin: 2rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-line);
+    font-size: 0.85rem;
+  }
+  .archive-pagination :is(a, span) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2rem;
-    border: 1px solid #222;
-    padding: 0.34rem 0.65rem 0.28rem;
-    color: inherit;
-    line-height: 1.1;
+    min-height: 2.25rem;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--color-line);
     text-decoration: none;
-    transition:
-      color 120ms ease,
-      border-color 120ms ease;
   }
   .archive-pagination a:hover {
-    border-color: #536d53;
-    color: #536d53;
+    background: var(--color-tint);
+    border-color: var(--color-accent);
   }
   .archive-pagination [aria-current='page'] {
-    border-color: #222;
-    color: #fffdf2;
-    background: #222;
+    background: var(--color-accent);
+    color: var(--color-surface);
+    border-color: var(--color-accent);
   }
   .archive-pagination [aria-disabled='true'] {
-    border-color: #999;
-    color: #999;
+    color: var(--color-muted);
+    border-color: transparent;
   }
-  @media (max-width: 900px) {
-    .archive-pagination {
-      text-align: left;
-    }
+  .archive-pagination .pagination-ellipsis {
+    border-color: transparent;
+    padding-inline: 0.2rem;
   }
 </style>

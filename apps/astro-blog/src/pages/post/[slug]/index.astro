@@ -387,7 +387,7 @@ const schemaData = {
 
 <style>
   :global(.article-editorial-page) {
-    background: #fffdf2;
+    background: var(--color-surface);
   }
   :global(.article-editorial-main) {
     width: 100%;
@@ -398,7 +398,7 @@ const schemaData = {
     min-height: 100vh;
     padding: clamp(1rem, 2vw, 2rem);
     color: #111;
-    background: #fffdf2;
+    background: var(--color-surface);
     font-family: var(--font-body);
   }
   .article-hero,
@@ -446,13 +446,13 @@ const schemaData = {
       border-color 120ms ease;
   }
   .article-badges .article-category {
-    color: #fffdf2;
+    color: var(--color-surface);
     background: #222;
   }
   .article-badges .article-category:hover {
-    border-color: #536d53;
-    color: #fffdf2;
-    background: #536d53;
+    border-color: var(--color-accent);
+    color: var(--color-surface);
+    background: var(--color-accent);
   }
   .article-tags {
     display: flex;
@@ -461,8 +461,8 @@ const schemaData = {
     margin-top: 1.25rem;
   }
   .article-tags a:hover {
-    border-color: #536d53;
-    color: #536d53;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
   }
   h1 {
     margin: 0;
@@ -539,10 +539,10 @@ const schemaData = {
       background-color 120ms ease;
   }
   .article-toc a:hover {
-    color: #536d53;
+    color: var(--color-accent);
   }
   :global(.article-toc a.is-active) {
-    color: #536d53 !important;
+    color: var(--color-accent) !important;
     background: transparent;
   }
   .article-toc .toc-level-2 a {
@@ -577,8 +577,8 @@ const schemaData = {
       border-color 120ms ease;
   }
   .article-return a:hover {
-    border-color: #536d53;
-    color: #536d53;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
   }
   .article-contributors {
     margin-top: 5rem;
@@ -598,7 +598,7 @@ const schemaData = {
   }
   .contributors-heading h2 {
     margin: 0;
-    color: #536d53;
+    color: var(--color-accent);
     font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -665,7 +665,7 @@ const schemaData = {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    color: #fffdf2;
+    color: var(--color-surface);
     background: #222;
   }
   .contributors-actions .edit-source-link svg {
@@ -674,13 +674,13 @@ const schemaData = {
     fill: currentColor;
   }
   .contributors-actions .edit-source-link:hover {
-    border-color: #536d53;
-    color: #fffdf2;
-    background: #536d53;
+    border-color: var(--color-accent);
+    color: var(--color-surface);
+    background: var(--color-accent);
   }
   .contributors-actions a:hover {
-    border-color: #536d53;
-    color: #536d53;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
   }
   @media (max-width: 900px) {
     .article-hero,

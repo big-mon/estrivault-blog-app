@@ -35,7 +35,7 @@ const categories = Object.entries(CATEGORY_META).filter(([slug]) =>
   summary {
     cursor: pointer;
     list-style: none;
-    border: 1px solid #b6bdac;
+    border: 1px solid var(--color-line);
     padding: 0.5rem 0.8rem;
     border-radius: 2px;
   }
@@ -53,18 +53,18 @@ const categories = Object.entries(CATEGORY_META).filter(([slug]) =>
     width: 13rem;
     max-width: 80vw;
     padding: 0.4rem;
-    border: 1px solid #b6bdac;
-    background: #fffdf2;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
     box-shadow: 0 4px 12px #32473518;
   }
   nav a {
     display: block;
     padding: 0.6rem 0.7rem;
-    color: #354d3e;
+    color: var(--color-link);
     text-decoration: none;
   }
   nav a:hover,
   nav a:focus-visible {
-    background: #e8eddf;
+    background: var(--color-tint);
   }
 </style>
