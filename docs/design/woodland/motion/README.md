@@ -1,5 +1,7 @@
 # Ambient motion
 
+The cloud cadence evidence below remains current. Foliage/water screenshots and amplitudes here describe the earlier version; see [the localized breeze refinement](../breeze/README.md) for the latest plant and ripple behavior.
+
 Clouds move in one direction across the sky, with their reset outside both viewport edges. Both now advance exactly one CSS pixel every 500 milliseconds: 2 pixels/second and 2 position updates/second. Travel distance is the viewport width plus the cloud width; step count and duration are calculated once on load and on resize, never in a rendering loop. Two clouds use different starting phases. The clipped decorative container prevents horizontal page overflow. At 390/820/1440px, periods are 245/460/820 seconds respectively.
 
 Only two oak crowns and small grass highlights move on desktop (one crown and shrubs on mobile). Crowns move 1 SVG unit over 8 seconds and back over 8 seconds; grass uses 10 seconds each way. Water highlight strokes move 3 SVG units and change opacity from 0.6 to 0.9 over 6 seconds each way. Stepped timing retains the quiet, coarse pixel appearance. Trunks, cottage, ground, shoreline, and all reading content stay still.

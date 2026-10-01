@@ -89,17 +89,20 @@ body.woodland-blog .note-body {
   animation-iteration-count: infinite;
 }
 .water {
-  animation: water-shift 6s steps(4, end) infinite alternate;
+  animation: water-shift 3s steps(7, jump-none) infinite alternate;
+}
+.water-delayed {
+  animation-delay: -1.5s;
 }
 .breeze {
-  animation: leaf-breeze 8s steps(2, end) infinite alternate;
+  animation: leaf-breeze 1.5s steps(4, jump-none) infinite alternate;
 }
 .breeze-grass {
-  animation-duration: 10s;
-  animation-delay: -4s;
+  animation-duration: 2s;
+  animation-delay: -1s;
 }
 .woodland-right .breeze {
-  animation-delay: -3s;
+  animation-delay: -0.75s;
 }
 .woodland[data-motion-paused] * {
   animation-play-state: paused;
@@ -111,16 +114,16 @@ body.woodland-blog .note-body {
 }
 @keyframes leaf-breeze {
   to {
-    transform: translateX(1px);
+    transform: translateX(3px);
   }
 }
 @keyframes water-shift {
   from {
-    opacity: 0.6;
+    opacity: 0.8;
   }
   to {
-    transform: translateX(3px);
-    opacity: 0.9;
+    transform: translateX(6px);
+    opacity: 1;
   }
 }
 @media (min-width: 1101px) {

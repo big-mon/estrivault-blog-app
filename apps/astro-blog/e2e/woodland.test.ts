@@ -111,10 +111,9 @@ for (const width of [320, 360, 390, 430, 768, 820, 1024]) {
           expect(geometry.sceneEnd).toBe(176);
           expect(geometry.overflow).toBe(false);
           if (reducedMotion === 'reduce') {
-            await expect(page.locator('.woodland-mobile .water')).toHaveCSS(
-              'animation-name',
-              'none',
-            );
+            for (const ripple of await page.locator('.woodland-mobile .water').all()) {
+              await expect(ripple).toHaveCSS('animation-name', 'none');
+            }
           }
           await page.evaluate(() => window.scrollTo(0, 0));
           await expect(page.locator('.woodland-mobile')).toBeInViewport();
@@ -232,15 +231,46 @@ for (const width of [390, 820, 1440]) {
     }
 
     const layers = width <= 1100 ? '.woodland-mobile' : '.woodland-right';
-    for (const detail of ['.breeze', '.water']) {
-      const element = page.locator(`${layers} ${detail}`).first();
-      const initial = await element.evaluate((node) => getComputedStyle(node).transform);
-      await expect
-        .poll(() => element.evaluate((node) => getComputedStyle(node).transform), {
-          timeout: 10_000,
-        })
-        .not.toBe(initial);
-    }
+    const motion = await page.evaluate(async (scope) => {
+      const leaf = document.querySelector(`${scope} .breeze`)!;
+      const water = document.querySelector(`${scope} .water`)!;
+      const crown = document.querySelector(`${scope} .tree-crown > path:first-child`)!;
+      const fixed = JSON.stringify(crown.getBoundingClientRect());
+      const main = document.querySelector('body > main')!.getBoundingClientRect();
+      const visible = [leaf, water].every((element) => {
+        const rect = element.getBoundingClientRect();
+        return (
+          rect.right > 0 &&
+          rect.left < innerWidth &&
+          rect.bottom > 0 &&
+          rect.top < innerHeight &&
+          (innerWidth <= 1100 ?
+            rect.bottom <= 176
+          : rect.right - Math.max(rect.left, main.right) >= 20)
+        );
+      });
+      const samples: number[][] = [];
+      let crownStationary = true;
+      for (let i = 0; i <= 30; i++) {
+        samples.push(
+          [leaf, water].map((element) => new DOMMatrix(getComputedStyle(element).transform).m41),
+        );
+        crownStationary &&= JSON.stringify(crown.getBoundingClientRect()) === fixed;
+        if (i < 30) await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+      return {
+        visible,
+        crownStationary,
+        spans: [0, 1].map((index) => {
+          const positions = samples.map((sample) => sample[index]);
+          return Math.max(...positions) - Math.min(...positions);
+        }),
+      };
+    }, layers);
+    expect(motion.visible).toBe(true);
+    expect(motion.crownStationary).toBe(true);
+    expect(motion.spans[0]).toBeGreaterThanOrEqual(3);
+    expect(motion.spans[1]).toBeGreaterThanOrEqual(6);
     expect(await page.locator('body > main').boundingBox()).toEqual(contentBefore);
 
     // Both sides of a cloud's loop are outside the viewport: no visible teleport.
