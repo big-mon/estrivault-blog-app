@@ -8,6 +8,7 @@ import EditorialMasthead from '$components/EditorialMasthead.astro';
 import { encodeRouteSegment, getArchivePagePath } from '$lib/url-segments.mjs';
 interface Props {
   title: string;
+  isCategory?: boolean;
   description?: string;
   posts: PostMeta[];
   total: number;
@@ -20,6 +21,7 @@ interface Props {
 }
 const {
   title,
+  isCategory = false,
   description,
   posts,
   total,
@@ -40,10 +42,26 @@ function getTagHref(tag: string): string {
 <div class="archive-page">
   <EditorialMasthead />
   <section class="archive-index" aria-labelledby="archive-title">
-    <div class="listing-heading"><h1 id="archive-title">{title}</h1><CategoryMenu /></div>
+    <div class:list={['listing-heading', { 'category-heading': isCategory }]}>
+      {
+        isCategory ?
+          <div class="category-heading-title">
+            <p class="category-eyebrow">カテゴリー</p>
+            <h1 id="archive-title">{title}</h1>
+          </div>
+        : <h1 id="archive-title">{title}</h1>
+      }
+      <CategoryMenu />
+    </div>
     <div class="archive-context">
       {description && <p>{description}</p>}
-      <p>{total}件の記事 · {page} / {totalPages}ページ</p>
+      {
+        !isCategory && (
+          <p>
+            {total}件の記事 · {page} / {totalPages}ページ
+          </p>
+        )
+      }
       {
         topTags.length > 0 && (
           <nav class="archive-tags" aria-label="関連タグ">
@@ -70,6 +88,30 @@ function getTagHref(tag: string): string {
   <EditorialFooter />
 </div>
 <style>
+  .category-heading {
+    flex-wrap: wrap;
+    align-items: flex-end;
+    padding-bottom: 1.2rem;
+    margin-bottom: 1.1rem;
+    border-bottom: 1px solid var(--color-accent);
+  }
+  .category-heading-title {
+    min-width: 0;
+  }
+  .category-eyebrow {
+    margin: 0 0 0.45rem;
+    color: var(--color-accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+  .category-heading h1 {
+    color: var(--color-ink);
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+  }
   .archive-context {
     margin: 0 0 1.4rem;
     color: var(--color-muted);

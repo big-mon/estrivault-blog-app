@@ -308,3 +308,36 @@ for (const width of [390, 820, 1440]) {
     expect(await page.locator('body > main').boundingBox()).toEqual(contentBefore);
   });
 }
+
+for (const width of [320, 390, 820, 1440]) {
+  test(`category context stays distinct without redundant counts at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of ['/category/software/', '/category/software/2/']) {
+      await page.goto(path);
+      await expect(page.locator('.category-eyebrow')).toHaveText('カテゴリー');
+      await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+      await expect(page.locator('.category-heading h1')).toHaveText('開発・Web');
+      await expect(page.locator('.archive-context')).not.toContainText(
+        /件の記事|\d+\s*\/\s*\d+ページ/,
+      );
+      await expect(page.locator('.post-title').first()).toHaveJSProperty('tagName', 'H2');
+      await expect(page.locator('.category-heading h1')).toHaveCSS('font-size', '24px');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      );
+      await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+      await expect(page.getByRole('navigation', { name: 'ページネーション' })).toBeInViewport();
+    }
+    await page.getByRole('link', { name: '前のページ', exact: true }).click();
+    await expect(page).toHaveURL('/category/software/');
+    await page.getByRole('link', { name: '次のページ', exact: true }).click();
+    await expect(page).toHaveURL('/category/software/2/');
+    for (const path of ['/2/', '/tag/ai/']) {
+      await page.goto(path);
+      await expect(page.locator('.category-eyebrow')).toHaveCount(0);
+      await expect(page.locator('.archive-context')).toContainText('件の記事');
+    }
+  });
+}
