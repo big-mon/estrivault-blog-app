@@ -86,7 +86,7 @@ for (const width of [1280, 390]) {
       await expect(card.locator('img')).toBeVisible();
       await expect(card.locator('.link-card-placeholder')).not.toBeVisible();
       await card.hover();
-      await expect(card).toHaveCSS('border-top-color', 'rgb(9, 105, 218)');
+      await expect(card).toHaveCSS('border-top-color', 'rgb(83, 109, 83)');
       await card.locator('img').evaluate((element) => element.dispatchEvent(new Event('error')));
       await expect(card.locator('img')).not.toBeVisible();
       await expect(card.getByRole('img', { name: '画像の読み込みに失敗しました' })).toBeVisible();

@@ -1,0 +1,125 @@
+[
+  {
+    "width": 390,
+    "start": {
+      "cloud": 96,
+      "water": "matrix(1, 0, 0, 1, 0, 0)",
+      "leaf": "matrix(1, 0, 0, 1, 0, 0)",
+      "main": {
+        "x": 0,
+        "y": 176,
+        "width": 374,
+        "height": 3432.375,
+        "top": 176,
+        "right": 374,
+        "bottom": 3608.375,
+        "left": 0
+      },
+      "animations": 5
+    },
+    "finish": {
+      "cloud": 145,
+      "water": "matrix(1, 0, 0, 1, 0, 0)",
+      "leaf": "matrix(1, 0, 0, 1, 0, 0)",
+      "main": {
+        "x": 0,
+        "y": 176,
+        "width": 374,
+        "height": 3432.375,
+        "top": 176,
+        "right": 374,
+        "bottom": 3608.375,
+        "left": 0
+      },
+      "animations": 5
+    },
+    "seconds": 12.038673000000927,
+    "layoutCount": 0,
+    "layoutSeconds": 0,
+    "recalcCount": 3,
+    "recalcSeconds": 0.0006869999999999999,
+    "taskSeconds": 0.006683
+  },
+  {
+    "width": 820,
+    "start": {
+      "cloud": 270.875,
+      "water": "matrix(1, 0, 0, 1, 0, 0)",
+      "leaf": "matrix(1, 0, 0, 1, 0, 0)",
+      "main": {
+        "x": 0,
+        "y": 176,
+        "width": 804,
+        "height": 2764.0625,
+        "top": 176,
+        "right": 804,
+        "bottom": 2940.0625,
+        "left": 0
+      },
+      "animations": 5
+    },
+    "finish": {
+      "cloud": 362.875,
+      "water": "matrix(1, 0, 0, 1, 0, 0)",
+      "leaf": "matrix(1, 0, 0, 1, 0, 0)",
+      "main": {
+        "x": 0,
+        "y": 176,
+        "width": 804,
+        "height": 2764.0625,
+        "top": 176,
+        "right": 804,
+        "bottom": 2940.0625,
+        "left": 0
+      },
+      "animations": 5
+    },
+    "seconds": 12.013431999999739,
+    "layoutCount": 0,
+    "layoutSeconds": 0,
+    "recalcCount": 3,
+    "recalcSeconds": 0.0008129999999999999,
+    "taskSeconds": 0.007873000000000002
+  },
+  {
+    "width": 1440,
+    "start": {
+      "cloud": 26,
+      "water": "matrix(1, 0, 0, 1, 0, 0)",
+      "leaf": "matrix(1, 0, 0, 1, 0, 0)",
+      "main": {
+        "x": 282,
+        "y": 80,
+        "width": 860,
+        "height": 2820.25,
+        "top": 80,
+        "right": 1142,
+        "bottom": 2900.25,
+        "left": 282
+      },
+      "animations": 7
+    },
+    "finish": {
+      "cloud": 116,
+      "water": "matrix(1, 0, 0, 1, 0, 0)",
+      "leaf": "matrix(1, 0, 0, 1, 0, 0)",
+      "main": {
+        "x": 282,
+        "y": 80,
+        "width": 860,
+        "height": 2820.25,
+        "top": 80,
+        "right": 1142,
+        "bottom": 2900.25,
+        "left": 282
+      },
+      "animations": 7
+    },
+    "seconds": 12.013976000000184,
+    "layoutCount": 0,
+    "layoutSeconds": 0,
+    "recalcCount": 3,
+    "recalcSeconds": 0.0007700000000000001,
+    "taskSeconds": 0.007111000000000001
+  }
+]
