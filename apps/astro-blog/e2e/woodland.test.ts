@@ -93,12 +93,13 @@ for (const [width, height, deviceScaleFactor] of [
               left: rect('.woodland-left'),
               right: rect('.woodland-right'),
               surface: rect('body > main'),
-              width: document.documentElement.clientWidth,
+              // The body box excludes the root's reserved scrollbar gutter.
+              width: document.body.getBoundingClientRect().width,
               height: innerHeight,
               dpr: devicePixelRatio,
               pageEnd: document.documentElement.scrollHeight,
               scroll: scrollY,
-              overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+              overflow: document.documentElement.scrollWidth > innerWidth,
             };
           });
           expect(geometry.dpr).toBe(deviceScaleFactor);
