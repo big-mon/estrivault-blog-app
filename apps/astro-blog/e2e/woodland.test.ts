@@ -93,12 +93,12 @@ for (const [width, height, deviceScaleFactor] of [
               left: rect('.woodland-left'),
               right: rect('.woodland-right'),
               surface: rect('body > main'),
-              width: innerWidth,
+              width: document.documentElement.clientWidth,
               height: innerHeight,
               dpr: devicePixelRatio,
               pageEnd: document.documentElement.scrollHeight,
               scroll: scrollY,
-              overflow: document.documentElement.scrollWidth > innerWidth,
+              overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
             };
           });
           expect(geometry.dpr).toBe(deviceScaleFactor);
