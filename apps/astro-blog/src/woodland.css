@@ -63,8 +63,9 @@ body.woodland-blog .note-body {
 }
 .woodland-left,
 .woodland-right {
-  width: 480px;
-  height: 720px;
+  /* Cover wide gutters so the SVG's vertical edge stays behind the reading surface. */
+  width: max(480px, calc(50% - 430px));
+  height: auto;
   bottom: 0;
 }
 .woodland-left {
@@ -129,14 +130,6 @@ body.woodland-blog .note-body {
 @media (min-width: 1101px) {
   .woodland-mobile * {
     animation: none;
-  }
-}
-@media (min-width: 2000px) {
-  .woodland-left {
-    left: calc(50% - 1050px);
-  }
-  .woodland-right {
-    right: calc(50% - 1050px);
   }
 }
 @media (max-width: 1280px) and (min-width: 1101px) {
