@@ -54,6 +54,76 @@ test('category dropdown supports keyboard, dismissal and routes', async ({ page 
   await expect(page.locator('h1')).toBeVisible();
 });
 
+for (const [width, height, deviceScaleFactor] of [
+  [3840, 2160, 1],
+  [3072, 1728, 1.25],
+  [2560, 1440, 1.5],
+  [1920, 1080, 2],
+]) {
+  test(`4K scenery covers the gutters at ${width}x${height} CSS pixels, DPR ${deviceScaleFactor}`, async ({
+    browser,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({
+      baseURL,
+      viewport: { width, height },
+      deviceScaleFactor,
+      reducedMotion: 'reduce',
+    });
+    const page = await context.newPage();
+    try {
+      for (const path of [
+        '/',
+        '/post/about',
+        '/2/',
+        '/category/software/',
+        '/tag/aiコーディング/',
+      ]) {
+        await page.goto(path);
+        for (const bottom of [false, true]) {
+          await page.evaluate(
+            (end) => scrollTo(0, end ? document.documentElement.scrollHeight : 0),
+            bottom,
+          );
+          const geometry = await page.evaluate(() => {
+            const rect = (selector: string) =>
+              document.querySelector(selector)!.getBoundingClientRect().toJSON();
+            return {
+              scene: rect('.woodland'),
+              left: rect('.woodland-left'),
+              right: rect('.woodland-right'),
+              surface: rect('body > main'),
+              // The body box excludes the root's reserved scrollbar gutter.
+              width: document.body.getBoundingClientRect().width,
+              height: innerHeight,
+              dpr: devicePixelRatio,
+              pageEnd: document.documentElement.scrollHeight,
+              scroll: scrollY,
+              overflow: document.documentElement.scrollWidth > innerWidth,
+            };
+          });
+          expect(geometry.dpr).toBe(deviceScaleFactor);
+          expect(geometry.scene.x).toBe(0);
+          expect(geometry.scene.y).toBe(0);
+          expect(geometry.scene.bottom).toBe(geometry.height);
+          expect(geometry.left.x).toBe(0);
+          expect(geometry.right.right).toBe(geometry.width);
+          expect(geometry.left.right).toBeGreaterThanOrEqual(geometry.surface.left);
+          expect(geometry.right.left).toBeLessThanOrEqual(geometry.surface.right);
+          expect(geometry.left.height / geometry.left.width).toBeCloseTo(1.5);
+          expect(geometry.right.height / geometry.right.width).toBeCloseTo(1.5);
+          expect(geometry.overflow).toBe(false);
+          expect(
+            Math.abs(geometry.surface.bottom + geometry.scroll - geometry.pageEnd),
+          ).toBeLessThanOrEqual(1);
+        }
+      }
+    } finally {
+      await context.close();
+    }
+  });
+}
+
 test('scenery is static when reduced motion is requested', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
@@ -197,9 +267,9 @@ test('article and note body links use accessible green normal, hover and focus s
   }
 });
 
-for (const width of [390, 820, 1440]) {
+for (const width of [390, 820, 1440, 3840]) {
   test(`ambient motion stays decorative and pauses offscreen at ${width}px`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 900 });
+    await page.setViewportSize({ width, height: width === 3840 ? 2160 : 900 });
     await page.goto('/');
     const scene = page.locator('.woodland');
     await expect(scene).not.toHaveAttribute('data-motion-paused');
