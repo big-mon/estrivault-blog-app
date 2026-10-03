@@ -1,5 +1,6 @@
 ---
 import { SITE_TITLE } from '$constants';
+import { AUTHOR_AVATAR_SRC } from '$lib/author-avatar';
 interface Props {
   homePage?: boolean;
 }
@@ -11,10 +12,16 @@ const path = Astro.url.pathname;
   {
     homePage ?
       <h1 class="brand">
-        <a href="/">{SITE_TITLE}</a>
+        <a href="/">
+          <img src={AUTHOR_AVATAR_SRC} alt="" width="60" height="60" />
+          {SITE_TITLE}
+        </a>
       </h1>
     : <div class="brand">
-        <a href="/">{SITE_TITLE}</a>
+        <a href="/">
+          <img src={AUTHOR_AVATAR_SRC} alt="" width="60" height="60" />
+          {SITE_TITLE}
+        </a>
       </div>
   }
   <nav aria-label="Primary navigation">
@@ -43,6 +50,17 @@ const path = Astro.url.pathname;
     font-weight: 400;
     line-height: 1.1;
   }
+  .brand a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .brand img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
   a {
     color: #20231e;
     text-decoration: none;
@@ -63,6 +81,10 @@ const path = Astro.url.pathname;
   @media (max-width: 900px) {
     .brand {
       font-size: 3rem;
+    }
+    .brand img {
+      width: 48px;
+      height: 48px;
     }
     .editorial-masthead {
       gap: 1rem;
