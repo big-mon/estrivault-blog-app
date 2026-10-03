@@ -5,7 +5,7 @@ import { Resvg } from '@resvg/resvg-js';
 import { createElement as h } from 'react';
 import satori from 'satori';
 import { getPostOgpFontDigest, loadPostOgpFonts } from './font';
-import { layoutPostOgpTitle } from './title-layout';
+import { getPostOgpTitleStyle, layoutPostOgpTitle } from './title-layout';
 
 export interface PostOgpCardData {
   title: string;
@@ -16,7 +16,7 @@ export interface PostOgpCardData {
 
 const IMAGE_WIDTH = 1200;
 const IMAGE_HEIGHT = 630;
-const CACHE_SCHEMA_VERSION = 'post-ogp-cache-v3';
+const CACHE_SCHEMA_VERSION = 'post-ogp-cache-v4';
 
 export interface PostOgpCacheOptions {
   cacheDir?: string;
@@ -65,28 +65,9 @@ async function getPostOgpCacheKey(input: PostOgpCardData): Promise<string> {
   return hash.digest('hex');
 }
 
-function renderTitleLines(lines: string[], fontSize: number, lineHeight: number) {
-  return lines.map((line, index) =>
-    h(
-      'div',
-      {
-        key: `title-line-${index}`,
-        style: {
-          display: 'flex',
-          fontSize,
-          lineHeight,
-          fontWeight: 700,
-          letterSpacing: '-0.05em',
-          color: '#303e32',
-        },
-      },
-      line,
-    ),
-  );
-}
-
 async function renderPostOgpPng(input: PostOgpCardData): Promise<Uint8Array> {
-  const titleLayout = layoutPostOgpTitle(input.title);
+  const fonts = await loadPostOgpFonts();
+  const titleLayout = await layoutPostOgpTitle(input.title, fonts);
   const category = input.category || 'Other';
 
   const markup = h(
@@ -147,12 +128,7 @@ async function renderPostOgpPng(input: PostOgpCardData): Promise<Uint8Array> {
               },
               'E',
             ),
-          h(
-            'div',
-            { style: { display: 'flex', flexDirection: 'column', gap: 4 } },
-            h('div', { style: { display: 'flex', fontSize: 26, fontWeight: 700 } }, 'big-mon'),
-            h('div', { style: { display: 'flex', fontSize: 22, color: '#586454' } }, 'Estrilda'),
-          ),
+          h('div', { style: { display: 'flex', fontSize: 40, fontWeight: 700 } }, 'Estrilda'),
         ),
         h('div', {
           style: { width: 14, height: 14, borderRadius: '50%', backgroundColor: '#536d53' },
@@ -160,8 +136,11 @@ async function renderPostOgpPng(input: PostOgpCardData): Promise<Uint8Array> {
       ),
       h(
         'div',
-        { style: { display: 'flex', flexDirection: 'column', gap: 8, margin: '16px 0' } },
-        ...renderTitleLines(titleLayout.lines, titleLayout.fontSize, titleLayout.lineHeight),
+        {
+          lang: 'ja-JP',
+          style: { ...getPostOgpTitleStyle(titleLayout.fontSize), margin: '16px 0' },
+        },
+        titleLayout.title,
       ),
       h(
         'div',
@@ -193,7 +172,7 @@ async function renderPostOgpPng(input: PostOgpCardData): Promise<Uint8Array> {
   const svg = await satori(markup, {
     width: IMAGE_WIDTH,
     height: IMAGE_HEIGHT,
-    fonts: await loadPostOgpFonts(),
+    fonts,
   });
   const rendered = new Resvg(svg, {
     fitTo: {

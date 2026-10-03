@@ -172,7 +172,7 @@ test('post pages expose generated OGP images', async ({ page, request }) => {
   const twitterImage = await page.locator('meta[name="twitter:image"]').getAttribute('content');
 
   expect(ogImage).toMatch(
-    /^https:\/\/estrilda\.damonge\.com\/post\/about\/og\.png\?v=3-[a-f0-9]{12}$/,
+    /^https:\/\/estrilda\.damonge\.com\/post\/about\/og\.png\?v=4-[a-f0-9]{12}$/,
   );
   expect(twitterImage).toBe(ogImage);
   expect(ogImage).not.toContain('/Hero/');
