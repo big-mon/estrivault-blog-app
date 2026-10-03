@@ -11,11 +11,12 @@ export interface PostOgpCardData {
   title: string;
   category: string;
   publishedAt: Date | string;
+  avatarDataUrl?: string;
 }
 
 const IMAGE_WIDTH = 1200;
 const IMAGE_HEIGHT = 630;
-const CACHE_SCHEMA_VERSION = 'post-ogp-cache-v2';
+const CACHE_SCHEMA_VERSION = 'post-ogp-cache-v3';
 
 export interface PostOgpCacheOptions {
   cacheDir?: string;
@@ -58,6 +59,7 @@ async function getPostOgpCacheKey(input: PostOgpCardData): Promise<string> {
       title: input.title,
       category: input.category || 'Other',
       publishedAt: normalizePublishedAt(input.publishedAt),
+      avatarDataUrl: input.avatarDataUrl,
     }),
   );
   return hash.digest('hex');
@@ -75,7 +77,7 @@ function renderTitleLines(lines: string[], fontSize: number, lineHeight: number)
           lineHeight,
           fontWeight: 700,
           letterSpacing: '-0.05em',
-          color: '#050505',
+          color: '#303e32',
         },
       },
       line,
@@ -94,210 +96,95 @@ async function renderPostOgpPng(input: PostOgpCardData): Promise<Uint8Array> {
         width: IMAGE_WIDTH,
         height: IMAGE_HEIGHT,
         display: 'flex',
-        position: 'relative',
-        overflow: 'hidden',
-        backgroundColor: '#f6f6f3',
-        color: '#050505',
+        padding: 42,
+        backgroundColor: '#e8eddf',
+        color: '#303e32',
         fontFamily: 'Noto Sans JP',
       },
     },
-    h('div', {
-      style: {
-        position: 'absolute',
-        top: 0,
-        right: 84,
-        width: 240,
-        height: 12,
-        backgroundColor: '#050505',
-      },
-    }),
-    h('div', {
-      style: {
-        position: 'absolute',
-        top: 68,
-        right: 84,
-        width: 148,
-        height: 148,
-        border: '3px solid rgba(5,5,5,0.14)',
-      },
-    }),
-    h('div', {
-      style: {
-        position: 'absolute',
-        bottom: 46,
-        left: 46,
-        width: 260,
-        height: 72,
-        borderLeft: '14px solid #050505',
-        borderBottom: '14px solid #050505',
-        opacity: 0.92,
-      },
-    }),
     h(
       'div',
       {
         style: {
-          position: 'relative',
           width: '100%',
           height: '100%',
           display: 'flex',
-          padding: 42,
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '38px 46px',
+          backgroundColor: '#fffdf2',
+          border: '1px solid #c8ceba',
+          borderRadius: 24,
+          boxShadow: '0 12px 24px rgba(48,62,50,0.10)',
         },
       },
       h(
         'div',
-        {
-          style: {
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            border: '3px solid #050505',
-            backgroundColor: 'rgba(255,255,255,0.96)',
-            padding: '34px 36px 32px 36px',
-            boxShadow: '18px 18px 0 rgba(5,5,5,0.08)',
-          },
-        },
+        { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' } },
         h(
           'div',
-          {
-            style: {
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-            },
-          },
-          h(
-            'div',
-            {
-              style: {
-                display: 'flex',
-                alignItems: 'center',
-                padding: '12px 18px',
-                backgroundColor: '#050505',
-                color: '#ffffff',
-                fontSize: 22,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-              },
-            },
-            category,
-          ),
-          h(
-            'div',
-            {
-              style: {
-                display: 'flex',
-                alignItems: 'center',
-                padding: '10px 14px',
-                border: '2px solid #050505',
-                fontSize: 16,
-                fontWeight: 700,
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-              },
-            },
-            'Article',
-          ),
-        ),
-        h(
-          'div',
-          {
-            style: {
-              display: 'flex',
-              alignItems: 'stretch',
-              gap: 28,
-              marginTop: 18,
-              marginBottom: 24,
-            },
-          },
-          h('div', {
-            style: {
-              display: 'flex',
-              width: 16,
-              flexShrink: 0,
-              backgroundColor: '#050505',
-            },
-          }),
-          h(
-            'div',
-            {
-              style: {
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 12,
-                maxWidth: 930,
-                paddingTop: 4,
-              },
-            },
-            h('div', {
-              style: {
-                display: 'flex',
-                width: 220,
-                height: 4,
-                backgroundColor: '#050505',
-              },
-            }),
-            h(
+          { style: { display: 'flex', alignItems: 'center', gap: 20 } },
+          input.avatarDataUrl ?
+            h('img', {
+              src: input.avatarDataUrl,
+              width: 76,
+              height: 76,
+              style: { borderRadius: '50%', objectFit: 'cover' },
+            })
+          : h(
               'div',
               {
                 style: {
                   display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 76,
+                  height: 76,
+                  borderRadius: '50%',
+                  backgroundColor: '#e8eddf',
+                  fontSize: 32,
                 },
               },
-              ...renderTitleLines(titleLayout.lines, titleLayout.fontSize, titleLayout.lineHeight),
+              'E',
             ),
+          h(
+            'div',
+            { style: { display: 'flex', flexDirection: 'column', gap: 4 } },
+            h('div', { style: { display: 'flex', fontSize: 26, fontWeight: 700 } }, 'big-mon'),
+            h('div', { style: { display: 'flex', fontSize: 22, color: '#586454' } }, 'Estrilda'),
           ),
         ),
+        h('div', {
+          style: { width: 14, height: 14, borderRadius: '50%', backgroundColor: '#536d53' },
+        }),
+      ),
+      h(
+        'div',
+        { style: { display: 'flex', flexDirection: 'column', gap: 8, margin: '16px 0' } },
+        ...renderTitleLines(titleLayout.lines, titleLayout.fontSize, titleLayout.lineHeight),
+      ),
+      h(
+        'div',
+        { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' } },
         h(
           'div',
           {
             style: {
               display: 'flex',
-              justifyContent: 'flex-end',
-              alignItems: 'flex-end',
-              gap: 24,
-              borderTop: '2px solid #050505',
-              paddingTop: 24,
+              padding: '8px 18px',
+              borderRadius: 24,
+              backgroundColor: '#e8eddf',
+              color: '#536d53',
+              fontSize: 22,
+              fontWeight: 700,
             },
           },
-          h(
-            'div',
-            {
-              style: {
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-end',
-                gap: 10,
-              },
-            },
-            h(
-              'div',
-              {
-                style: {
-                  display: 'flex',
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: '#505050',
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                },
-              },
-              'Estrilda',
-            ),
-            h('div', {
-              style: {
-                display: 'flex',
-                width: 120,
-                height: 14,
-                backgroundColor: '#050505',
-              },
-            }),
-          ),
+          category,
+        ),
+        h(
+          'div',
+          { style: { display: 'flex', fontSize: 18, color: '#586454' } },
+          'estrilda.damonge.com',
         ),
       ),
     ),

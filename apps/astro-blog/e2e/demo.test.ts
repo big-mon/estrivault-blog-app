@@ -62,6 +62,26 @@ test('home page has expected h1', async ({ page }) => {
   await expect(page.locator('h1')).toBeVisible();
 });
 
+test('site avatar loads beside the brand on desktop and mobile', async ({ page }) => {
+  for (const width of [360, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const route of ['/', '/post/about', '/notes/', '/category/software/']) {
+      await page.goto(route);
+      const brand = page.locator('.editorial-masthead .brand a');
+      await expect(brand).toHaveAccessibleName('Estrilda');
+      const avatar = brand.locator('img');
+      await expect(avatar).toHaveAttribute('alt', '');
+      await expect(avatar).toHaveAttribute('src', /^\/author-avatar\.jpg\?v=[a-f0-9]{12}$/);
+      await expect
+        .poll(() => avatar.evaluate((img: HTMLImageElement) => img.naturalWidth))
+        .toBe(400);
+      const bounds = await brand.boundingBox();
+      expect(bounds!.x).toBeGreaterThanOrEqual(0);
+      expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
+    }
+  }
+});
+
 test('homepage serializes site-name h1, recent articles, and recent notes hierarchy', async ({
   page,
 }) => {
@@ -151,8 +171,10 @@ test('post pages expose generated OGP images', async ({ page, request }) => {
   const ogImage = await page.locator('meta[property="og:image"]').getAttribute('content');
   const twitterImage = await page.locator('meta[name="twitter:image"]').getAttribute('content');
 
-  expect(ogImage).toBe('https://estrilda.damonge.com/post/about/og.png');
-  expect(twitterImage).toBe('https://estrilda.damonge.com/post/about/og.png');
+  expect(ogImage).toMatch(
+    /^https:\/\/estrilda\.damonge\.com\/post\/about\/og\.png\?v=3-[a-f0-9]{12}$/,
+  );
+  expect(twitterImage).toBe(ogImage);
   expect(ogImage).not.toContain('/Hero/');
   expect(twitterImage).not.toContain('/Hero/');
 
@@ -407,7 +429,7 @@ test('agent API notes expose the analogous public document representations', asy
   const notes = await response.json();
   expect(notes).toMatchObject({
     api_version: '1',
-    total: 2,
+    total: 3,
     sort: '-date_published',
   });
   expect(notes.items).toHaveLength(notes.total);
@@ -548,9 +570,9 @@ test('agent API output is public-only, internally consistent, and deterministic'
   const index = await readJson('dist/api/v1/index.json');
 
   expect(posts.total).toBe(131);
-  expect(notes.total).toBe(2);
+  expect(notes.total).toBe(3);
   expect(new Set(posts.items.map((post: { slug: string }) => post.slug)).size).toBe(131);
-  expect(new Set(notes.items.map((note: { slug: string }) => note.slug)).size).toBe(2);
+  expect(new Set(notes.items.map((note: { slug: string }) => note.slug)).size).toBe(notes.total);
   expect(posts.items.every((post: object) => !('draft' in post))).toBeTruthy();
   for (const item of [...posts.items, ...notes.items]) {
     expect(item.tags).toEqual(
