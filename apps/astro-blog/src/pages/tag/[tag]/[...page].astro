@@ -52,7 +52,7 @@ const result = getPaginatedPosts(archivePosts, {
   page: currentPage,
   perPage: POSTS_PER_PAGE,
 });
-const { topTags, uniqueTagCount } = getArchiveTagStats(archivePosts, tag);
+const { topTags } = getArchiveTagStats(archivePosts, tag);
 
 const siteBase = SITE_URL.replace(/\/$/, '');
 const encodedTagRouteSegment = encodeRouteSegment(tagRouteSegment);
@@ -81,7 +81,6 @@ const nextUrl =
   mainClass="archive-editorial-main"
 >
   <ArchiveListing
-    archiveType="TAG"
     title={`#${tag}`}
     description={`${tag}タグが付けられた記事を、新しい順にまとめた一覧です。`}
     posts={result.posts}
@@ -91,12 +90,6 @@ const nextUrl =
     routeBase={routeBase}
     tagRouteMap={tagRouteMap}
     topTags={topTags}
-    sideMeta={[
-      { label: 'TYPE', value: 'TAG' },
-      { label: 'TAG', value: tag },
-      { label: 'ARTICLES', value: result.total },
-      { label: 'TAGS', value: uniqueTagCount },
-    ]}
     emptyMessage="このタグにはまだ記事がありません。"
   />
 </BaseLayout>

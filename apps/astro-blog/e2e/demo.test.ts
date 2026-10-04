@@ -62,7 +62,29 @@ test('home page has expected h1', async ({ page }) => {
   await expect(page.locator('h1')).toBeVisible();
 });
 
-test('homepage serializes site-name h1, hero h2, and recent notes hierarchy', async ({ page }) => {
+test('site avatar loads beside the brand on desktop and mobile', async ({ page }) => {
+  for (const width of [360, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const route of ['/', '/post/about', '/notes/', '/category/software/']) {
+      await page.goto(route);
+      const brand = page.locator('.editorial-masthead .brand a');
+      await expect(brand).toHaveAccessibleName('Estrilda');
+      const avatar = brand.locator('img');
+      await expect(avatar).toHaveAttribute('alt', '');
+      await expect(avatar).toHaveAttribute('src', /^\/author-avatar\.jpg\?v=[a-f0-9]{12}$/);
+      await expect
+        .poll(() => avatar.evaluate((img: HTMLImageElement) => img.naturalWidth))
+        .toBe(400);
+      const bounds = await brand.boundingBox();
+      expect(bounds!.x).toBeGreaterThanOrEqual(0);
+      expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
+    }
+  }
+});
+
+test('homepage serializes site-name h1, recent articles, and recent notes hierarchy', async ({
+  page,
+}) => {
   await page.goto('/');
 
   const html = await page.content();
@@ -70,7 +92,8 @@ test('homepage serializes site-name h1, hero h2, and recent notes hierarchy', as
   await expect(page.locator('h1')).toHaveText('Estrilda');
   await expect(page.locator('.editorial-masthead h1')).toHaveText('Estrilda');
   await expect(page.locator('.hero-copy h1')).toHaveCount(0);
-  await expect(page.locator('.hero-copy h2')).toHaveText('投資、開発、AI、趣味の実践ログ。');
+  await expect(page.locator('#latest-title')).toHaveText('最近の記事');
+  await expect(page.locator('.home-hero, .archive-status, .series-card')).toHaveCount(0);
 
   const recentNotes = page.locator('#recent-notes');
   await expect(recentNotes.locator('.section-heading-row > h2')).toHaveText('RECENT NOTES');
@@ -148,8 +171,10 @@ test('post pages expose generated OGP images', async ({ page, request }) => {
   const ogImage = await page.locator('meta[property="og:image"]').getAttribute('content');
   const twitterImage = await page.locator('meta[name="twitter:image"]').getAttribute('content');
 
-  expect(ogImage).toBe('https://estrilda.damonge.com/post/about/og.png');
-  expect(twitterImage).toBe('https://estrilda.damonge.com/post/about/og.png');
+  expect(ogImage).toMatch(
+    /^https:\/\/estrilda\.damonge\.com\/post\/about\/og\.png\?v=4-[a-f0-9]{12}$/,
+  );
+  expect(twitterImage).toBe(ogImage);
   expect(ogImage).not.toContain('/Hero/');
   expect(twitterImage).not.toContain('/Hero/');
 
@@ -235,8 +260,8 @@ test('LLM guide points to both sitemaps and the removed full endpoint stays abse
 test('standard pages expose the canonical public site name in the footer', async ({ page }) => {
   await page.goto('/2/');
 
-  await expect(page.locator('footer p')).toContainText('Estrilda');
-  await expect(page.locator('footer p')).not.toContainText('Estrivault');
+  await expect(page.locator('.editorial-footer .footer-brand')).toContainText('Estrilda');
+  await expect(page.locator('.editorial-footer .footer-brand')).not.toContainText('Estrivault');
 });
 
 test('agent API index and posts expose the public read-only collection', async ({ request }) => {
@@ -404,7 +429,7 @@ test('agent API notes expose the analogous public document representations', asy
   const notes = await response.json();
   expect(notes).toMatchObject({
     api_version: '1',
-    total: 2,
+    total: 3,
     sort: '-date_published',
   });
   expect(notes.items).toHaveLength(notes.total);
@@ -545,9 +570,9 @@ test('agent API output is public-only, internally consistent, and deterministic'
   const index = await readJson('dist/api/v1/index.json');
 
   expect(posts.total).toBe(131);
-  expect(notes.total).toBe(2);
+  expect(notes.total).toBe(3);
   expect(new Set(posts.items.map((post: { slug: string }) => post.slug)).size).toBe(131);
-  expect(new Set(notes.items.map((note: { slug: string }) => note.slug)).size).toBe(2);
+  expect(new Set(notes.items.map((note: { slug: string }) => note.slug)).size).toBe(notes.total);
   expect(posts.items.every((post: object) => !('draft' in post))).toBeTruthy();
   for (const item of [...posts.items, ...notes.items]) {
     expect(item.tags).toEqual(

@@ -46,7 +46,7 @@ const result = getPaginatedPosts(archivePosts, {
   page: currentPage,
   perPage: POSTS_PER_PAGE,
 });
-const { topTags, uniqueTagCount } = getArchiveTagStats(archivePosts);
+const { topTags } = getArchiveTagStats(archivePosts);
 
 const siteBase = SITE_URL.replace(/\/$/, '');
 const routeBase = `/category/${Astro.params.category}`;
@@ -74,7 +74,7 @@ const nextUrl =
   mainClass="archive-editorial-main"
 >
   <ArchiveListing
-    archiveType="CATEGORY"
+    isCategory
     title={categoryMeta.label}
     description={categoryMeta.description}
     posts={result.posts}
@@ -84,12 +84,6 @@ const nextUrl =
     routeBase={routeBase}
     tagRouteMap={tagRouteMap}
     topTags={topTags}
-    sideMeta={[
-      { label: 'TYPE', value: 'CATEGORY' },
-      { label: 'SLUG', value: (Astro.params.category ?? category).toUpperCase() },
-      { label: 'ARTICLES', value: result.total },
-      { label: 'TAGS', value: uniqueTagCount },
-    ]}
     emptyMessage="このカテゴリーにはまだ記事がありません。"
   />
 </BaseLayout>

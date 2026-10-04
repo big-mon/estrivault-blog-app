@@ -1,307 +1,139 @@
 ---
 import type { PostMeta } from '@estrivault/content-processor';
+import CategoryMenu from '$components/CategoryMenu.astro';
 import ArchivePagination from '$components/ArchivePagination.astro';
 import ArchivePostRow from '$components/ArchivePostRow.astro';
 import EditorialFooter from '$components/EditorialFooter.astro';
 import EditorialMasthead from '$components/EditorialMasthead.astro';
 import { encodeRouteSegment, getArchivePagePath } from '$lib/url-segments.mjs';
-
-interface ArchiveMeta {
-  label: string;
-  value: string | number;
-}
-
 interface Props {
-  archiveType: string;
   title: string;
+  isCategory?: boolean;
   description?: string;
   posts: PostMeta[];
   total: number;
   page: number;
   totalPages: number;
   routeBase: string;
-  tagRouteMap: ReadonlyMap<string, string>;
-  sideMeta: ArchiveMeta[];
+  tagRouteMap?: ReadonlyMap<string, string>;
   topTags?: string[];
   emptyMessage: string;
 }
-
 const {
-  archiveType,
   title,
+  isCategory = false,
   description,
   posts,
   total,
   page,
   totalPages,
   routeBase,
-  tagRouteMap,
-  sideMeta,
+  tagRouteMap = new Map(),
   topTags = [],
   emptyMessage,
 } = Astro.props;
-
-const visibleTopTags = topTags.slice(0, 5);
-
 function getTagHref(tag: string): string {
-  const routeSegment = tagRouteMap.get(tag);
-  if (!routeSegment) {
-    throw new Error(`No route segment found for archive tag: ${tag}`);
-  }
-
-  return getArchivePagePath(`/tag/${encodeRouteSegment(routeSegment)}`, 1);
+  const segment = tagRouteMap.get(tag);
+  if (!segment) throw new Error(`No route segment found for archive tag: ${tag}`);
+  return getArchivePagePath(`/tag/${encodeRouteSegment(segment)}`, 1);
 }
 ---
 
 <div class="archive-page">
   <EditorialMasthead />
-
-  <section class="archive-hero">
-    <div>
-      <p class="kicker">{archiveType}</p>
-      <h1>{title}</h1>
-      {description && <p class="lead">{description}</p>}
+  <section class="archive-index" aria-labelledby="archive-title">
+    <div class:list={['listing-heading', { 'category-heading': isCategory }]}>
       {
-        visibleTopTags.length > 0 && (
-          <div class="tag-variants" aria-label="上位タグ">
-            <h2>TAG VARIANT</h2>
-            <div>
-              {visibleTopTags.map((tag) => (
-                <a class="tag-link" href={getTagHref(tag)}>
-                  #{tag}
-                </a>
-              ))}
-            </div>
+        isCategory ?
+          <div class="category-heading-title">
+            <p class="category-eyebrow">カテゴリー</p>
+            <h1 id="archive-title">{title}</h1>
           </div>
+        : <h1 id="archive-title">{title}</h1>
+      }
+      <CategoryMenu />
+    </div>
+    <div class="archive-context">
+      {description && <p>{description}</p>}
+      {
+        !isCategory && (
+          <p>
+            {total}件の記事 · {page} / {totalPages}ページ
+          </p>
+        )
+      }
+      {
+        topTags.length > 0 && (
+          <nav class="archive-tags" aria-label="関連タグ">
+            {topTags.slice(0, 5).map((tag) => (
+              <a href={getTagHref(tag)}>#{tag}</a>
+            ))}
+          </nav>
         )
       }
     </div>
-    <aside>
-      <h2>ARCHIVE STATUS</h2>
-      <dl>
-        {
-          sideMeta.map((item) => (
-            <div>
-              <dt>{item.label}</dt>
-              <dd>{item.value}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </aside>
-  </section>
-
-  <section class="archive-index" aria-labelledby="archive-index-title">
-    <div class="section-heading">
-      <h2 id="archive-index-title">ARTICLES MATCHING YOUR SELECTION</h2>
-      <p>{total} RESULTS</p>
-    </div>
-
     {
       posts.length > 0 ?
         <ol class="post-list">
           {posts.map((post) => (
             <li>
-              <ArchivePostRow post={post} />
+              <ArchivePostRow post={post} headingLevel="h2" />
             </li>
           ))}
         </ol>
-      : <div class="empty-state">
-          <p>{emptyMessage}</p>
-        </div>
+      : <p class="empty-state">{emptyMessage}</p>
     }
   </section>
-
   <ArchivePagination page={page} totalPages={totalPages} routeBase={routeBase} />
-
   <EditorialFooter />
 </div>
-
 <style>
-  :global(.archive-editorial-page) {
-    background: #f1eee7;
+  .category-heading {
+    flex-wrap: wrap;
+    align-items: flex-end;
+    padding-bottom: 1.2rem;
+    margin-bottom: 1.1rem;
+    border-bottom: 1px solid var(--color-accent);
   }
-  :global(.archive-editorial-main) {
-    width: 100%;
-    max-width: none;
-    padding: 0;
+  .category-heading-title {
+    min-width: 0;
   }
-  .archive-page {
-    min-height: 100vh;
-    color: #111;
-    background: #f1eee7;
-    font-family: var(--font-body);
-    padding: clamp(1rem, 2vw, 2rem);
+  .category-eyebrow {
+    margin: 0 0 0.45rem;
+    color: var(--color-accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
   }
-  .archive-hero,
-  .archive-index {
-    max-width: 1180px;
-    margin-right: auto;
-    margin-left: auto;
+  .category-heading h1 {
+    color: var(--color-ink);
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
   }
-  .kicker,
-  .section-heading h2,
-  .section-heading p,
-  dl dt,
-  dl dd {
-    font-family: var(--font-meta);
-    font-style: normal;
-  }
-  .kicker,
-  .section-heading h2,
-  dl dt {
-    color: #d6452a;
-  }
-  .archive-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 1rem;
-    min-height: 300px;
-    border-bottom: 1px solid #222;
-    margin-top: 0;
-    padding: 1rem 0;
-  }
-  .kicker {
-    display: inline-flex;
-    align-items: center;
-    border: 1px solid #222;
-    margin: 0 0 1.2rem;
-    padding: 0.34rem 0.65rem 0.28rem;
-    color: #f1eee7;
-    background: #222;
-    line-height: 1.1;
-    letter-spacing: 0.05em;
-  }
-  h1 {
-    max-width: 24ch;
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(2.25rem, 4vw, 3.5rem);
-    font-weight: 700;
-    line-height: 1.18;
-  }
-  .lead {
-    max-width: 42rem;
-    margin-top: 1rem;
-    color: #555;
-    font-size: 1.14rem;
+  .archive-context {
+    margin: 0 0 1.4rem;
+    color: var(--color-muted);
+    font-size: 0.85rem;
     line-height: 1.8;
   }
-  .tag-variants {
-    margin-top: 1.25rem;
+  .archive-context p {
+    margin: 0.5rem 0;
   }
-  .tag-variants h2 {
-    margin: 0 0 0.7rem;
-    color: #d6452a;
-    font-family: var(--font-meta);
-    font-size: 0.88rem;
-    font-style: normal;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .tag-variants div {
+  .archive-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem 0.75rem;
-  }
-  .tag-variants .tag-link {
-    display: inline-flex;
-    align-items: center;
-    border: 1px solid #222;
-    padding: 0.34rem 0.55rem 0.28rem;
-    color: inherit;
-    font-family: var(--font-meta);
-    font-size: 0.9rem;
-    font-style: normal;
-    line-height: 1.1;
-    text-decoration: none;
-    transition:
-      color 120ms ease,
-      border-color 120ms ease;
-  }
-  .tag-variants .tag-link:hover {
-    border-color: #d6452a;
-    color: #d6452a;
-  }
-  aside {
-    border-left: 1px solid #222;
-    margin-top: -1rem;
-    margin-bottom: -1rem;
-    padding: 1rem 0 1rem 1rem;
-  }
-  aside h2 {
-    margin: 0;
-    font-family: var(--font-meta);
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    line-height: 1.2;
-    white-space: nowrap;
-  }
-  dl {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    column-gap: 1.25rem;
-    border-top: 1px solid #d6452a;
-    margin: 1rem 0 0;
-    padding-top: 0.75rem;
-  }
-  dl div {
-    display: contents;
-  }
-  dl dt,
-  dl dd {
-    margin: 0;
-    line-height: 1.65;
-  }
-  dl dd {
-    text-align: right;
-  }
-  .archive-index {
-    margin-top: 2.5rem;
-  }
-  .section-heading {
-    display: flex;
-    gap: 1rem;
-    align-items: baseline;
-    justify-content: space-between;
-    border-bottom: 1px solid #222;
-    padding-bottom: 0.8rem;
-  }
-  .section-heading h2,
-  .section-heading p {
-    margin: 0;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .section-heading p {
-    color: #666;
-    font-size: 0.9rem;
+    gap: 0.4rem 1rem;
+    margin-top: 0.75rem;
   }
   .post-list {
-    border-bottom: 1px solid #222;
-    list-style: none;
-    margin: 0;
     padding: 0;
+    margin: 0;
+    list-style: none;
   }
   .empty-state {
-    border-bottom: 1px solid #222;
-    padding: 3rem 0;
-    color: #666;
-    text-align: center;
-  }
-  @media (max-width: 900px) {
-    .archive-page {
-      padding: 1rem;
-    }
-    .archive-hero {
-      grid-template-columns: 1fr;
-    }
-    aside {
-      display: none;
-    }
-    h1 {
-      max-width: none;
-    }
+    padding: 2rem 0;
+    color: var(--color-muted);
   }
 </style>

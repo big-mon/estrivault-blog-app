@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '$layouts/BaseLayout.astro';
-import Pagination from '$components/Pagination.astro';
-import PostCard from '$components/PostCard.astro';
+import ArchiveListing from '$components/ArchiveListing.astro';
 import { POSTS_PER_PAGE, SITE_TITLE, SITE_URL } from '$constants';
 import { getPosts } from '$lib/content';
 import { getArchivePageUrl } from '$lib/url-segments.mjs';
@@ -35,16 +34,18 @@ const nextUrl =
   canonical={pageUrl}
   prevUrl={prevUrl}
   nextUrl={nextUrl}
+  hideHeader
+  hideFooter
+  bodyClass="archive-editorial-page"
+  mainClass="archive-editorial-main"
 >
-  <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-    {result.posts.map((post) => <PostCard post={post} />)}
-  </div>
-
-  {
-    result.totalPages > 1 && (
-      <div class="mt-12">
-        <Pagination currentPage={result.page} totalPages={result.totalPages} baseUrl="/" />
-      </div>
-    )
-  }
+  <ArchiveListing
+    title="記事一覧"
+    posts={result.posts}
+    total={result.total}
+    page={result.page}
+    totalPages={result.totalPages}
+    routeBase=""
+    emptyMessage="記事がありません。"
+  />
 </BaseLayout>

@@ -1,6 +1,15 @@
 @import 'tailwindcss';
 
 :root {
+  --color-surface: #fffdf2;
+  --color-ink: #303e32;
+  --color-muted: #586454;
+  --color-accent: #536d53;
+  --color-line: #c8ceba;
+  --color-tint: #e8eddf;
+  --color-link: #3e6249;
+  --color-link-hover: #24452f;
+  --color-link-visited: #4f6654;
   /* Shared typography roles for editorial pages and components. */
   --font-display: 'Times New Roman', serif;
   --font-body: 'Inter', 'Noto Sans JP', sans-serif;
@@ -67,7 +76,7 @@ html {
 .note-body h2::before {
   content: counter(content-section, decimal-leading-zero);
   counter-increment: content-section;
-  color: #d6452a;
+  color: var(--color-accent);
   font-family: var(--font-meta);
   font-size: clamp(1.05rem, 1.6vw, 1.35rem);
   font-weight: 700;
@@ -80,7 +89,7 @@ html {
   margin: 3rem 0 1.1rem;
   border-bottom: 1px solid #8f897e;
   padding-bottom: 0.55rem;
-  color: #d6452a;
+  color: var(--color-accent);
   font-family: var(--font-meta);
   font-size: 1rem;
   font-style: normal;
@@ -101,7 +110,7 @@ html {
 
 .article-body a:not(.heading-anchor),
 .note-body a:not(.heading-anchor) {
-  color: #a83822;
+  color: var(--color-link);
   text-decoration: underline;
   text-decoration-color: currentcolor;
   text-decoration-thickness: 0.075em;
@@ -113,14 +122,14 @@ html {
 
 .article-body a:not(.heading-anchor):hover,
 .note-body a:not(.heading-anchor):hover {
-  color: #d6452a;
+  color: var(--color-accent);
   text-decoration-thickness: 0.12em;
 }
 
 .article-body a:not(.heading-anchor):focus-visible,
 .note-body a:not(.heading-anchor):focus-visible {
   border-radius: 0.15em;
-  outline: 2px solid #d6452a;
+  outline: 2px solid var(--color-link-hover);
   outline-offset: 0.18em;
 }
 
@@ -189,7 +198,7 @@ html {
   top: 0.95em;
   left: -1.75rem;
   transform: translateY(-50%);
-  color: #d6452a;
+  color: var(--color-accent);
   font-family: var(--font-meta);
   font-size: 0.78rem;
   font-weight: 700;
@@ -217,7 +226,7 @@ html {
 .article-body blockquote,
 .note-body blockquote {
   margin: 2.4rem 0;
-  border-left: 2px solid #d6452a;
+  border-left: 2px solid var(--color-accent);
   padding: 0.9rem 0 0.9rem 1.3rem;
   color: #555;
   line-height: 1.95;
@@ -248,7 +257,7 @@ html {
 
 .article-body th,
 .note-body th {
-  color: #d6452a;
+  color: var(--color-accent);
   font-family: var(--font-meta);
   font-size: 0.86rem;
 }
@@ -269,7 +278,7 @@ html {
   margin: 2.4rem 0;
   padding: 1.25rem;
   background: #161616;
-  color: #f1eee7;
+  color: var(--color-surface);
   font-family: var(--font-meta);
   font-size: 0.9rem;
   line-height: 1.7;
@@ -300,7 +309,7 @@ html {
 .article-body .directive-box,
 .note-body .directive-box {
   margin: 2.4rem 0;
-  border: 1px solid #d6452a;
+  border: 1px solid var(--color-accent);
   padding: 1.1rem 1.25rem;
   background: transparent;
   line-height: 1.9;
@@ -348,7 +357,7 @@ html {
   border-radius: 0;
   box-shadow: none;
   object-fit: contain;
-  background: #f1eee7;
+  background: var(--color-surface);
   transition: opacity 120ms ease;
 }
 
@@ -380,7 +389,7 @@ html {
 
 .article-body .amazon-card__title:hover,
 .note-body .amazon-card__title:hover {
-  color: #d6452a;
+  color: var(--color-accent);
   text-decoration: none;
 }
 
@@ -388,10 +397,10 @@ html {
 .note-body .amazon-card__cta {
   display: inline-block;
   width: fit-content;
-  border: 1px solid #b7791f;
+  border: 1px solid var(--color-accent);
   border-radius: 0;
   padding: 0.36rem 0.6rem 0.3rem;
-  background: #f3a847;
+  background: var(--color-tint);
   color: #111;
   font-family: var(--font-meta);
   font-size: 0.82rem;
@@ -406,8 +415,8 @@ html {
 .article-body .amazon-card__cta:hover,
 .note-body .amazon-card__cta:hover {
   transform: none;
-  border-color: #9c5f12;
-  background: #e99632;
+  border-color: var(--color-link-hover);
+  background: var(--color-line);
   color: #111;
 }
 
@@ -453,7 +462,7 @@ html {
 :is(.article-body, .note-body) a.link-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
-  border-color: #0969da;
+  border-color: var(--color-accent);
 }
 :is(.article-body, .note-body) .link-card-content {
   flex: 1;
@@ -527,4 +536,48 @@ html {
     width: 230px;
     aspect-ratio: 1.917;
   }
+}
+
+/* Shared list heading and link states across the reading surfaces. */
+.listing-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+.listing-heading :is(h1, h2) {
+  min-width: 0;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+.listing-heading .category-menu {
+  flex-shrink: 0;
+}
+body.woodland-blog a {
+  color: var(--color-link);
+  text-underline-offset: 0.18em;
+}
+body.woodland-blog a:visited {
+  color: var(--color-link-visited);
+}
+body.woodland-blog a:hover {
+  color: var(--color-link-hover);
+}
+body.woodland-blog a:focus-visible {
+  outline: 2px solid var(--color-link-hover);
+  outline-offset: 3px;
+}
+.article-body a:not(.heading-anchor):visited,
+.note-body a:not(.heading-anchor):visited {
+  color: var(--color-link-visited);
+}
+.article-body a:not(.heading-anchor):hover,
+.note-body a:not(.heading-anchor):hover {
+  color: var(--color-link-hover);
 }

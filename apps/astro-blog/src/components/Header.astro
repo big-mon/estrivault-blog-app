@@ -1,5 +1,6 @@
 ---
 import { NAVIGATION_LINKS, SITE_TITLE } from '$constants';
+import { AUTHOR_AVATAR_SRC } from '$lib/author-avatar';
 
 interface Props {
   pathname: string;
@@ -23,7 +24,13 @@ function isActive(href: string): boolean {
     class="mx-auto max-w-6xl rounded-2xl border border-gray-200/50 bg-gradient-to-br from-white to-gray-50 px-6 py-4 shadow-xl shadow-gray-900/10 sm:px-8 lg:px-10"
   >
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <a href="/" class="text-xl font-bold text-gray-900 no-underline">{SITE_TITLE}</a>
+      <a
+        href="/"
+        class="inline-flex items-center gap-3 text-xl font-bold text-gray-900 no-underline"
+      >
+        <img src={AUTHOR_AVATAR_SRC} alt="" width="36" height="36" class="rounded-full" />
+        {SITE_TITLE}
+      </a>
       <nav aria-label="Main navigation">
         <ul class="flex flex-wrap gap-2 text-sm font-medium md:gap-4 md:text-base">
           {

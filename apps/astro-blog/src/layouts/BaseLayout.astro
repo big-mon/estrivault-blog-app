@@ -3,6 +3,8 @@ import Header from '$components/Header.astro';
 import Footer from '$components/Footer.astro';
 import { GOOGLE_ADSENSE_CLIENT, SITE_AUTHOR, SITE_TITLE, SOCIAL_LINK_X } from '$constants';
 import '../app.css';
+import '../woodland.css';
+import Woodland from '$components/Woodland.astro';
 
 interface Props {
   title: string;
@@ -108,7 +110,8 @@ const adsenseClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT || GOOGLE_ADS
 
     {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
-  <body class={bodyClass}>
+  <body class={`${bodyClass} woodland-blog`}>
+    <Woodland />
     {!hideHeader && <Header pathname={pathname} />}
 
     <main class={mainClass}>
