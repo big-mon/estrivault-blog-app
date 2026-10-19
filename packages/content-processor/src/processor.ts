@@ -50,7 +50,7 @@ function readFrontmatterScalar(content: string, field: string): string | undefin
     return undefined;
   }
 
-  const match = block[1].match(new RegExp(`^${field}:\\s*(\\S+)\\s*$`, 'm'));
+  const match = block[1].match(new RegExp(`^${field}:\\s*(\\S+)\\s*(?:#.*)?\\s*$`, 'm'));
   if (!match?.[1]) {
     return undefined;
   }

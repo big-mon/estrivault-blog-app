@@ -108,7 +108,9 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
       node.properties.src = resolvedSrc;
       node.properties.srcset = buildSrcSet(normalizedCloudinaryCloudName, publicId, buildOptions);
       node.properties.decoding = 'async';
-      if (!isFirstImage) {
+      if (isFirstImage) {
+        delete node.properties.loading;
+      } else {
         node.properties.loading = 'lazy';
       }
 
@@ -125,7 +127,6 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
           children: [{ type: 'text' as const, value: title }],
         };
         figureChildren.push(figcaption);
-        delete node.properties.title;
       }
 
       const figure: Element = {
@@ -139,6 +140,12 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
         paragraphFigures.set(parent, figure);
       } else if (!isParagraph(parent)) {
         childFigures.set(node, figure);
+      } else {
+        return undefined;
+      }
+
+      if (typeof title === 'string') {
+        delete node.properties.title;
       }
       return undefined;
     });

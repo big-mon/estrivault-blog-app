@@ -24,7 +24,8 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
       }
 
       // slugを生成（日本語対応）。同じテキストは -1, -2 と連番にして一意にする。
-      const slug = uniqueId(generateSlug(textContent), usedIds);
+      const baseSlug = generateSlug(textContent);
+      const slug = baseSlug ? uniqueId(baseSlug, usedIds) : baseSlug;
 
       if (slug && /^h[1-3]$/.test(node.tagName)) {
         headings.push({ id: slug, level: Number(node.tagName[1]), text: textContent });
