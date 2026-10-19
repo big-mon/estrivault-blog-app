@@ -1,6 +1,4 @@
 ---
-import Header from '$components/Header.astro';
-import Footer from '$components/Footer.astro';
 import { GOOGLE_ADSENSE_CLIENT, SITE_AUTHOR, SITE_TITLE, SOCIAL_LINK_X } from '$constants';
 import '../app.css';
 import '../woodland.css';
@@ -20,8 +18,6 @@ interface Props {
   modifiedTime?: string;
   section?: string;
   tags?: string[];
-  hideHeader?: boolean;
-  hideFooter?: boolean;
   bodyClass?: string;
   mainClass?: string;
   enableAdsense?: boolean;
@@ -41,14 +37,11 @@ const {
   modifiedTime,
   section,
   tags = [],
-  hideHeader = false,
-  hideFooter = false,
   bodyClass = '',
   mainClass = 'mx-auto w-full max-w-6xl px-4 py-4',
   enableAdsense = false,
 } = Astro.props;
 
-const pathname = Astro.url.pathname;
 const adsenseClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT || GOOGLE_ADSENSE_CLIENT;
 ---
 
@@ -74,7 +67,7 @@ const adsenseClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT || GOOGLE_ADS
     {image && <meta property="og:image" content={image} />}
     {image && <meta property="og:image:alt" content={title} />}
 
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
     <meta name="twitter:site" content={`@${SOCIAL_LINK_X}`} />
     <meta name="twitter:creator" content={`@${SOCIAL_LINK_X}`} />
     <meta name="twitter:title" content={title} />
@@ -112,12 +105,9 @@ const adsenseClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT || GOOGLE_ADS
   </head>
   <body class={`${bodyClass} woodland-blog`}>
     <Woodland />
-    {!hideHeader && <Header pathname={pathname} />}
 
     <main class={mainClass}>
       <slot />
     </main>
-
-    {!hideFooter && <Footer />}
   </body>
 </html>

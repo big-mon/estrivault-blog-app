@@ -10,6 +10,7 @@ import type { HeadingInfo } from '../../types';
 export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
   const transformer: Transformer<Root, Root> = (tree: Root, file) => {
     const headings: HeadingInfo[] = [];
+    const usedIds = new Set<string>();
     visit(tree, 'element', (node: Element) => {
       // h1-h6タグのみ処理
       if (!node.tagName.match(/^h[1-6]$/)) {
@@ -22,8 +23,8 @@ export const rehypeHeadingAnchor: Plugin<[], Root, Root> = () => {
         return undefined;
       }
 
-      // slugを生成（日本語対応）
-      const slug = generateSlug(textContent);
+      // slugを生成（日本語対応）。同じテキストは -1, -2 と連番にして一意にする。
+      const slug = uniqueId(generateSlug(textContent), usedIds);
 
       if (slug && /^h[1-3]$/.test(node.tagName)) {
         headings.push({ id: slug, level: Number(node.tagName[1]), text: textContent });
@@ -74,6 +75,22 @@ function getTextContent(node: Element): string {
   }
 
   return text.trim();
+}
+
+function uniqueId(base: string, usedIds: Set<string>): string {
+  if (!usedIds.has(base)) {
+    usedIds.add(base);
+    return base;
+  }
+
+  let suffix = 1;
+  let candidate = `${base}-${suffix}`;
+  while (usedIds.has(candidate)) {
+    suffix += 1;
+    candidate = `${base}-${suffix}`;
+  }
+  usedIds.add(candidate);
+  return candidate;
 }
 
 /**

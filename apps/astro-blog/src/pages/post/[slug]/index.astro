@@ -4,7 +4,7 @@ import EditorialFooter from '$components/EditorialFooter.astro';
 import EditorialMasthead from '$components/EditorialMasthead.astro';
 import { AUTHOR_PERSON, getCategoryLabel, SITE_TITLE, SITE_URL } from '$constants';
 import { getAllPostsMeta, getPostBySlug } from '$lib/content';
-import { formatEditorialDate } from '$lib/format-date';
+import { formatEditorialDate, formatSchemaDate } from '$lib/format-date';
 import { getPostOgpImageUrl } from '$lib/og';
 import { encodeRouteSegment, getArchivePagePath, getTagRouteMap } from '$lib/url-segments.mjs';
 
@@ -89,8 +89,8 @@ const schemaData = {
   image: [ogImage],
   author: AUTHOR_PERSON,
   publisher: AUTHOR_PERSON,
-  datePublished: post.meta.publishedAt.toISOString(),
-  dateModified: (post.meta.updatedAt || post.meta.publishedAt).toISOString(),
+  datePublished: formatSchemaDate(post.meta.publishedAt),
+  dateModified: formatSchemaDate(post.meta.updatedAt || post.meta.publishedAt),
   mainEntityOfPage: {
     '@type': 'WebPage',
     '@id': canonical,
@@ -114,12 +114,10 @@ const schemaData = {
   ogType="article"
   image={ogImage}
   jsonLd={schemaData}
-  publishedTime={post.meta.publishedAt.toISOString()}
-  modifiedTime={(post.meta.updatedAt || post.meta.publishedAt).toISOString()}
+  publishedTime={formatSchemaDate(post.meta.publishedAt)}
+  modifiedTime={formatSchemaDate(post.meta.updatedAt || post.meta.publishedAt)}
   section={categoryLabel}
   tags={post.meta.tags}
-  hideHeader
-  hideFooter
   bodyClass="article-editorial-page"
   mainClass="article-editorial-main"
   enableAdsense

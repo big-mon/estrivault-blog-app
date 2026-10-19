@@ -23,17 +23,6 @@ export function getCategoryLabel(category: string): string {
   return getCategoryMeta(category).label;
 }
 
-export const NAVIGATION_LINKS = [
-  { label: 'About', href: '/post/about' },
-  { label: 'Notes', href: '/notes/' },
-  { label: CATEGORY_META.investing.label, href: '/category/investing/' },
-  { label: CATEGORY_META.software.label, href: '/category/software/' },
-  { label: CATEGORY_META.ai.label, href: '/category/ai/' },
-  { label: CATEGORY_META.games.label, href: '/category/games/' },
-  { label: CATEGORY_META.gear.label, href: '/category/gear/' },
-  { label: CATEGORY_META.essays.label, href: '/category/essays/' },
-];
-
 export const SOCIAL_LINK_X = 'big_mon';
 export const SOCIAL_LINK_GITHUB = 'big-mon/estrivault-blog-app';
 export const AUTHOR_GITHUB_PROFILE = 'big-mon';

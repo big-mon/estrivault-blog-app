@@ -12,6 +12,7 @@ import type { PostMeta, PostHTML, ProcessorOptions, HeadingInfo } from './types'
 import { FrontMatterError, MarkdownParseError } from './errors';
 
 const markdownParser = unified().use(remarkParse).use(remarkDirective).use(remarkGfm);
+const NAIVE_DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
 
 export function extractOgpUrls(source: string): string[] {
   const { content } = parseFrontmatter(source);
@@ -29,14 +30,42 @@ export function parseFrontmatter(content: string): {
 } {
   try {
     const parsed = matter(content);
+    const data = parsed.data || {};
+    assignTokyoDate(content, data, 'publishedAt');
+    assignTokyoDate(content, data, 'updatedAt');
     return {
-      data: parsed.data || {},
+      data,
       content: parsed.content,
     };
   } catch (parseError) {
     throw new MarkdownParseError(
       `フロントマターのパースに失敗しました: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
     );
+  }
+}
+
+function readFrontmatterScalar(content: string, field: string): string | undefined {
+  const block = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!block?.[1]) {
+    return undefined;
+  }
+
+  const match = block[1].match(new RegExp(`^${field}:\\s*(\\S+)\\s*$`, 'm'));
+  if (!match?.[1]) {
+    return undefined;
+  }
+
+  return match[1].trim().replace(/^['"]|['"]$/g, '');
+}
+
+function assignTokyoDate(content: string, data: Record<string, unknown>, field: string): void {
+  if (!(field in data)) {
+    return;
+  }
+
+  const raw = readFrontmatterScalar(content, field);
+  if (raw && NAIVE_DATE_TIME.test(raw)) {
+    data[field] = `${raw}+09:00`;
   }
 }
 
@@ -68,7 +97,7 @@ function normalizeDateField(
 
   let dateValue = value;
   if (dateValue.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
-    dateValue = dateValue + '.000Z';
+    dateValue = dateValue + '+09:00';
   } else if (dateValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
     dateValue = dateValue + 'T00:00:00.000Z';
   }
