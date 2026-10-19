@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { extractMetadata, extractNoteMetadata } from '../dist/index.js';
+import { extractMetadata, extractNoteMetadata, parseFrontmatter } from '../dist/index.js';
 
 test('timezone-less publishedAt is read as Tokyo time', async () => {
   const meta = await extractMetadata(
@@ -38,4 +38,17 @@ test('timezone-less datetime with a trailing YAML comment is read as Tokyo time'
   assert.equal(meta.publishedAt.toISOString(), '2023-03-17T14:59:00.000Z');
   assert.equal(meta.updatedAt.toISOString(), '2024-01-01T18:04:05.000Z');
   assert.equal(note.publishedAt.toISOString(), '2023-03-17T14:59:00.000Z');
+});
+
+test('a hash inside a quoted datetime is not a YAML comment', () => {
+  for (const publishedAt of [
+    '"2023-03-17T23:59:00 # not a comment"',
+    "'2023-03-17T23:59:00 # not a comment'",
+  ]) {
+    const { data } = parseFrontmatter(
+      ['---', 'title: Example', `publishedAt: ${publishedAt}`, '---', ''].join('\n'),
+    );
+
+    assert.equal(data.publishedAt, '2023-03-17T23:59:00 # not a comment');
+  }
 });
