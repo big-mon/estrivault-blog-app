@@ -1,6 +1,6 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
-import type { Root } from 'hast';
+import type { Element, Root, Text } from 'hast';
 import { buildUrl, buildSrcSet, type BuildUrlOptions } from '@estrivault/cloudinary-utils';
 
 export interface ImageTransformOptions {
@@ -77,6 +77,10 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
   const normalizedCloudinaryCloudName = cloudinaryCloudName.trim();
 
   return (tree: Root) => {
+    let imageOrdinal = 0;
+    const paragraphFigures = new WeakMap<Element, Element>();
+    const childFigures = new WeakMap<Element, Element>();
+
     visit(tree, 'element', (node, index, parent) => {
       if (node.tagName !== 'img' || !node.properties || !parent || index === undefined) {
         return undefined;
@@ -96,12 +100,19 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
         return undefined;
       }
 
+      const isFirstImage = imageOrdinal === 0;
+      imageOrdinal += 1;
+
       const publicId = getBodyImagePublicId(src);
       const buildOptions: BuildUrlOptions = { w: 1200, mode, quality: 90 };
       node.properties.src = resolvedSrc;
       node.properties.srcset = buildSrcSet(normalizedCloudinaryCloudName, publicId, buildOptions);
-      node.properties.loading = 'lazy';
       node.properties.decoding = 'async';
+      if (isFirstImage) {
+        delete node.properties.loading;
+      } else {
+        node.properties.loading = 'lazy';
+      }
 
       if (!node.properties.sizes) {
         node.properties.sizes = '(max-width: 640px) 100vw, (max-width: 768px) 90vw, 800px';
@@ -116,18 +127,45 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
           children: [{ type: 'text' as const, value: title }],
         };
         figureChildren.push(figcaption);
-        delete node.properties.title;
       }
 
-      const figure = {
-        type: 'element' as const,
+      const figure: Element = {
+        type: 'element',
         tagName: 'figure',
         properties: {},
         children: figureChildren,
       };
 
-      if (Array.isArray(parent.children)) {
-        parent.children[index] = figure;
+      if (isImageOnlyParagraph(parent, node)) {
+        paragraphFigures.set(parent, figure);
+      } else if (!isParagraph(parent)) {
+        childFigures.set(node, figure);
+      } else {
+        return undefined;
+      }
+
+      if (typeof title === 'string') {
+        delete node.properties.title;
+      }
+      return undefined;
+    });
+
+    visit(tree, 'element', (node, index, parent) => {
+      if (!parent || index === undefined || !Array.isArray(parent.children)) {
+        return undefined;
+      }
+
+      const paragraphFigure = paragraphFigures.get(node);
+      if (paragraphFigure) {
+        parent.children[index] = paragraphFigure;
+        paragraphFigures.delete(node);
+        return undefined;
+      }
+
+      const childFigure = childFigures.get(node);
+      if (childFigure) {
+        parent.children[index] = childFigure;
+        childFigures.delete(node);
       }
       return undefined;
     });
@@ -135,3 +173,20 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
     return tree;
   };
 };
+
+function isParagraph(node: { type: string }): node is Element {
+  return node.type === 'element' && (node as Element).tagName === 'p';
+}
+
+function isImageOnlyParagraph(parent: { type: string }, image: Element): parent is Element {
+  if (!isParagraph(parent)) {
+    return false;
+  }
+
+  return parent.children.every((child) => {
+    if (child === image) {
+      return true;
+    }
+    return child.type === 'text' && (child as Text).value.trim() === '';
+  });
+}

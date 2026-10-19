@@ -4,6 +4,7 @@ import EditorialFooter from '$components/EditorialFooter.astro';
 import EditorialMasthead from '$components/EditorialMasthead.astro';
 import NoteDetail from '$components/NoteDetail.astro';
 import { AUTHOR_PERSON, SITE_TITLE, SITE_URL } from '$constants';
+import { formatSchemaDate } from '$lib/format-date';
 import { getAllNotesMeta, getNoteBySlug, getRelatedNotes } from '$lib/content';
 
 export async function getStaticPaths() {
@@ -35,8 +36,8 @@ const jsonLd = {
   description,
   author: AUTHOR_PERSON,
   publisher: AUTHOR_PERSON,
-  datePublished: note.meta.publishedAt.toISOString(),
-  dateModified: note.meta.publishedAt.toISOString(),
+  datePublished: formatSchemaDate(note.meta.publishedAt),
+  dateModified: formatSchemaDate(note.meta.publishedAt),
   articleSection: 'Note',
   keywords: note.meta.tags.join(', '),
   mainEntityOfPage: {
@@ -54,20 +55,18 @@ const jsonLd = {
   canonical={canonical}
   ogType="article"
   jsonLd={jsonLd}
-  publishedTime={note.meta.publishedAt.toISOString()}
-  modifiedTime={note.meta.publishedAt.toISOString()}
+  publishedTime={formatSchemaDate(note.meta.publishedAt)}
+  modifiedTime={formatSchemaDate(note.meta.publishedAt)}
   section="Note"
   tags={note.meta.tags}
-  hideHeader
-  hideFooter
   bodyClass="note-page"
   mainClass="note-main"
 >
   <div class="note-page-shell" data-note-path={notePath}>
     <EditorialMasthead />
-    <main class="note-page-content">
+    <div class="note-page-content">
       <NoteDetail note={note} relatedNotes={relatedNotes} variant="page" />
-    </main>
+    </div>
     <EditorialFooter />
   </div>
 </BaseLayout>

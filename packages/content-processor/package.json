@@ -17,7 +17,8 @@
     "clean": "node ../../scripts/clean-workspace-dist.mjs",
     "build:types": "tsc --build",
     "build:bundle": "esbuild src/index.ts --bundle --packages=external --format=esm --platform=browser --conditions=worker,browser --target=es2022 --outdir=dist --minify",
-    "build": "pnpm run build:types && pnpm run build:bundle"
+    "build": "pnpm run build:types && pnpm run build:bundle",
+    "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
     "@estrivault/cloudinary-utils": "workspace:^",
