@@ -37,7 +37,7 @@ export function resolveBodyImageUrl(
   return buildUrl(normalizedCloudinaryCloudName, publicId, {
     w: 1200,
     mode,
-    quality: 90,
+    quality: 'auto',
   });
 }
 
@@ -104,7 +104,7 @@ export const rehypeImageTransform: Plugin<[ImageTransformOptions?], Root, Root> 
       imageOrdinal += 1;
 
       const publicId = getBodyImagePublicId(src);
-      const buildOptions: BuildUrlOptions = { w: 1200, mode, quality: 90 };
+      const buildOptions: BuildUrlOptions = { w: 1200, mode, quality: 'auto' };
       node.properties.src = resolvedSrc;
       node.properties.srcset = buildSrcSet(normalizedCloudinaryCloudName, publicId, buildOptions);
       node.properties.decoding = 'async';
