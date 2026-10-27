@@ -14,7 +14,7 @@ GoogleのAIであるGeminiの評判が私のXのタイムライン上ではか�
 
 [Google AI Pro](https://one.google.com/explore-plan/gemini-advanced)は定価で月額2,900円ですが[Business Standard](https://workspace.google.com/intl/ja/)なら1,900円と安いようです。これって本当なんでしょうか？**価格が明らかにおかしいような気**がします。個人用とWorkspaceはどちらを選んでもGeminiとNotebookLMのどちらもプラン内容に含まれています。
 
-![Business Standard](/tech/googleWorkspacePrice)
+![Business Standard](/Tech/googleWorkspacePrice)
 
 ということで試してみましょう。
 
@@ -24,7 +24,7 @@ GoogleのAIであるGeminiの評判が私のXのタイムライン上ではか�
 
 そうして入力を進めると、ドメインが必要であることが明かされます。なるほど、**独自ドメインを持っていないとWorkspaceを利用できない**んですね。無料ドメインサービスもあるのでWorkspace以外の月額費用を支払わずに使用することもできるかもしれませんが、今回の私は独自ドメインを保有していたのでそちらを使用してみます。
 
-![ドメインの確認](/tech/googleWorkspaceDomain)
+![ドメインの確認](/Tech/googleWorkspaceDomain)
 
 使用するドメインを選択していくとWorkspace管理用のアカウント名を入力する画面が現れ、それも入力したらプランの選択画面になります。今回は当初見繕っていたBusiness Standardを選んでみましょう。
 
@@ -38,7 +38,7 @@ GoogleのAIであるGeminiの評判が私のXのタイムライン上ではか�
 
 今回選択したドメインはCloudflareにて管理しているドメインだったのですが、なんと自動的にCloudflareでの連携の案内が表示され、Cloudflareでログインと証明作業のための確認を1つ済ませるだけでドメイン所有権の確認が完了してしまいました。
 
-![ドメイン所有権の確認](/tech/googleWorkspaceDomain2)
+![ドメイン所有権の確認](/Tech/googleWorkspaceDomain2)
 
 ドメインの証明が完了したら次はそのドメインをGmailに統合する作業が始まります。Gmailは通常@gmail.comですが、@ドメインでメール受信できるようになるということですね。MicrosoftでいうOutlookとおそらく同じようなものです。
 
@@ -82,7 +82,7 @@ Googleフォトなど個人アカウントで利用することが多いサー�
 
 めでたくWorkspaceにてDeep Researchを使用できるかと思ったのですが、私の環境のせいとは思えませんがどう操作してもリサーチを開始してくれないことに気が付きました。様々なブログでDeep Researchが使えると語られていますし、サポートページでも有効な機能にきちんと載っているのですが、使用できていません。
 
-![Deep Resarchが始まらない](/tech/d7d39bsbxeq5snqqqhks)
+![Deep Resarchが始まらない](/Tech/d7d39bsbxeq5snqqqhks)
 
 具体的にはプロンプトを渡すことでリサーチの計画を立ててくれるところは問題ないのですが、素直にリサーチを開始ボタンを押しても肝心のDeep Researchが始まらず、何について調べますかと聞き返してくる始末……
 
