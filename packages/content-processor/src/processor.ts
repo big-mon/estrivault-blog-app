@@ -85,7 +85,7 @@ function resolveCoverImage(coverImage?: string, cloudinaryCloudName: string = ''
   }
   // 先頭スラッシュ除去・拡張子除去
   const publicId = coverImage.replace(/^\//, '').replace(/\.[^/.]+$/, '');
-  return buildUrl(cloudinaryCloudName, publicId, { w: 1200, quality: 85 });
+  return buildUrl(cloudinaryCloudName, publicId, { w: 1200, quality: 'auto' });
 }
 
 function normalizeDateField(
