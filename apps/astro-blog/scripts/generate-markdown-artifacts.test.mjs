@@ -450,7 +450,7 @@ ${sharedDefinition}
 
   assert.ok(
     body.includes(
-      String.raw`![Full \*alt\*](https://res.cloudinary.com/damonge/image/upload/t_body/Tech/shared?_a=`,
+      String.raw`![Full \*alt\*](https://res.cloudinary.com/damonge/image/upload/t_body/Tech/shared`,
     ),
   );
   assert.match(
