@@ -42,7 +42,7 @@ export function buildSrcSet(
   baseOpts: BuildUrlOptions,
 ): string {
   // 記事コンテンツ幅に適したサイズ（最大800px表示 + 高解像度対応）
-  const widths = [400, 600, 800, 1200];
+  const widths = [800, 1200];
   const baseWidth = baseOpts.w;
 
   // ベース幅以下のサイズのみを生成
