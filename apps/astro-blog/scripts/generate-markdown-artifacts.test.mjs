@@ -346,7 +346,7 @@ test('article body image destinations use Cloudinary without reserializing Markd
 
   assert.match(
     body,
-    /!\[Alt text\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Tech\/example\?_a=[^ )]+ 'Image title'\)/,
+    /!\[Alt text\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Tech\/example 'Image title'\)/,
   );
   assert.ok(body.includes(absoluteImage));
   assert.ok(body.includes(dataImage));
@@ -379,11 +379,11 @@ test('HTML and public Markdown share external image URL classification', async (
       );
       assert.match(
         body,
-        /!\[Alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\//,
+        /!\[Alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\//,
       );
       assert.match(
         html.html,
-        /<img src="https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\//,
+        /<img src="https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\//,
       );
     } else {
       assert.ok(body.includes(`![Alt](${sourceUrl})`), sourceUrl);
@@ -400,7 +400,7 @@ test('escaped parentheses in inline image destinations replace only the raw dest
 
   assert.match(
     body,
-    /!\[Escaped alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Tech\/a(?:%28|\()b(?:%29|\))\?_a=[^ )]+ "Escaped title"\)/,
+    /!\[Escaped alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Tech\/a(?:%28|\()b(?:%29|\)) "Escaped title"\)/,
   );
   assert.doesNotMatch(body, /\/Tech\/a\\\(b\\\)\.png/);
 });
@@ -413,11 +413,11 @@ test('character references in inline image destinations replace only the raw des
 
   assert.match(
     body,
-    /!\[Bare\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Tech\/a&b\?_a=[^ )]+\)/,
+    /!\[Bare\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Tech\/a&b\)/,
   );
   assert.match(
     body,
-    /!\[Angle\]\(<https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Tech\/a&b\?_a=[^ )]+>\)/,
+    /!\[Angle\]\(<https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Tech\/a&b>\)/,
   );
   assert.doesNotMatch(body, /\/Tech\/a&amp;b\.png/);
 });
@@ -450,20 +450,20 @@ ${sharedDefinition}
 
   assert.ok(
     body.includes(
-      String.raw`![Full \*alt\*](https://res.cloudinary.com/damonge/image/upload/c_fit,w_1200/f_auto/q_auto/v1/Tech/shared?_a=`,
+      String.raw`![Full \*alt\*](https://res.cloudinary.com/damonge/image/upload/t_body/Tech/shared`,
     ),
   );
   assert.match(
     body,
-    /!\[Collapsed\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Tech\/collapsed\?_a=[^ )]+\)/,
+    /!\[Collapsed\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Tech\/collapsed\)/,
   );
   assert.match(
     body,
-    /!\[Shortcut\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Tech\/shortcut\?_a=[^ )]+\)/,
+    /!\[Shortcut\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Tech\/shortcut\)/,
   );
   assert.match(
     body,
-    /> !\[Inside\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Tech\/shared\?_a=[^ )]+ /,
+    /> !\[Inside\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Tech\/shared /,
   );
 
   const serializedTitle = String.raw`"Title with \"quotes\" and \\slashes
@@ -494,7 +494,7 @@ publishedAt: 2026-01-01
 
   assert.match(
     body,
-    /> !\[nested\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Tech\/x\?_a=[^ )]+ "q"\)/,
+    /> !\[nested\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Tech\/x "q"\)/,
   );
   assert.ok(body.includes(String.raw`[a\] b]: /Tech/x.png "q"`));
 });
@@ -558,9 +558,9 @@ publishedAt: 2026-01-01
 
   assert.match(
     body,
-    /!\[First local image\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/images\.v2\/first\.v2\?_a=[^ )]+\)/,
+    /!\[First local image\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/images\.v2\/first\.v2\)/,
   );
-  assert.doesNotMatch(body, /v1\/images\.v2\/second\.v2\?_a=/);
+  assert.doesNotMatch(body, /t_body\/images\.v2\/second\.v2/);
   assert.ok(body.includes('[Shared link][ASSET]'));
 });
 
@@ -572,7 +572,7 @@ test('image destination lookup ignores duplicate alt and title text', () => {
 
   assert.match(
     body,
-    /!\[\/Tech\/repeated\.png\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Tech\/repeated\?_a=[^ )]+ "\/Tech\/repeated\.png"\)/,
+    /!\[\/Tech\/repeated\.png\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Tech\/repeated "\/Tech\/repeated\.png"\)/,
   );
 });
 
@@ -583,7 +583,7 @@ test('body images inside demoted headings are projected without replacing headin
 
   assert.match(
     body,
-    /^## Heading !\[Heading image\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Tech\/heading\?_a=[^ )]+\)$/m,
+    /^## Heading !\[Heading image\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Tech\/heading\)$/m,
   );
   assert.doesNotMatch(body, /^# Heading !\[Heading image\]\(\/Tech\/heading\.png\)$/m);
 });
@@ -614,7 +614,7 @@ test('HTML and public Markdown preserve dotted local image paths and strip one .
     const publicImageMatch = body.match(/!\[Alt\]\((\S+)\)/);
     assert.ok(publicImageMatch, sourceUrl);
     assert.ok(
-      publicImageMatch[1].includes(`/v1/${expectedPublicId}?_a=`),
+      publicImageMatch[1].includes(`/t_body/${expectedPublicId}`),
       `${sourceUrl}: ${publicImageMatch[1]}`,
     );
 
@@ -655,7 +655,7 @@ test('note body images receive the Cloudinary processor options', () => {
 
   assert.match(
     body,
-    /!\[Note alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Stocks\/note\?_a=[^ )]+ 'Note title'\)/,
+    /!\[Note alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Stocks\/note 'Note title'\)/,
   );
   assert.doesNotMatch(body, /!\[Note alt\]\(\/Stocks\/note\.png 'Note title'\)/);
 });
@@ -681,7 +681,7 @@ test('nested callout body image destinations use Cloudinary too', () => {
 
   assert.match(
     body,
-    /> !\[Nested alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Hero\/nested\?_a=[^ )]+ 'Nested title'\)/,
+    /> !\[Nested alt\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Hero\/nested 'Nested title'\)/,
   );
   assert.doesNotMatch(body, /> !\[Nested alt\]\(\/Hero\/nested\.png 'Nested title'\)/);
 });
@@ -1074,7 +1074,7 @@ test('the default generator emits independently parseable public YAML artifacts'
     );
     assert.match(
       representativeMarkdown,
-      /!\[Universal Unreal Engine Unlockerを起動\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/c_fit,w_1200\/f_auto\/q_auto\/v1\/Tech\/toa-ueu1\?_a=[^ )]+ 'Universal Unreal Engine Unlockerを起動'\)/,
+      /!\[Universal Unreal Engine Unlockerを起動\]\(https:\/\/res\.cloudinary\.com\/damonge\/image\/upload\/t_body\/Tech\/toa-ueu1 'Universal Unreal Engine Unlockerを起動'\)/,
     );
   } finally {
     await rm(outputDirectory, { recursive: true, force: true });
