@@ -1,5 +1,5 @@
 import { Cloudinary } from '@cloudinary/url-gen';
-import { fill, fit } from '@cloudinary/url-gen/actions/resize';
+import { fill, limitFit } from '@cloudinary/url-gen/actions/resize';
 import { format, quality } from '@cloudinary/url-gen/actions/delivery';
 
 export interface BuildUrlOptions {
@@ -21,7 +21,7 @@ export function buildUrl(cloudName: string, publicId: string, opts: BuildUrlOpti
   const img = cld.image(publicId);
 
   if (opts.mode === 'fit' || !opts.h) {
-    img.resize(fit().width(opts.w));
+    img.resize(limitFit().width(opts.w));
   } else {
     img.resize(fill().width(opts.w).height(opts.h));
   }
