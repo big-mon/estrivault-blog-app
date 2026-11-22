@@ -50,7 +50,7 @@ export function buildSrcSet(
   // 画像ごとのベース幅を追加すると変換パターンが無制限に増えるので追加しない。
   const validWidths = widths.filter((w) => w <= baseWidth);
   if (validWidths.length === 0) {
-    validWidths.push(widths[0]);
+    validWidths.push(800);
   }
 
   return validWidths
