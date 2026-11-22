@@ -1,7 +1,3 @@
-import { Cloudinary } from '@cloudinary/url-gen';
-import { fill, fit } from '@cloudinary/url-gen/actions/resize';
-import { format, quality } from '@cloudinary/url-gen/actions/delivery';
-
 export interface BuildUrlOptions {
   w: number;
   h?: number;
@@ -11,51 +7,29 @@ export interface BuildUrlOptions {
 
 /**
  * Cloudinary画像URLを生成
+ *
+ * 本文・カバー画像の変換は named 変換 `t_body`（c_limit,w_1200,f_auto,q_auto）に
+ * 統一している。DAMONGE本文と同じ変換で、仕様はCloudinary側の定義だけが持つ。
+ * そのため opts の w / mode / quality はURLに影響しない（呼び出し側の互換のため残す）。
  */
 export function buildUrl(cloudName: string, publicId: string, opts: BuildUrlOptions): string {
   if (!cloudName || !publicId || !opts?.w) {
     throw new Error('Invalid parameters');
   }
 
-  const cld = new Cloudinary({ cloud: { cloudName } });
-  const img = cld.image(publicId);
-
-  if (opts.mode === 'fit' || !opts.h) {
-    img.resize(fit().width(opts.w));
-  } else {
-    img.resize(fill().width(opts.w).height(opts.h));
-  }
-
-  // 品質設定の適用
-  const imageQuality = opts.quality || 'auto';
-  img.delivery(format('auto')).delivery(quality(imageQuality));
-
-  return img.toURL();
+  return `https://res.cloudinary.com/${cloudName}/image/upload/t_body/${publicId}`;
 }
 
 /**
- * レスポンシブ画像用のsrcsetを生成
+ * srcset用URLを返す
+ *
+ * 本文画像は t_body の単一配信に統一したため、幅のバリエーションは作らない。
+ * 呼び出し側の互換のため、単一URL（記述子なし）をそのまま返す。
  */
 export function buildSrcSet(
   cloudName: string,
   publicId: string,
   baseOpts: BuildUrlOptions,
 ): string {
-  // 記事コンテンツ幅に適したサイズ（最大800px表示 + 高解像度対応）
-  const widths = [800, 1200];
-  const baseWidth = baseOpts.w;
-
-  // ベース幅以下のサイズのみを生成
-  const validWidths = widths.filter((w) => w <= baseWidth);
-  if (!validWidths.includes(baseWidth)) {
-    validWidths.push(baseWidth);
-  }
-
-  return validWidths
-    .sort((a, b) => a - b)
-    .map((w) => {
-      const opts = { ...baseOpts, w };
-      return `${buildUrl(cloudName, publicId, opts)} ${w}w`;
-    })
-    .join(', ');
+  return buildUrl(cloudName, publicId, baseOpts);
 }
