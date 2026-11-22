@@ -46,9 +46,11 @@ export function buildSrcSet(
   const baseWidth = baseOpts.w;
 
   // ベース幅以下のサイズのみを生成
+  // CloudinaryのStrict transformations前提のため、幅は固定セットだけを使う。
+  // 画像ごとのベース幅を追加すると変換パターンが無制限に増えるので追加しない。
   const validWidths = widths.filter((w) => w <= baseWidth);
-  if (!validWidths.includes(baseWidth)) {
-    validWidths.push(baseWidth);
+  if (validWidths.length === 0) {
+    validWidths.push(widths[0]);
   }
 
   return validWidths
