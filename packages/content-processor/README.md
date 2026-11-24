@@ -47,4 +47,7 @@
 
 ```bash
 pnpm --filter @estrivault/content-processor build
+pnpm --filter @estrivault/content-processor test
 ```
+
+共通の前提と検証手順は[development guide](../../docs/development.md)を参照してください。

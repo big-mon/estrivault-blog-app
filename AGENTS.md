@@ -11,7 +11,7 @@ semantics.
 - `apps/astro-blog/`: Astro static-site application, routes, components, shared presentation, and
   generated post OGP endpoints.
 - `packages/content-processor/`: trusted Markdown/frontmatter processing and embed transformations.
-- `packages/cloudinary-utils/`: Cloudinary URL and responsive `srcset` construction.
+- `packages/cloudinary-utils/`: Cloudinary URL helpers (`t_body` named transformation).
 - `packages/og-image-generator/`: Satori/resvg post-image generation, fonts, title layout, and its
   Node test suite.
 - `content/blog/` and `content/notes/`: canonical authored Markdown. These are source content, not
@@ -21,7 +21,10 @@ semantics.
 - `scripts/`: pnpm usage enforcement and OGP metadata refresh.
 - `apps/astro-blog/scripts/generate-redirects.mjs`: authoritative generator for the ignored
   `apps/astro-blog/public/_redirects` file.
-- `wrangler.toml`: Cloudflare Workers Static Assets build and deployment configuration.
+- `worker/`: Cloudflare Worker entry (`index.mjs`) for Accept-based Markdown negotiation and
+  response headers; tested by `pnpm test:worker`.
+- `wrangler.toml`: Cloudflare Workers Static Assets build and deployment configuration (`main` +
+  `[assets]`).
 
 ## Hard safety boundaries
 
@@ -86,44 +89,19 @@ before continuing.
 - Note cards remain normal links. Modal behavior is progressive enhancement; direct note URLs must
   remain standalone pages. Preserve dialog semantics, Escape/outside-click close, focus handling,
   scroll locking, and focus restoration.
-- The static Cloudflare deployment serves `apps/astro-blog/dist`. Document URLs omit a trailing
-  slash; archive URLs keep one, and archive page 1 omits its page number. Change canonical redirect
-  behavior in `generate-redirects.mjs`, never in the ignored generated `_redirects` file.
+- Production is a Cloudflare Worker plus Static Assets: `wrangler.toml` sets `main` to
+  `worker/index.mjs` with `run_worker_first = true`, and `[assets].directory` is
+  `apps/astro-blog/dist`. That directory holds the Astro HTML build **and** generated public Markdown
+  artifacts (`index.md` under post/note paths, plus discovery files). Do not treat the Worker or
+  Markdown artifacts as optional when changing build or routing. Document URLs omit a trailing slash;
+  archive URLs keep one, and archive page 1 omits its page number. Change canonical redirect behavior
+  in `generate-redirects.mjs`, never in the ignored generated `_redirects` file.
 - Rebuild before visually verifying source changes against a preview server, because preview serves
   built output.
 
-## Verification router
+## Verification and completion
 
-Use the smallest relevant checks, then widen for cross-cutting changes. Exact commands and pass
-criteria are in [docs/development.md](docs/development.md).
-
-- Documentation only: validate changed links and commands, then run Prettier in check mode on only
-  the changed documentation files.
-- Astro UI, routing, content loading, or shared CSS: Astro lint/check; build when static output,
-  generated routes, or OGP endpoints are affected; run the matching E2E test(s).
-- `content-processor` or `cloudinary-utils`: build/type-check the affected package and validate the
-  Astro consumer when output or types change.
-- `og-image-generator`: build it and run its package test; add Astro build/E2E when integration or
-  generated endpoints change.
-- Redirect generator or deployment behavior: run the Astro build, inspect generated `_redirects`,
-  and test relevant HTTP behavior locally where possible.
-- Dependency or workspace changes: install with the frozen lockfile when appropriate, then run the
-  affected package checks and the PR-CI command set.
-
-PR CI is narrower than the repository's full local check surface: after a frozen install, it runs
-the workspace-cleanup test, Astro lint, Astro check, and Playwright E2E. It does not directly run
-root lint, root format check, package type-checks, or the OGP package unit tests. Run omitted checks
-locally when the change touches their ownership area.
-
-## Completion criteria
-
-Before reporting completion:
-
-1. Relevant checks exit successfully; tests must report zero unexpected failures.
-2. Generated-output behavior and command side effects have been reviewed for the changed area.
-3. `git status --short`, `git diff --stat`, and the full relevant `git diff` contain only intended
-   changes; also use the authored-Markdown checks above whenever those paths were touched.
-4. No temporary server, watcher, generated artifact, credential, or unrelated formatting change is
-   left behind.
-5. Report commands actually run, their results, and anything still unverified. Do not claim a CI,
-   deployment, browser, or network result that was not observed.
+Use the smallest relevant checks, then widen for cross-cutting changes. Command lists, pull-request
+CI job steps, local-vs-CI gaps, and completion criteria are defined only in
+[docs/development.md](docs/development.md) (sections **Select checks by change**, **Local checks
+versus GitHub Actions**, and **Final review**).

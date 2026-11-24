@@ -37,8 +37,16 @@ bundles. Dependencies stay external, and the OGP bundle emits its imported fonts
 Both watchers reuse their package's `build:bundle` command. Keep bundling after TypeScript so it does
 not leave unbundled entry points in `dist`.
 
-`pnpm build` incrementally builds all packages, generates Cloudflare redirect rules, and builds the
-Astro static output. `wrangler.toml` uses this root command and publishes `apps/astro-blog/dist`.
+`pnpm build` incrementally builds all packages, generates Cloudflare redirect rules, runs Astro
+build, and emits public Markdown artifacts into `apps/astro-blog/dist` via
+`scripts/generate-markdown-artifacts.mjs`.
+
+Deployment uses Cloudflare Workers with Static Assets (`wrangler.toml`: `main = "worker/index.mjs"`,
+`[assets].directory = "apps/astro-blog/dist"`, `run_worker_first = true`). The published bundle is
+the whole `dist` tree (HTML, generated `index.md` artifacts, and discovery files such as
+`llms.txt`), with the Worker handling Accept negotiation and response metadata before static
+fallback. Do not remove the Worker entry or Markdown artifact generation when changing routing or
+build output.
 
 ## Select checks by change
 
@@ -68,15 +76,25 @@ For workspace packages:
 
 ```bash
 pnpm --filter @estrivault/content-processor build
+pnpm --filter @estrivault/content-processor test
 pnpm --filter @estrivault/cloudinary-utils build
 pnpm --filter @estrivault/og-image-generator build
 pnpm --filter @estrivault/og-image-generator test
 pnpm type-check # for cross-package type changes
 ```
 
-The OGP tests import built `dist` output and must exit 0 with all Node tests passing.
-`content-processor` and `cloudinary-utils` have no package test script; use build/type checks and the
-relevant Astro check, build, or E2E coverage for consumer-visible changes.
+`content-processor` and `og-image-generator` run Node tests via `node --test`; both must exit 0 with
+all tests passing. The OGP tests import built `dist` output. `cloudinary-utils` has no package test
+script; use build/type checks and the relevant Astro check, build, or E2E coverage for
+consumer-visible changes.
+
+For Worker or public Markdown artifact changes:
+
+```bash
+pnpm test:worker
+pnpm --filter astro-blog run test:source-markdown
+pnpm --filter astro-blog build # regenerates dist Markdown artifacts
+```
 
 ## Astro formatter upgrades
 
@@ -89,12 +107,22 @@ both repository plugins. Astro 7 and plugin 1.0 both default to JSX whitespace h
 
 ## Local checks versus GitHub Actions
 
-Pull-request CI uses Node 22.x and the pnpm version pinned by root `packageManager`. After a frozen
-install, it runs the workspace-cleanup, pnpm-enforcement, Astro-formatting, OGP-workflow, Worker, and source-Markdown
-tests; pnpm-enforcement lint/format checks; Astro lint and check; Playwright Chromium setup; and the
-full Astro E2E suite. It does not directly run root lint, root format check,
-`pnpm type-check`, or the OGP unit tests. Run omitted checks locally when their ownership area
-changes. A local pass does not prove GitHub Actions passed.
+Pull-request CI is defined in `.github/workflows/ci.yml` (job `astro-blog`, name “Lint and E2E”). It
+uses Node 22.x and the pnpm version pinned by root `packageManager`. After `pnpm install
+--frozen-lockfile`, steps run in this order:
+
+1. `pnpm test:clean` — workspace `dist` cleanup contract
+2. `pnpm test:require-pnpm` — pnpm-only install enforcement
+3. `pnpm test:format-astro` — Astro formatter stability
+4. `pnpm test:ogp-workflow` — OGP refresh workflow script (stubbed, no network)
+5. ESLint + Prettier check on pnpm-enforcement scripts, root `package.json`, and `ci.yml`
+6. `pnpm test:worker` and `pnpm --filter astro-blog run test:source-markdown`
+7. `pnpm --filter astro-blog lint` and `check`
+8. Playwright Chromium setup, then `pnpm --filter astro-blog test:e2e`
+
+It does not directly run root `pnpm lint`, `pnpm format:check`, `pnpm type-check`, or
+`pnpm --filter @estrivault/og-image-generator test`. Run omitted checks locally when their
+ownership area changes. A local pass does not prove GitHub Actions passed.
 
 ## OGP metadata: network and mutation boundary
 
