@@ -62,7 +62,9 @@ before continuing.
 - `pnpm install` runs `postinstall` and builds all three workspace packages.
 - `pnpm dev` builds all three workspace packages, then starts the Cloudinary and OGP generator
   watchers plus the Astro server; `content-processor` is not watched.
-- `pnpm build` generates `apps/astro-blog/public/_redirects` before producing the static app.
+- `pnpm build` generates `apps/astro-blog/public/_redirects`, builds Astro, then
+  `apps/astro-blog/scripts/generate-markdown-artifacts.mjs` writes public `index.md` artifacts into
+  `apps/astro-blog/dist`.
 - `pnpm ogp:refresh` reads authored Markdown, makes outbound requests for eligible URLs, and normally
   rewrites `content/ogp-metadata.json`. Use `--dry-run` when no write is intended, but it still
   performs network fetches for URLs selected for refresh.
@@ -91,8 +93,9 @@ before continuing.
   scroll locking, and focus restoration.
 - Production is a Cloudflare Worker plus Static Assets: `wrangler.toml` sets `main` to
   `worker/index.mjs` with `run_worker_first = true`, and `[assets].directory` is
-  `apps/astro-blog/dist`. That directory holds the Astro HTML build **and** generated public Markdown
-  artifacts (`index.md` under post/note paths, plus discovery files). Do not treat the Worker or
+  `apps/astro-blog/dist`. That directory holds the Astro HTML build (including prerendered
+  `llms.txt` / `sitemap.md` routes) **and** build-script Markdown artifacts (`index.md`,
+  `post/<slug>/index.md`, `notes/<slug>/index.md`). Do not treat the Worker or
   Markdown artifacts as optional when changing build or routing. Document URLs omit a trailing slash;
   archive URLs keep one, and archive page 1 omits its page number. Change canonical redirect behavior
   in `generate-redirects.mjs`, never in the ignored generated `_redirects` file.

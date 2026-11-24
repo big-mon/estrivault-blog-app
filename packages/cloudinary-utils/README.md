@@ -4,9 +4,9 @@ Cloudinary画像URLを生成する、リポジトリ内部のワークスペー�
 
 ## API
 
-- `buildUrl(cloudName, publicId, options)` — 本文・カバー画像用の URL を返します。実体は named 変換
-  `t_body`（`c_limit,w_1200,f_auto,q_auto`）のみで、`options` の幅・品質は互換のため残していますが URL
-  には反映されません。
+- `buildUrl(cloudName, publicId, options)` — `cloudName`・`publicId`・`options.w` が無いと throw します。
+  返す URL は常に named 変換 `t_body` 付きの 1 本だけです。`h` / `mode` / `quality` は呼び出し互換用で URL
+  には入りません。
 - `buildSrcSet(cloudName, publicId, options)` — `t_body` の単一 URL をそのまま返します（幅別の
   `srcset` は生成しません）。
 

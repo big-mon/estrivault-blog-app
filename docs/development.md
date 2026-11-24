@@ -38,15 +38,17 @@ Both watchers reuse their package's `build:bundle` command. Keep bundling after 
 not leave unbundled entry points in `dist`.
 
 `pnpm build` incrementally builds all packages, generates Cloudflare redirect rules, runs Astro
-build, and emits public Markdown artifacts into `apps/astro-blog/dist` via
-`scripts/generate-markdown-artifacts.mjs`.
+build, and—via `apps/astro-blog/package.json`'s `build` script—runs
+`apps/astro-blog/scripts/generate-markdown-artifacts.mjs` to write `index.md`,
+`post/<slug>/index.md`, and `notes/<slug>/index.md` under `apps/astro-blog/dist`.
 
 Deployment uses Cloudflare Workers with Static Assets (`wrangler.toml`: `main = "worker/index.mjs"`,
 `[assets].directory = "apps/astro-blog/dist"`, `run_worker_first = true`). The published bundle is
-the whole `dist` tree (HTML, generated `index.md` artifacts, and discovery files such as
-`llms.txt`), with the Worker handling Accept negotiation and response metadata before static
-fallback. Do not remove the Worker entry or Markdown artifact generation when changing routing or
-build output.
+the whole `dist` tree: Astro HTML (including prerendered discovery routes such as `llms.txt` from
+`src/pages/llms.txt.ts` and `sitemap.md` from `src/pages/sitemap.md.ts`), the generated post/note
+Markdown artifacts above, and static assets. The Worker handles Accept negotiation and response
+metadata before static fallback. Do not remove the Worker entry or Markdown artifact generation when
+changing routing or build output.
 
 ## Select checks by change
 
