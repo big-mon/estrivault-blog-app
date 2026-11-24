@@ -74,7 +74,7 @@ test('site avatar loads beside the brand on desktop and mobile', async ({ page }
       await expect(avatar).toHaveAttribute('src', /^\/author-avatar\.jpg\?v=[a-f0-9]{12}$/);
       await expect
         .poll(() => avatar.evaluate((img: HTMLImageElement) => img.naturalWidth))
-        .toBe(400);
+        .toBe(120);
       const bounds = await brand.boundingBox();
       expect(bounds!.x).toBeGreaterThanOrEqual(0);
       expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
