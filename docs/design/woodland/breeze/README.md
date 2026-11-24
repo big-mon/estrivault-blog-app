@@ -1,16 +1,33 @@
-# Visible, localized breeze and ripples
+# Breeze and ripple captures
 
-The cloud cadence remains one CSS pixel every 0.5 seconds. This refinement changes only plant details and water.
+Elapsed-time samples at 390, 820, and 1440px (approximately 0, 1.5, 3, 4.5, and 6 seconds).
 
-- Tree trunks and crown silhouettes are fixed. Small leaf-color patches shift 0 → 1 → 2 → 3 SVG pixels and back in a repeating 3-second cycle (four held positions in each 1.5-second leg). At mobile/tablet scale the total excursion is 3 CSS pixels; at full desktop scale it is 6 CSS pixels.
-- Sparse grass clusters use the same three-pixel excursion over a 4-second round trip. The right-side foliage has a phase offset so both sides do not move in lockstep.
-- Two groups of water highlights move 0 → 6 SVG pixels and back over six seconds, with seven held integer-pixel positions in each three-second leg. The second group is offset by 1.5 seconds. Opacity stays between 0.8 and 1, avoiding disappearance or flashing. Mobile ripple strokes are three pixels high instead of two so the narrow water band remains legible. Shorelines and the water body stay fixed.
-- All movement uses existing CSS transforms/opacity. Reduced motion removes it; offscreen and hidden-document pause behavior is retained. No dependency, timer, or rendering loop was added.
+## 390px
 
-## Visual and regression evidence
+| Time | Screenshot                   |
+| ---- | ---------------------------- |
+| 0s   | [390-0s.png](390-0s.png)     |
+| 1.5s | [390-1.5s.png](390-1.5s.png) |
+| 3s   | [390-3s.png](390-3s.png)     |
+| 4.5s | [390-4.5s.png](390-4.5s.png) |
+| 6s   | [390-6s.png](390-6s.png)     |
 
-The five actual elapsed-time screenshots for each width (390, 820, 1440) show approximately 0, 1.5, 3, 4.5, and 6 seconds. `observations.json` records geometry and computed transforms at each capture. They include the full reading area to make its stationary position reviewable.
+## 820px
 
-The browser regression samples actual motion for six seconds at each width. It checks that the selected leaf and water details are within the visible scene, cover their full 3/6 SVG-pixel excursion, and leave tree silhouettes and reading-panel geometry stationary. Existing cloud cadence, loop endpoints, reduced-motion, offscreen pause, overflow, archive, notes, and footer checks remain in the full suite.
+| Time | Screenshot                   |
+| ---- | ---------------------------- |
+| 0s   | [820-0s.png](820-0s.png)     |
+| 1.5s | [820-1.5s.png](820-1.5s.png) |
+| 3s   | [820-3s.png](820-3s.png)     |
+| 4.5s | [820-4.5s.png](820-4.5s.png) |
+| 6s   | [820-6s.png](820-6s.png)     |
 
-These are headless Linux Chromium captures, not a physical iOS test. Perceptibility is supported by visible paired frames and measured movement, not a claim about every observer or device. Existing Library transfer restrictions remain; images are committed for review in the draft PR.
+## 1440px
+
+| Time | Screenshot                     |
+| ---- | ------------------------------ |
+| 0s   | [1440-0s.png](1440-0s.png)     |
+| 1.5s | [1440-1.5s.png](1440-1.5s.png) |
+| 3s   | [1440-3s.png](1440-3s.png)     |
+| 4.5s | [1440-4.5s.png](1440-4.5s.png) |
+| 6s   | [1440-6s.png](1440-6s.png)     |
