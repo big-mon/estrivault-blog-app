@@ -45,7 +45,8 @@ build, and—via `apps/astro-blog/package.json`'s `build` script—runs
 Deployment uses Cloudflare Workers with Static Assets (`wrangler.toml`: `main = "worker/index.mjs"`,
 `[assets].directory = "apps/astro-blog/dist"`, `run_worker_first = true`). The published bundle is
 the whole `dist` tree: Astro HTML (including prerendered discovery routes such as `llms.txt` from
-`src/pages/llms.txt.ts` and `sitemap.md` from `src/pages/sitemap.md.ts`), the generated post/note
+`apps/astro-blog/src/pages/llms.txt.ts` and `sitemap.md` from
+`apps/astro-blog/src/pages/sitemap.md.ts`), the generated post/note
 Markdown artifacts above, and static assets. The Worker handles Accept negotiation and response
 metadata before static fallback. Do not remove the Worker entry or Markdown artifact generation when
 changing routing or build output.
